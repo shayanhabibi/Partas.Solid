@@ -62,7 +62,8 @@ Which would render the Html
 
 Ontop of the above, we also can pass properties down to nested children while maintaining reactivity:
 
-> [!IMPORTANT] Setting default properties and splitting properties/spreading now has all the mergeProps and splitProps abstracted away
+> [!TIP]
+> Setting default properties and splitting properties/spreading now has all the mergeProps and splitProps abstracted away
 
 ```fsharp
 type [<Erase>] CustomTag() =
