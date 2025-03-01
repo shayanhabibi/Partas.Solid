@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <WarningsAsErrors>3239;0025</WarningsAsErrors>
+        <PackageId>Partas.Solid.FablePlugin</PackageId>
+        <Title>Partas.Solid.FablePlugin</Title>
+        <RootNamespace>Partas.Solid</RootNamespace>
+        <AssemblyNamespace>Partas.Solid.FablePlugin</AssemblyNamespace>
+        <PackageTags>Partas;F#;FSharp;Plugin;fable-javascript;Compiler;Fable;Solid;Solidjs</PackageTags>
+        <Company>F# Community</Company>
+        <Description>Fable plugin; an opinionated derivative of Oxpecker.Solid.FablePlugin</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Authors>Shayan Habibi, Vladimir Schur and contributors</Authors>
+        <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
+        <Version>0.1.0</Version>
+        <PackageVersion>0.1.0</PackageVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Fable.AST" Version="4.6.0" />
+    </ItemGroup>
+
+</Project>
