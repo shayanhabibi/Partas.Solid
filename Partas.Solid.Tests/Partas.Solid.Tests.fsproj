@@ -4,18 +4,53 @@
         <TargetFramework>net9.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
+        <IsTestProject>true</IsTestProject>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Tests.fs"/>
-        <Compile Include="Program.fs"/>
+        <Compile Include="SolidCases\LibraryImport\Shared.fs" />
+        <Compile Include="SolidCases\TagsNoChildren\TagsNoChildren.fs" />
+        <None Include="SolidCases\TagsNoChildren\TagsNoChildren.fsproj" />
+        <None Include="SolidCases\TagsNoChildren\TagsNoChildren.expected" />
+        <Compile Include="SolidCases\LibraryImport\LibraryImport.fs" />
+        <None Include="SolidCases\LibraryImport\LibraryImport.fsproj" />
+        <None Include="SolidCases\LibraryImport\LibraryImport.expected" />
+        <None Include="SolidCases\TagExtensions\TagExtensions.fsproj" />
+        <Compile Include="SolidCases\TagExtensions\TagExtensions.fs" />
+        <None Include="SolidCases\TagExtensions\TagExtensions.expected" />
+        <Compile Include="SolidCases\ImportedTagsWithExtensions\Shared.fs" />
+        <None Include="SolidCases\ImportedTagsWithExtensions\ImportedTagsWithExtensions.fsproj" />
+        <Compile Include="SolidCases\ImportedTagsWithExtensions\ImportedTagsWithExtensions.fs" />
+        <None Include="SolidCases\ImportedTagsWithExtensions\ImportedTagsWithExtensions.expected" />
+        <Compile Include="Common.fs" />
+        <Compile Include="SolidTests.fs" />
+        <Compile Include="Program.fs" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="6.0.2"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1"/>
-        <PackageReference Include="xunit" Version="2.9.2"/>
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2"/>
+        <PackageReference Include="coverlet.collector" Version="6.0.2" >
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Fable.Browser.Dom" Version="2.18.1" />
+        <PackageReference Include="Fable.Core" Version="4.4.0" />
+        <PackageReference Include="Fable.Promise" Version="3.2.0" />
+        <PackageReference Include="Fli" Version="1.111.10" />
+        <PackageReference Include="FsUnit.xUnit" Version="7.0.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+        <PackageReference Include="xunit" Version="2.9.2" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+        <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Partas.Solid\Partas.Solid.fsproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="obj\" />
+    </ItemGroup>
+    
 </Project>

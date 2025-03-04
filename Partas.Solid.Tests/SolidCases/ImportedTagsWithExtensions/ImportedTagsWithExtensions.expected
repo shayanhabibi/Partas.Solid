@@ -1,0 +1,31 @@
+import { splitProps } from "solid-js";
+import { FakeImport } from "FakeLibrary";
+import { CustomTag } from "./Shared.fs.jsx";
+
+export function NoPropsOneExtension(props) {
+    const [local, others] = splitProps(props, []);
+    return <FakeImport key="value" />;
+}
+
+export function PropsWithExtension(props) {
+    const [local, others] = splitProps(props, []);
+    return <CustomTag class="testClass"
+        key="value" />;
+}
+
+export function NoPropsExtensionChain(props) {
+    const [local, others] = splitProps(props, []);
+    return <CustomTag key="value"
+        key2="value2" />;
+}
+
+export function PropsWithExtensionChain(props) {
+    const [local, others] = splitProps(props, []);
+    return <FakeImport class="Tester"
+        draggable="drag"
+        key="value"
+        key2="value2"
+        key3="value3"
+        key4="value4" />;
+}
+

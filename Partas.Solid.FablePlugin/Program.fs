@@ -405,6 +405,8 @@ module internal rec AST =
                 // TODO - check imp against tagName before lifting
                 imp |> tagFinalizer
                 fromExpressions context props @ propList
+            | Tags.Call.NoChildrenWithHandler(NoChildren(_, props, _)) ->
+                fromExpressions context props @ propList
             | _ -> propList
 
     type TagSource =
@@ -932,7 +934,7 @@ type SolidTypeComponentAttribute(typ: SolidAssistance) =
                     |> Helpers.Baked.convertSettersToObject
                 Sequential([mergeExpr; bodyWithSplitter]) // add mergeProps to head of body
             else
-                newBody // if no items in array then carry on
+                bodyWithSplitter // if no items in array then carry on
         let name =
             match memberDecl with
             | SomeDecl -> memberDecl.Name 
@@ -950,10 +952,13 @@ type SolidTypeComponentAttribute(typ: SolidAssistance) =
 
     new() = SolidTypeComponentAttribute(SolidAssistance.Auto)
     
-// type PrintExpressionAttribute() =
-//     inherit MemberDeclarationPluginAttribute()
-//     override this.FableMinimumVersion = "4.0"
-//     override this.Transform(pluginHelper, file, memberDecl) =
-//         memberDecl
-//     override this.TransformCall(var0, member_, expr) =
-//         expr
+type PrintExpressionAttribute() =
+    inherit MemberDeclarationPluginAttribute()
+    override this.FableMinimumVersion = "4.0"
+    override this.Transform(pluginHelper, file, memberDecl) =
+        Console.WriteLine memberDecl
+        memberDecl
+    override this.TransformCall(var0, member_, expr) =
+        Console.ForegroundColor <- ConsoleColor.Yellow
+        Console.WriteLine expr
+        expr

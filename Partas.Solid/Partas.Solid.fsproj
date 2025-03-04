@@ -11,11 +11,13 @@
         <Company>F# Community</Company>
         <Description>Private fork of Oxpecker.Solid; a F# web framework built on top of Solid.js</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/shayanhabibi/Partas.Solid</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
         <Version>0.1.0</Version>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>0.1.0</PackageVersion>
         <PackageReleaseNotes>Init</PackageReleaseNotes>
     </PropertyGroup>

@@ -3,6 +3,8 @@
 open System.Runtime.CompilerServices
 open Fable.Core
 
+#nowarn 49
+
 [<AutoOpen>]
 module Builder =
 
@@ -33,30 +35,30 @@ module Builder =
 
     type HtmlContainer with
         member inline _.Combine
-            ([<InlineIfLambda>] first: HtmlContainerFun, [<InlineIfLambda>] second: HtmlContainerFun)
+            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
-            fun builder ->
-                first builder
-                second builder
+            fun PARTAS_BUILDER ->
+                PARTAS_FIRST PARTAS_BUILDER
+                PARTAS_SECOND PARTAS_BUILDER
 
         [<Erase>]
         member inline _.Zero() : HtmlContainerFun = ignore
 
         [<Erase>]
-        member inline _.Delay([<InlineIfLambda>] delay: unit -> HtmlContainerFun) : HtmlContainerFun = delay()
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun = PARTAS_DELAY()
 
         [<Erase>]
-        member inline _.Yield(element: #HtmlElement) : HtmlContainerFun = fun cont -> ignore element
+        member inline _.Yield(PARTAS_ELEMENT: #HtmlElement) : HtmlContainerFun = fun PARTAS_YIELD -> ignore PARTAS_ELEMENT
 
         [<Erase>]
-        member inline _.Yield(text: string) : HtmlContainerFun = fun cont -> ignore text
+        member inline _.Yield(PARTAS_TEXT: string) : HtmlContainerFun = fun PARTAS_YIELD -> ignore PARTAS_TEXT
 
         [<Erase>]
-        member inline _.Yield(text: int) : HtmlContainerFun = fun cont -> ignore text
+        member inline _.Yield(PARTAS_TEXT: int) : HtmlContainerFun = fun PARTAS_YIELD -> ignore PARTAS_TEXT
 
     [<Erase>]
     type HtmlContainerExtensions =
         [<Extension; Erase>]
-        static member Run(this: #HtmlContainer, runExpr: HtmlContainerFun) =
-            runExpr this
-            this
+        static member Run(PARTAS_THIS: #HtmlContainer, PARTAS_RUN: HtmlContainerFun) =
+            PARTAS_RUN PARTAS_THIS
+            PARTAS_THIS

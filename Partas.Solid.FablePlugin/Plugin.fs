@@ -47,6 +47,12 @@ type IdentType =
     | ReturnVal
     | Constructor
     | Props
+    | Yield
+    | First
+    | Element
+    | Second
+    | Builder
+    | Delay
     | Other
 
 type PluginContext =
@@ -128,9 +134,9 @@ type PropInfo = string * Expr
 type PropList = PropInfo list
 
 type TagInfo =
-    | WithBuilder of tagName: TagSource * propsAndChildren: CallInfo * range: SourceLocation option
+    | WithBuilder of tagName: TagSource * propsAndChildren: Expr list * range: SourceLocation option
     | Constructor of tagName: TagSource * props: Expr list * range: SourceLocation option
-    | Combined of tagName: TagSource * props: Expr list * propsAndChildren: CallInfo * range: SourceLocation option
+    | Combined of tagName: TagSource * props: Expr list * propsAndChildren: Expr list * range: SourceLocation option
 
 type ElementBuilder =
     {
@@ -329,6 +335,19 @@ module Baked =
             Type.Any,
             None
         )
+    let wrapChildrenExpression childrenExpression =
+        Value(
+            kind =
+                NewTuple(
+                    values =
+                        [ Value(kind = StringConstant "children", range = None)
+                          TypeCast(childrenExpression, Type.Any)
+
+                          ],
+                    isStruct = false
+                ),
+            range = None
+        )
 module internal rec AST =
     // Broadly speaking, the transformation should prioritise capturing Exprs which are resulting in tags and
     // redirecting them to a different transformation tree.
@@ -376,6 +395,11 @@ module internal rec AST =
                 _,
                 _ ) -> Some()
             | _ -> None
+        let (|NativeImportedConstructor|_|) (ctx: PluginContext) = function
+            | Import({Kind = MemberImport(MemberRef({ FullName = Helpers.StartsWith "Partas.Solid.Tags" ctx }, _))}, _, _)
+                & ImportedConstructor ctx ->
+                Some()
+            | _ -> None
         let (|ImportedSetter|_|) (ctx: PluginContext) = function
             | Import(
                 {
@@ -408,6 +432,16 @@ module internal rec AST =
                 _
                 ) -> Some compiledName
             | _ -> None
+        let (|ImportedContainerExtensionName|_|) (ctx: PluginContext) = function
+            | Import(
+                {
+                    Selector = Helpers.StartsWith "HtmlContainerExtensions_"
+                    Kind = MemberImport(MemberRef.PartasName ctx _  & MemberRef(_, { CompiledName = compiledName }))
+                },
+                _,
+                _
+                ) -> Some compiledName
+            | _ -> None
             
 
     module Ident =
@@ -419,6 +453,12 @@ module internal rec AST =
             | { Name = Helpers.StartsWith "returnVal"; Type = Type.PartasName ctx _ } -> IdentType.ReturnVal
             | { Name = Helpers.EndsWith "_$ctor"; Type = Type.PartasName ctx _ } -> IdentType.Constructor
             | { Name = "props"; IsThisArgument = true; Type = Type.PartasName ctx _ } -> IdentType.Props
+            | { Name = Helpers.StartsWith "PARTAS_YIELD"; Type = Type.PartasName ctx _ } -> IdentType.Yield
+            | { Name = Helpers.StartsWith "PARTAS_BUILDER"; Type = Type.PartasName ctx _ } -> IdentType.Builder
+            | { Name = Helpers.StartsWith "PARTAS_FIRST" } -> IdentType.First
+            | { Name = Helpers.StartsWith "PARTAS_SECOND" } -> IdentType.Second
+            | { Name = Helpers.StartsWith "PARTAS_ELEMENT" } -> IdentType.Element
+            | { Name = Helpers.StartsWith "PARTAS_DELAY" } -> IdentType.Delay
             | _ -> IdentType.Other
     module Type =
         /// Recursively explores a `Type` AST node until either returning the tail part of a DeclaredType fullname,
@@ -438,8 +478,7 @@ module internal rec AST =
             | Type.DelegateType(_, PartasName ctx tagSource) -> Some tagSource
             | Type.LambdaType(_, PartasName ctx tagSource) -> Some tagSource
             | _ -> None
-            
-                
+  
     module CallInfo =
         let (|PropertySetter|_|) (ctx: PluginContext) = function
             | { ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.Props)) } ->
@@ -519,6 +558,24 @@ module internal rec AST =
                 (prop, transform ctx expr)
                 |> Some
             | _, _ -> None
+        // Captured method/Extension call
+        | Call(
+            Value(ValueKind.UnitConstant, None),
+            {
+                MemberRef = Some(MemberRef(_, { CompiledName = extensionName }))
+                Args = exprs
+            },
+            Type.MetaType,
+            None
+            ) ->
+            match extensionName, exprs with
+            | "attr", [ Value(StringConstant prop, _); value ] ->
+                (prop, transform ctx value)
+                |> Some
+            | _ ->
+                $"Unhandled extension: {extensionName}\nProvidedValues: {exprs}"
+                |> PluginContext.logError ctx
+                None
         | _ -> None
     
     (*
@@ -537,6 +594,7 @@ module internal rec AST =
     5) Expand expression, recursive transformation, or emit
     *)
     let (|TagConstructor|_|) (ctx: PluginContext) = function
+        // Local tag
         | Call(
             (IdentExpr(Ident.IdentIs ctx IdentType.Constructor)),
             (CallInfo.Constructor ctx as callInfo),
@@ -544,12 +602,30 @@ module internal rec AST =
             range) ->
             TagInfo.Constructor( TagSource.AutoImport typeName, callInfo.Args, range)
             |> Some
+        // Native import
         | Call(
-            (Expr.ImportedConstructor ctx & Import(importee, t, r) ),
+            (Expr.NativeImportedConstructor ctx),
             callInfo,
             (Type.PartasName ctx typeName),
             range) ->
-            TagInfo.Constructor (TagSource.LibraryImport (Import({ importee with Selector = typeName }, t, r)), callInfo.Args, range)
+            TagInfo.Constructor (TagSource.AutoImport typeName, callInfo.Args, range)
+            |> Some
+        // Library Imports
+        | Call(
+            (Expr.ImportedConstructor ctx & Import({Kind = UserImport false}, _, _) as imp),
+            callInfo,
+            (Type.PartasName ctx typeName),
+            range) ->
+            TagInfo.Constructor (TagSource.LibraryImport imp, callInfo.Args, range)
+            |> Some
+        // Non LibraryImports; ie User defined imports
+        | Call(
+            (Expr.ImportedConstructor ctx & Import(identee, t, r)),
+            callInfo,
+            (Type.PartasName ctx typeName),
+            range) ->
+            let importExpr = Import({identee with Selector = typeName}, t, r)
+            TagInfo.Constructor (TagSource.LibraryImport importExpr, callInfo.Args, range)
             |> Some
         // WITH PROPS - TODO
         | Let(Ident.IdentIs ctx IdentType.ReturnVal, TagConstructor ctx tagInfo, body) ->
@@ -565,15 +641,42 @@ module internal rec AST =
         | Call(Import({ Kind = MemberImport(MemberRef({ FullName = Helpers.EndsWith "HtmlElementExtensions" }, _)) }, _, _) as callee, ({
                 Args = TagConstructor ctx tagInfo :: rest 
             } as callInfo), _, _) ->
+            // We compile all the information of the extension call into the callinfo and make the rest almost impossible to mistake
+            // for a different type of expression. We can then add this to the property list
+            let attributeCall = Call(Expr.Value(ValueKind.UnitConstant, None), { callInfo with Args = rest }, Type.MetaType, None)
             match tagInfo with
             | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
-                TagInfo.Combined(tagSource, props, { propsAndChildren with Args = rest @ propsAndChildren.Args }, range)
+                TagInfo.Combined(tagSource, attributeCall :: props, propsAndChildren, range)
             | TagInfo.Constructor(tagSource, props, range) ->
-                TagInfo.Combined(tagSource, props, { callInfo with Args = rest }, range)
+                TagInfo.Constructor(tagSource, attributeCall :: props, range)
             | TagInfo.WithBuilder(tagSource, propsAndChildren, range) ->
-                TagInfo.WithBuilder(tagSource, { propsAndChildren with Args = rest @ propsAndChildren.Args }, range)
+                TagInfo.Combined(tagSource, [ attributeCall ], propsAndChildren, range)
             |> Some
-            
+        // WITH CHILDREN - TODO
+        | Call(
+            Expr.ImportedContainerExtensionName ctx name,
+            {
+                Args = TagConstructor ctx tagInfo :: rest
+            },
+            typ,
+            range) ->
+            match tagInfo with
+            | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
+                TagInfo.Combined(tagSource, props, rest @ propsAndChildren, range)
+            | TagInfo.Constructor(tagSource, props, range) ->
+                TagInfo.Combined(tagSource, props, rest, range)
+            | TagInfo.WithBuilder(tagSource, propsAndChildren, range)  ->
+                TagInfo.WithBuilder(tagSource, rest @ propsAndChildren, range)
+            |> Some
+        | Let(Ident.IdentIs ctx IdentType.Element, TagConstructor ctx tagInfo, body) ->
+            match tagInfo with
+            | TagInfo.WithBuilder(tagSource, propsAndChildren, range) ->
+                TagInfo.WithBuilder(tagSource, transform ctx body :: propsAndChildren, range )
+            | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
+                TagInfo.Combined(tagSource, props, transform ctx body :: propsAndChildren, range)
+            | TagInfo.Constructor(tagSource, props, range) ->
+                TagInfo.Combined(tagSource, props, [ transform ctx body ], range)
+            |> Some
         | _ -> None
     let renderElement (ctx: PluginContext) (builder: ElementBuilder) =
         
@@ -582,7 +685,11 @@ module internal rec AST =
         let renderTagName = function
             | TagSource.LibraryImport imp -> imp
             | TagSource.AutoImport name -> Value(StringConstant name, None)
-        let internalCollection = (builder.Children @ (builder.Properties |> renderPropList))|> Baked.flattenExpressions
+        // let internalCollection = (builder.Children @ (builder.Properties |> renderPropList))|> Baked.flattenExpressions
+        let internalCollection =
+            (builder.Children |> Baked.flattenExpressions |> Baked.wrapChildrenExpression)
+            :: renderPropList builder.Properties
+            |> Baked.flattenExpressions
         Call(
                 callee = Baked.importJsxCreate,
                 info =
@@ -602,10 +709,9 @@ module internal rec AST =
             
     let collectTagInfo (ctx: PluginContext): TagInfo -> ElementBuilder = function
         | TagInfo.WithBuilder(tagSource, propsAndChildren, range) ->
-            { TagSource = tagSource; Children = []; Properties = [] }
+            { TagSource = tagSource; Children = propsAndChildren |> List.map(transform ctx) |> List.fold (collectChildren ctx) []; Properties = [] }
         | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
-            // Console.WriteLine propsAndChildren
-            { TagSource = tagSource; Children = collectCallInfo ctx propsAndChildren; Properties = collectProperties ctx props }
+            { TagSource = tagSource; Children = propsAndChildren |> List.map(transform ctx) |> List.fold (collectChildren ctx) []; Properties = collectProperties ctx props }
         | TagInfo.Constructor(tagSource, props, range) ->
             { TagSource = tagSource; Children = []; Properties = collectProperties ctx props }
     let collectProperties (ctx: PluginContext): Expr list -> PropInfo list = function
@@ -616,21 +722,28 @@ module internal rec AST =
             expr |> PluginContext.debugDisposal ctx "PropertyCollection"
             collectProperties ctx tail
     
+    let collectChildren (ctx: PluginContext) (currentList: Expr list) (expr: Expr): Expr list =
+        Console.WriteLine expr
+        match expr with
+        | Sequential(Value(Null(Type.Any), None) :: tail) ->
+            (currentList, tail) ||> List.fold (collectChildren ctx)
+        | Sequential(head :: tail) ->
+            head :: ((currentList, tail) ||> List.fold (collectChildren ctx))
+        | Value(Null(Any), None) ->
+            currentList
+        | expr ->
+            expr |> PluginContext.debugDisposal ctx "ChildrenCollection"
+            (expr :: currentList)
+    
     let transform (ctx: PluginContext) (expr: Expr)=
         match expr with
         // TODO
         | TagConstructor ctx tagInfo ->
-            // Console.ForegroundColor <- ConsoleColor.Yellow
-            // Console.WriteLine(callee)
-            // Console.ResetColor()
-            // callInfo.Args
-            // |> List.map (transform ctx)
-            // |> Baked.flattenExpressions
-            // Value(ValueKind.Null(Type.Any), None)
             tagInfo |> collectTagInfo ctx |> renderElement ctx
         // TODO
-        | Sequential expressions ->
-            expressions
+        | Sequential(Value(Null(Any), None) :: exprs)
+        | Sequential exprs ->
+            exprs
             |> List.map (transform ctx)
             |> Sequential
         // IMPORTANT - Must come before the PropertySetter recognizer
@@ -659,9 +772,48 @@ module internal rec AST =
         | AttributeExpression ctx propInfo ->
             PluginContext.logWarning ctx $"Attribute expression was parsed at the top level and was reduced out:\n{propInfo}"
             snd propInfo
+        | CurriedApply(expr, _, _, _) ->
+            transform ctx expr
+        // This is a builder or yield emitting a string or element
+        | Lambda(Ident.IdentIs ctx IdentType.Builder,
+                 Sequential(TypeCast(expr, Unit) :: next), _) ->
+            expr :: next
+            |> Sequential
+            |> transform ctx
+        // Yield emitting an element or string
+        | Lambda(Ident.IdentIs ctx (IdentType.Builder | IdentType.First | IdentType.Second),
+                 expr, _)
+        | Lambda(Ident.IdentIs ctx IdentType.Yield,
+                 TypeCast(expr, Unit), _) ->
+            transform ctx expr
+        | Let(
+            Ident.IdentIs ctx (
+                IdentType.First
+              | IdentType.Builder
+              | IdentType.Second
+                ),
+            value,
+            body
+            )
+         ->
+            Sequential[value; body]
+            |> transform ctx
+        | IdentExpr(Ident.IdentIs ctx _) ->
+            Value(Null(Type.Any), None) // FATALITY!
         | _ as expr -> expr
+        //     Value(UnitConstant, None)
+        // // ^ use this when constructing patterns to prevent errors obfuscating the screen
 
-            
+(*
+    The AST goes as follows:
+        Without the builder, (aka without children) tags are just
+        Calls to a constructor of the tag type. The constructor call will have the
+        properties and what not within its args. Any method calls are displayed as
+        such as the callee. The first arg of this method call will be the object
+        to which it is applied (ie the constructor) and thereafter the values are
+        the arguments.
+        
+*)
 module internal rec SchemaRules =
     let (|ValidMemberRef|_|) (ctx: PluginContext) (memberDecl: MemberDecl) =
         match memberDecl with
@@ -686,9 +838,9 @@ type SolidTypeComponentAttribute() =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
-        // Console.WriteLine "\nSTART MEMBER DECL!!!"
-        // Console.WriteLine memberDecl.Body
-        // Console.WriteLine "END MEMBER DECL!!!\n"
+        Console.WriteLine "\nSTART MEMBER DECL!!!"
+        Console.WriteLine memberDecl.Body
+        Console.WriteLine "END MEMBER DECL!!!\n"
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
         match memberDecl with
         | SchemaRules.ValidMemberRef ctx finalName ->
@@ -697,7 +849,8 @@ type SolidTypeComponentAttribute() =
                 |> AST.transform ctx
                 |> Baked.convertGettersToObject (PluginContext.getGetters ctx)
                 |> Baked.convertSettersToObject (PluginContext.getSetters ctx)
-            { memberDecl with Body = newExpr }
+            // Console.WriteLine memberDecl
+            { memberDecl with Body = newExpr; Name = finalName }
             
             
         | _ ->

@@ -9,7 +9,6 @@ open Fable.Core.JsInterop
 
 [<AutoOpen>]
 module Tags =
-
     /// Fragment (or template) node, only renders children, not itself
     [<Erase>]
     type Fragment() =
@@ -61,7 +60,7 @@ module Tags =
     // they can be referenced within the JSX DSL
     type HtmlTag with
         [<Erase>]
-        member private this.``__SPREAD_PROPERTY__``
+        member this.``__SPREAD_PROPERTY__``
             with set (value: obj) = ()
         member this.spreadObj
             with inline set (value: obj) = this.``__SPREAD_PROPERTY__`` <- value
@@ -69,7 +68,7 @@ module Tags =
         member this.children
             with get(): HtmlElement = jsNative
         [<Erase>]
-        member private this.``class``
+        member this.``class``
             with get() : string = ""
         [<Erase>]
         member this.id
