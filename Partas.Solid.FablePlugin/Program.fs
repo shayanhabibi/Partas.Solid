@@ -1,4 +1,7 @@
-﻿namespace Partas.Solid
+﻿// Deprecated/Historical
+// See Plugin.fs for current iteration.
+
+namespace Partas.Solid
 
 open System
 open Fable

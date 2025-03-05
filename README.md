@@ -103,113 +103,18 @@ Will be uploaded to nuget soon(tm)
 
 Purposeful attribute change to allow simultaneous use from mainstream by changing `[<SolidComponent>]` to `[<SolidTypeComponent>]`.
 
-# Current Progress
+# REWRITE
 
-I have undertaken to completely rewrite the plugin, but keeping much of the Oxpecker.Solid library.
+I have undertaken to rewrite the plugin to be more aggressive in transformation so that things such as tags within if/else statements with extensions etc etc are supported by default, not because of adding extra patterns, but because the transformations are recursively applied to all expressions. This will likely increase compile times, and this will be measured when a sizeable example is prepared.
 
-I intend my version to be more aggressive in transformation, and to be more sensible in active recognition.
+For me, the native support of some type of 'context' within the transformations also allows support of features like automatically
+producing mergeProps (to set defaults at the top level) and splitProps, while keeping type safety. This has already been implemented.
 
-As an example, there is only one TagConstructor/Builder/Tag recognizer. This pattern must successfully capture ALL cases of tag builders regardless of method chains, children etc. The pattern seeks the constructors when nested in chains, and lifts them to the top, to also simplify library import/member import patterns.
+As I progress, I will also look at for/loops to see about automatically producing the relevant Solid construct.
+Naturally, these behaviours will have opt-out flags when finalised.
 
-> Previous patterns to recognize constructors
+As it deviates further from Oxpecker.Solid, the chance of a merge might decrease as my intention differs from Oxpecker.Solid, in that I intend to allow full creation of components that are usable and flexible with the same syntax, completely within F#.
 
-```fsharp
-let (|ConstructorBuilder|_|) (expr: Expr) =
-    let condition =
-        fun importInfo ->
-            [ "HtmlContainerExtensions_Run"; "BindingsModule_Extensions_run" ]
-            |> List.map importInfo.Selector.StartsWith
-            |> List.exists ((=) true)
+This allows me to write my components in F#, create a component library with the flexibility of jsx element attributes/properties, and use that library in the Oxpecker.Solid style DSL/Syntax within subsequent functions, with the freedom to choose whether end usage is entirely by f# functions, or in Oxpecker.Solid DSL.
 
-    match expr with
-    | CallTag condition tagCallInfo -> Some tagCallInfo
-    | _ -> None
-let (|Constructor|_|) (expr: Expr) =
-    let condition = _.Selector.EndsWith("_$ctor")
-
-    match expr with
-    | CallTag condition (_, _, range) & LibraryTagImport(tagName, _) -> Some(LibraryImport tagName, range)
-    | CallTag condition (tagName, _, range) -> Some(tagName, range)
-    | _ -> None
-let (|TextNoSiblings|_|) =
-    function
-    | Lambda({ Name = cont }, TypeCast(textBody, Unit), None) when cont.StartsWith("cont") -> Some textBody
-    | _ -> None
-
-module Let =
-    let (|NoChildrenNoProps|NoChildrenWithProps|WithChildren|InvalidExpr|) =
-        function
-        | Let(_, Tags.ConstructorBuilder(withChildrenTag), _) ->
-            WithChildren(TagInfo.WithChildren withChildrenTag)
-        | Let(_, Tags.Constructor(tagName, range), Sequential exprs) ->
-            NoChildrenWithProps(TagInfo.NoChildren(tagName, exprs, range))
-        | Let(_, Tags.Constructor(tagName, range), _) ->
-            NoChildrenNoProps(TagInfo.NoChildren(tagName, [], range))
-        | _ as expr -> InvalidExpr(expr)
-
-module Call =
-    let (|NoChildrenWithHandler|_|) =
-        function
-        | Call(Import(ImportInfo.HtmlElementExtension _, _, _),
-               {
-                   Args = arg :: _
-               },
-               _,
-               range) as expr ->
-            match arg with
-            | Tags.Constructor(tagName, _) -> TagInfo.NoChildren(tagName, [ expr ], range) |> Some
-            | LibraryTagImport(imp, _) -> TagInfo.NoChildren(LibraryImport imp, [expr], range) |> Some
-            | Tags.Let.NoChildrenWithProps(TagInfo.NoChildren(tagName, props, _)) -> TagInfo.NoChildren(tagName, expr :: props, range) |> Some
-            | Let(_, LibraryTagImport(imp, _), Sequential exprs) -> TagInfo.NoChildren(LibraryImport imp, expr :: exprs, range) |> Some 
-            | NoChildrenWithHandler(TagInfo.NoChildren(tagName, props, _)) -> TagInfo.NoChildren(tagName, expr :: props, range) |> Some
-            | _ -> None
-            
-            
-        | _ -> None
-```
-
-> Redesigned recogniz**er**
-
-```fsharp
-let (|TagConstructor|_|) (ctx: PluginContext) = function
-    | Call(
-        (IdentExpr(Ident.IdentIs ctx IdentType.Constructor)),
-        (CallInfo.Constructor ctx as callInfo),
-        ((Type.PartasName ctx (Helpers.EndsWithTrimmed "_$ctor" typeName)) | (Type.PartasName ctx typeName)),
-        range) ->
-        TagInfo.Constructor( TagSource.AutoImport typeName, callInfo.Args, range)
-        |> Some
-    | Call(
-        (Expr.ImportedConstructor ctx & Import(importee, t, r) ),
-        callInfo,
-        (Type.PartasName ctx typeName),
-        range) ->
-        TagInfo.Constructor (TagSource.LibraryImport (Import({ importee with Selector = typeName }, t, r)), callInfo.Args, range)
-        |> Some
-    // WITH PROPS - TODO
-    | Let(Ident.IdentIs ctx IdentType.ReturnVal, TagConstructor ctx tagInfo, body) ->
-        match tagInfo with
-        | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
-            TagInfo.Combined(tagSource, body :: props, propsAndChildren, range)
-        | TagInfo.Constructor(tagSource, props, range) ->
-            TagInfo.Constructor(tagSource, body :: props, range)
-        | TagInfo.WithBuilder(tagSource, propsAndChildren, range) ->
-            TagInfo.Combined(tagSource, [ body ], propsAndChildren, range)
-        |> Some
-    // WITH PROPS & EXTENSION - TODO
-    | Call(Import({ Kind = MemberImport(MemberRef({ FullName = Helpers.EndsWith "HtmlElementExtensions" }, _)) }, _, _) as callee, ({
-            Args = TagConstructor ctx tagInfo :: rest 
-        } as callInfo), _, _) ->
-        match tagInfo with
-        | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
-            TagInfo.Combined(tagSource, props, { propsAndChildren with Args = rest @ propsAndChildren.Args }, range)
-        | TagInfo.Constructor(tagSource, props, range) ->
-            TagInfo.Combined(tagSource, props, { callInfo with Args = rest }, range)
-        | TagInfo.WithBuilder(tagSource, propsAndChildren, range) ->
-            TagInfo.WithBuilder(tagSource, { propsAndChildren with Args = rest @ propsAndChildren.Args }, range)
-        |> Some
-        
-    | _ -> None
-```
-
-It also incorporates a context pattern to allow the use of the Fable warning/errors logger etc, and to allow behaviours like lifting property accesses and assignments. 
+This probably doesn't make sense but I'm really tired :)
