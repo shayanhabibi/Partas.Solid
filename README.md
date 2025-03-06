@@ -1,5 +1,11 @@
 # Partas.Solid
 
+> [!WARNING]
+> This is not compatible with Fable 4.0, as the
+> Plugin is not detected correctly.
+> 
+> Use the latest 5.0 alpha, or wait for full release.
+
 > [!IMPORTANT]
 > This is an opinionated fork of [Oxpecker.Solid](https://github.com/lanayx/Oxpecker) that
 > enables experimental behaviours and patterns which I use in personal projects.
@@ -12,109 +18,181 @@
 
 ## Features
 
-The feature set contained within this is a modified transformation or alternate transformation
-which can be applied to the type definitions of your tags/elements. This allows a UserDefined custom tag rather than only allowing Library Imported tags.
+### Reduce undefined behaviour
+
+Hugely opinionated, but I feel that reducing all transformation
+to a few pathways which expressions must all traverse simplifies
+the cognitive load for developing the plugin. The bulk of the code is
+boiler plate reduction for Expr pattern matches. 
+
+I feel this iteration has less specific pattern matchers, which prevents what might some deem as undocumented behaviour.
+
+As an example, currently Oxpecker would perform the following conversion:
 
 ```fsharp
-namespace Partas.Solid.Test
+let mutable show = true
 
-open Partas.Solid
-open Fable.Core
-
-type [<Erase>] CustomTag() =
-    inherit RegularNode()
-    [<SolidTypeComponent>]
-    member private props.typeDef () =
-        div() { "Hi" }
+[<SolidComponent>]
+let Button () =
+    let this = button() {
+        "some boiler plate"
+    }
+    div(class'="MyButton") {
+        if show then this else ()
+    }
 ```
-
-Compiles to
-
 ```jsx
-function CustomTag(props) {
-    return <div> Hi </div>;
+export let show = createAtom(true);
+
+export function Button() {
+    return <button>
+        some boiler plate
+    </button>;
 }
 ```
 
-We can now utilise this like any other tag:
+As opposed to the proposed iteration:
 
-```fsharp
-module App
-open Partas.Solid.Test
-
-[<SolidTypeComponent>]
-let App () =
-    CustomTag()
-```
 ```jsx
-import { CustomTag } from "./Program.fs.jsx"
+export let show = createAtom(true);
 
-export function App() {
-    return <CustomTag />;
-}
-```
-
-Which would render the Html
-
-```html
-<div>Hi</div>
-```
-
-Ontop of the above, we also can pass properties down to nested children while maintaining reactivity:
-
-> [!TIP]
-> Setting default properties and splitting properties/spreading now has all the mergeProps and splitProps abstracted away
-
-```fsharp
-type [<Erase>] CustomTag() =
-    inherit RegularNode()
-    [<SolidTypeComponent>]
-    member private props.typeDef () =
-        props.class' <- "DefaultClass" // setting properties will set the 'default'
-        div(class' = props.class') {
-            button(spreadObj = props)
-        }
-```
-```jsx
-function CustomTag(props) {
-    props = mergeProps({
-        class: "DefaultClass",
-    }, props);
-    const [local, others] = splitProps(props, ["class"]);
-    return <div class={local.class}>
-        <button {...others} />
+export function Button() {
+    const this$ = <button>
+        some boiler plate
+    </button>;
+    return <div class="MyButton">
+        {show() ? this$ : undefined}
     </div>;
 }
 ```
 
-## Rough Edges
+Using ternary conditional expressions in solid-js works, although there is
+also the `<Match>` or `<Show>` tags.
 
-Oxpecker.Solid is a great DSL and works for most use cases. However, I've encountered many rough edges when it comes to LibraryImports especially. In the process of developing these behaviours, I've fixed several of those issues. But in the process, perhaps I've created more.
+### Custom Tags & Components in Oxpecker Syntax
 
-If you do decide to play with this and find some odd behaviours, please let me know.
+Currently, Oxpecker doesn't support the ability to create components and then use them in the Oxpecker style.
 
-# Usage
+Naturally, this is because a functional approach would not use the DSL to construct final pages, and use functions instead. But creating a permissive and flexible component library wouldn't work in this manner without being extremely verbose.
 
-## Installation
+As an alternative, the current iteration provides an extra attribute which can be applied to members of your type definition for the tag using `props` as the self identifier. The self identifier, props, allows type safe access to your defined properties which can be set in Oxpecker style.
 
-Will be uploaded to nuget soon(tm)
+Any accesses to your properties are automatically split, and you can spread whatever other properties into a tag to allow prop drilling, or to integrate with other component libraries that might use providers etc.
 
-## Attribute
+As an added benefit, there is sugar for setting the defaults of any property using `<-`.
 
-Purposeful attribute change to allow simultaneous use from mainstream by changing `[<SolidComponent>]` to `[<SolidTypeComponent>]`.
+```fsharp
+// -- Program.fs
+type [<Erase>] CustomTag() =
+    inherit RegularNode()
+    
+    [<SolidTypeComponent>]
+    member private props.typeDef =
+    
+        props.class' <- "DefaultClass" // setting properties will set the 'default'
+        
+        div(class' = props.class') {
+        
+            button().spread(props)
+            
+        }
+```
 
-# REWRITE
+```jsx
+function CustomTag(props) {
+    
+    props = mergeProps({
+        class: "DefaultClass",
+    }, props);
+    
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["class"]);
+    
+    return <div class={PARTAS_LOCAL.class}>
+        
+        <button {...PARTAS_OTHERS} bool:n$={false} />
+        
+    </div>;
+}
+```
 
-I have undertaken to rewrite the plugin to be more aggressive in transformation so that things such as tags within if/else statements with extensions etc etc are supported by default, not because of adding extra patterns, but because the transformations are recursively applied to all expressions. This will likely increase compile times, and this will be measured when a sizeable example is prepared.
+> [!NOTE]
+> There is a pull in discussion on Fable that will prevent the need for the noop `bool:n$={false}` after the spread.
 
-For me, the native support of some type of 'context' within the transformations also allows support of features like automatically
-producing mergeProps (to set defaults at the top level) and splitProps, while keeping type safety. This has already been implemented.
+You can use those tags like any other import from other files, and from the standard attribute `SolidComponent`:
 
-As I progress, I will also look at for/loops to see about automatically producing the relevant Solid construct.
-Naturally, these behaviours will have opt-out flags when finalised.
+```fsharp
+// -- Test.fs
+open Program
 
-As it deviates further from Oxpecker.Solid, the chance of a merge might decrease as my intention differs from Oxpecker.Solid, in that I intend to allow full creation of components that are usable and flexible with the same syntax, completely within F#.
+[<SolidComponent>]
+let SomeTag () =
 
-This allows me to write my components in F#, create a component library with the flexibility of jsx element attributes/properties, and use that library in the Oxpecker.Solid style DSL/Syntax within subsequent functions, with the freedom to choose whether end usage is entirely by f# functions, or in Oxpecker.Solid DSL.
+    let this = button() { "some boiler plate" }
+    
+    CustomTag(class'="MyButton") {
+    
+        if show then this else ()
+        
+    }
+```
 
-This probably doesn't make sense but I'm really tired :)
+```jsx
+import { createAtom } from "./fable_modules/fable-library-js.5.0.0-alpha.11/Util.js";
+import { CustomTag } from "./Program.fs.jsx";
+
+export let show = createAtom(true);
+
+export function SomeTag() {
+    
+    const this$ = <button>
+        some boiler plate
+    </button>;
+    
+    return <CustomTag class="MyButton">
+        {show() ? this$ : undefined}
+    </CustomTag>;
+}
+```
+
+You can set those defaults in a deeply nested tree where you actually make use of them. As an example of where/what undefined behaviour looks like currently, I've included this example despite it producing unsatisfactory output. This would be the first time I've actually tested this capability!
+
+```fsharp
+type [<Erase>] CustomTag() =
+    inherit RegularNode()
+    [<SolidTypeComponent>]
+    member private props.typeDef =
+        div(){
+            div(class' = props.class') {
+                button().spread(props)
+                props.class' <- "ProximalDefaultDefinition"            
+            }
+        }
+```
+
+```jsx
+function CustomTag(props) {
+    props = mergeProps({
+        class: "ProximalDefaultDefinition",
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["class"]);
+    return <div>
+        <div class={PARTAS_LOCAL.class}>
+            <button {...PARTAS_OTHERS} bool:n$={false} />
+            {(value) => {
+            }}
+        </div>
+    </div>;
+}
+```
+
+To prevent undefined behaviour further, I can easily add an error when a property is set twice, for safety.
+
+## Conclusion
+
+If you like this kind of thing DSL, let me know!
+
+I'll  be developing a component library that will make heavy usage of the type definition feature to allow you to copy paste and change what you want.
+
+### Install
+
+This will be published as a package to test this when I've completed a comprehensive testing suite.
