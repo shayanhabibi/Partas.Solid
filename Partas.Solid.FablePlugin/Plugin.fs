@@ -433,6 +433,11 @@ module internal rec AST =
                 range
             ) ->
             Value(NewAnonymousRecord(values |> List.map (transform ctx), fieldNames, types, isStruct), range)
+        | Value(
+                NewArray(ArrayValues exprs, typ, kind),
+                range
+            ) ->
+            Value(NewArray(ArrayValues (exprs |> List.map (transform ctx)), typ, kind), range)
         | _ as expr -> expr
 
 type SolidTypeComponentAttribute() =

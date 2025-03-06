@@ -1,5 +1,7 @@
 import { splitProps, mergeProps } from "solid-js";
 import { cva } from "class-variance-authority";
+import { twMerge } from "tailwind-merge";
+import { clsx } from "clsx";
 
 export function SimpleCombination(props) {
     props = mergeProps({
@@ -49,5 +51,11 @@ export function Button(props) {
             size: PARTAS_LOCAL.size,
             variant: PARTAS_LOCAL.variant,
         })}
+        {...PARTAS_OTHERS} bool:n$={false} />;
+}
+
+export function AccordionItem(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["class"]);
+    return <button class={twMerge(clsx(["border-b", PARTAS_LOCAL.class]))}
         {...PARTAS_OTHERS} bool:n$={false} />;
 }

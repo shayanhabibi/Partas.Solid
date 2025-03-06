@@ -87,3 +87,11 @@ type Button() =
     member props.constructor =
         button(class' = button.variants({|size = props.size; variant = props.variant|}))
             .spread props
+
+[<Erase>]
+type AccordionItem() =
+    inherit button()
+    [<SolidTypeComponent>]
+    member props.constructor =
+        button(class' = Lib.cn [| "border-b"; props.class' |])
+            .spread props
