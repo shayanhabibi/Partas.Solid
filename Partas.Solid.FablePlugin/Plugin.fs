@@ -1,5 +1,17 @@
 ﻿namespace Partas.Solid
-
+// The majority of this plugin behaviour is enabled by the following pattern matchers and functions:
+// - BuilderCollector
+//     Collects everything in the tag builder computations 
+// - PropsCollector
+//     Collects all the properties passed to tag constructors
+// - TagConstructor
+//     Matches any tag constructor
+// - transform
+//     Entry point for almost every expression
+// Everything else is pretty much just sugar for reducing boiler plate by identifying simple patterns in Exprs.
+// A lot of heavy sugar use with patterns against Expr and Ident node patterns using:
+// - Ident.IdentIs
+// - Helpers.StartsWith | Helpers.EndsWith | Helpers.StartsWithTrimmed | etc
 open System
 open Fable
 open Fable.AST
@@ -250,7 +262,9 @@ module Baked =
             Type = jsxElementType
             IsMutable = false; IsThisArgument = false; IsCompilerGenerated = true; Range = None
         })
-
+    /// Converts property setters into a sugar for setting their defaults by
+    /// converting them into a mergeProps, which merges an object with the key,value pairs
+    /// against the given props (ie overwritting any double ups).
     let convertSettersToObject (values: (string * Expr) list) (rest: Expr) =
         match values with
         | [] -> rest
@@ -289,6 +303,8 @@ module Baked =
                 )
                 rest
             ]
+    /// It renders the JSX splitProps, with the given values split into PARTAS_LOCAL, and the rest
+    /// into PARTAS_OTHERS
     let convertGettersToObject (values: string list) (rest: Expr) =
         Expr.Let(
             ident =
@@ -345,6 +361,7 @@ module Baked =
         (emptyList, exprs)
         ||> List.fold (fun acc prop ->
             Value(kind = NewList(headAndTail = Some(prop, acc), typ = listItemType), range = None))
+    /// Renders a identifier getter in the JSX of `PARTAS_LOCAL.{getter-target}`
     let propGetter (getTarget: string) =
         Get(
             IdentExpr
@@ -465,7 +482,12 @@ module internal rec AST =
 
     module Ident =
         /// where we can, we use ridiculous names in computations so that the chance of user AST
-        /// accidentally being transformed as one of these patterns is almost nil.
+        /// accidentally being transformed as one of these patterns is almost nil. It also simplifies
+        /// debugging the resulting JSX since they are easy to identify.
+        /// Unfortunately, this is incompatible with builders for types that have the Import attribute
+        // The Import attribute causes the builders to produce default names for functions and just generally
+        // ruins the vibe. If this causes issue with native bindings etc, then either the plugin will have to
+        // take all cases and inject them manually, or tackle matching the generated names and identifiers.
         let (|IdentIs|) (ctx: PluginContext): Ident -> IdentType = function
             | { Name = Helpers.StartsWith "returnVal"; Type = Type.PartasName ctx _ } -> IdentType.ReturnVal
             | { Name = Helpers.EndsWith "_$ctor"; Type = Type.PartasName ctx _ } -> IdentType.Constructor
@@ -642,7 +664,7 @@ module internal rec AST =
                     when fable5 ->
                     Some("{..." + ident + "} bool:n$", Value(ValueKind.BoolConstant(false), None))
                 | "spread", [ expr ]
-                    when fable5 ->
+                    when fable4 ->
                     $"Spread does not support this as a value in Fable 4 or below:\n{expr}"
                     |> PluginContext.logError ctx
                     None
@@ -794,11 +816,9 @@ module internal rec AST =
             Expr.ImportedContainerExtensionName ctx "Run", // run is being called. builder being applied to obj. obj is arg 1.
             {   // Check the first argument, which is the argument this is being called against, for the constructor which called it.
                 Args = TagConstructor ctx tagInfo :: BuilderCollector ctx rest // The rest are the computations being applied
-                // The rest need to be transformed, pass them back to the transformer.
             },
             typ,
             range) ->
-            // 
             match tagInfo with
             | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
                 TagInfo.Combined(tagSource, props, rest @ propsAndChildren, range)
@@ -848,17 +868,11 @@ module internal rec AST =
             { TagSource = tagSource; Children = propsAndChildren; Properties = props }
         | TagInfo.Constructor(tagSource, props, range) ->
             { TagSource = tagSource; Children = []; Properties = props }
-    
-
             
     /// Transforms a single expression before wrapping it in a list and feeding it back to the BuilderCollector.
     let (|BuilderCollectorFeedback|) (ctx: PluginContext): Expr -> Expr list = fun e -> [ transform ctx e ] |> function
         | BuilderCollector ctx feedback -> feedback
     
-    // I'll be very honest, and I can really use some help here,
-    // I have no ****ing idea how this pattern correctly organises
-    // the expressions. A review is appreciated :) just note
-    // that I reverse the list on render - TODO
     /// This active recognizer is a bit more psychotic in terms of recursion
     let (|BuilderCollector|) (ctx: PluginContext): Expr list -> Expr list = function
         | [] -> []
@@ -866,12 +880,6 @@ module internal rec AST =
             headBuilds @ tailBuilds
         | expr :: BuilderCollector ctx restBuilds ->
             match expr with
-            // | Call(
-            //     (Get(IdentExpr(Ident.IdentIs ctx IdentType.RouterBuilder), _, _, _)
-            //    | Import({ Selector = "uncurry2" }, Any, None)),
-            //     { Args = BuilderCollector ctx body },
-            //     _, _) ->
-            //     body @ restBuilds
             | Let(Ident.IdentIs ctx (IdentType.Element | IdentType.First | IdentType.Text),
                   BuilderCollectorFeedback ctx value,
                   BuilderCollectorFeedback ctx body
@@ -886,7 +894,6 @@ module internal rec AST =
             | CurriedApply(BuilderCollectorFeedback ctx applied, BuilderCollector ctx args, typ, range) ->
                 if args.IsEmpty then applied @ restBuilds
                 else CurriedApply(applied.Head, args, typ, range) :: restBuilds
-                // args @ applied @ restBuilds
             | Lambda(
                 Ident.IdentIs ctx IdentType.Cont,
                 TypeCast(Lambda(item, Lambda(index, BuilderCollectorFeedback ctx expr, _), _), _),
@@ -900,7 +907,7 @@ module internal rec AST =
                 _
                 ) -> expr @ restBuilds
             | IdentExpr(Ident.IdentIs ctx IdentType.Other) ->
-                expr :: restBuilds // wtf is this? ok. go on through sir.
+                expr :: restBuilds // Non builder identifier
             | TypeCast(Value(StringConstant _, _) as text, Unit) ->
                  text :: restBuilds
             | TypeCast(BuilderCollectorFeedback ctx expr, typ) ->
@@ -922,7 +929,6 @@ module internal rec AST =
             
             // This is one of our builder identifiers; no reason it should be rendered.
             | IdentExpr(_)
-            // Some transformation said 'na'.
             | Value(UnitConstant, None) -> restBuilds // You have been judged unworthy
             // Trust the F# compiler to not allow invalid elements within the builder.
             | _ ->
@@ -961,28 +967,15 @@ module internal rec AST =
             CurriedApply(transform ctx applied, exprs |> List.map (transform ctx), typ, range )
         | Delegate(args, body, name, tags) ->
             Delegate(args, transform ctx body, name, tags)
-        // | Lambda(ident, expr, name) ->
-        //     Lambda(ident, transform ctx expr, name)
-        // | CurriedApply(expr, _, _, _) ->
-        //     transform ctx expr
+        | Lambda(ident, expr, name) ->
+            Lambda(ident, transform ctx expr, name)
         | Let(ident, value, body) ->
             Let(ident, transform ctx value, transform ctx body)
         | Call(callee, callInfo, typ, range) ->
             Call(callee, { callInfo with Args = callInfo.Args |> List.map (transform ctx) }, typ, range)
             
         | _ as expr -> expr
-        //     Value(UnitConstant, None)
-        // // ^ use this as a result stub when constructing patterns to prevent errors obfuscating the screen
 
-(*
-    The AST goes as follows:
-        Without the builder, (aka without children) tags are just
-        Calls to a constructor of the tag type. The constructor call will have the
-        properties and what not within its args. Any method calls are displayed as
-        such as the callee. The first arg of this method call will be the object
-        to which it is applied (ie the constructor) and thereafter the values are
-        the arguments.
-*)
 module internal rec SchemaRules =
     let (|ValidMemberRef|_|) (ctx: PluginContext) (memberDecl: MemberDecl) =
         match memberDecl with

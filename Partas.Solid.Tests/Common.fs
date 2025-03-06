@@ -9,7 +9,7 @@ let runCase folderName caseName =
     cli {
         Shell CMD
         WorkingDirectory dir
-        Command "fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx"
+        Command "dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx"
     }
     |> Command.execute
     |> fun output ->
