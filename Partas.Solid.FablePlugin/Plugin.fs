@@ -412,7 +412,7 @@ module internal rec AST =
                 targets
                 |> List.map (fun (target, expr) -> target, transform ctx expr)
                 )
-        | TypeCast(expr, DeclaredType _) -> transform ctx expr
+        | TypeCast(expr, (DeclaredType _ | Any)) -> transform ctx expr
         // We SHOULD NOT be capturing attribute expressions at this level. This is the only pattern that we don't want
         // gobble gobbled. But... Perhaps this points to redundancy in property collection.
         | AttributeExpression ctx propInfo ->
@@ -428,16 +428,20 @@ module internal rec AST =
             Let(ident, transform ctx value, transform ctx body)
         | Call(callee, callInfo, typ, range) ->
             Call(callee, { callInfo with Args = callInfo.Args |> List.map (transform ctx) }, typ, range)
-            
+        | Value(
+                NewAnonymousRecord(values, fieldNames, types, isStruct),
+                range
+            ) ->
+            Value(NewAnonymousRecord(values |> List.map (transform ctx), fieldNames, types, isStruct), range)
         | _ as expr -> expr
 
 type SolidTypeComponentAttribute() =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
-        // Console.WriteLine "\nSTART MEMBER DECL!!!"
-        // Console.WriteLine memberDecl.Body
-        // Console.WriteLine "END MEMBER DECL!!!\n"
+        Console.WriteLine "\nSTART MEMBER DECL!!!"
+        Console.WriteLine memberDecl.Body
+        Console.WriteLine "END MEMBER DECL!!!\n"
         let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
         match memberDecl with
         | SchemaRules.ValidMemberRef ctx finalName ->
