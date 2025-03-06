@@ -444,7 +444,7 @@ type SolidTypeComponentAttribute() =
             let newExpr =
                 memberDecl.Body
                 |> AST.transform ctx
-                |> Baked.convertGettersToObject (PluginContext.getGetters ctx)
+                |> Baked.convertGettersToObject (PluginContext.getGetters ctx |> List.distinct)
                 |> Baked.convertSettersToObject (PluginContext.getSetters ctx)
             { memberDecl with Body = newExpr; Name = finalName }
         | _ ->

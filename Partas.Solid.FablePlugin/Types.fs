@@ -111,11 +111,28 @@ module internal PluginContext =
     /// This will complete the transformation before emitting all collected errors.
     let logError = _.Helper.LogError
     
+    /// Access the setter array without clearing it
+    let peekSetters = _.SetterArray.ToArray() >> Array.toList
+    
+    /// Access the getter array without clearing it
+    let peekGetters = _.GetterArray.ToArray() >> Array.toList
+    
+    /// Logs a warning if a setter key has already been provided a value.
+    let checkDuplicateSetter (ctx: PluginContext) (setter: string * Expr) =
+        ctx
+        |> _.SetterArray
+        |> _.Exists(fst >> (=) (fst setter))
+        |> function
+            | true -> $"Multiple defaults for the same property in a `SolidTypeComponent` are not allowed: '{fst setter}' was set more than once" |> logWarning ctx
+            | false -> ()
+            
     /// <summary>
     /// Adds an attribute (or more precise to say the element <c>props</c>) property set name and the value
     /// it is being set to. This is lifted at the end of the transformations to produce a <c>solid-js</c> mergeProps.
     /// </summary>
-    let addSetter = _.SetterCollector
+    let addSetter ctx setter=
+        checkDuplicateSetter ctx setter
+        ctx.SetterCollector setter
     
     /// <summary>
     /// Adds an attribute (or more precise to say the element <c>props</c>) property access selector to the context.
@@ -123,11 +140,6 @@ module internal PluginContext =
     /// </summary>
     let addGetter = _.GetterCollector
     
-    /// Access the setter array without clearing it
-    let peekSetters = _.SetterArray.ToArray() >> Array.toList
-    
-    /// Access the getter array without clearing it
-    let peekGetters = _.GetterArray.ToArray() >> Array.toList
     
     /// <summary>
     /// Lift the getter array values. This clears the context values for the array. Use <c>peekGetters</c> to observe
