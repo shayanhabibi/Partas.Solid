@@ -195,4 +195,4 @@ I'll  be developing a component library that will make heavy usage of the type d
 
 ### Install
 
-This will be published as a package to test this when I've completed a comprehensive testing suite.
+`dotnet add package Partas.Solid`

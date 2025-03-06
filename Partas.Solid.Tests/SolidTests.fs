@@ -26,3 +26,15 @@ let ``Imported Tags With Extensions`` () =
 [<Fact>]
 let ``Tags with child elements`` () =
     runSolidCase "ChildrenSimple"
+
+[<Fact>]
+let ``Default property setting`` () =
+    runSolidCase "MergeProps"
+
+[<Fact>]
+let ``Property accessing with splitProps`` () =
+    runSolidCase "SplitProps"
+
+[<Fact>]
+let ``mergeProps splitProps and property spreading`` () =
+    runSolidCase "CombinedSpread"

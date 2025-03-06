@@ -1,0 +1,18 @@
+import { splitProps, mergeProps } from "solid-js";
+
+export function SimpleCombination(props) {
+    props = mergeProps({
+        class: "ClassDefault",
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["class"]);
+    return <div>
+        Some text
+        <span class={PARTAS_LOCAL.class}>
+            More text
+        </span>
+        <div {...PARTAS_OTHERS} bool:n$={false}>
+            All but class have been spread into this tag!
+        </div>
+    </div>;
+}
+
