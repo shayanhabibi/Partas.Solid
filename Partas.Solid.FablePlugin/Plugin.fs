@@ -75,7 +75,7 @@ module internal rec AST =
                 Baked.propGetter prop |> Some
             | PropertySetter ctx (prop, expr) ->
                 PluginContext.addSetter ctx (prop, transform ctx expr)
-                Expr.Value(ValueKind.Null(Type.Any), None)
+                Expr.Value(UnitConstant, None)
                 |> Some
             | _ -> None
         // Determines at top level whether the current expression could be considered
@@ -435,9 +435,9 @@ type SolidTypeComponentAttribute() =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
-        Console.WriteLine "\nSTART MEMBER DECL!!!"
-        Console.WriteLine memberDecl.Body
-        Console.WriteLine "END MEMBER DECL!!!\n"
+        // Console.WriteLine "\nSTART MEMBER DECL!!!"
+        // Console.WriteLine memberDecl.Body
+        // Console.WriteLine "END MEMBER DECL!!!\n"
         let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
         match memberDecl with
         | SchemaRules.ValidMemberRef ctx finalName ->
