@@ -22,6 +22,9 @@
         <None Include="SolidCases\ImportedTagsWithExtensions\ImportedTagsWithExtensions.fsproj" />
         <Compile Include="SolidCases\ImportedTagsWithExtensions\ImportedTagsWithExtensions.fs" />
         <None Include="SolidCases\ImportedTagsWithExtensions\ImportedTagsWithExtensions.expected" />
+        <None Include="SolidCases\ChildrenSimple\ChildrenSimple.fsproj" />
+        <None Include="SolidCases\ChildrenSimple\ChildrenSimple.expected" />
+        <Compile Include="SolidCases\ChildrenSimple\ChildrenSimple.fs" />
         <Compile Include="Common.fs" />
         <Compile Include="SolidTests.fs" />
         <Compile Include="Program.fs" />

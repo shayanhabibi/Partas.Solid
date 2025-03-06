@@ -1,24 +1,24 @@
 import { splitProps } from "solid-js";
 
 export function NoPropsOneExtension(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <div key="value" />;
 }
 
 export function PropsWithExtension(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <div class="testClass"
         key="value" />;
 }
 
 export function NoPropsExtensionChain(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <div key="value"
         key2="value2" />;
 }
 
 export function PropsWithExtensionChain(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <div class="Tester"
         draggable="drag"
         key="value"

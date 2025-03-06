@@ -1,9 +1,5 @@
 ﻿namespace Partas.Solid
 
-// This will take a different approach of being more contextually driven and parsing deep into expression trees.
-// The returned tree will be ordered appropriately by default.
-// We will attempt to handle all edge cases through thorough testing.
-
 open System
 open Fable
 open Fable.AST
@@ -16,7 +12,8 @@ do ()
 /// for use in the environment based on the language target etc
 [<RequireQualifiedAccess>]
 module FableRequirements =
-    let [<Literal>] version = "4.0"
+    // Fable 4 does not detect the plugin
+    let [<Literal>] version = "5.0"
     let (|Language|_|) (input: PluginHelper) =
         match input.Options.Language with
         | Language.JavaScript -> Some()
@@ -28,12 +25,13 @@ module FableRequirements =
         | _ -> None
 
 /// Identifies what type of member the transformation sequence originated from
-[<RequireQualifiedAccess; Struct>]
+/// Currently ?unutilised
+[<RequireQualifiedAccess>]
 type TransformationKind =
     | MemberDecl
     | MemberCall
     | TypeMemberDecl
-
+/// Used in Active Pattern Matches to identify if a MemberRef is one of these
 [<RequireQualifiedAccess>]
 type MemberRefType =
     | Setter
@@ -42,20 +40,38 @@ type MemberRefType =
     | Generated
     | None
 
+// [<RequireQualifiedAccess>]
+// type EnumType =
+//     | Enumerator
+//     | CopyStruct
+//     | GetEnumerator
+//     | Next
+//     | Current
 /// Idents we are interested in that impact the flow of transformation.
 [<RequireQualifiedAccess>]
 type IdentType =
-    | ReturnVal
-    | Constructor
-    | Props
+    | ReturnVal // Compiler generated
+    | Constructor // Partas type with _$ctor
+    | Props // identifies props identifier
+    // | Enumerator of EnumType
+    // Builder - PARTAS_{...}
     | Yield
     | First
-    | Element
     | Second
+    | Element
     | Builder
     | Delay
-    | Other
+    | Cont
+    | Value
+    | Text
+    // Special cases
 
+    // Unknown
+    | Other
+    
+/// A record which is passed through almost all transformation patterns and methods.
+/// It can therefor be used to pass contextual information, or access the plugin helper
+/// from within the transformation tree (to shoot out a warning or something)
 type PluginContext =
     {
         Helper: PluginHelper
@@ -65,7 +81,6 @@ type PluginContext =
         SetterCollector: (string * Expr) -> unit
         GetterCollector: string -> unit
     }
-
 [<RequireQualifiedAccess>]
 module PluginContext =
     let create helper kind =
@@ -78,24 +93,56 @@ module PluginContext =
             GetterCollector = fun _ -> ()
         }
         { ctx with SetterCollector = ctx.SetterArray.Add; GetterCollector = ctx.GetterArray.Add }
-        
+    /// Get the PluginHelper from the context    
     let helper = _.Helper
+    /// Get the Entity from an EntityRef
     let getEntity = _.Helper.GetEntity
+    /// Get the MemberFunctionOrValue from a MemberRef
     let getMember = _.Helper.GetMember
+    /// Emit a msg on Fable compilation as a warning
     let logWarning = _.Helper.LogWarning
+    /// Emit a msg on Fable compilation as an error.
+    /// This will complete the transformation before emitting all collected errors.
     let logError = _.Helper.LogError
+    /// <summary>
+    /// Adds an attribute (or more precise to say the element <c>props</c>) property set name and the value
+    /// it is being set to. This is lifted at the end of the transformations to produce a <c>solid-js</c> mergeProps.
+    /// </summary>
     let addSetter = _.SetterCollector
+    /// <summary>
+    /// Adds an attribute (or more precise to say the element <c>props</c>) property access selector to the context.
+    /// This is lifted at the end of the transformations to produce a <c>solid-js</c> splitProps.
+    /// </summary>
     let addGetter = _.GetterCollector
-    let peekSetter = _.SetterArray.ToArray() >> Array.toList
-    let peekGetter = _.GetterArray.ToArray() >> Array.toList
+    /// Access the setter array without clearing it
+    let peekSetters = _.SetterArray.ToArray() >> Array.toList
+    /// Access the getter array without clearing it
+    let peekGetters = _.GetterArray.ToArray() >> Array.toList
+    /// <summary>
+    /// Lift the getter array values. This clears the context values for the array. Use <c>peekGetters</c> to observe
+    /// the elements without clearing them.
+    /// </summary>
     let getGetters (ctx: PluginContext) =
-        let getters = peekGetter ctx
+        let getters = peekGetters ctx
         ctx.GetterArray.Clear()
         getters
+    /// <summary>
+    /// Lift the setter array values. This clears the context values for the array. Use <c>peekSetters</c> to observe
+    /// the elements without clearing them.
+    /// </summary>
     let getSetters (ctx: PluginContext) =
-        let setters = peekSetter ctx
+        let setters = peekSetters ctx
         ctx.SetterArray.Clear()
         setters
+    /// <summary>
+    /// When disposing of an expression (ie not including it in the final transformation tree), you can apply this
+    /// func with a <c>PluginContext</c> and a context string (such as in what process this is occuring, eg: 'property
+    /// collection') to log a warning of the disposed expression when the fable cli is passed the <c>--verbose</c> flag. <br/>
+    /// This is useful for trying to debug why an expression might not be rendering on transpilation.
+    /// </summary>
+    /// <param name="ctx"></param>
+    /// <param name="disposalContext"></param>
+    /// <param name="expr"></param>
     let debugDisposal (ctx: PluginContext) (disposalContext: string) (expr: Expr)=
         ctx
         |> helper
@@ -115,26 +162,22 @@ module PluginContext =
                     | Some range ->
                         helper.LogWarning(msg, range)
                     | _ -> helper.LogWarning(msg)
+/// DU which holds a string of the name for the Tag, or an expression containing the name of the tag, and where it
+/// should be imported from on compilation.
 [<RequireQualifiedAccess>]
 type TagSource =
     | AutoImport of tagName: string
     | LibraryImport of importExpr: Expr
-
-module TagSource =
-    module AutoImport =
-        let create value = TagSource.AutoImport value
-    module LibraryImport =
-        let create value = TagSource.LibraryImport value
-    let transform = function
-        | TagSource.AutoImport tagName ->
-            Value(StringConstant(tagName), None)
-        | TagSource.LibraryImport expr ->
-            expr
-
+/// <summary>
+/// Alias for a <c>string * Expr</c> tuple which are compiled into an attribute key,value pair.
+/// </summary>
 type PropInfo = string * Expr
+/// Alias for a list of PropInfos (which in turn is an alias for a string Expr tuple)
 type PropList = PropInfo list
 
-// TODO - refactor out?
+/// Helper DU to help discriminate between a tag which is just a constructor (ie no children), an empty constructor with a
+/// builder computation (ie has children, but no properties), or a combination of both a constructor with properties, and
+/// a builder computation (has children)
 type TagInfo =
     | WithBuilder of tagName: TagSource * propsAndChildren: Expr list * range: SourceLocation option
     | Constructor of tagName: TagSource * props: PropList * range: SourceLocation option
@@ -148,17 +191,6 @@ type ElementBuilder =
         Properties: PropList
         Children: Expr list
     }
-module ElementBuilder =
-    let bindTagSource from target = { target with TagSource = from.TagSource }
-    let appendProperties from target = { target with Properties = target.Properties @ from.Properties }
-    let appendChildren from target = { target with Children = target.Children @ from.Children }
-    let combine from target =
-        target
-        |> bindTagSource from
-        |> appendProperties from
-        |> appendChildren from
-    let addChild child target = { target with Children = child :: target.Children }
-    let addProperty prop target = { target with Properties = prop :: target.Properties }
 
 /// Variety of useful Pattern Recognizers for dealing with strings within pattern matchers
 [<RequireQualifiedAccess>]
@@ -183,22 +215,9 @@ module Helpers =
         | EndsWithTrimmed "'" s -> trimReservedIdentifiers s
         | EndsWithTrimmed "`1" s -> trimReservedIdentifiers s
         | s -> s
-    let rec (|StartsWithEither|_|) (possibles: string list) (input: string) =
-        possibles
-        |> List.exists input.StartsWith
-    let rec (|EndsWithEither|_|) (possibles: string list) (input: string) =
-        possibles
-        |> List.exists input.EndsWith
-    let getTailOfFullName (fullName: string) =
-        fullName.Split('.')
-        |> Array.rev
-        |> Array.head
-        |> trimReservedIdentifiers
     
 /// Prebaked expressions. Most reused constructors should be lifted into this module.
 module Baked =
-    let renderProp ((name: string, expr: Expr): PropInfo) = Value(NewTuple([ Value(StringConstant name, None); TypeCast(expr, Type.Any) ], false), None)
-    let renderAttribute (name: string, expr: Expr): Expr = renderProp (name, expr)
     let importMergeProps =
         Import(
             { Selector = "mergeProps"
@@ -227,7 +246,7 @@ module Baked =
     
     let spreadPropertyExpression =
         IdentExpr({
-            Name = "others"
+            Name = "PARTAS_OTHERS"
             Type = jsxElementType
             IsMutable = false; IsThisArgument = false; IsCompilerGenerated = true; Range = None
         })
@@ -274,7 +293,7 @@ module Baked =
         Expr.Let(
             ident =
                 {
-                    Name = "[local, others]"
+                    Name = "[PARTAS_LOCAL, PARTAS_OTHERS]"
                     Type = Type.Any
                     IsMutable = false
                     IsThisArgument = false
@@ -329,7 +348,7 @@ module Baked =
     let propGetter (getTarget: string) =
         Get(
             IdentExpr
-                { Name = "local"
+                { Name = "PARTAS_LOCAL"
                   Type = jsxElementType
                   IsMutable = false
                   IsThisArgument = true
@@ -379,6 +398,11 @@ module internal rec AST =
             let (|PartasName|_|) (ctx: PluginContext): MemberRef option -> string option = function
                 | Some(AST.MemberRef.PartasName ctx name) -> Some name
                 | _ -> None
+    /// Contains active patterns to match expressions against common patterns such as an imported constructor,
+    /// or a setter of an imported property etc.
+    /// Consider the Expr.ImportedConstructor as an example.
+    /// They do not recognize constructors in the sense of TagConstructors. They will recognize any constructor which
+    /// is library imported, or module imported.
     module Expr =
         let (|ImportedConstructor|_|) (ctx: PluginContext) = function
             | Import({
@@ -431,7 +455,7 @@ module internal rec AST =
         let (|ImportedContainerExtensionName|_|) (ctx: PluginContext) = function
             | Import(
                 {
-                    Selector = Helpers.StartsWith "HtmlContainerExtensions_"
+                    Selector = Helpers.StartsWith "HtmlContainerExtensions_" | Helpers.StartsWith "BindingsModule_Extensions"
                     Kind = MemberImport(MemberRef.PartasName ctx _  & MemberRef(_, { CompiledName = compiledName }))
                 },
                 _,
@@ -440,20 +464,34 @@ module internal rec AST =
             | _ -> None
 
     module Ident =
-        let private (|PartasSolidType|_|) (ctx: PluginContext): Type -> unit option = function
-            | DeclaredType({ FullName = Helpers.StartsWith "Partas.Solid" }, _)
-            | LambdaType(_, PartasSolidType ctx ) -> Some()
-            | _ -> None
+        /// where we can, we use ridiculous names in computations so that the chance of user AST
+        /// accidentally being transformed as one of these patterns is almost nil.
         let (|IdentIs|) (ctx: PluginContext): Ident -> IdentType = function
             | { Name = Helpers.StartsWith "returnVal"; Type = Type.PartasName ctx _ } -> IdentType.ReturnVal
             | { Name = Helpers.EndsWith "_$ctor"; Type = Type.PartasName ctx _ } -> IdentType.Constructor
             | { Name = "props"; IsThisArgument = true; Type = Type.PartasName ctx _ } -> IdentType.Props
+            // | { Name = "enumerator"; IsCompilerGenerated = true } -> IdentType.Enumerator(EnumType.Enumerator)
+            // | { Name = (
+            //         Helpers.StartsWithTrimmed "System.Collections.Generic.IEnumerator`1." value
+            //       | Helpers.StartsWithTrimmed "System.Collections.IEnumerator." value
+            //         ); IsCompilerGenerated = true } ->
+            //     match value with
+            //     | Helpers.StartsWith "get_Current" -> EnumType.Current
+            //     | Helpers.StartsWith "MoveNext" -> EnumType.Next
+            //     | _ ->
+            //         $"Got a identity for an enumerator func with an unhandled subtype: {value}"
+            //         |> PluginContext.logError ctx
+            //         EnumType.Enumerator
+            //     |> IdentType.Enumerator
             | { Name = Helpers.StartsWith "PARTAS_YIELD"; Type = Type.PartasName ctx _ } -> IdentType.Yield
-            | { Name = Helpers.StartsWith "PARTAS_BUILDER"; Type = Type.PartasName ctx _ } -> IdentType.Builder
             | { Name = Helpers.StartsWith "PARTAS_FIRST" } -> IdentType.First
             | { Name = Helpers.StartsWith "PARTAS_SECOND" } -> IdentType.Second
             | { Name = Helpers.StartsWith "PARTAS_ELEMENT" } -> IdentType.Element
+            | { Name = Helpers.StartsWith "PARTAS_BUILDER"; Type = Type.PartasName ctx _ } -> IdentType.Builder
             | { Name = Helpers.StartsWith "PARTAS_DELAY" } -> IdentType.Delay
+            | { Name = Helpers.StartsWith "PARTAS_CONT" } -> IdentType.Cont
+            | { Name = Helpers.StartsWith "PARTAS_VALUE" } -> IdentType.Value
+            | { Name = Helpers.StartsWith "PARTAS_TEXT" } -> IdentType.Text
             | _ -> IdentType.Other
     module Type =
         /// Recursively explores a `Type` AST node until either returning the tail part of a DeclaredType fullname,
@@ -473,7 +511,9 @@ module internal rec AST =
             | Type.DelegateType(_, PartasName ctx tagSource) -> Some tagSource
             | Type.LambdaType(_, PartasName ctx tagSource) -> Some tagSource
             | _ -> None
-  
+    /// Contains patterns to match CallInfo's with common member ref or thisarg patterns.
+    /// Honestly, they're only used probably once each in current iterations, but I think
+    /// it helps with the readability of the more complicated patterns.
     module CallInfo =
         let (|PropertySetter|_|) (ctx: PluginContext) = function
             | { ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.Props)) } ->
@@ -491,99 +531,165 @@ module internal rec AST =
                 Args = [ Value(StringConstant eventName, _); handler ] } ->
                 Some(eventName, transform ctx handler)
             | _ -> None
+    [<AutoOpen>]
+    module AttributesAndProperties =
+        /// <summary>
+        /// Recognizes whether current expression is considered a prop setter by
+        /// any of our definitions.
+        /// </summary>
+        /// <remarks>
+        /// It is imperative that this recognizer comes AFTER the PropertyGetter
+        /// since it is greedier and will consume and nullify attribute expressions
+        /// that involve the use of the properties argument.
+        /// </remarks>
+        let private (|PropertySetter|_|) (ctx: PluginContext) = function
+            | Call(_, (CallInfo.PropertySetter ctx as callInfo), _, _)
+                // This is a `props.poop <- 5` type call that had the attribute defined
+                // within the same module/file/type (Local)
+            | Call(Expr.ImportedSetter ctx, callInfo, _, _) ->
+                // This is a `props.class' <- "value"` type call that had the extension
+                // defined in a different module (Imported)
+                match callInfo with
+                | { MemberRef = MemberRef.Option.PartasName ctx name
+                    Args = expr :: _ } ->
+                    Some(name, expr)
+                | _ ->
+                    None
+            | _ -> None
+        /// <summary>
+        /// Recognizes whether current expression is considered a prop setter by any
+        /// of our definitions. 
+        /// </summary>
+        /// <remarks>
+        /// It is imperative that this recognizer in a recursive transformation tree
+        /// comes BEFORE the PropertySetter recognizer. The Setter is greedy, and will
+        /// nullify expressions that are attribute expressions which involve the props ident
+        /// </remarks>
+        let private (|PropertyGetter|_|) (ctx: PluginContext) = function
+            | Call(
+                callee,
+                {
+                    ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.Props))
+                    Args = [ _ ]
+                    MemberRef = MemberRef.Option.PartasName ctx prop
+                } & { MemberRef =Some(MemberRef.MemberRefIs ctx MemberRefType.Getter) },
+                typ,
+                range) as expr ->
+                Some(prop)
+            | _ -> None
+        // Collects and transforms any of our 'special' `props` usage so that we can
+        // later create the splitProps and mergeProps to suit.
+        let (|PropsGetterOrSetter|_|) (ctx: PluginContext) = function
+            | PropertyGetter ctx prop ->
+                PluginContext.addGetter ctx prop
+                Baked.propGetter prop |> Some
+            | PropertySetter ctx (prop, expr) ->
+                PluginContext.addSetter ctx (prop, transform ctx expr)
+                Expr.Value(ValueKind.Null(Type.Any), None)
+                |> Some
+            | _ -> None
+        // Determines at top level whether the current expression could be considered
+        // as a attribute expression by any of our definitions
+        let (|AttributeExpression|_|) (ctx: PluginContext) = function
+            | Call(
+                callee,
+                {
+                    ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal))
+                    Args = expr :: _
+                    MemberRef = MemberRef.Option.PartasName ctx prop as memberRef
+                },
+                _,
+                _) ->
+                match callee, memberRef with
+                | Expr.ImportedSetter ctx, _ // Captures properties defined in other modules
+                | _, Some(MemberRef.MemberRefIs ctx MemberRefType.Setter) -> // Captures properties defined in self module
+                    (prop, transform ctx expr)
+                    |> Some
+                | _, _ -> None
+            // Captured method/Extension call
+            | Call(
+                Value(ValueKind.UnitConstant, None),
+                {
+                    MemberRef = Some(MemberRef(_, { CompiledName = extensionName }))
+                    Args = exprs
+                },
+                Type.MetaType,
+                None
+                ) -> // TODO - handlers for the different extensions that are supported
+                let fable4 = ctx |> PluginContext.helper |> _.Options |> _.Define |> List.contains "FABLE_COMPILER_4"
+                let fable5 = ctx |> PluginContext.helper |> _.Options |> _.Define |> List.contains "FABLE_COMPILER_5"
+                match extensionName, exprs with
+                | (
+                    "on" | "bool" | "data" | "attr"
+                    ), [ Value(StringConstant prop, _); value ] ->
+                    let propName =
+                        match extensionName with
+                        | "bool" | "on" -> $"{extensionName}:{prop}"
+                        | "data" -> $"data-{prop}" 
+                        | "attr" -> prop
+                        | _ -> failwith "Unreachable"
+                    Some(propName, transform ctx value)
+                | ("ref" | "style'" | "classList"), [ identExpr ] ->
+                    Some(extensionName |> Helpers.trimReservedIdentifiers, transform ctx identExpr)
+                | "spread", _ when fable4 ->
+                    $"Spread is not supported in fable4"
+                    |> PluginContext.logError ctx
+                    None
+                | "spread", [ IdentExpr(Ident.IdentIs ctx IdentType.Props) | TypeCast(IdentExpr(Ident.IdentIs ctx IdentType.Props), _) ]
+                    when fable5 ->
+                    Some("{...PARTAS_OTHERS} bool:n$", Value(ValueKind.BoolConstant(false), None))
+                | "spread", [ (TypeCast(IdentExpr({ Name = ident }), _) | IdentExpr({ Name = ident })) ]
+                    when fable5 ->
+                    Some("{..." + ident + "} bool:n$", Value(ValueKind.BoolConstant(false), None))
+                | "spread", [ expr ]
+                    when fable5 ->
+                    $"Spread does not support this as a value in Fable 4 or below:\n{expr}"
+                    |> PluginContext.logError ctx
+                    None
+                // -- FEATURE NOT PRESENT IN FABLE COMPILER YET -- //
+                // | "spread", [ identExpr ] when fable5 -> 
+                //     Some("__SPREAD_PROPERTY__", identExpr)
+                | _ ->
+                    $"Unhandled extension: {extensionName}\nProvidedValues: {exprs}"
+                    |> PluginContext.logError ctx
+                    None
+            | Call(
+                Value(ValueKind.UnitConstant, None),
+                {
+                    MemberRef = (
+                        Some(MemberRef.MemberRefIs ctx MemberRefType.Setter)
+                         & MemberRef.Option.PartasName ctx propName
+                    )
+                    Args = value :: _
+                }, _, _) ->
+                let transformedPropName =
+                    match propName with
+                    | Helpers.StartsWithTrimmed "aria" propName ->
+                        $"aria-{propName.ToLower()}"
+                    | _ -> propName
+                Some(transformedPropName, transform ctx value)
+            | _ -> None
+        /// wraps single expressions in a list and feeds back to the list collector
+        let (|PropCollectorFeeder|) (ctx: PluginContext): Expr -> PropList = fun e -> [ e ] |> function
+            | PropCollector ctx props -> props
             
-    /// <summary>
-    /// Recognizes whether current expression is considered a prop setter by
-    /// any of our definitions.
-    /// </summary>
-    /// <remarks>
-    /// It is imperative that this recognizer comes AFTER the PropertyGetter
-    /// since it is greedier and will consume and nullify attribute expressions
-    /// that involve the use of the properties argument.
-    /// </remarks>
-    let (|PropertySetter|_|) (ctx: PluginContext) = function
-        | Call(_, (CallInfo.PropertySetter ctx as callInfo), _, _)
-            // This is a `props.poop <- 5` type call that had the attribute defined
-            // within the same module/file/type (Local)
-        | Call(Expr.ImportedSetter ctx, callInfo, _, _) ->
-            // This is a `props.class' <- "value"` type call that had the extension
-            // defined in a different module (Imported)
-            match callInfo with
-            | { MemberRef = MemberRef.Option.PartasName ctx name
-                Args = expr :: _ } ->
-                Some(name, expr)
-            | _ ->
-                None
-        | _ -> None
-    /// <summary>
-    /// Recognizes whether current expression is considered a prop setter by any
-    /// of our definitions. 
-    /// </summary>
-    /// <remarks>
-    /// It is imperative that this recognizer in a recursive transformation tree
-    /// comes BEFORE the PropertySetter recognizer. The Setter is greedy, and will
-    /// nullify expressions that are attribute expressions which involve the props ident
-    /// </remarks>
-    let (|PropertyGetter|_|) (ctx: PluginContext) = function
-        | Call(
-            callee,
-            {
-                ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.Props))
-                Args = [ _ ]
-                MemberRef = MemberRef.Option.PartasName ctx prop
-            } & { MemberRef =Some(MemberRef.MemberRefIs ctx MemberRefType.Getter) },
-            typ,
-            range) as expr ->
-            Some(prop)
-        | _ -> None
-    // Collects and transforms any of our 'special' `props` usage so that we can
-    // later create the splitProps and mergeProps to suit.
-    let (|PropsGetterOrSetter|_|) (ctx: PluginContext) = function
-        | PropertyGetter ctx prop ->
-            PluginContext.addGetter ctx prop
-            Baked.propGetter prop |> Some
-        | PropertySetter ctx (prop, expr) ->
-            PluginContext.addSetter ctx (prop, transform ctx expr)
-            Expr.Value(ValueKind.Null(Type.Any), None)
-            |> Some
-        | _ -> None
-    // Determines at top level whether the current expression could be considered
-    // as a attribute expression by any of our definitions
-    let (|AttributeExpression|_|) (ctx: PluginContext) = function
-        | Call(
-            callee,
-            {
-                ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal))
-                Args = expr :: _
-                MemberRef = MemberRef.Option.PartasName ctx prop as memberRef
-            },
-            _,
-            _) ->
-            match callee, memberRef with
-            | Expr.ImportedSetter ctx, _ // Captures properties defined in other modules
-            | _, Some(MemberRef.MemberRefIs ctx MemberRefType.Setter) -> // Captures properties defined in self module
-                (prop, transform ctx expr)
-                |> Some
-            | _, _ -> None
-        // Captured method/Extension call
-        | Call(
-            Value(ValueKind.UnitConstant, None),
-            {
-                MemberRef = Some(MemberRef(_, { CompiledName = extensionName }))
-                Args = exprs
-            },
-            Type.MetaType,
-            None
-            ) -> // TODO - handlers for the different extensions that are supported
-            match extensionName, exprs with
-            | "attr", [ Value(StringConstant prop, _); value ] ->
-                (prop, transform ctx value)
-                |> Some
-            | _ ->
-                $"Unhandled extension: {extensionName}\nProvidedValues: {exprs}"
-                |> PluginContext.logError ctx
-                None
-        | _ -> None
+        /// Use this active recognizer on expression lists to collect all the properties.
+        /// If an unexpected expression is read, then it will dispose of it with a warning in
+        /// compilation 
+        let (|PropCollector|) (ctx: PluginContext): Expr list -> PropList = function
+            | [] -> []
+            | Sequential (PropCollector ctx headProps) :: PropCollector ctx tailProps ->
+                tailProps @ headProps
+            | expr :: PropCollector ctx props ->
+                match expr with
+                | AttributeExpression ctx propInfo -> [ propInfo ]
+                | Sequential(PropCollector ctx props) -> props
+                | Value(Null(Unit), None) -> []
+                | Value(UnitConstant, None) -> []
+                | _ ->
+                    PluginContext.debugDisposal ctx "PropCollector" expr
+                    []
+                |> (@) props
     
     (*
     The tag constructor recognizer actively matches ANY expression pattern that, according to our
@@ -622,6 +728,24 @@ module internal rec AST =
             (Type.PartasName ctx typeName),
             range) ->
             TagInfo.Constructor (TagSource.LibraryImport imp, props, range)
+            |> Some
+        // Non LibraryImports that require LibraryImport injection
+        | Call(
+            (Expr.ImportedConstructor ctx
+             & Import({ Selector = ( Helpers.StartsWith "BindingsModule_Route"
+                                   | Helpers.StartsWith "BindingsModule_HashRoute") }, t, r)),
+            {
+                Args = PropCollector ctx props
+            },
+            (Type.PartasName ctx typeName),
+            range) ->
+            let importExpr =
+                Import(
+                    { Selector = typeName
+                      Path = "@solidjs/router"
+                      Kind = UserImport false },
+                    t, r)
+            TagInfo.Constructor (TagSource.LibraryImport importExpr, props, range)
             |> Some
         // Non LibraryImports; ie User defined imports
         | Call(
@@ -716,7 +840,7 @@ module internal rec AST =
                 typ = Baked.jsxElementType,
                 range = None
             )
-            
+    /// Collates TagInfos into ElementBuilders which can then be rendered via `renderElement`
     let collectTagInfo (ctx: PluginContext): TagInfo -> ElementBuilder = function
         | TagInfo.WithBuilder(tagSource, BuilderCollector ctx propsAndChildren, range) ->
             { TagSource = tagSource; Children = propsAndChildren; Properties = [] }
@@ -725,26 +849,7 @@ module internal rec AST =
         | TagInfo.Constructor(tagSource, props, range) ->
             { TagSource = tagSource; Children = []; Properties = props }
     
-    /// wraps single expressions in a list and feeds back to the list collector
-    let (|PropCollectorFeeder|) (ctx: PluginContext): Expr -> PropList = fun e -> [ e ] |> function
-        | PropCollector ctx props -> props
-        
-    /// Use this active recognizer on expression lists to collect all the properties.
-    /// If an unexpected expression is read, then it will dispose of it with a warning in
-    /// compilation 
-    let (|PropCollector|) (ctx: PluginContext): Expr list -> PropList = function
-        | [] -> []
-        | Sequential (PropCollector ctx headProps) :: PropCollector ctx tailProps ->
-            tailProps @ headProps
-        | expr :: PropCollector ctx props ->
-            match expr with
-            | AttributeExpression ctx propInfo -> [ propInfo ]
-            | Sequential(PropCollector ctx props) -> props
-            | Value(Null(Unit), None) -> []
-            | _ ->
-                PluginContext.debugDisposal ctx "PropCollector" expr
-                []
-            |> (@) props
+
             
     /// Transforms a single expression before wrapping it in a list and feeding it back to the BuilderCollector.
     let (|BuilderCollectorFeedback|) (ctx: PluginContext): Expr -> Expr list = fun e -> [ transform ctx e ] |> function
@@ -761,7 +866,13 @@ module internal rec AST =
             headBuilds @ tailBuilds
         | expr :: BuilderCollector ctx restBuilds ->
             match expr with
-            | Let(Ident.IdentIs ctx (IdentType.Element | IdentType.First),
+            // | Call(
+            //     (Get(IdentExpr(Ident.IdentIs ctx IdentType.RouterBuilder), _, _, _)
+            //    | Import({ Selector = "uncurry2" }, Any, None)),
+            //     { Args = BuilderCollector ctx body },
+            //     _, _) ->
+            //     body @ restBuilds
+            | Let(Ident.IdentIs ctx (IdentType.Element | IdentType.First | IdentType.Text),
                   BuilderCollectorFeedback ctx value,
                   BuilderCollectorFeedback ctx body
                   ) ->
@@ -772,10 +883,19 @@ module internal rec AST =
                 BuilderCollectorFeedback ctx body
                 ) ->
                     body @ value @ restBuilds
-            | CurriedApply(BuilderCollectorFeedback ctx applied, BuilderCollector ctx args, _, _) ->
-                args @ applied @ restBuilds
+            | CurriedApply(BuilderCollectorFeedback ctx applied, BuilderCollector ctx args, typ, range) ->
+                if args.IsEmpty then applied @ restBuilds
+                else CurriedApply(applied.Head, args, typ, range) :: restBuilds
+                // args @ applied @ restBuilds
             | Lambda(
-                Ident.IdentIs ctx (IdentType.Builder | IdentType.Yield),
+                Ident.IdentIs ctx IdentType.Cont,
+                TypeCast(Lambda(item, Lambda(index, BuilderCollectorFeedback ctx expr, _), _), _),
+                _
+                ) ->
+                let getHead = List.tryHead >> Option.defaultValue (Value(UnitConstant, None))
+                Delegate([ item; index ], getHead expr, None, []) :: restBuilds
+            | Lambda(
+                Ident.IdentIs ctx (IdentType.Builder | IdentType.Yield | IdentType.Cont),
                 BuilderCollectorFeedback ctx expr,
                 _
                 ) -> expr @ restBuilds
@@ -783,26 +903,32 @@ module internal rec AST =
                 expr :: restBuilds // wtf is this? ok. go on through sir.
             | TypeCast(Value(StringConstant _, _) as text, Unit) ->
                  text :: restBuilds
+            | TypeCast(BuilderCollectorFeedback ctx expr, typ) ->
+                expr @ restBuilds
             | IfThenElse(
                 BuilderCollectorFeedback ctx guardExpr,
                 BuilderCollectorFeedback ctx thenExpr,
                 BuilderCollectorFeedback ctx elseExpr,
                 range) ->
-                let getHead = List.tryHead >> Option.defaultValue (Value(Null(Any), None))
+                let getHead = List.tryHead >> Option.defaultValue (Value(UnitConstant, None))
                 [ IfThenElse(
                     getHead guardExpr,
                     getHead thenExpr,
                     getHead elseExpr,
                     range) ] @ restBuilds
+            | Get(BuilderCollectorFeedback ctx exprs, _, _, _) ->
+                let head = exprs |> (List.tryHead >> Option.defaultValue (Value(UnitConstant, None)))
+                head :: restBuilds
+            
             // This is one of our builder identifiers; no reason it should be rendered.
             | IdentExpr(_)
             // Some transformation said 'na'.
-            | Value(Null(Any), None) -> restBuilds // You have been judged unworthy
+            | Value(UnitConstant, None) -> restBuilds // You have been judged unworthy
             // Trust the F# compiler to not allow invalid elements within the builder.
             | _ ->
                 expr :: restBuilds
                 
-        
+    // Have an expression? Don't know what to do with it? Let me gobble gobble sir.
     let transform (ctx: PluginContext) (expr: Expr)=
         match expr with
         | TagConstructor ctx tagInfo ->
@@ -826,19 +952,27 @@ module internal rec AST =
                 |> List.map (fun (target, expr) -> target, transform ctx expr)
                 )
         | TypeCast(expr, DeclaredType _) -> transform ctx expr
-        // We SHOULD NOT be capturing attribute expressions at this level
+        // We SHOULD NOT be capturing attribute expressions at this level. This is the only pattern that we don't want
+        // gobble gobbled. But... Perhaps this points to redundancy in property collection.
         | AttributeExpression ctx propInfo ->
             PluginContext.logWarning ctx $"Attribute expression was parsed at the top level and was reduced out:\n{propInfo}"
             snd propInfo
-        | CurriedApply(expr, _, _, _) ->
-            transform ctx expr
+        | CurriedApply(applied, exprs, typ, range) ->
+            CurriedApply(transform ctx applied, exprs |> List.map (transform ctx), typ, range )
+        | Delegate(args, body, name, tags) ->
+            Delegate(args, transform ctx body, name, tags)
+        // | Lambda(ident, expr, name) ->
+        //     Lambda(ident, transform ctx expr, name)
+        // | CurriedApply(expr, _, _, _) ->
+        //     transform ctx expr
         | Let(ident, value, body) ->
             Let(ident, transform ctx value, transform ctx body)
         | Call(callee, callInfo, typ, range) ->
             Call(callee, { callInfo with Args = callInfo.Args |> List.map (transform ctx) }, typ, range)
+            
         | _ as expr -> expr
         //     Value(UnitConstant, None)
-        // // ^ use this when constructing patterns to prevent errors obfuscating the screen
+        // // ^ use this as a result stub when constructing patterns to prevent errors obfuscating the screen
 
 (*
     The AST goes as follows:
@@ -869,6 +1003,7 @@ module internal rec SchemaRules =
             PluginContext.helper ctx
             |> _.LogWarning("This is an invalid member declaration for this attribute. Ensure it follows the following pattern: `member props.typeDef =`. Ensure it is declared within a namespace starting with `Partas.Solid`", memberDecl.Args |> List.randomChoice |> _.Range.Value)
             None
+
 type SolidTypeComponentAttribute() =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
@@ -876,7 +1011,7 @@ type SolidTypeComponentAttribute() =
         // Console.WriteLine "\nSTART MEMBER DECL!!!"
         // Console.WriteLine memberDecl.Body
         // Console.WriteLine "END MEMBER DECL!!!\n"
-        let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
+        let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
         match memberDecl with
         | SchemaRules.ValidMemberRef ctx finalName ->
             let newExpr =
@@ -886,7 +1021,28 @@ type SolidTypeComponentAttribute() =
                 |> Baked.convertSettersToObject (PluginContext.getSetters ctx)
             { memberDecl with Body = newExpr; Name = finalName }
         | _ ->
-            memberDecl
+            $"Unsupported definitions under this attribute are not recommended. Please use `[<SolidComponent>]` instead"
+            |> PluginContext.logWarning ctx
+            {
+                memberDecl with
+                    Body = memberDecl.Body
+                           |> AST.transform ctx
+            }
     override this.TransformCall(pluginHelper, memb, expr) =
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberCall
+        expr
+
+/// Applies Solid transformations to `let` bindings.
+/// Use SolidTypeComponentAttribute for Type member definitions such
+/// as `member props.typeDef =`.
+type SolidComponentAttribute() =
+    inherit MemberDeclarationPluginAttribute()
+    override _.FableMinimumVersion = FableRequirements.version
+    override this.Transform(pluginHelper, file, memberDecl) =
+        let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
+        {
+            memberDecl with
+                Body = memberDecl.Body |> AST.transform ctx
+        }
+    override this.TransformCall(pluginHelper, memb, expr) =
         expr

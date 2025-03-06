@@ -55,6 +55,12 @@ module Builder =
 
         [<Erase>]
         member inline _.Yield(PARTAS_TEXT: int) : HtmlContainerFun = fun PARTAS_YIELD -> ignore PARTAS_TEXT
+        
+        // [<Erase>]
+        // member inline _.For(PARTAS_VALUES: #seq<'T>, [<InlineIfLambda>] PARTAS_BODY: 'T -> HtmlContainerFun): HtmlContainerFun =
+        //     fun PARTAS_BUILDER ->
+        //         for PARTAS_VALUE in PARTAS_VALUES do
+        //             PARTAS_BODY PARTAS_VALUE PARTAS_BUILDER
 
     [<Erase>]
     type HtmlContainerExtensions =

@@ -2,18 +2,18 @@ import { splitProps } from "solid-js";
 import { FakeImport } from "FakeLibrary";
 import { CustomTag } from "./Shared.fs.jsx";
 export function MyTag(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <FakeImport />;
 }
 export function MyOtherTag(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <CustomTag />;
 }
 export function ImportedTagWithProps(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <FakeImport class="Test props" />;
 }
 export function UserTagWithProps(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <CustomTag class="test bops" />;
 }

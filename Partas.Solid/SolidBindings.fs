@@ -5,6 +5,7 @@ open Browser.Types
 open Fable.Core
 open System
 
+#nowarn 49
 
 [<AutoOpen>]
 module Bindings =
@@ -435,7 +436,7 @@ module Bindings =
         [<Erase>]
         member inline _.Zero() : HtmlContainerFun = ignore
         [<Erase>]
-        member inline _.Yield(value: 'T -> Accessor<int> -> #HtmlElement) : HtmlContainerFun = fun cont -> ignore value
+        member inline _.Yield(PARTAS_VALUE: 'T -> Accessor<int> -> #HtmlElement) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_VALUE
 
     [<Erase>]
     type Index<'T>() =
@@ -446,7 +447,7 @@ module Bindings =
         [<Erase>]
         member inline _.Zero() : HtmlContainerFun = ignore
         [<Erase>]
-        member inline _.Yield(value: Accessor<'T> -> int -> #HtmlElement) : HtmlContainerFun = fun cont -> ignore value
+        member inline _.Yield(PARTAS_VALUE: Accessor<'T> -> int -> #HtmlElement) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_VALUE
 
     [<Erase>]
     type Show() =
@@ -473,17 +474,17 @@ module Bindings =
             with set (value: HtmlElement) = ()
         [<Erase>]
         member inline _.Combine
-            ([<InlineIfLambda>] first: HtmlContainerFun, [<InlineIfLambda>] second: HtmlContainerFun)
+            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
-            fun builder ->
-                first builder
-                second builder
+            fun PARTAS_BUILDER ->
+                PARTAS_FIRST PARTAS_BUILDER
+                PARTAS_SECOND PARTAS_BUILDER
         [<Erase>]
-        member inline _.Delay([<InlineIfLambda>] delay: unit -> HtmlContainerFun) : HtmlContainerFun = delay()
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun = PARTAS_DELAY()
         [<Erase>]
         member inline _.Zero() : HtmlContainerFun = ignore
         [<Erase>]
-        member inline _.Yield(value: Match) : HtmlContainerFun = fun cont -> ignore value
+        member inline _.Yield(PARTAS_ELEMENT: Match) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     [<Erase>]
     type Suspense() =
@@ -528,19 +529,19 @@ module Bindings =
     type Extensions =
 
         [<Extension; Erase>]
-        static member Run(this: For<'T>, runExpr: HtmlContainerFun) =
-            runExpr Unchecked.defaultof<_>
-            this
+        static member Run(PARTAS_THIS: For<'T>, PARTAS_RUNEXPR: HtmlContainerFun) =
+            PARTAS_RUNEXPR Unchecked.defaultof<_>
+            PARTAS_THIS
 
         [<Extension; Erase>]
-        static member Run(this: Index<'T>, runExpr: HtmlContainerFun) =
-            runExpr Unchecked.defaultof<_>
-            this
+        static member Run(PARTAS_THIS: Index<'T>, PARTAS_RUNEXPR: HtmlContainerFun) =
+            PARTAS_RUNEXPR Unchecked.defaultof<_>
+            PARTAS_THIS
 
         [<Extension; Erase>]
-        static member Run(this: Switch, runExpr: HtmlContainerFun) =
-            runExpr Unchecked.defaultof<_>
-            this
+        static member Run(PARTAS_THIS: Switch, PARTAS_RUNEXPR: HtmlContainerFun) =
+            PARTAS_RUNEXPR Unchecked.defaultof<_>
+            PARTAS_THIS
 
     [<RequireQualifiedAccess; StringEnum>]
     type SolidResourceState =

@@ -1,0 +1,34 @@
+﻿import { splitProps } from "solid-js";
+
+export function TypeDefTest(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <button>
+        Button
+    </button>;
+}
+
+export function TypeDefTestWithProps(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <button class="ButtonClass"
+        draggable="indubitably">
+        Button
+        <span class="sr-only">
+            Span
+        </span>
+    </button>;
+}
+
+export function TypeDefTestWithExtensions(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <button class="ButtonClass"
+        Key="Value">
+        Button
+        <span class="sr-only">
+            Span
+        </span>
+        <div class="DivBelow"
+            key="value" />
+        TextBelow
+    </button>;
+}
+

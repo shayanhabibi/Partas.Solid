@@ -1,14 +1,14 @@
 import { splitProps } from "solid-js";
 export function MyTag(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <div />;
 }
 export function TagWithProp(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <div class="SomeClass" />;
 }
 export function TagWithProps(props) {
-    const [local, others] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     return <div class="SomeClass"
         draggable="drag" />;
 }

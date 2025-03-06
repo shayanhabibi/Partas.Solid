@@ -22,3 +22,7 @@ let ``Tag Extensions``() =
 [<Fact>]
 let ``Imported Tags With Extensions`` () =
     runSolidCase "ImportedTagsWithExtensions"
+
+[<Fact>]
+let ``Tags with child elements`` () =
+    runSolidCase "ChildrenSimple"

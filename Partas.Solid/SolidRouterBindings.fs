@@ -6,6 +6,8 @@ open Fable.Core.JsInterop
 open System
 open Partas.Solid
 
+#nowarn 49
+
 [<AutoOpen>]
 module Bindings =
 
@@ -72,7 +74,7 @@ module Bindings =
         inherit PathMatch
         abstract member route: RouteDescription with get, set
 
-    [<Import("Route", "@solidjs/router")>]
+    // [<Import("Route", "@solidjs/router")>] <--- this is injected by the plugin
     type Route() =
         interface HtmlElement
         [<Erase>]
@@ -89,17 +91,17 @@ module Bindings =
             with set (value: RoutePreloadFunc) = ()
         [<Erase>]
         member inline _.Combine
-            ([<InlineIfLambda>] first: HtmlContainerFun, [<InlineIfLambda>] second: HtmlContainerFun)
+            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
-            fun builder ->
-                first builder
-                second builder
+            fun PARTAS_BUILDER ->
+                PARTAS_FIRST PARTAS_BUILDER
+                PARTAS_SECOND PARTAS_BUILDER
         [<Erase>]
-        member inline _.Delay([<InlineIfLambda>] delay: unit -> HtmlContainerFun) : HtmlContainerFun = delay()
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun = PARTAS_DELAY()
         [<Erase>]
         member inline _.Zero() : HtmlContainerFun = ignore
         [<Erase>]
-        member inline _.Yield(value: Route) : HtmlContainerFun = fun cont -> ignore value
+        member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     [<AllowNullLiteral>]
     [<Global>]
@@ -112,7 +114,7 @@ module Bindings =
         member val path: string = jsNative with get, set
         member val ``component``: HtmlElement = jsNative with get, set
 
-    [<Import("Router", "@solidjs/router")>]
+    // [<Import("Router", "@solidjs/router")>] // <--- this is injected by the plugin
     type Router() =
         interface HtmlElement
         [<Erase>]
@@ -135,21 +137,21 @@ module Bindings =
             with set (value: string) = ()
         [<Erase>]
         member inline _.Combine
-            ([<InlineIfLambda>] first: HtmlContainerFun, [<InlineIfLambda>] second: HtmlContainerFun)
+            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
-            fun builder ->
-                first builder
-                second builder
+            fun PARTAS_BUILDER ->
+                PARTAS_FIRST PARTAS_BUILDER
+                PARTAS_SECOND PARTAS_BUILDER
         [<Erase>]
-        member inline _.Delay([<InlineIfLambda>] delay: unit -> HtmlContainerFun) : HtmlContainerFun = delay()
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun = PARTAS_DELAY()
         [<Erase>]
         member inline _.Zero() : HtmlContainerFun = ignore
         [<Erase>]
-        member inline _.Yield(value: Route) : HtmlContainerFun = fun cont -> ignore value
+        member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
         [<Erase>]
-        member inline _.Yield(value: RootConfig[]) : HtmlContainerFun = fun cont -> ignore value
+        member inline _.Yield(PARTAS_ELEMENT: RootConfig[]) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
-    [<Import("HashRouter", "@solidjs/router")>]
+    // [<Import("HashRouter", "@solidjs/router")>] <-- injected by plugin
     type HashRouter() =
         inherit Router()
 
@@ -161,14 +163,14 @@ module Bindings =
     [<Erase>]
     type Extensions =
         [<Extension; Erase>]
-        static member Run(this: Router, runExpr: HtmlContainerFun) =
-            runExpr Unchecked.defaultof<_>
-            this
+        static member Run(PARTAS_THIS: Router, PARTAS_RUN: HtmlContainerFun) =
+            PARTAS_RUN Unchecked.defaultof<_>
+            PARTAS_THIS
 
         [<Extension; Erase>]
-        static member Run(this: Route, runExpr: HtmlContainerFun) =
-            runExpr Unchecked.defaultof<_>
-            this
+        static member Run(PARTAS_THIS: Route, PARTAS_RUN: HtmlContainerFun) =
+            PARTAS_RUN Unchecked.defaultof<_>
+            PARTAS_THIS
 
     [<Import("A", "@solidjs/router")>]
     type A() =
