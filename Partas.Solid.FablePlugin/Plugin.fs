@@ -344,8 +344,6 @@ module internal rec AST =
                 BuilderCollectorFeedback ctx expr,
                 _
                 ) -> expr @ restBuilds
-            | IdentExpr(Ident.IdentIs ctx IdentType.Other) ->
-                expr :: restBuilds // Non builder identifier
             | TypeCast(Value(StringConstant _, _) as text, Unit) ->
                  text :: restBuilds
             | TypeCast(BuilderCollectorFeedback ctx expr, typ) ->
@@ -363,6 +361,15 @@ module internal rec AST =
                     range) ] @ restBuilds
             | PropsGetterOrSetter ctx (BuilderCollectorFeedback ctx exprs) ->
                 exprs @ restBuilds
+            // | PropsGetterOrSetter ctx expr ->
+                // match expr with
+                // | Value(UnitConstant, None) | Value(Null(Any), None) -> restBuilds
+                // | _ -> expr :: restBuilds
+            | IdentExpr(Ident.IdentIs ctx IdentType.Other) ->
+                expr :: restBuilds // Non builder identifier
+            // This is a prop getter in a builder, don't transform inside as it's already been done.
+            | Get(IdentExpr({ IsThisArgument = true ; IsCompilerGenerated = true }), _, _, _) ->
+                expr :: restBuilds
             | Get(BuilderCollectorFeedback ctx exprs, _, _, _) ->
                 let head = exprs |> (List.tryHead >> Option.defaultValue (Value(UnitConstant, None)))
                 head :: restBuilds
