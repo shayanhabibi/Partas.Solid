@@ -361,6 +361,8 @@ module internal rec AST =
                     getHead thenExpr,
                     getHead elseExpr,
                     range) ] @ restBuilds
+            | PropsGetterOrSetter ctx (BuilderCollectorFeedback ctx exprs) ->
+                exprs @ restBuilds
             | Get(BuilderCollectorFeedback ctx exprs, _, _, _) ->
                 let head = exprs |> (List.tryHead >> Option.defaultValue (Value(UnitConstant, None)))
                 head :: restBuilds
