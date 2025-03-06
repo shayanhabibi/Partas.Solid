@@ -19,7 +19,7 @@
 
     <ItemGroup>
         <None Include="../README.md" Pack="true" PackagePath="\" />
-        <None Include="Program.fs" />
+        <None Include="HISTORICAL.fs" />
         <Compile Include="Plugin.fs" />
     </ItemGroup>
 
