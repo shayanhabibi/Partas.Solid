@@ -364,7 +364,13 @@ module internal rec AST =
             | Get(BuilderCollectorFeedback ctx exprs, _, _, _) ->
                 let head = exprs |> (List.tryHead >> Option.defaultValue (Value(UnitConstant, None)))
                 head :: restBuilds
-            
+            // This is an artifact from the builder and is a noop anyway, so we can  dispose
+            | Lambda(
+                    { Name = name; IsCompilerGenerated = true },
+                    TypeCast(IdentExpr({ Name = otherName; IsCompilerGenerated = true }), Unit),
+                    None)
+                when name = otherName ->
+                restBuilds
             // This is one of our builder identifiers; no reason it should be rendered.
             | IdentExpr(_)
             | Value(UnitConstant, None) -> restBuilds // You have been judged unworthy
@@ -427,9 +433,9 @@ type SolidTypeComponentAttribute() =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
-        // Console.WriteLine "\nSTART MEMBER DECL!!!"
-        // Console.WriteLine memberDecl.Body
-        // Console.WriteLine "END MEMBER DECL!!!\n"
+        Console.WriteLine "\nSTART MEMBER DECL!!!"
+        Console.WriteLine memberDecl.Body
+        Console.WriteLine "END MEMBER DECL!!!\n"
         let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
         match memberDecl with
         | SchemaRules.ValidMemberRef ctx finalName ->
