@@ -96,6 +96,10 @@ module internal rec AST =
                     (prop, transform ctx expr)
                     |> Some
                 | _, _ -> None
+            // member val set/get
+            | Set(IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal), FieldSet(prop), _, expr, _) ->
+                (prop, transform ctx expr)
+                |> Some
             // Captured method/Extension call
             | Call(
                 Value(ValueKind.UnitConstant, None),
