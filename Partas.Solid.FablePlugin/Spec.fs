@@ -216,10 +216,13 @@ module internal Baked =
                 ),
             range = None
         )
+    /// Renders an ElementBuilder into the final Expr. Performs ONE final transformation; it will
+    /// pattern match the tagname "Fragment" and remove it to render `<> </>`.
     let renderElement (ctx: PluginContext) (builder: ElementBuilder) =
         let renderProp ((name: string, expr: Expr): PropInfo) = Value(NewTuple([ Value(StringConstant name, None); TypeCast(expr, Type.Any) ], false), None)
         let renderPropList = List.map renderProp
         let renderTagName = function
+            | TagSource.AutoImport "Fragment" -> Value(StringConstant "", None)
             | TagSource.LibraryImport imp -> imp
             | TagSource.AutoImport name -> Value(StringConstant name, None)
         let internalCollection =
