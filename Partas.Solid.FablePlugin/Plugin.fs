@@ -451,9 +451,9 @@ type SolidTypeComponentAttribute() =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
-        Console.WriteLine "\nSTART MEMBER DECL!!!"
-        Console.WriteLine memberDecl.Body
-        Console.WriteLine "END MEMBER DECL!!!\n"
+        // Console.WriteLine "\nSTART MEMBER DECL!!!"
+        // Console.WriteLine memberDecl.Body
+        // Console.WriteLine "END MEMBER DECL!!!\n"
         let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
         match memberDecl with
         | SchemaRules.ValidMemberRef ctx finalName ->
