@@ -407,6 +407,9 @@ module internal rec AST =
     // Have an expression? Don't know what to do with it? Let me gobble gobble sir.
     let transform (ctx: PluginContext) (expr: Expr)=
         match expr with
+        | Emit({ CallInfo = { Args = exprs } as callInfo } as emitInfo, typ, range) ->
+            let transformedExprs = exprs |> List.map (transform ctx)
+            Emit({ emitInfo with CallInfo = { callInfo with Args = transformedExprs } }, typ, range)
         | TagConstructor ctx tagInfo ->
             tagInfo |> collectTagInfo ctx |> Baked.renderElement ctx
         | Sequential exprs ->
@@ -459,9 +462,9 @@ type SolidTypeComponentAttribute() =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
-        // Console.WriteLine "\nSTART MEMBER DECL!!!"
-        // Console.WriteLine memberDecl.Body
-        // Console.WriteLine "END MEMBER DECL!!!\n"
+        Console.WriteLine "\nSTART MEMBER DECL!!!"
+        Console.WriteLine memberDecl.Body
+        Console.WriteLine "END MEMBER DECL!!!\n"
         let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
         match memberDecl with
         | SchemaRules.ValidMemberRef ctx finalName ->

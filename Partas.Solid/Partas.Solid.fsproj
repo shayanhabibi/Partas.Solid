@@ -16,10 +16,10 @@
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
-        <Version>0.2.3</Version>
+        <Version>0.2.4</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>0.2.3</PackageVersion>
-        <PackageReleaseNotes>Observe member val getters and setters the same as method calls</PackageReleaseNotes>
+        <PackageVersion>0.2.4</PackageVersion>
+        <PackageReleaseNotes>Emits have their parameters transformed</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
