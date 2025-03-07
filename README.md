@@ -187,6 +187,45 @@ function CustomTag(props) {
 
 To prevent undefined behaviour further, I can easily add an error when a property is set twice, for safety.
 
+## createContext & useContext
+
+Frequently described as an anti-pattern, it doesn't mean it has _no_ place to be used. Especially in the context of creating a component library.
+
+The plugin supports you creating a context, and then using it as a tag to generate the provider.
+
+```fsharp
+// context defined in another module/file
+let context = createContext<int>()
+// local context definition
+let SomeContext = Bindings.createContext<int>()
+// Adding the context providers
+[<SolidComponent>]
+let MyComponent () =
+    context(5) {
+        context(3) {
+            "provider 1"
+        }
+        SomeContext(10) {
+            "provider 2"
+        }
+    }
+```
+
+```jsx
+export const SomeContext = createContext();
+
+export function MyComponent() {
+    return <context.Provider value={5}>
+        <context.Provider value={3}>
+            provider 1
+        </context.Provider>
+        <SomeContext.Provider value={10}>
+            provider 2
+        </SomeContext.Provider>
+    </context.Provider>;
+}
+```
+
 ## Conclusion
 
 If you like this kind of thing DSL, let me know!

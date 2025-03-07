@@ -36,6 +36,8 @@ type internal IdentType =
     | Constructor
     // identifies props identifier
     | Props
+    // identifies ContextProviders
+    | ContextProvider 
     // Identifies for loops
     // | Enumerator of EnumType
     

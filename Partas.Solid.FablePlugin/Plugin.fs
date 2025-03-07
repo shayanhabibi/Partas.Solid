@@ -313,6 +313,35 @@ module internal rec AST =
             | TagInfo.Constructor(tagSource, props, range) ->
                 TagInfo.Combined(tagSource, props, body, range)
             |> Some
+        // An imported context
+        | CurriedApply(
+            Import(
+                { Kind = MemberImport(MemberRef(_,{ CompiledName = typeName })) } as imp,
+                (Type.PartasName ctx "ContextProvider" as typ),
+                irange),
+            props,
+            _,
+            range
+            ) ->
+            TagInfo.Constructor(
+                TagSource.LibraryImport(Import({ imp with Selector = typeName + ".Provider" }, typ, irange)),
+                [("value", Sequential(props))],
+                irange
+                )
+            |> Some
+        // Local defined context
+        | CurriedApply(
+                IdentExpr({ Name = typeName; Type = Type.PartasName ctx "ContextProvider" }),
+                props,
+                _,
+                range
+            ) ->
+            TagInfo.Constructor(
+                TagSource.AutoImport $"{typeName}.Provider",
+                [("value", Sequential(props))],
+                range
+                )
+            |> Some
         | _ -> None
             
     /// Transforms a single expression before wrapping it in a list and feeding it back to the BuilderCollector.
@@ -494,6 +523,7 @@ type SolidComponentAttribute() =
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
+        Console.WriteLine memberDecl
         {
             memberDecl with
                 Body = memberDecl.Body |> AST.transform ctx

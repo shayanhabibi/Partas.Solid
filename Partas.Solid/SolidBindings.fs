@@ -13,6 +13,8 @@ module Bindings =
     type Setter<'T> = 'T -> unit
     type Accessor<'T> = unit -> 'T
     type Signal<'T> = Accessor<'T> * Setter<'T>
+    type ContextProvider = inherit HtmlContainer
+    type Context<'T> = 'T -> ContextProvider
 
     /// Solid on* event handlers
     type HtmlTag with
@@ -618,6 +620,7 @@ module Bindings =
         static member inline Find(this: SolidStorePath<'T, 'Value array>, predicate: 'Value -> bool) =
             SolidStorePath<'T, 'Value>(this.Setter, Array.append this.Path [| predicate |])
 
+    
 
 [<AutoOpen>]
 [<Erase>]
@@ -643,6 +646,12 @@ type Bindings =
     [<ImportMember("solid-js")>]
     static member createEffect(effect: 'T -> 'T, initialValue: 'T) : unit = jsNative
 
+    [<ImportMember("solid-js")>]
+    static member createContext<'T> (?value: 'T): Context<'T> = jsNative
+    
+    [<ImportMember("solid-js")>]
+    static member useContext(context: Context<'T>): 'T = jsNative
+    
     /// Fetcher will be called immediately
     [<ImportMember("solid-js"); ParamObject(fromIndex = 1)>]
     static member createResource
