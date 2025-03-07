@@ -56,15 +56,19 @@ module internal rec AST =
         /// nullify expressions that are attribute expressions which involve the props ident
         /// </remarks>
         let private (|PropertyGetter|_|) (ctx: PluginContext) = function
+            | Get(
+                IdentExpr(Ident.IdentIs ctx IdentType.Props),
+                FieldGet({ Name = prop }), _, _
+                )
             | Call(
-                callee,
+                _,
                 {
                     ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.Props))
                     Args = [ _ ]
                     MemberRef = MemberRef.Option.PartasName ctx prop
                 } & { MemberRef =Some(MemberRef.MemberRefIs ctx MemberRefType.Getter) },
-                typ,
-                range) as expr ->
+                _,
+                _) ->
                 Some(prop)
             | _ -> None
         // Collects and transforms any of our 'special' `props` usage so that we can
