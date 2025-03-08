@@ -23,6 +23,40 @@ do ()
 module internal rec AST =
     [<AutoOpen>]
     module AttributesAndProperties =
+        let (|ValueUnrollerFeedback|) (expr: Expr): Expr list = [ expr ] |> function
+            | ValueUnroller exprs -> exprs
+        /// There is a tendency for `toArray` and `delay` to generate in property value scenarios.
+        /// As I do not know their purpose outside of this use case, I am hesitant to pervasively
+        /// flatten these expressions out. Instead, I choose to only perform this action exclusively
+        /// for property values. This is because the output otherwise does not seem to work well with
+        /// SolidJs
+        /// Unlike the builder collectors, the procedure of unrolling these type of list expressions
+        /// does not further transformation the expressions. This is left to the caller.
+        let private (|ValueUnroller|): Expr list -> Expr list = function
+            | [] -> []
+            | Sequential(ValueUnroller exprs) :: ValueUnroller rest ->
+                exprs @ rest
+            | expr :: ValueUnroller rest ->
+                match expr with
+                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = ValueUnroller exprs }, typ, range) ->
+                    Value(NewArray(ArrayValues exprs, Any, ArrayKind.MutableArray), range) :: rest
+                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = ValueUnroller exprs }, typ, range) ->
+                    exprs @ rest
+                | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, ValueUnrollerFeedback exprs, range) ->
+                    exprs @ rest
+                | Call(Import({ Selector = Utils.StartsWith "append" }, Any, None), { Args = ValueUnroller exprs }, typ, range) ->
+                    exprs @ rest
+                | Call(Import({Selector = Utils.StartsWith "singleton"}, Any, None), { Args = value :: ValueUnroller exprs }, typ, range) ->
+                    exprs @ (value :: rest)
+                | Call(callee, ({ Args = ValueUnroller exprs } as callInfo), typ, range) ->
+                    Call(callee, { callInfo with Args = exprs }, typ, range) :: rest
+                | TypeCast(ValueUnrollerFeedback exprs, typ) ->
+                    exprs @ rest
+                | IfThenElse(ValueUnrollerFeedback guardExprs, ValueUnrollerFeedback thenExprs, ValueUnrollerFeedback elseExprs, range) ->
+                    IfThenElse(Sequential guardExprs, Sequential thenExprs, Sequential elseExprs, range) :: rest
+                | expr -> expr :: rest
+            
+        
         /// <summary>
         /// Recognizes whether current expression is considered a prop setter by
         /// any of our definitions.
@@ -89,7 +123,7 @@ module internal rec AST =
                 callee,
                 {
                     ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal))
-                    Args = expr :: _
+                    Args = (ValueUnrollerFeedback [ expr ] |  expr) :: _
                     MemberRef = MemberRef.Option.PartasName ctx prop as memberRef
                 },
                 _,
@@ -158,7 +192,7 @@ module internal rec AST =
                         Some(MemberRef.MemberRefIs ctx MemberRefType.Setter)
                          & MemberRef.Option.PartasName ctx propName
                     )
-                    Args = value :: _
+                    Args = (ValueUnrollerFeedback [ value ] | value ) :: _
                 }, _, _) ->
                 let transformedPropName =
                     match propName with
@@ -235,7 +269,12 @@ module internal rec AST =
         | Call(
             (Expr.ImportedConstructor ctx
              & Import({ Selector = ( Utils.StartsWith "BindingsModule_Route"
-                                   | Utils.StartsWith "BindingsModule_HashRoute") }, t, r)),
+                                   | Utils.StartsWith "BindingsModule_HashRoute"
+                                   | Utils.StartsWith "BindingsModule_Match"
+                                   | Utils.StartsWith "BindingsModule_For"
+                                   | Utils.StartsWith "BindingsModule_Index"
+                                   | Utils.StartsWith "BindingsModule_Show"
+                                   | Utils.StartsWith "BindingsModule_Switch") }, t, r)),
             {
                 Args = PropCollector ctx props
             },
@@ -244,7 +283,11 @@ module internal rec AST =
             let importExpr =
                 Import(
                     { Selector = typeName
-                      Path = "@solidjs/router"
+                      Path =
+                          match typeName with
+                          | Utils.StartsWith "Route" | Utils.StartsWith "HashRoute" ->
+                              "@solidjs/router"
+                          | _ -> "solid-js"
                       Kind = UserImport false },
                     t, r)
             TagInfo.Constructor (TagSource.LibraryImport importExpr, props, range)
@@ -508,8 +551,15 @@ module internal rec AST =
                 targets
                 |> List.map (fun (target, expr) -> target, transform ctx expr)
                 )
-        // To make this more pervasive, we can remove the Type restriction
-        | TypeCast(expr, (DeclaredType _ | Any)) -> transform ctx expr
+        // While the more pervasive TypeCast transformation is good for 90% of cases,
+        // it can leave artifacts from using Setters in builders. We match this single case and dispose
+        // before it is passed back to the BuilderCollector
+        | Lambda(
+                { Name = name; IsCompilerGenerated = true },
+                TypeCast(IdentExpr({ Name = otherName; IsCompilerGenerated = true }), Unit),
+                None)
+            when name = otherName -> Value(UnitConstant, None)
+        | TypeCast(expr, _) -> transform ctx expr
         // Attribute expression pairs should have been captured by
         // TagConstructor -> PropCollector. It would be invalid to have them
         // matched here
@@ -538,6 +588,17 @@ module internal rec AST =
                 range
             ) ->
             Value(NewArray(ArrayValues (exprs |> List.map (transform ctx)), typ, kind), range)
+        | Operation(kind, tags, typ, range) ->
+            Operation(
+                match kind with
+                | Unary(operator, operand) -> Unary(operator, operand |> transform ctx)
+                | Binary(operator, left, right) -> Binary(operator, left |> transform ctx, transform ctx right)
+                | Logical(operator, left, right) -> Logical(operator, left |> transform ctx, transform ctx right)
+                ,
+                tags,
+                typ,
+                range
+            )
         | _ as expr -> expr
 
 type SolidTypeComponentAttribute() =
@@ -548,6 +609,7 @@ type SolidTypeComponentAttribute() =
         // Console.WriteLine memberDecl.Body
         // Console.WriteLine "END MEMBER DECL!!!\n"
         let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
+        
         match memberDecl with
         // Check that the memberDecl has the correct self identifier of `props`
         | SchemaRules.ValidMemberRef ctx finalName ->

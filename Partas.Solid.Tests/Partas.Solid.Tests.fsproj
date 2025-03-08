@@ -34,6 +34,9 @@
         <Compile Include="SolidCases\CombinedSpread\CombinedSpread.fs" />
         <None Include="SolidCases\CombinedSpread\CombinedSpread.expected" />
         <None Include="SolidCases\CombinedSpread\CombinedSpread.fsproj" />
+        <Compile Include="SolidCases\OperatorsInProps\OperatorsInProps.fs" />
+        <None Include="SolidCases\OperatorsInProps\OperatorsInProps.expected" />
+        <None Include="SolidCases\OperatorsInProps\MergeProps.fsproj" />
         <Compile Include="Common.fs" />
         <Compile Include="SolidTests.fs" />
         <Compile Include="Program.fs" />

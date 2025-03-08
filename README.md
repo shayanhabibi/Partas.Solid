@@ -8,22 +8,17 @@
 
 > [!IMPORTANT]
 > This is an opinionated fork of [Oxpecker.Solid](https://github.com/lanayx/Oxpecker) that
-> enables experimental behaviours and patterns which I use in personal projects.
+> keeps the original DSL style, but more aggressively
+> transforms F# input to produce correct JSX.
 > 
-> Until such a time as these types of behaviours/patterns are sought out by users, the behaviours
-> will not be supported on the mainstream.
-> 
-> For this reason, I publish this as a means of allowing users to experiment or observe the patterns
-> enabled and submit requests for it to be considered in the mainline.
+> As I progress with changes in this fork, I am
+> growing more pessimistic of the chances of this
+> being merged upstream; these changes are fundamentally
+> personal, and do not fit the up-stream vision or intention.
 
 ## Features
 
 ### Reduce undefined behaviour
-
-Hugely opinionated, but I feel that reducing all transformation
-to a few pathways which expressions must all traverse simplifies
-the cognitive load for developing the plugin. The bulk of the code is
-boiler plate reduction for Expr pattern matches. 
 
 I feel this iteration has less specific pattern matchers, which prevents what might some deem as undocumented behaviour.
 
@@ -51,7 +46,7 @@ export function Button() {
 }
 ```
 
-As opposed to the proposed iteration:
+As opposed to Partas:
 
 ```jsx
 export let show = createAtom(true);
@@ -71,11 +66,39 @@ also the `<Match>` or `<Show>` tags.
 
 ### Custom Tags & Components in Oxpecker Syntax
 
-Currently, Oxpecker doesn't support the ability to create components and then use them in the Oxpecker style.
+Feel free to design a component system completely within F# that uses the same syntax, and offers the same flexibility and style variation that any other component framework would offer, but with all the advantages of F# compiler safety.
 
-Naturally, this is because a functional approach would not use the DSL to construct final pages, and use functions instead. But creating a permissive and flexible component library wouldn't work in this manner without being extremely verbose.
+Partas.Solid provides an extra attribute which can be applied to members of a Tag type definition using `props` as the self identifier. The self identifier, props, allows type safe access to your defined properties which can be set in Oxpecker style.
 
-As an alternative, the current iteration provides an extra attribute which can be applied to members of your type definition for the tag using `props` as the self identifier. The self identifier, props, allows type safe access to your defined properties which can be set in Oxpecker style.
+```fsharp
+[<Erase>]
+type MyCustomDiv() =
+    inherit div()
+    [<Erase>]
+    member val bordered: bool = jsNative with get,set
+    [<SolidTypeComponent>]
+    member props.constructor =
+    // the props self identifier is a requirement
+    // the member name has no influence on output
+        div(class' = if props.bordered then "border border-border" else "") { props.children }
+
+[<SolidComponent>]
+let App() =
+    MyCustomDiv(bordered = true) {
+        "Hello world!"
+    }
+```
+
+> [!NOTE]
+> The tag name is dependent on the type; the member definition that you add the `SolidTypeComponent` attribute to has no influence.
+> 
+> It is advantageous to make it a private field.
+
+> [!CAUTION]
+> Like in Oxpecker, defining custom tags without the
+> special attribute member will not generate a component
+> function. You will still be able to transpile, but the
+> output would be invalid on runtime.
 
 Any accesses to your properties are automatically split, and you can spread whatever other properties into a tag to allow prop drilling, or to integrate with other component libraries that might use providers etc.
 
@@ -154,7 +177,7 @@ export function SomeTag() {
 }
 ```
 
-You can set those defaults in a deeply nested tree where you actually make use of them. As an example of where/what undefined behaviour looks like currently, I've included this example despite it producing unsatisfactory output. This would be the first time I've actually tested this capability!
+You can set those defaults in a deeply nested tree where you actually make use of them.
 
 ```fsharp
 type [<Erase>] CustomTag() =
@@ -178,14 +201,12 @@ function CustomTag(props) {
     return <div>
         <div class={PARTAS_LOCAL.class}>
             <button {...PARTAS_OTHERS} bool:n$={false} />
-            {(value) => {
-            }}
         </div>
     </div>;
 }
 ```
 
-To prevent undefined behaviour further, I can easily add an error when a property is set twice, for safety.
+If you try to apply two defaults to the same property, you will receive an error on compilation.
 
 ## createContext & useContext
 
@@ -224,6 +245,145 @@ export function MyComponent() {
         </SomeContext.Provider>
     </context.Provider>;
 }
+```
+
+### Flattened Arrays in attribute value positions
+
+To allow a pattern such as:
+
+```fsharp
+div(class' = clsx [| "a1"; "a2"; if someCondition then "a3" else "a4" |])
+```
+
+We aggressively unroll the Fable AST in the value position to prevent the formation of toList/toArray, delay and singleton chains.
+
+A comprehensive component and example output:
+
+```fsharp
+[<Erase>]
+type Sidebar() =
+    inherit div()
+    member val side: sidebar.Side = unbox null with get,set
+    member val variant: sidebar.Variant = unbox null with get,set
+    member val collapsible: sidebar.Collapsible = unbox null with get,set
+    [<SolidTypeComponentAttribute>]
+    member props.constructor =
+        props.side <- Left
+        props.variant <- sidebar.Sidebar
+        props.collapsible <- Offcanvas
+        let ctx = Context.useSidebar()
+        let (isMobile, state, openMobile, setOpenMobile) = (ctx.isMobile, ctx.state, ctx.openMobile, ctx.openMobile)
+        Switch() {
+            Match(when' = (props.collapsible = sidebar.None)) {
+                
+                div(class' = Lib.cn [|
+                    "test flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground"
+                    props.class'
+                |]).spread props
+                    { props.children }
+                
+            }
+            Match(when' = isMobile()) {
+                
+                Sheet( open' = openMobile(), onOpenChange = !!setOpenMobile )
+                    .spread props {
+                        SheetContent(
+                            class' = "w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden",
+                            position = !!props.side
+                            ).data("sidebar", !!sidebar.Sidebar)
+                            .data("mobile", "true")
+                            .style'(createObj [ "--sidebar-width" ==> sidebarWidthMobile ])
+                            { div(class' = "flex size-full flex-col") { props.children } }
+                    }
+                
+            }
+            Match(when' = (isMobile() |> not)) {
+                // gap handler on desktop
+                div(
+                class' = Lib.cn [|
+                    "relative h-svh w-[--sidebar-width] bg-transparent transition-[width] duration-200 ease-linear"
+                    "group-data-[collapsible=offcanvas]:w-0"
+                    "group-data-[side=right]:rotate-180"
+                    if (props.variant = sidebar.Floating || props.variant = sidebar.Inset) then
+                        "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
+                    else "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
+                |]
+                )
+                
+                div(
+                class' = Lib.cn [|
+                    "fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex"
+                    if props.side = sidebar.Left then
+                        "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
+                    else "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]"
+                    // Adjust the padding for floating and inset variants.
+                    if props.variant = sidebar.Floating || props.variant = sidebar.Inset then
+                        "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
+                    else "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l"
+                    props.class' 
+                |]
+                    ).spread props
+                    {
+                        div(
+                            class' = "flex size-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+                        ).data("sidebar", !!sidebar.Sidebar)
+                            { props.children }
+                    }
+            }
+            
+        }
+```
+
+```jsx
+
+export function Sidebar(props) {
+    props = mergeProps({
+        side: "left", variant: "sidebar", collapsible: "offcanvas",
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["collapsible", "class", "children", "side", "variant"]);
+    const ctx = Context_useSidebar();
+    const isMobile = ctx.isMobile;
+    return <Switch>
+        <Match when={PARTAS_LOCAL.collapsible === "none"}>
+            <div
+                class={twMerge(clsx(["test flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground", PARTAS_LOCAL.class]))}
+                {...PARTAS_OTHERS} bool:n $={false}>
+                {PARTAS_LOCAL.children}
+            </div>
+        </Match>
+        <Match when={isMobile()}>
+            <Sheet open={ctx.openMobile()}
+                   onOpenChange={ctx.openMobile}
+                   {...PARTAS_OTHERS} bool:n $={false}>
+                <SheetContent class="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+                              position={PARTAS_LOCAL.side}
+                              data-sidebar="sidebar"
+                              data-mobile="true"
+                              style={{
+                                  "--sidebar-width": sidebar_sidebarWidthMobile,
+                              }}>
+                    <div class="flex size-full flex-col">
+                        {PARTAS_LOCAL.children}
+                    </div>
+                </SheetContent>
+            </Sheet>
+        </Match>
+        <Match when={!isMobile()}>
+            <div
+                class={twMerge(clsx(["relative h-svh w-[--sidebar-width] bg-transparent transition-[width] duration-200 ease-linear", "group-data-[collapsible=offcanvas]:w-0", "group-data-[side=right]:rotate-180", ((PARTAS_LOCAL.variant === "floating") ? (true) : (PARTAS_LOCAL.variant === "inset")) ? ("group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]") : ("group-data-[collapsible=icon]:w-[--sidebar-width-icon]")]))}/>
+            <div
+                class={twMerge(clsx(["fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex", (PARTAS_LOCAL.side === "left") ? ("left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]") : ("right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]"), ((PARTAS_LOCAL.variant === "floating") ? (true) : (PARTAS_LOCAL.variant === "inset")) ? ("p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]") : ("group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l"), PARTAS_LOCAL.class]))}
+                {...PARTAS_OTHERS} bool:n $={false}>
+                <div
+                    class="flex size-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+                    data-sidebar="sidebar">
+                    {PARTAS_LOCAL.children}
+                </div>
+            </div>
+        </Match>
+    </Switch>;
+}
+
 ```
 
 ## Conclusion
