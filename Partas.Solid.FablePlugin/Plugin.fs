@@ -113,7 +113,7 @@ module internal rec AST =
                 },
                 Type.MetaType,
                 None
-                ) -> // TODO - handlers for the different extensions that are supported
+                ) ->
                 let fable4 = ctx |> PluginContext.helper |> _.Options |> _.Define |> List.contains "FABLE_COMPILER_4"
                 let fable5 = ctx |> PluginContext.helper |> _.Options |> _.Define |> List.contains "FABLE_COMPILER_5"
                 match extensionName, exprs with
@@ -185,6 +185,10 @@ module internal rec AST =
                 | Value(Null(Unit), None) -> []
                 | Value(UnitConstant, None) -> []
                 | _ ->
+                    // There are a lot of artifact expressions disposed of,
+                    // but if you notice an attribute isn't being rendered, then
+                    // add the `--verbosity` flag to Fable, and then copy the output
+                    // to a file and search the text for the expression by some keyword
                     PluginContext.debugDisposal ctx "PropCollector" expr
                     []
                 |> (@) props
@@ -355,20 +359,24 @@ module internal rec AST =
             headBuilds @ tailBuilds
         | expr :: BuilderCollector ctx restBuilds ->
             match expr with
+            // Builder op
             | Let(Ident.IdentIs ctx (IdentType.Element | IdentType.First | IdentType.Text),
                   BuilderCollectorFeedback ctx value,
                   BuilderCollectorFeedback ctx body
                   ) ->
                     value @ body @ restBuilds
+            // Builder op
             | Let(
                 Ident.IdentIs ctx (IdentType.Builder | IdentType.Second),
                 BuilderCollectorFeedback ctx value,
                 BuilderCollectorFeedback ctx body
                 ) ->
                     body @ value @ restBuilds
+            // This was somehow related to fixes for Oxpecker.Solid.Tests
             | CurriedApply(BuilderCollectorFeedback ctx applied, BuilderCollector ctx args, typ, range) ->
                 if args.IsEmpty then applied @ restBuilds
                 else CurriedApply(applied.Head, args, typ, range) :: restBuilds
+            // This captures and correctly generates the lambda in the For and Index bindings
             | Lambda(
                 Ident.IdentIs ctx IdentType.Cont,
                 TypeCast(Lambda(item, Lambda(index, BuilderCollectorFeedback ctx expr, _), _), _),
@@ -376,15 +384,19 @@ module internal rec AST =
                 ) ->
                 let getHead = List.tryHead >> Option.defaultValue (Value(UnitConstant, None))
                 Delegate([ item; index ], getHead expr, None, []) :: restBuilds
+            // Builder op
             | Lambda(
                 Ident.IdentIs ctx (IdentType.Builder | IdentType.Yield | IdentType.Cont),
                 BuilderCollectorFeedback ctx expr,
                 _
                 ) -> expr @ restBuilds
+            // In the case of JSX (not tsx) the type cast is irrelevant for the string
             | TypeCast(Value(StringConstant _, _) as text, Unit) ->
                  text :: restBuilds
+            // Ensure typecasts are transformed
             | TypeCast(BuilderCollectorFeedback ctx expr, typ) ->
                 expr @ restBuilds
+            // Ensure conditionals are transformed
             | IfThenElse(
                 BuilderCollectorFeedback ctx guardExpr,
                 BuilderCollectorFeedback ctx thenExpr,
@@ -396,14 +408,17 @@ module internal rec AST =
                     getHead thenExpr,
                     getHead elseExpr,
                     range) ] @ restBuilds
+            // lift any getters/setters
             | PropsGetterOrSetter ctx (BuilderCollectorFeedback ctx exprs) ->
                 exprs @ restBuilds
             // | PropsGetterOrSetter ctx expr ->
                 // match expr with
                 // | Value(UnitConstant, None) | Value(Null(Any), None) -> restBuilds
                 // | _ -> expr :: restBuilds
+            // Identifiers that are not one of our artifact build identifiers are allowed to be rendered
+            // The rest will be disposed
             | IdentExpr(Ident.IdentIs ctx IdentType.Other) ->
-                expr :: restBuilds // Non builder identifier
+                expr :: restBuilds
             // This is a prop getter in a builder, don't transform inside as it's already been done.
             | Get(IdentExpr({ IsThisArgument = true ; IsCompilerGenerated = true }), _, _, _) ->
                 expr :: restBuilds
@@ -424,29 +439,63 @@ module internal rec AST =
             | _ ->
                 expr :: restBuilds
                 
-    /// Collates TagInfos into ElementBuilders which can then be rendered via `renderElement`
+    /// <summary>
+    /// Collates TagInfos into ElementBuilders which can then be rendered via `renderElement`<br/>
+    /// Performs final clean up of properties by trimming reserved identifiers of the attribute keys
+    /// </summary>
     let collectTagInfo (ctx: PluginContext): TagInfo -> ElementBuilder = function
         | TagInfo.WithBuilder(tagSource, BuilderCollector ctx propsAndChildren, range) ->
-            { TagSource = tagSource; Children = propsAndChildren; Properties = [] }
+            {
+                TagSource = tagSource
+                Children = propsAndChildren
+                Properties = []
+            }
         | TagInfo.Combined(tagSource, props, BuilderCollector ctx propsAndChildren, range) ->
-            { TagSource = tagSource; Children = propsAndChildren; Properties = props }
+            {
+                TagSource = tagSource
+                Children = propsAndChildren
+                Properties = props |> List.map (fun (prop,expr) -> (prop |> Utils.trimReservedIdentifiers, expr) )
+            }
         | TagInfo.Constructor(tagSource, props, range) ->
-            { TagSource = tagSource; Children = []; Properties = props }
+            {
+                TagSource = tagSource
+                Children = []
+                Properties = props |> List.map (fun (prop,expr) -> (prop |> Utils.trimReservedIdentifiers, expr) )
+            }
             
-    // Have an expression? Don't know what to do with it? Let me gobble gobble sir.
+    /// <summary>
+    /// This is the heart of the transformation sequence.<br/>
+    /// This must handle the transformation of every expression. All expressions parsed
+    /// into the transformer are at some point or another, passed through this
+    /// transformer.<br/>
+    /// </summary>
+    /// <param name="ctx">PluginContext</param>
+    /// <param name="expr">Expr node to transform</param>
+    /// <remarks>
+    /// Much of this transformation has to do with picking up
+    /// top level expressions that contain nested expressions, and
+    /// then passing those nested expressions through the transformation
+    /// before assembling them back into the nested structure.
+    /// </remarks>
     let transform (ctx: PluginContext) (expr: Expr)=
         match expr with
+        // To enable sugar like `&&=` and `??=`, we have to ensure the arguments
+        // are transformed.
         | Emit({ CallInfo = { Args = exprs } as callInfo } as emitInfo, typ, range) ->
             let transformedExprs = exprs |> List.map (transform ctx)
             Emit({ emitInfo with CallInfo = { callInfo with Args = transformedExprs } }, typ, range)
+        // Matches against any expression pattern that needs to be converted into a JSX tag
         | TagConstructor ctx tagInfo ->
             tagInfo |> collectTagInfo ctx |> Baked.renderElement ctx
+        // transform each expr in the sequence
         | Sequential exprs ->
             exprs
             |> List.map (transform ctx)
             |> Sequential
+        // any captured Getters or Setters of our self identifier are treated specially
         | PropsGetterOrSetter ctx expr ->
             expr
+        // transform conditionals
         | IfThenElse(guardExpr, thenExpr, elseExpr, range) ->
             IfThenElse(
                 transform ctx guardExpr,
@@ -459,12 +508,16 @@ module internal rec AST =
                 targets
                 |> List.map (fun (target, expr) -> target, transform ctx expr)
                 )
+        // To make this more pervasive, we can remove the Type restriction
         | TypeCast(expr, (DeclaredType _ | Any)) -> transform ctx expr
-        // We SHOULD NOT be capturing attribute expressions at this level. This is the only pattern that we don't want
-        // gobble gobbled. But... Perhaps this points to redundancy in property collection.
+        // Attribute expression pairs should have been captured by
+        // TagConstructor -> PropCollector. It would be invalid to have them
+        // matched here
         | AttributeExpression ctx propInfo ->
             PluginContext.logWarning ctx $"Attribute expression was parsed at the top level and was reduced out:\n{propInfo}"
             snd propInfo
+        // Nested expression structures have their descendants transformed before
+        // being restored
         | CurriedApply(applied, exprs, typ, range) ->
             CurriedApply(transform ctx applied, exprs |> List.map (transform ctx), typ, range )
         | Delegate(args, body, name, tags) ->
@@ -491,16 +544,19 @@ type SolidTypeComponentAttribute() =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
-        Console.WriteLine "\nSTART MEMBER DECL!!!"
-        Console.WriteLine memberDecl.Body
-        Console.WriteLine "END MEMBER DECL!!!\n"
+        // Console.WriteLine "\nSTART MEMBER DECL!!!"
+        // Console.WriteLine memberDecl.Body
+        // Console.WriteLine "END MEMBER DECL!!!\n"
         let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
         match memberDecl with
+        // Check that the memberDecl has the correct self identifier of `props`
         | SchemaRules.ValidMemberRef ctx finalName ->
             let newExpr =
                 memberDecl.Body
-                |> AST.transform ctx
+                |> AST.transform ctx // initiate transformation
+                // Create and append the splitProps expression
                 |> Baked.convertGettersToObject (PluginContext.getGetters ctx |> List.distinct)
+                // Create and append the mergeProps expression if we have any setters
                 |> Baked.convertSettersToObject (PluginContext.getSetters ctx)
             { memberDecl with Body = newExpr; Name = finalName }
         | _ ->
