@@ -458,10 +458,10 @@ module internal rec AST =
                 // match expr with
                 // | Value(UnitConstant, None) | Value(Null(Any), None) -> restBuilds
                 // | _ -> expr :: restBuilds
-            // Identifiers that are not one of our artifact build identifiers are allowed to be rendered
-            // The rest will be disposed
-            | IdentExpr(Ident.IdentIs ctx IdentType.Other) ->
-                expr :: restBuilds
+            // We can transform the contents of the Get, but since it is a field access, we don't want
+            // to dispose of the accessor.
+            | Get(BuilderCollectorFeedback ctx [ expr ], (GetKind.FieldGet _ as getKind), typ ,range) ->
+                Get(expr, getKind, typ, range) :: restBuilds
             // We can transform the contents of the Get, but since it is a tuple accessor, we can't
             // unwrap it. This would cause accessors to be disposed of.
             | Get((BuilderCollectorFeedback ctx [ expr ] | expr), (TupleIndex _ as getKind), typ, range) ->
@@ -479,6 +479,10 @@ module internal rec AST =
                     None)
                 when name = otherName ->
                 restBuilds
+            // Identifiers that are not one of our artifact build identifiers are allowed to be rendered
+            // The rest will be disposed
+            | IdentExpr(Ident.IdentIs ctx IdentType.Other) ->
+                expr :: restBuilds
             // This is one of our builder identifiers; no reason it should be rendered.
             | IdentExpr(_)
             | Value(UnitConstant, None) -> restBuilds // You have been judged unworthy
@@ -578,22 +582,32 @@ module internal rec AST =
             Delegate(args, transform ctx body, name, tags)
         | Lambda(ident, expr, name) ->
             Lambda(ident, transform ctx expr, name)
-        | Let(ident, value, body) ->
+        | Let(ident, value, body) -> // transform other lets
             Let(ident, transform ctx value, transform ctx body)
-        | Call(callee, callInfo, typ, range) ->
+        | Call(callee, callInfo, typ, range) -> // transform calls
             Call(callee, { callInfo with Args = callInfo.Args |> List.map (transform ctx) }, typ, range)
-        | Value(
+        | Value( // transform inside anon records
                 NewAnonymousRecord(values, fieldNames, types, isStruct),
                 range
             ) ->
             Value(NewAnonymousRecord(values |> List.map (transform ctx), fieldNames, types, isStruct), range)
-        | Value(
+        | Value( // transform inside arrays
                 NewArray(ArrayValues exprs, typ, kind),
                 range
             ) ->
             Value(NewArray(ArrayValues (exprs |> List.map (transform ctx)), typ, kind), range)
+        | Value( // transform inside lists
+                NewList(Some(expr1, expr2), typ),
+                range
+            ) ->
+            Value(NewList(Some(transform ctx expr1, transform ctx expr2), typ), range)
+        | Value( // transform inside records
+                NewRecord(exprs, entityRef, genArgs),
+                range
+            ) ->
+            Value(NewRecord(exprs |> List.map (transform ctx), entityRef, genArgs), range)
         | Operation(kind, tags, typ, range) ->
-            Operation(
+            Operation( // transform operations
                 match kind with
                 | Unary(operator, operand) -> Unary(operator, operand |> transform ctx)
                 | Binary(operator, left, right) -> Binary(operator, left |> transform ctx, transform ctx right)

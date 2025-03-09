@@ -42,3 +42,7 @@ let ``mergeProps splitProps and property spreading`` () =
 [<Fact>]
 let ``Property getters mixed with Operands are transformed`` () =
     runSolidCase "OperatorsInProps"
+
+[<Fact>]
+let ``Field getters and records are transformed`` () =
+    runSolidCase "FieldGettersInComputations"

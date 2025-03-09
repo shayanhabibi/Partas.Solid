@@ -36,7 +36,10 @@
         <None Include="SolidCases\CombinedSpread\CombinedSpread.fsproj" />
         <Compile Include="SolidCases\OperatorsInProps\OperatorsInProps.fs" />
         <None Include="SolidCases\OperatorsInProps\OperatorsInProps.expected" />
-        <None Include="SolidCases\OperatorsInProps\MergeProps.fsproj" />
+        <None Include="SolidCases\OperatorsInProps\OperatorsInProps.fsproj" />
+        <Compile Include="SolidCases\FieldGettersInComputations\FieldGettersInComputations.fs" />
+        <Content Include="SolidCases\FieldGettersInComputations\FieldGettersInComputations.expected" />
+        <None Include="SolidCases\FieldGettersInComputations\FieldGettersInComputations.fsproj" />
         <Compile Include="Common.fs" />
         <Compile Include="SolidTests.fs" />
         <Compile Include="Program.fs" />

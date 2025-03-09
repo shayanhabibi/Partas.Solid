@@ -1,0 +1,25 @@
+import { Record } from "./fable_modules/fable-library-js.5.0.0-alpha.11/Types.js";
+import { record_type, string_type } from "./fable_modules/fable-library-js.5.0.0-alpha.11/Reflection.js";
+import { item, singleton } from "./fable_modules/fable-library-js.5.0.0-alpha.11/List.js";
+
+export class MenuItem extends Record {
+    constructor(Title, Url, Icon) {
+        super();
+        this.Title = Title;
+        this.Url = Url;
+        this.Icon = Icon;
+    }
+}
+
+export function MenuItem_$reflection() {
+    return record_type("Partas.Solid.Tests.SolidCases.FieldGettersInComputations.MenuItem", [], MenuItem, () => [["Title", string_type], ["Url", string_type], ["Icon", string_type]]);
+}
+
+export function App_App() {
+    const items = singleton(new MenuItem("Home", "#", <div />));
+    return <div>
+        <button />
+        {item(0, items).Icon}
+    </div>;
+}
+
