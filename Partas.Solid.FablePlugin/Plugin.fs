@@ -462,6 +462,10 @@ module internal rec AST =
             // The rest will be disposed
             | IdentExpr(Ident.IdentIs ctx IdentType.Other) ->
                 expr :: restBuilds
+            // We can transform the contents of the Get, but since it is a tuple accessor, we can't
+            // unwrap it. This would cause accessors to be disposed of.
+            | Get((BuilderCollectorFeedback ctx [ expr ] | expr), (TupleIndex _ as getKind), typ, range) ->
+                Get(expr, getKind, typ, range) :: restBuilds
             // This is a prop getter in a builder, don't transform inside as it's already been done.
             | Get(IdentExpr({ IsThisArgument = true ; IsCompilerGenerated = true }), _, _, _) ->
                 expr :: restBuilds
