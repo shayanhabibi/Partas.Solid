@@ -641,7 +641,7 @@ type SolidComponentAttribute() =
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
-        Console.WriteLine memberDecl
+        // Console.WriteLine memberDecl
         {
             memberDecl with
                 Body = memberDecl.Body |> AST.transform ctx
