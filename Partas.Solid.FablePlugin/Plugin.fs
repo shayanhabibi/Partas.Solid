@@ -260,6 +260,7 @@ module internal rec AST =
             (Expr.ImportedConstructor ctx & Import({Kind = UserImport false}, _, _) as imp),
             {
                 Args = PropCollector ctx props
+                MemberRef  = Some(MemberRef(_, { CompiledName = ".ctor" }))
             },
             (Type.PartasName ctx typeName),
             range) ->
@@ -297,6 +298,7 @@ module internal rec AST =
             (Expr.ImportedConstructor ctx & Import(identee, t, r)),
             {
                 Args = PropCollector ctx props
+                MemberRef = Some(MemberRef(_, { CompiledName = ".ctor" }))
             },
             (Type.PartasName ctx typeName),
             range) ->

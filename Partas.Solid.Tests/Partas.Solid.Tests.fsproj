@@ -40,7 +40,12 @@
         <Compile Include="SolidCases\FieldGettersInComputations\FieldGettersInComputations.fs" />
         <Content Include="SolidCases\FieldGettersInComputations\FieldGettersInComputations.expected" />
         <None Include="SolidCases\FieldGettersInComputations\FieldGettersInComputations.fsproj" />
+        <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructorTypes.fs" />
+        <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.fs" />
+        <Content Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.expected" />
+        <None Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.fsproj" />
         <Compile Include="Common.fs" />
+        <Compile Include="IssueTests.fs" />
         <Compile Include="SolidTests.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
