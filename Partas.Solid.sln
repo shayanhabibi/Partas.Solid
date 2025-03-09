@@ -6,8 +6,6 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Partas.Solid.FablePlugin", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Partas.Solid.Tests", "Partas.Solid.Tests\Partas.Solid.Tests.fsproj", "{C08FF805-9A5B-4529-B78A-AC7C67F0DFF8}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ScratchTests", "ScratchTests\ScratchTests.fsproj", "{107B9E6E-5EF2-4ECA-91F1-11D3A7940D4F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
