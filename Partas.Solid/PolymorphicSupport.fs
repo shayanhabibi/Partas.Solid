@@ -6,6 +6,8 @@ open System.Runtime.CompilerServices
 open Partas.Solid
 open Fable.Core
 
+#nowarn 64
+
 /// If a tag has some capacity for polymorphism, then that must be explicitly
 /// labeled by interfacing with Polymorph. All Kobalte base elements do this.
 [<Erase>]

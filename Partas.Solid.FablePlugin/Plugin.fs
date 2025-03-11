@@ -673,8 +673,19 @@ module internal rec AST =
                 range
                 ) ->
                 match callee with
+                // Some ident
                 | IdentExpr({ Type = Type.PartasName ctx typeName } as identee) ->
                     IdentExpr({ identee with Name = typeName |> Utils.trimReservedIdentifiers }) |> Some
+                // prevent import of native tags
+                | Expr.NativeImportedConstructor ctx
+                    & Import(
+                        importInfo,
+                        typ & Type.PartasName ctx typeName,
+                        range
+                    ) ->
+                    IdentExpr({ Name = typeName; Type = typ; IsMutable = false ; IsThisArgument = false ; IsCompilerGenerated = true; Range = range })
+                    |> Some
+                // an imported tag
                 | Import(
                     importInfo,
                     typ & Type.PartasName ctx typeName,
@@ -684,34 +695,60 @@ module internal rec AST =
                 | _ -> None
             | _ -> None
         let (|TagRender|_|) (ctx: PluginContext): Expr -> Expr option = function
+            // A call to render a tagvalue with a constructor
             | Call(
                 Import(ImportInfo.Render, GetType eRef, _),
                 {
-                    Args = [ Call(_, CallInfo.Constructor ctx, _, _) ] & [ TagConstructor ctx tagInfo ]
-                },
-                _,
-                _
-                ) ->
-                tagInfo |> collectTagInfo ctx |> renderElement ctx |> Some
+                    ThisArg = thisArg // contains info on the left expr of render
+                    Args = (
+                        TagConstructor ctx tagInfo :: BuilderCollector ctx rest
+                         | TypeCast(TagConstructor ctx tagInfo, _) :: BuilderCollector ctx rest
+                    )
+                }, _, _ ) ->
+                tagInfo
+                |> function
+                    | TagInfo.WithBuilder(tagName, propsAndChildren, range) ->
+                        TagInfo.WithBuilder(tagName, rest @ propsAndChildren, range)
+                    | TagInfo.Combined(tagName, props, propsAndChildren, range) ->
+                        TagInfo.Combined(tagName, props, rest @ propsAndChildren, range)
+                    | TagInfo.Constructor(tagName, props, range) ->
+                        TagInfo.Combined(tagName, props, rest, range)
+                |> collectTagInfo ctx
+                |> fun eleBuilder ->
+                    match thisArg with
+                    | Some expr // Make sure we capture getters
+                    | Some(PropsGetterOrSetter ctx expr) ->
+                        { eleBuilder with TagSource = TagSource.LibraryImport expr }
+                    | _ -> eleBuilder
+                |> renderElement ctx |> Some
+            // a call to render a tagvalue with an anon record
+            // todo - support key,value pair list
             | Call(
                 Import(ImportInfo.Render, GetType eRef, _),
                 {
+                    ThisArg = thisArg
                     Args = CollectProperties ctx props
                 },
                 _,
                 range
                 ) ->
                 let importExpr =
-                    Import(
-                        {
-                            Selector =
-                                eRef.FullName |> Utils.trimReservedIdentifiers
-                            Path = eRef.SourcePath |> Option.defaultValue ""
-                            Kind = UserImport false
-                        },
-                        Any,
-                        range
-                    )
+                    match thisArg with
+                    | Some(PropsGetterOrSetter ctx expr) ->
+                        expr
+                    | Some(IdentExpr(_) as ident) ->
+                        ident
+                    | _ ->
+                        Import(
+                            {
+                                Selector =
+                                    eRef.FullName |> Utils.trimReservedIdentifiers
+                                Path = eRef.SourcePath |> Option.defaultValue ""
+                                Kind = UserImport false
+                            },
+                            Any,
+                            range
+                        )
                 { TagSource = TagSource.LibraryImport importExpr
                   Properties = props
                   Children = [] }
@@ -763,7 +800,7 @@ type SolidComponentAttribute() =
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
-        Console.WriteLine memberDecl
+        // Console.WriteLine memberDecl
         {
             memberDecl with
                 Body = memberDecl.Body |> AST.transform ctx
