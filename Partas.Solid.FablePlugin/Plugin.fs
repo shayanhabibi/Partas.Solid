@@ -16,6 +16,7 @@ open System
 open Fable
 open Fable.AST
 open Fable.AST.Fable
+open Partas.Solid.Baked
 
 [<assembly: ScanForPlugins>]
 do ()
@@ -123,7 +124,11 @@ module internal rec AST =
                 callee,
                 {
                     ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal))
-                    Args = (ValueUnrollerFeedback [ expr ] |  expr) :: _
+                    Args = (
+                        TagValue.TagValue ctx expr // Before unrolling, check if it's a TagValue ident expression
+                      | ValueUnrollerFeedback [ expr ]
+                      |  expr
+                      ) :: _
                     MemberRef = MemberRef.Option.PartasName ctx prop as memberRef
                 },
                 _,
@@ -537,6 +542,11 @@ module internal rec AST =
         | Emit({ CallInfo = { Args = exprs } as callInfo } as emitInfo, typ, range) ->
             let transformedExprs = exprs |> List.map (transform ctx)
             Emit({ emitInfo with CallInfo = { callInfo with Args = transformedExprs } }, typ, range)
+        | TagValue.TagValue ctx expr ->
+            expr
+        // Enables plugin magic for TagValues
+        | TagValue.TagRender ctx expr ->
+            expr
         // Matches against any expression pattern that needs to be converted into a JSX tag
         | TagConstructor ctx tagInfo ->
             tagInfo |> collectTagInfo ctx |> Baked.renderElement ctx
@@ -621,6 +631,98 @@ module internal rec AST =
             )
         | _ as expr -> expr
 
+    /// Plugin support for the TagValue magics
+    module TagValue =
+        module EntityRef =
+            let (|TagValue|_|) = function
+                | { FullName = "Partas.Solid.Builder.TagValue`1" } -> Some()
+                | _ -> None
+        module ImportInfo =
+            let (|TagValue|_|) = function
+                | { Kind = MemberImport(MemberRef(EntityRef.TagValue, _)) } -> Some()
+                | _ -> None
+            let (|Render|_|) = function
+                | { Kind = MemberImport(MemberRef(EntityRef.TagValue, { CompiledName = "render" })) }
+                    -> Some()
+                | _ -> None
+        
+        /// Will retrieve the wrapped type entity ref if it is a valid TagValue type
+        let (|GetType|_|) = function
+            | DeclaredType(EntityRef.TagValue, [ DeclaredType(entRef,_) ]) -> Some entRef
+            | LambdaType(GetType entRef, _ ) -> Some entRef
+            | _ -> None
+        let (|CollectProperties|_|) (ctx: PluginContext) = function
+            | [ TypeCast(Value(NewAnonymousRecord(values, fields, _, _), _), _) ] ->
+                values
+                |> List.zip (fields |> Array.toList)
+                |> List.map (fun (s,e) ->
+                    e
+                    |> transform ctx
+                    |> fun e ->
+                        s |> Utils.trimReservedIdentifiers,
+                        e)
+                |> Some
+            | _ -> None
+        let (|TagValue|_|) (ctx: PluginContext): Expr -> Expr option = function
+            | Call(
+                Import({ Selector = "op_BangAt"; Kind = MemberImport(MemberRef({ FullName = "Partas.Solid.Builder" }, _)) }, _, _),
+                {
+                    Args = Lambda(_, Call(callee, _, _, _), _) :: _
+                },
+                _,
+                range
+                ) ->
+                match callee with
+                | IdentExpr({ Type = Type.PartasName ctx typeName } as identee) ->
+                    IdentExpr({ identee with Name = typeName |> Utils.trimReservedIdentifiers }) |> Some
+                | Import(
+                    importInfo,
+                    typ & Type.PartasName ctx typeName,
+                    range) ->
+                    Import({ importInfo with Selector = typeName }, typ, range)
+                    |> Some
+                | _ -> None
+            | _ -> None
+        let (|TagRender|_|) (ctx: PluginContext): Expr -> Expr option = function
+            | Call(
+                Import(ImportInfo.Render, GetType eRef, _),
+                {
+                    Args = [ Call(_, CallInfo.Constructor ctx, _, _) ] & [ TagConstructor ctx tagInfo ]
+                },
+                _,
+                _
+                ) ->
+                tagInfo |> collectTagInfo ctx |> renderElement ctx |> Some
+            | Call(
+                Import(ImportInfo.Render, GetType eRef, _),
+                {
+                    Args = CollectProperties ctx props
+                },
+                _,
+                range
+                ) ->
+                let importExpr =
+                    Import(
+                        {
+                            Selector =
+                                eRef.FullName |> Utils.trimReservedIdentifiers
+                            Path = eRef.SourcePath |> Option.defaultValue ""
+                            Kind = UserImport false
+                        },
+                        Any,
+                        range
+                    )
+                { TagSource = TagSource.LibraryImport importExpr
+                  Properties = props
+                  Children = [] }
+                |> renderElement ctx
+                |> Some
+            | _ -> None
+            
+            
+                
+
+
 type SolidTypeComponentAttribute() =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
@@ -661,7 +763,7 @@ type SolidComponentAttribute() =
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
-        // Console.WriteLine memberDecl
+        Console.WriteLine memberDecl
         {
             memberDecl with
                 Body = memberDecl.Body |> AST.transform ctx

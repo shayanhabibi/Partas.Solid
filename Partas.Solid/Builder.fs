@@ -31,6 +31,20 @@ module Builder =
     type VoidNode() =
         interface HtmlTag
 
+    [<Erase>]
+    type TagValue<'T when 'T :> HtmlTag>(tag: unit -> 'T) =
+        [<Erase>]
+        member this.render (PARTAS_CONSTRUCTOR: 'T :> HtmlTag): 'T = jsNative
+        
+        [<Erase>]
+        member this.render (PARTAS_PROPERTIES: obj):  'T = jsNative
+        
+        [<Erase>]
+        member this.render (): 'T = jsNative
+        static member inline (%) (left: TagValue<'T>, right: obj) = left.render(right)
+    
+    let (!@) (this: unit -> #HtmlTag) = TagValue(this)
+    
     type HtmlContainerFun = HtmlContainer -> unit
 
     type HtmlContainer with
