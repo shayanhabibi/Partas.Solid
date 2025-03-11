@@ -4,9 +4,10 @@
 
 <div align="center">
   <a href="https://github.com/shayanhabibi/Partas.Solid" target="_blank">
-    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwYzA0ODEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1yZXBsYWNlLWFsbCI+PHBhdGggZD0iTTE0IDE0YTIgMiAwIDAgMSAyIDJ2NGEyIDIgMCAwIDEtMiAyIi8+PHBhdGggZD0iTTE0IDRhMiAyIDAgMCAxIDItMiIvPjxwYXRoIGQ9Ik0xNiAxMGEyIDIgMCAwIDEtMi0yIi8+PHBhdGggZD0iTTIwIDE0YTIgMiAwIDAgMSAyIDJ2NGEyIDIgMCAwIDEtMiAyIi8+PHBhdGggZD0iTTIwIDJhMiAyIDAgMCAxIDIgMiIvPjxwYXRoIGQ9Ik0yMiA4YTIgMiAwIDAgMS0yIDIiLz48cGF0aCBkPSJtMyA3IDMgMyAzLTMiLz48cGF0aCBkPSJNNiAxMFY1YSAzIDMgMCAwIDEgMy0zaDEiLz48cmVjdCB4PSIyIiB5PSIxNCIgd2lkdGg9IjgiIGhlaWdodD0iOCIgcng9IjIiLz48L3N2Zz4=" height="24px" style="border-radius:8px;"/>
+    <img src="https://www.solidjs.com/img/logo/without-wordmark/logo.svg" height="32px" style="border-radius:8px;" />
+    <img src="https://fsharp.org/img/logo/fsharp256.png" height="32px" />
   </a>
-
+    
 <h3 align="center">Partas.Solid</h3>
   <p align="center">
     <kbd>Solid-JS wrapper in Oxpecker style.</kbd>
