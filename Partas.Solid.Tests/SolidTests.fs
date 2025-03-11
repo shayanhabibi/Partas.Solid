@@ -46,3 +46,7 @@ let ``Property getters mixed with Operands are transformed`` () =
 [<Fact>]
 let ``Field getters and records are transformed`` () =
     runSolidCase "FieldGettersInComputations"
+
+[<Fact>]
+let ``Tags can be used as values`` () =
+    runSolidCase "TagsAsValuesSimple"

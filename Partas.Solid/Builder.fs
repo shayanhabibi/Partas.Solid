@@ -42,6 +42,7 @@ module Builder =
         [<Erase>]
         member this.render (): 'T = jsNative
         static member inline (%) (left: TagValue<'T>, right: obj) = left.render(right)
+        static member inline (%) (left: TagValue<'T>, right: #HtmlTag) = left.render(right)
     
     let (!@) (this: unit -> #HtmlTag) = TagValue(this)
     
