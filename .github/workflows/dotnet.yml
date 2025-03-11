@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_VERSION: 9.0.101
+
+# Kill other jobs when we trigger this workflow by sending new commits
+# to the PR.
+# https://stackoverflow.com/a/72408109
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+#   fantomas-check:
+#     runs-on: ubuntu-22.04
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+
+#       - name: Setup .NET
+#         uses: actions/setup-dotnet@v3
+#         with:
+#           dotnet-version: ${{ env.DOTNET_VERSION }}
+
+#       - name: Tool Restore
+#         run: dotnet tool restore
+
+#       - name: Lint
+#         run: dotnet fantomas -r --check .
+
+  build:
+    runs-on: ubuntu-22.04
+    # needs: ['fantomas-check']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # workaround for https://github.com/actions/runner/issues/2033
+      - name: ownership workaround
+        run: git config --global --add safe.directory '*'
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore nuget dependencies
+        run: dotnet restore Partas.Solid.sln
+
+      - name: Compile the main solution
+        run: dotnet build Partas.Solid.sln --no-restore
+
+      - name: Test the main solution
+        run: dotnet test Partas.Solid.sln --no-restore --no-build
+
+      - name: Restore Solid nuget dependencies
+        run: dotnet restore Partas.Solid.sln
+
+      - name: Compile Solid solution
+        run: dotnet build Partas.Solid.sln --no-restore
