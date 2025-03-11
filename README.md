@@ -42,6 +42,16 @@ Bindings for different libraries [Partas.Solid.Bindings](https://github.com/shay
 > 
 > Use the latest 5.0 alpha, or wait for full release.
 
+> [!IMPORTANT]
+> Compilation with Fable should use the `.jsx` extension.
+> The plugin codegen is not supported in Debug mode (due to compiler AST differences).
+> 
+> Suggested compile flags:
+> 
+> ```shell
+> fable -c Release -o output -e .fs.jsx
+> ```
+
 ## Oxpecker.Solid
 
 > [!IMPORTANT]
