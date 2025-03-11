@@ -692,7 +692,10 @@ module internal rec AST =
                     range) ->
                     Import({ importInfo with Selector = typeName }, typ, range)
                     |> Some
+                | Import({ Kind = UserImport false }, _, _) ->
+                    Some callee
                 | _ -> None
+            | TypeCast(TagValue ctx expr, _) -> expr |> Some
             | _ -> None
         let (|TagRender|_|) (ctx: PluginContext): Expr -> Expr option = function
             // A call to render a tagvalue with a constructor
