@@ -183,6 +183,42 @@ module internal rec AST =
                     $"Spread does not support this as a value in Fable 4 or below:\n{expr}"
                     |> PluginContext.logError ctx
                     None
+                // If polymorph, then revise the expression to be a lambda call
+                // that spreads the props within.
+                | "as'", [ expr ] ->
+                    match transform ctx expr with
+                    | Call(
+                        callee, ({
+                            Tags = [ "jsx" ]
+                            Args = [ tagName ; internalCollection ]
+                        } as callInfo), typ, range)
+                        when callee = importJsxCreate && typ = jsxElementType ->
+                        let c: Ident = { Name = "PARTAS_POLYPROPS"
+                                         Type = typ
+                                         IsMutable = false
+                                         IsThisArgument = false
+                                         IsCompilerGenerated = true
+                                         Range = range
+                                          }
+                        Lambda(c,
+                            Call(
+                            callee,
+                            { callInfo with Args = [
+                                        tagName;
+                                        Value(
+                                            NewList(Some(
+                                                Value(NewTuple([ Value(StringConstant "{...PARTAS_POLYPROPS} on:n$", None); TypeCast(Value(ValueKind.BoolConstant false, None), Type.Any) ], false), None)
+                                                , internalCollection
+                                            ), Any),
+                                            None
+                                            )
+                            ]  },
+                            typ, range), None)
+                    | expr -> expr
+                    |> fun expr ->
+                        Some("as", expr)
+                    
+                    
                 // -- FEATURE NOT PRESENT IN FABLE COMPILER YET -- //
                 // | "spread", [ identExpr ] when fable5 -> 
                 //     Some("__SPREAD_PROPERTY__", identExpr)
@@ -325,7 +361,7 @@ module internal rec AST =
                 TagInfo.Combined(tagSource, bodyProps, propsAndChildren, range)
             |> Some
         // WITH PROPS & EXTENSION
-        | Call(Import({ Kind = MemberImport(MemberRef({ FullName = Utils.EndsWith "HtmlElementExtensions" }, _)) }, _, _) as callee, ({
+        | Call(Import({ Kind = MemberImport(MemberRef({ FullName = Utils.EndsWith "HtmlElementExtensions" | Utils.EndsWith "PolymorphicExtensions" }, _)) }, _, _) as callee, ({
                 Args = TagConstructor ctx tagInfo :: rest 
             } as callInfo), _, _) ->
             // We compile all the information of the extension call into the callinfo and make the rest almost impossible to mistake

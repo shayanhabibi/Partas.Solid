@@ -31,11 +31,52 @@ module Builder =
     type VoidNode() =
         interface HtmlTag
 
+    /// <summary>
+    /// Explicit plugin declaration that the identifier that this
+    /// is bound to can be treated as a Tag. <br/>
+    /// This allows you to pass tags constructors as functions/values 
+    /// </summary>
+    /// <example><code>
+    /// // Verbose syntax
+    /// let tag = TagValue(div)
+    /// // Operator overload
+    /// let tag = !@div
+    /// </code></example>
     [<Erase>]
     type TagValue<'T when 'T :> HtmlTag>(tag: unit -> 'T) =
+        /// <summary>
+        /// Directs the plugin to build the call site as a Tag
+        /// in JSX.
+        /// </summary>
+        /// <example><code>
+        /// let tag = TagValue(div)
+        /// // Verbose syntax
+        /// tag.render({| class' = "hello" |})
+        /// // alt
+        /// tag.render(div(class' = "hello"))
+        /// // Operator overload
+        /// tag % {| class' = "hello |}
+        /// // alt
+        /// tag % div(class' = "hello")
+        /// </code></example>
         [<Erase>]
         member this.render (PARTAS_CONSTRUCTOR: 'T :> HtmlTag): 'T = jsNative
         
+        /// <summary>
+        /// Directs the plugin to build the call site as a Tag
+        /// in JSX.
+        /// </summary>
+        /// <example><code>
+        /// let tag = TagValue(div)
+        /// // Verbose syntax
+        /// tag.render({| class' = "hello" |})
+        /// // alt
+        /// tag.render(div(class' = "hello"))
+        /// // Operator overload
+        /// tag % {| class' = "hello |}
+        /// // alt
+        /// tag % div(class' = "hello")
+        /// </code></example>
         [<Erase>]
         member this.render (PARTAS_PROPERTIES: obj):  'T = jsNative
         
