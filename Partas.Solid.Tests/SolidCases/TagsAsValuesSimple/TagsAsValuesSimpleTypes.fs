@@ -9,7 +9,7 @@ open Fable.Core
 type ModuleTag() =
     inherit RegularNode()
     [<Erase>]
-    member val other: TagValue<div> = jsNative with get,set
+    member val other: TagValue = jsNative with get,set
     [<SolidTypeComponent>]
     member props.constructor =
         div()
@@ -18,4 +18,4 @@ type ModuleTag() =
 type Imported() =
     inherit RegularNode()
     [<Erase>]
-    member val other: TagValue<'T> = jsNative with get,set
+    member val other: TagValue = jsNative with get,set

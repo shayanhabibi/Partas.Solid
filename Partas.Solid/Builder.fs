@@ -4,6 +4,7 @@ open System.Runtime.CompilerServices
 open Fable.Core
 
 #nowarn 49
+#nowarn 64
 
 [<AutoOpen>]
 module Builder =
@@ -43,7 +44,7 @@ module Builder =
     /// let tag = !@div
     /// </code></example>
     [<Erase>]
-    type TagValue<'T when 'T :> HtmlTag>(tag: unit -> 'T) =
+    type TagValue(tag: unit -> #HtmlElement) =
         /// <summary>
         /// Directs the plugin to build the call site as a Tag
         /// in JSX.
@@ -60,7 +61,7 @@ module Builder =
         /// tag % div(class' = "hello")
         /// </code></example>
         [<Erase>]
-        member this.render (PARTAS_CONSTRUCTOR: 'T :> HtmlTag): 'T = jsNative
+        member this.render (PARTAS_CONSTRUCTOR: 'T): 'T = jsNative
         
         /// <summary>
         /// Directs the plugin to build the call site as a Tag
@@ -77,15 +78,15 @@ module Builder =
         /// // alt
         /// tag % div(class' = "hello")
         /// </code></example>
+        static member inline (%) (left: TagValue, right: 'T): 'T = left.render(right)
         [<Erase>]
-        member this.render (PARTAS_PROPERTIES: obj):  'T = jsNative
+        member this.render (PARTAS_PROPERTIES: obj): RegularNode = jsNative
         
         [<Erase>]
-        member this.render (): 'T = jsNative
-        static member inline (%) (left: TagValue<'T>, right: obj) = left.render(right)
-        static member inline (%) (left: TagValue<'T>, right: #HtmlTag) = left.render(right)
+        member this.render (): RegularNode = jsNative
+        static member inline (%) (left: TagValue, right: obj) = left.render(right)
     
-    let (!@) (this: unit -> #HtmlTag) = TagValue(this)
+    let (!@) (this: unit -> 'T) = TagValue(unbox this)
     
     type HtmlContainerFun = HtmlContainer -> unit
 

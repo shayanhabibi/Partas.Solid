@@ -7,6 +7,7 @@ open System
 open Partas.Solid
 
 #nowarn 49
+#nowarn 64
 
 [<AutoOpen>]
 module Bindings =
@@ -82,7 +83,7 @@ module Bindings =
             with set (value: string) = ()
         [<Erase>]
         member this.component'
-            with set (value: unit -> HtmlElement) = ()
+            with set (value: TagValue) = ()
         [<Erase>]
         member this.matchFilters
             with set (value: obj) = ()
@@ -105,11 +106,6 @@ module Bindings =
 
     [<AllowNullLiteral>]
     [<Global>]
-    type RootProps [<ParamObject; Emit("$0")>] (children: HtmlElement) =
-        member val children: HtmlElement = jsNative with get, set
-
-    [<AllowNullLiteral>]
-    [<Global>]
     type RootConfig [<ParamObject; Emit("$0")>] (path: string, ``component``: HtmlElement) =
         member val path: string = jsNative with get, set
         member val ``component``: HtmlElement = jsNative with get, set
@@ -119,7 +115,7 @@ module Bindings =
         interface HtmlElement
         [<Erase>]
         member this.root
-            with set (value: RootProps -> HtmlElement) = ()
+            with set (value: TagValue) = ()
         [<Erase>]
         member this.base'
             with set (value: string) = ()

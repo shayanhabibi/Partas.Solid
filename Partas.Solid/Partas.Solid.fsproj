@@ -16,10 +16,10 @@
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
-        <Version>0.2.12</Version>
+        <Version>0.2.13</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>0.2.12</PackageVersion>
-        <PackageReleaseNotes>Internal support for Kobalte Polymorphism with `.as'`</PackageReleaseNotes>
+        <PackageVersion>0.2.13</PackageVersion>
+        <PackageReleaseNotes>Remove TagValue type argument.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>

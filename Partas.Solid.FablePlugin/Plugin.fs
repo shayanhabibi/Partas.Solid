@@ -671,7 +671,7 @@ module internal rec AST =
     module TagValue =
         module EntityRef =
             let (|TagValue|_|) = function
-                | { FullName = "Partas.Solid.Builder.TagValue`1" } -> Some()
+                | { FullName = "Partas.Solid.Builder.TagValue" } -> Some()
                 | _ -> None
         module ImportInfo =
             let (|TagValue|_|) = function
@@ -684,8 +684,8 @@ module internal rec AST =
         
         /// Will retrieve the wrapped type entity ref if it is a valid TagValue type
         let (|GetType|_|) = function
-            | DeclaredType(EntityRef.TagValue, [ DeclaredType(entRef,_) ]) -> Some entRef
-            | LambdaType(GetType entRef, _ ) -> Some entRef
+            | DeclaredType(EntityRef.TagValue, _) -> Some()
+            | LambdaType(GetType, _ ) -> Some()
             | _ -> None
         let (|CollectProperties|_|) (ctx: PluginContext) = function
             | [ TypeCast(Value(NewAnonymousRecord(values, fields, _, _), _), _) ] ->
@@ -733,15 +733,19 @@ module internal rec AST =
                 | _ -> None
             | TypeCast(TagValue ctx expr, _) -> expr |> Some
             | _ -> None
-        let (|TagRender|_|) (ctx: PluginContext): Expr -> Expr option = function
+        
+        let (|TagRender|_|) (ctx: PluginContext): Expr -> Expr option =
+            let rec (|UnrollTypeCast|) = function
+                | TypeCast(UnrollTypeCast expr, _) -> expr
+                | expr -> expr
+            function
             // A call to render a tagvalue with a constructor
             | Call(
-                Import(ImportInfo.Render, GetType eRef, _),
+                Import(ImportInfo.Render, _, _),
                 {
                     ThisArg = thisArg // contains info on the left expr of render
                     Args = (
-                        TagConstructor ctx tagInfo :: BuilderCollector ctx rest
-                         | TypeCast(TagConstructor ctx tagInfo, _) :: BuilderCollector ctx rest
+                        UnrollTypeCast(TagConstructor ctx tagInfo) :: BuilderCollector ctx rest
                     )
                 }, _, _ ) ->
                 tagInfo
@@ -763,7 +767,7 @@ module internal rec AST =
             // a call to render a tagvalue with an anon record
             // todo - support key,value pair list
             | Call(
-                Import(ImportInfo.Render, GetType eRef, _),
+                Import(ImportInfo.Render, _, _),
                 {
                     ThisArg = thisArg
                     Args = CollectProperties ctx props
@@ -777,17 +781,9 @@ module internal rec AST =
                         expr
                     | Some(IdentExpr(_) as ident) ->
                         ident
+                    | Some expr -> expr
                     | _ ->
-                        Import(
-                            {
-                                Selector =
-                                    eRef.FullName |> Utils.trimReservedIdentifiers
-                                Path = eRef.SourcePath |> Option.defaultValue ""
-                                Kind = UserImport false
-                            },
-                            Any,
-                            range
-                        )
+                        failwith "unreachable"
                 { TagSource = TagSource.LibraryImport importExpr
                   Properties = props
                   Children = [] }
@@ -839,7 +835,7 @@ type SolidComponentAttribute() =
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
-        // Console.WriteLine memberDecl
+        Console.WriteLine memberDecl
         {
             memberDecl with
                 Body = memberDecl.Body |> AST.transform ctx

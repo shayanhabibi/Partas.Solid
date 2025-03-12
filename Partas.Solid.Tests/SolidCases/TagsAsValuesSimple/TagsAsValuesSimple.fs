@@ -8,7 +8,7 @@ open Partas.Solid.Tests.SolidCases.TagsAsValuesSimpleTypes
 type CustomTag() =
     inherit RegularNode()
     [<Erase>]
-    member val icon: TagValue<_> = unbox null with get,set
+    member val icon: TagValue = unbox null with get,set
     [<SolidTypeComponent>]
     member props.constructor =
         props.icon <- !@button

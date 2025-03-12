@@ -22,7 +22,7 @@ type PolymorphicExtensions =
             morph: #HtmlTag
         ): 'Base = this
     [<Erase; Extension>]
-    static member as'<'Base, 'T when 'Base :> Polymorph and 'T :> HtmlTag > (
+    static member as'<'Base when 'Base :> Polymorph > (
             this: 'Base,
-            morph: TagValue<'T>
+            morph: TagValue
         ): 'Base = this
