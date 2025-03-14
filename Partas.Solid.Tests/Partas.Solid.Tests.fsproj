@@ -48,6 +48,9 @@
         <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.fs" />
         <Content Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.expected" />
         <None Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.fsproj" />
+        <Compile Include="IssueCases\IndexAccess\IndexAccess.fs" />
+        <Content Include="IssueCases\IndexAccess\IndexAccess.expected" />
+        <None Include="IssueCases\IndexAccess\IndexAccess.fsproj" />
         <Compile Include="Common.fs" />
         <Compile Include="IssueTests.fs" />
         <Compile Include="SolidTests.fs" />

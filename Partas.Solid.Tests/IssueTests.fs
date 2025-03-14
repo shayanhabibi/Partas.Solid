@@ -10,4 +10,7 @@ let runIssueCase caseName =
 [<Fact>]
 let ``#2 createSignal getting converted into Tag`` () =
     runIssueCase "CreateSignalTagConstructor"
-    
+
+[<Fact>]
+let ``#9 Index access is rendered`` () =
+    runIssueCase "IndexAccess"

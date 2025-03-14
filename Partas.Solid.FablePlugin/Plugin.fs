@@ -512,6 +512,9 @@ module internal rec AST =
             // This is a prop getter in a builder, don't transform inside as it's already been done.
             | Get(IdentExpr({ IsThisArgument = true ; IsCompilerGenerated = true }), _, _, _) ->
                 expr :: restBuilds
+            // hand this off to our main transform loop
+            | Get(BuilderCollectorFeedback ctx [ expr ], ExprGet(BuilderCollectorFeedback ctx [ otherExprs ]), _, range) ->
+                Get(expr, ExprGet otherExprs, Any, range) :: restBuilds
             | Get(BuilderCollectorFeedback ctx exprs, _, _, _) ->
                 let head = exprs |> (List.tryHead >> Option.defaultValue (Value(UnitConstant, None)))
                 head :: restBuilds
@@ -665,6 +668,20 @@ module internal rec AST =
                 typ,
                 range
             )
+        // Capture and include index access
+        | Get(expr, ExprGet(getExpr) & ExprGet(Call(callee, callInfo, _, _)), typ, range) ->
+            match transform ctx getExpr with
+            | Value(UnitConstant, None) | Value(Null(Any), None) -> transform ctx expr
+            | getExpr ->
+                // PluginContext.debugDisposal ctx "Transform of Get ExprGet" getExpr
+                Get(
+                    transform ctx expr,
+                    ExprGet(
+                        getExpr
+                    ),
+                    typ,
+                    range)
+            
         | _ as expr -> expr
 
     /// Plugin support for the TagValue magics
@@ -835,7 +852,7 @@ type SolidComponentAttribute() =
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
-        Console.WriteLine memberDecl
+        // Console.WriteLine memberDecl
         {
             memberDecl with
                 Body = memberDecl.Body |> AST.transform ctx
