@@ -14,3 +14,7 @@ let ``#2 createSignal getting converted into Tag`` () =
 [<Fact>]
 let ``#9 Index access is rendered`` () =
     runIssueCase "IndexAccess"
+
+[<Fact>]
+let ``#11 String interpolation is transformed`` () =
+    runIssueCase "TransformInsideStringInterpolation"

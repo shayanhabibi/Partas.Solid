@@ -51,6 +51,9 @@
         <Compile Include="IssueCases\IndexAccess\IndexAccess.fs" />
         <Content Include="IssueCases\IndexAccess\IndexAccess.expected" />
         <None Include="IssueCases\IndexAccess\IndexAccess.fsproj" />
+        <Compile Include="IssueCases\TransformInsideStringInterpolation\TransformInsideStringInterpolation.fs" />
+        <Content Include="IssueCases\TransformInsideStringInterpolation\TransformInsideStringInterpolation.expected" />
+        <None Include="IssueCases\TransformInsideStringInterpolation\TransformInsideStringInterpolation.fsproj" />
         <Compile Include="Common.fs" />
         <Compile Include="IssueTests.fs" />
         <Compile Include="SolidTests.fs" />

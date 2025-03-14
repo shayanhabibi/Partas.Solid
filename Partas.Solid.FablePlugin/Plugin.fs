@@ -657,6 +657,11 @@ module internal rec AST =
                 range
             ) ->
             Value(NewRecord(exprs |> List.map (transform ctx), entityRef, genArgs), range)
+        | Value( // transform inside string interpolation
+            StringTemplate(exprOption, parts, values),
+            range) ->
+            let newTag = exprOption |> Option.map(transform ctx)
+            Value(StringTemplate(newTag, parts, values |> List.map (transform ctx)), range)
         | Operation(kind, tags, typ, range) ->
             Operation( // transform operations
                 match kind with
@@ -681,7 +686,6 @@ module internal rec AST =
                     ),
                     typ,
                     range)
-            
         | _ as expr -> expr
 
     /// Plugin support for the TagValue magics
