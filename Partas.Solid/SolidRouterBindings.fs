@@ -76,6 +76,7 @@ module Bindings =
         abstract member route: RouteDescription with get, set
 
     // [<Import("Route", "@solidjs/router")>] <--- this is injected by the plugin
+    [<PartasImport("Route", "@solidjs/router")>]
     type Route() =
         interface HtmlElement
         [<Erase>]
@@ -111,6 +112,7 @@ module Bindings =
         member val ``component``: HtmlElement = jsNative with get, set
 
     // [<Import("Router", "@solidjs/router")>] // <--- this is injected by the plugin
+    [<PartasImport("Router", "@solidjs/router")>] // Replaces Import as it doesn't impact the builder param names
     type Router() =
         interface HtmlElement
         [<Erase>]
@@ -148,6 +150,7 @@ module Bindings =
         member inline _.Yield(PARTAS_ELEMENT: RootConfig[]) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     // [<Import("HashRouter", "@solidjs/router")>] <-- injected by plugin
+    [<PartasImport("HashRouter", "@solidjs/router")>]
     type HashRouter() =
         inherit Router()
 

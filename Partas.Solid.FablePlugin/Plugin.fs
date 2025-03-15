@@ -311,29 +311,19 @@ module internal rec AST =
             range) ->
             TagInfo.Constructor (TagSource.LibraryImport imp, props, range)
             |> Some
-        // Non LibraryImports that require LibraryImport injection
+        // Non LibraryImports that require LibraryImport injection via the attribute PartasImportAttribute
         | Call(
             (Expr.ImportedConstructor ctx
-             & Import({ Selector = ( Utils.StartsWith "BindingsModule_Route"
-                                   | Utils.StartsWith "BindingsModule_HashRoute"
-                                   | Utils.StartsWith "BindingsModule_Match"
-                                   | Utils.StartsWith "BindingsModule_For"
-                                   | Utils.StartsWith "BindingsModule_Index"
-                                   | Utils.StartsWith "BindingsModule_Show"
-                                   | Utils.StartsWith "BindingsModule_Switch") }, t, r)),
+             & Import(_, t, r)),
             {
                 Args = PropCollector ctx props
             },
-            (Type.PartasName ctx typeName),
+            (Type.PartasName ctx typeName & Type.HasPartasImport ctx (selector, path)),
             range) ->
             let importExpr =
                 Import(
-                    { Selector = typeName
-                      Path =
-                          match typeName with
-                          | Utils.StartsWith "Route" | Utils.StartsWith "HashRoute" ->
-                              "@solidjs/router"
-                          | _ -> "solid-js"
+                    { Selector = selector
+                      Path = path
                       Kind = UserImport false },
                     t, r)
             TagInfo.Constructor (TagSource.LibraryImport importExpr, props, range)

@@ -428,7 +428,8 @@ module Bindings =
         [<Erase>]
         member this.onAbort
             with set (_: Event -> unit) = ()
-
+    
+    [<PartasImport("For", "solid-js")>]
     [<Erase>]
     type For<'T>() =
         interface HtmlElement
@@ -439,7 +440,8 @@ module Bindings =
         member inline _.Zero() : HtmlContainerFun = ignore
         [<Erase>]
         member inline _.Yield(PARTAS_VALUE: 'T -> Accessor<int> -> #HtmlElement) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_VALUE
-
+    
+    [<PartasImport("Index", "solid-js")>]
     [<Erase>]
     type Index<'T>() =
         interface HtmlElement
@@ -451,6 +453,7 @@ module Bindings =
         [<Erase>]
         member inline _.Yield(PARTAS_VALUE: Accessor<'T> -> int -> #HtmlElement) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_VALUE
 
+    [<PartasImport("Show", "solid-js")>]
     [<Erase>]
     type Show() =
         interface HtmlContainer
@@ -461,6 +464,7 @@ module Bindings =
         member this.fallback
             with set (value: HtmlElement) = ()
 
+    [<PartasImport("Match", "solid-js")>]
     [<Erase>]
     type Match() =
         interface HtmlContainer
@@ -468,6 +472,7 @@ module Bindings =
         member this.when'
             with set (value: bool) = ()
 
+    [<PartasImport("Switch", "solid-js")>]
     [<Erase>]
     type Switch() =
         interface HtmlElement
@@ -488,13 +493,14 @@ module Bindings =
         [<Erase>]
         member inline _.Yield(PARTAS_ELEMENT: Match) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
+    [<PartasImport("Suspense","solid-js")>]
     [<Erase>]
     type Suspense() =
         interface HtmlContainer
         [<Erase>]
         member this.fallback
             with set (value: HtmlElement) = ()
-
+    [<PartasImport("SuspenseList","solid-js")>]
     [<Erase>]
     type SuspenseList() =
         interface HtmlContainer
@@ -507,7 +513,7 @@ module Bindings =
         [<Erase>]
         member this.fallback
             with set (value: HtmlElement) = ()
-
+    [<PartasImport("Portal","solid-js")>]
     [<Erase>]
     type Portal() =
         interface HtmlContainer
@@ -520,6 +526,7 @@ module Bindings =
 
     module ErrorBoundary =
         type Fallback = delegate of err: obj * reset: (unit -> unit) -> HtmlElement
+    [<PartasImport("ErrorBoundary","solid-js")>]
     [<Erase>]
     type ErrorBoundary() =
         interface HtmlContainer

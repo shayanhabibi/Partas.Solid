@@ -333,22 +333,39 @@ module internal Expr =
             ) -> Some compiledName
         | _ -> None
 module internal Type =
+    let rec private (|GetDeclaredType|_|) (ctx: PluginContext): Type -> Type option = function
+        | Type.DeclaredType(_) as typ -> Some typ
+        | Type.Array(GetDeclaredType ctx typ, _) -> Some typ
+        | Type.List(GetDeclaredType ctx typ) -> Some typ
+        | Type.Option(GetDeclaredType ctx typ, _) -> Some typ
+        | Type.Tuple(GetDeclaredType ctx typ :: _, _) -> Some typ
+        | Type.DelegateType(_, GetDeclaredType ctx typ) -> Some typ
+        | Type.LambdaType(_, GetDeclaredType ctx typ) -> Some typ
+        | _ -> None
     /// Recursively explores a `Type` AST node until either returning the tail part of a DeclaredType fullname,
     /// or none. It can therefor also be used to ensure the type starts with `Partas.Solid`
     let rec (|PartasName|_|) (ctx: PluginContext): Type -> string option = function
-        | Type.DeclaredType({ FullName = Utils.StartsWith "Partas.Solid" as fullName }, _) ->
+        | GetDeclaredType ctx (
+            Type.DeclaredType({ FullName = Utils.StartsWith "Partas.Solid" as fullName }, _)
+            ) ->
             fullName
             |> _.Split('.')
             |> Array.rev
             |> Array.head
             |> Utils.trimReservedIdentifiers
             |> Some
-        | Type.Array(PartasName ctx tagSource, _) -> Some tagSource
-        | Type.List(PartasName ctx tagSource) -> Some tagSource
-        | Type.Option(PartasName ctx tagSource, _) -> Some tagSource
-        | Type.Tuple(PartasName ctx tagSource :: _, _) -> Some tagSource
-        | Type.DelegateType(_, PartasName ctx tagSource) -> Some tagSource
-        | Type.LambdaType(_, PartasName ctx tagSource) -> Some tagSource
+        | _ -> None
+    /// Digs into a type to see if it can find a DeclaredType node; if so, it extracts the attribute key,value pair for
+    /// PartasImportAttribute if it is present and returns them
+    let (|HasPartasImport|_|) (ctx: PluginContext): Type -> (string * string) option = function
+        | GetDeclaredType ctx (
+                Type.DeclaredType(entityRef, _)
+            ) ->
+            entityRef
+            |> PluginContext.getEntity ctx
+            |> _.Attributes
+            |> Seq.tryFind (_.Entity >> _.FullName >> (=)"Partas.Solid.PartasImportAttribute")
+            |> Option.map (_.ConstructorArgs >> List.map _.ToString() >> List.pairwise >> List.head)
         | _ -> None
 module internal Ident =
     /// where we can, we use ridiculous names in computations so that the chance of user AST
