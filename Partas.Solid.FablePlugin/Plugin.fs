@@ -185,7 +185,11 @@ module internal rec AST =
                     None
                 // If polymorph, then revise the expression to be a lambda call
                 // that spreads the props within.
-                | "as'", [ expr ] ->
+                // Polymorphic attributes by default include: "as'" and "asChild" for supporting
+                // Kobalte and ArkUI.
+                // But anyone can include a polymorphic attribute by using an inline alias property
+                // to the actual propertyname which has to be prepended with __PARTAS_POLYMORPHIC__
+                | Polymorphism.PolymorphicAttribute ctx attrName, [ expr ] ->
                     match transform ctx expr with
                     | Call(
                         callee, ({
@@ -216,7 +220,7 @@ module internal rec AST =
                             typ, range), None)
                     | expr -> expr
                     |> fun expr ->
-                        Some("as", expr)
+                        Some(attrName, expr)
                     
                     
                 // -- FEATURE NOT PRESENT IN FABLE COMPILER YET -- //
@@ -687,7 +691,13 @@ module internal rec AST =
                     typ,
                     range)
         | _ as expr -> expr
-
+    /// Plugin support for extending Polymorphic attributes
+    module Polymorphism =
+        let (|PolymorphicAttribute|_|) (ctx: PluginContext) : string -> string option = function
+            | "as'" -> Some "as"
+            | "asChild" -> Some "asChild"
+            | Utils.StartsWithTrimmed "__PARTAS_POLYMORPHIC__" attrName -> Some (attrName |> Utils.trimReservedIdentifiers)
+            | _ -> None
     /// Plugin support for the TagValue magics
     module TagValue =
         module EntityRef =
