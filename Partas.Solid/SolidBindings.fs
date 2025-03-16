@@ -513,7 +513,7 @@ module Bindings =
         [<Erase>]
         member this.fallback
             with set (value: HtmlElement) = ()
-    [<PartasImport("Portal","solid-js")>]
+    [<PartasImport("Portal","solid-js/web")>]
     [<Erase>]
     type Portal() =
         interface HtmlContainer
