@@ -434,6 +434,57 @@ Previously, I had hard coded a pick-up for the supported cases (such as Router, 
 
 Now, we can instead apply the `[<PartasImport({selector},{path})>]` attribute to achieve the same outcome without AST (therefore pattern discrimination) degredation.
 
+## Recipes
+
+### Implementing Computation Expressions
+
+An example was found when implementing the ArkUI DatePicker.
+
+The DatePicker context components function by passing a function which is given the context methods/api in a reactive signal.
+
+To facilitate this, I define an interface type that takes a type (which would be the interface passed to the children):
+
+```fsharp
+namespace Partas.Solid.ArkUI
+
+open Partas.Solid
+open Fable.Core
+
+[<Interface>]
+type ArkUIContext<'T> =
+    inherit HtmlElement
+    inherit HtmlContainer
+```
+
+I then provide a `Yield` extension method within an `[<AutoOpen>]` module below it with the following signature:
+
+```fsharp
+[<AutoOpen>]
+module Bindings =
+    type ArkUIContext<'T> with
+        [<Erase>]
+        member inline _.Yield(PARTAS_VALUE: Accessor<'T> -> #HtmlElement): HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_VALUE
+```
+
+It's important that I've used those specific parameter and argument names, because they are already being picked up in existing patterns.
+
+Now I define the specific context component, and interface with my Context interface:
+
+```fsharp
+type DatePickerApi = Glutinum.ZagJs.DatePickerApi
+[<Import("DatePicker.Context", datePicker)>]
+type Context() =
+    inherit RegularNode()
+    interface ArkUIContext<DatePickerApi>
+```
+
+> [!NOTE]
+> Because the computation expression is not *built into the type* itself, I can use the normal Import attribute without issue.
+
+Following this, we should have our type safe lambdas within the builders! Just don't forget to **explicitly** `yield` the `fun`:
+
+![img.png](img.png)
+
 ## Example:
 
 A comprehensive component and example output:
