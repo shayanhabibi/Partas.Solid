@@ -313,11 +313,13 @@ module internal rec AST =
             |> Some
         // Non LibraryImports that require LibraryImport injection via the attribute PartasImportAttribute
         | Call(
-            (Expr.ImportedConstructor ctx
-             & Import(_, t, r)),
-            {
+            (   (* Callee *)
+                (Expr.ImportedConstructor ctx & Import(_, t, r)) // Captures constructors from other modules with PartasImportAttribute
+              | (IdentExpr(Ident.IdentIs ctx IdentType.Constructor) & IdentExpr({ Type = t; Range = r })) // Captures constructors defined in the same module with PartasImportAttribute
+            ),
+            {   (* CallInfo *)
                 Args = PropCollector ctx props
-            },
+            }, (* Type *)
             (Type.PartasName ctx typeName & Type.HasPartasImport ctx (selector, path)),
             range) ->
             let importExpr =
