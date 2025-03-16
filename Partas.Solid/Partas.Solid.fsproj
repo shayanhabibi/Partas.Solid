@@ -19,7 +19,7 @@
         <Version>0.2.17</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>0.2.17</PackageVersion>
-        <PackageReleaseNotes>Make import injection agnostic to its definition and subsequent imports  and returns a keyvalue of the import target</PackageReleaseNotes>
+        <PackageReleaseNotes>Introduce `PartasImportAttribute` to replace `Import` for types with builders so we can discriminate by parameter names</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>

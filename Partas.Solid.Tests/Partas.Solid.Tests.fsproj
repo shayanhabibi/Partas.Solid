@@ -57,6 +57,7 @@
         <Compile Include="Common.fs" />
         <Compile Include="IssueTests.fs" />
         <Compile Include="SolidTests.fs" />
+        <Compile Include="AttributeCases.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
@@ -83,6 +84,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Include="AttributeCases\PartasImportAttr\PartasImportAttr.fs" />
+      <Content Include="AttributeCases\PartasImportAttr\PartasImportAttr.expected" />
+      <None Include="AttributeCases\PartasImportAttr\PartasImportAttr.fsproj" />
       <Folder Include="General\" />
       <Folder Include="obj\" />
     </ItemGroup>
