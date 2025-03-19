@@ -632,6 +632,9 @@ module Bindings =
 [<AutoOpen>]
 [<Erase>]
 type Bindings =
+    /// Returns a memo evaluating to the resolved children which updates whenever the children change.
+    [<ImportMember("solid-js")>]
+    static member children(value: unit -> #HtmlElement): unit -> #HtmlElement = jsNative
     [<ImportMember("solid-js")>]
     static member mergeProps([<ParamList>] values: 'T[]): 'T = jsNative
     

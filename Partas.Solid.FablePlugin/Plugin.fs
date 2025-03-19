@@ -816,15 +816,20 @@ module internal rec AST =
             
             
                 
+type PartasCompileFlag =
+    | Default = 0
+    | DebugMode = 1
 
-
-type SolidTypeComponentAttribute() =
+type SolidTypeComponentAttribute(compileOptions: PartasCompileFlag) =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
-        // Console.WriteLine "\nSTART MEMBER DECL!!!"
-        // Console.WriteLine memberDecl.Body
-        // Console.WriteLine "END MEMBER DECL!!!\n"
+        match compileOptions with
+        | Default -> ()
+        | DebugMode ->
+            Console.WriteLine "\nSTART MEMBER DECL!!!"
+            Console.WriteLine memberDecl.Body
+            Console.WriteLine "END MEMBER DECL!!!\n"
         let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
         
         match memberDecl with
@@ -849,19 +854,28 @@ type SolidTypeComponentAttribute() =
     override this.TransformCall(pluginHelper, memb, expr) =
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberCall
         expr
+    
+    new() = SolidTypeComponentAttribute(PartasCompileFlag.Default)
 
 /// Applies Solid transformations to `let` bindings.
 /// Use SolidTypeComponentAttribute for Type member definitions such
 /// as `member props.typeDef =`.
-type SolidComponentAttribute() =
+type SolidComponentAttribute(compileOptions: PartasCompileFlag) =
     inherit MemberDeclarationPluginAttribute()
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
+        match compileOptions with
+        | Default -> ()
+        | DebugMode ->
+            Console.WriteLine "\nSTART MEMBER DECL!!!"
+            Console.WriteLine memberDecl.Body
+            Console.WriteLine "END MEMBER DECL!!!\n"
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
-        // Console.WriteLine memberDecl
         {
             memberDecl with
                 Body = memberDecl.Body |> AST.transform ctx
         }
     override this.TransformCall(pluginHelper, memb, expr) =
         expr
+    
+    new() = SolidComponentAttribute(PartasCompileFlag.Default)
