@@ -825,7 +825,7 @@ type SolidTypeComponentAttribute(flag: int) =
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
         match enum<PartasCompileFlag> flag with
-        | DebugMode ->
+        | PartasCompileFlag.DebugMode ->
             Console.WriteLine "\nSTART MEMBER DECL!!!"
             Console.WriteLine memberDecl.Body
             Console.WriteLine "END MEMBER DECL!!!\n"
@@ -866,7 +866,7 @@ type SolidComponentAttribute(flag: int) =
     override _.FableMinimumVersion = FableRequirements.version
     override this.Transform(pluginHelper, file, memberDecl) =
         match enum<PartasCompileFlag> flag with
-        | DebugMode ->
+        | PartasCompileFlag.DebugMode ->
             Console.WriteLine "\nSTART MEMBER DECL!!!"
             Console.WriteLine memberDecl.Body
             Console.WriteLine "END MEMBER DECL!!!\n"
