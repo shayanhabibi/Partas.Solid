@@ -16,10 +16,10 @@
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
-        <Version>0.2.18</Version>
+        <Version>0.2.20</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>0.2.18</PackageVersion>
-        <PackageReleaseNotes>Bugfix - Portal should import from solid-js/web</PackageReleaseNotes>
+        <PackageVersion>0.2.20</PackageVersion>
+        <PackageReleaseNotes>Added optional flag to SolidComponent and SolidTypeComponent</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
