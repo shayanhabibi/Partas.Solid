@@ -593,6 +593,32 @@ module internal rec AST =
         // any captured Getters or Setters of our self identifier are treated specially
         | PropsGetterOrSetter ctx expr ->
             expr
+            
+        // transform calls that should be getters
+        | Call(
+            Expr.ImportedGetter ctx,
+            {
+                ThisArg = Some(ident)
+                Args = args
+                MemberRef = MemberRef.Option.PartasName ctx prop
+            } & { MemberRef =Some(MemberRef.MemberRefIs ctx MemberRefType.Getter) },
+            _,
+            _) ->
+            Get(
+                expr = ident,
+                kind = GetKind.FieldGet(
+                        {
+                            Name = prop
+                            FieldType = None
+                            IsMutable = false
+                            MaybeCalculated = false
+                            Tags = []
+                        }
+                    ),
+                typ = Any,
+                range = None
+            )
+        
         // transform conditionals
         | IfThenElse(guardExpr, thenExpr, elseExpr, range) ->
             IfThenElse(

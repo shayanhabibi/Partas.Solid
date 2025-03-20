@@ -18,3 +18,7 @@ let ``#9 Index access is rendered`` () =
 [<Fact>]
 let ``#11 String interpolation is transformed`` () =
     runIssueCase "TransformInsideStringInterpolation"
+
+[<Fact>]
+let ``#14 Getter extensions are transformed`` () =
+    runIssueCase "TransformGetterExtensions"
