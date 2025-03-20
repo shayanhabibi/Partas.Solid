@@ -3,8 +3,10 @@ import { flexRender, createSolidTable } from "@tanstack/solid-table";
 import { Types_TableOptions$1 } from "./Program.fs.jsx";
 
 export function TransformGetterExtensions(props) {
-    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
-    const table = createSolidTable({});
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["data"]);
+    const table = createSolidTable({
+        data: PARTAS_LOCAL.data,
+    });
     return <div>
         <Show when={table.getRowModel().rows.length}
             fallback={<div />}>

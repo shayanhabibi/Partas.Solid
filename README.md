@@ -14,9 +14,53 @@
   </p>
 </div>
 
+<div align="center">
+
+[![Scc Count Badge](https://sloc.xyz/github/shayanhabibi/Partas.Solid/?category=code&badge-bg-color=9100FF)](https://github.com/shayanhabibi/Partas.Solid/)
+[![Scc Count Badge](https://sloc.xyz/github/shayanhabibi/Partas.Solid/?category=comments&badge-bg-color=5E00B5)](https://github.com/shayanhabibi/Partas.Solid/)
+[![Scc Count Badge](https://sloc.xyz/github/shayanhabibi/Partas.Solid/?category=cocomo&badge-bg-color=3B0086)](https://github.com/shayanhabibi/Partas.Solid/)
+
+</div>
+
 ---
+<!-- TOC -->
+* [Install](#install)
+  * [Compiling](#compiling)
+    * [JSX Flag](#jsx-flag)
+    * [Release Mode](#release-mode)
+* [Related Repositories](#related-repositories)
+  * [Oxpecker.Solid](#oxpeckersolid)
+    * [Differences](#differences)
+    * [Reduce undefined behaviour](#reduce-undefined-behaviour)
+* [Example](#example)
+* [DSL](#dsl)
+  * [SolidTypeComponentAttribute](#solidtypecomponentattribute)
+    * [Motivation](#motivation)
+    * [SolidTypeComponent](#solidtypecomponent)
+    * [Properties](#properties)
+    * [Aliasing properties](#aliasing-properties)
+    * [Accessing Properties in definitions](#accessing-properties-in-definitions)
+    * [Spreading properties in descendants](#spreading-properties-in-descendants)
+    * [Setting defaults, mergeProps](#setting-defaults-mergeprops)
+      * [Risky Business](#risky-business)
+  * [Misc magics](#misc-magics)
+    * [createContext & useContext](#createcontext--usecontext)
+    * [Flattened Arrays in attribute value positions](#flattened-arrays-in-attribute-value-positions)
+    * [Passing tags as values](#passing-tags-as-values)
+    * [Polymorphism Support](#polymorphism-support)
+    * [SolidComponent Attribute](#solidcomponent-attribute)
+    * [PartasImport attribute](#partasimport-attribute)
+  * [Recipes](#recipes)
+    * [Implementing Computation Expressions](#implementing-computation-expressions)
+  * [Example:](#example-1)
+  * [Conclusion](#conclusion)
+* [Dev](#dev)
+<!-- TOC -->
 
 # Install
+
+> [!WARNING]
+> Requires Fable 5; please install the latest alpha version.
 
 ```shell
 dotnet add package Partas.Solid
@@ -26,40 +70,40 @@ dotnet add package Partas.Solid
 paket install Partas.Solid
 ```
 
-### Related Repositories
+## Compiling
+
+### JSX Flag
+
+Since this is using the Solid-JS framework, you want to ensure you are compiling with the `.jsx` extension. Add the following flag to your Fable build configuration:
+
+```
+-e .fs.jsx
+```
+
+### Release Mode
+
+The Fable AST for Debug mode differs from Release mode. This is critical, since the plugin does a lot of heavy transformation, and is developed for Release mode.
+
+This means when Fable compiles in Debug mode (such as when using `watch`), you will get undefined behaviour.
+
+> [!IMPORTANT]
+> When using `watch`, add the `-c Release` flag.
+
+
+# Related Repositories
 
 Solid-ui (Shadcn port) [Partas.Solid.UI](https://github.com/shayanhabibi/Partas.Solid.UI)
 
 Bindings for different libraries [Partas.Solid.Bindings](https://github.com/shayanhabibi/Partas.Solid.Bindings)
 
----
-
-## Fable
-
-> [!WARNING]
-> This is not compatible with Fable 4.0, as the
-> Plugin is not detected correctly.
-> 
-> Use the latest 5.0 alpha, or wait for full release.
-
-> [!IMPORTANT]
-> Compilation with Fable should use the `.jsx` extension.
-> The plugin codegen is not supported in Debug mode (due to compiler AST differences).
-> 
-> Suggested compile flags:
-> 
-> ```shell
-> fable -c Release -o output -e .fs.jsx
-> ```
-
 ## Oxpecker.Solid
 
-> [!IMPORTANT]
 > This is an opinionated fork of [Oxpecker.Solid](https://github.com/lanayx/Oxpecker) that
 > keeps the original DSL style, but more aggressively
 > transforms F# input to produce correct JSX.
 > 
 > Please support the original release.
+
 
 ### Differences
 
@@ -152,22 +196,69 @@ let App() =
 
 </details>
 
-# Usage
+---
 
-Usage by principle is the same as [Oxpecker.Solid](https://github.com/lanayx/Oxpecker).
+# Example
 
-### SolidTypeComponentAttribute
+See the [Partas.Solid.UI.Playground](https://github.com/shayanhabibi/Partas.Solid.UI) for a comprehensive example of a component library built _ENTIRELY_ in F# using <kbd>Partas.Solid</kbd>, <kbd>Tailwind</kbd> and a host of other libraries like <kbd>TanStack Table</kbd> and <kbd>Kobalte</kbd>.
 
-An extra Attribute is provided which can be applied to a member of a type definition for a custom tag.
+# DSL
 
-The custom tag must be defined within a namespace that begins with `Partas.Solid`.
+Please see [Oxpecker.Solid](https://lanayx.github.io/Oxpecker/src/Oxpecker.Solid/) documentation for the general explanation of the base DSL.
 
-Any type which the attribute is applied to, must have no arguments, and be defined with `props` as the self identifier.
+At any point you can reference how things are done in the [Partas.Solid.UI](https://github.com/shayanhabibi/Partas.Solid.UI) repo to replicate common patterns.
+
+## SolidTypeComponentAttribute
+
+### Motivation
+
+Most framework DSLs in F# share a similar problem. You build a front end using the DSL, but you can't necessarily create components that are as flexible and usable (in the same DSL framework). You end up with a mix of DSL & function calls.
+
+The latter does not, and shouldn't, rationalise the inability to produce your own component library in the DSL, and then USE that library with the same DSL.
+
+---
+
+`Oxpecker.Solid` allows you to define Tags with properties/attributes to interop with libraries or web components. We take this a step further, by scaffolding the type definition with a method call that is compiled into a function (and all Solid-JS components are functions!).
 
 ```fsharp
-[<SolidTypeComponent>]
-member private props.constructor = div(class' = "MyClass").spread props
+namespace Partas.Solid // !!! Types/Tags must be defined in a module or
+                       //     namespace that starts with Partas.Solid.
+                       //     This is just to prevent unintentional transformations
+open Partas.Solid
+open Fable.Core
+
+[<Erase>]
+type MyComponent() =
+    inherit RegularNode()
+    [<Erase>]
+    member val customAttribute: int = unbox null with get,set
 ```
+
+> Here we have defined the custom tag in the Oxpecker style.
+> 
+> This allows you to utilise it like any other Oxpecker tag `MyComponent(class' = "dummy") { ... }`
+> 
+> This would fail on runtime since there is no such function or import as `MyComponent`.
+
+**Enter `SolidTypeComponent`**
+
+```fsharp
+type MyComponent() =
+    // ....
+    [<SolidTypeComponent>]
+    member props.constructor =
+        div()
+```
+
+```jsx
+export function MyComponent(props) {
+    return <div/>
+}
+```
+
+### SolidTypeComponent
+
+Any type which this attribute is applied to, must have no arguments, and be defined with `props` as the self identifier.
 
 The name of the member has no influence on the output. The compiled name is determined by the name of the type to which the member is attached to.
 
@@ -184,9 +275,6 @@ export function MyComponent(props) {
     return <div />
 }
 ```
-
-> [!NOTE]
-> If you were to apply an Import attribute to the type, and also provide a SolidTypeComponent member, then you would have the generated function, but any use of the tag would be rerouted to the Import selector, making the constructor useless.
 
 ### Properties
 

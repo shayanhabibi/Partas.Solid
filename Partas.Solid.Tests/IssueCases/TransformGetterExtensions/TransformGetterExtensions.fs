@@ -7,9 +7,10 @@ open Fable.Core
 [<Erase>]
 type TransformGetterExtensions() =
     inherit VoidNode()
+    [<Erase>] member val data: int[] = unbox null with get,set
     [<SolidTypeComponentAttribute>]
     member props.constructor =
-        let table = createTable<int>(TableOptions())
+        let table = createTable<int>(TableOptions(data = props.data))
         div() {
             Show(when' = unbox (table.getRowModel().rows.Length), fallback = (div())) {
                 For(each = table.getRowModel().rows) {

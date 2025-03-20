@@ -684,6 +684,8 @@ module internal rec AST =
             range) ->
             let newTag = exprOption |> Option.map(transform ctx)
             Value(StringTemplate(newTag, parts, values |> List.map (transform ctx)), range)
+        | Value(NewOption(Some expr, typ, isStruct), range) -> // transform inside options
+            Value(NewOption(Some(expr |> transform ctx), typ, isStruct), range)
         | Operation(kind, tags, typ, range) ->
             Operation( // transform operations
                 match kind with
