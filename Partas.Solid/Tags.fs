@@ -54,6 +54,42 @@ module Tags =
         /// Spreads the passed identifier within the Tag
         [<Extension; Erase>]
         static member spread(this: #HtmlTag, value: obj) = this
+    /// Set of html extensions that keep original type
+    [<Extension>]
+    [<Erase>]
+    type SvgHtmlElementExtensions =
+
+        /// Add an attribute to the element
+        [<Extension; Erase>]
+        static member attr(this: #SvgTag, name: string, value: string) = this
+
+        /// Add data attribute to the element
+        [<Extension; Erase>]
+        static member data(this: #SvgTag, name: string, value: string) = this
+
+        /// Referenced native HTML element
+        [<Extension; Erase>]
+        static member ref(this: #SvgTag, el: #Element) = this
+
+        /// Referenced native HTML element (before connecting to DOM)
+        [<Extension; Erase>]
+        static member ref(this: #SvgTag, el: #Element -> unit) = this
+
+        /// Usage `elem.style(createObj ["color", "green"; "background-color", state.myColor ])`
+        [<Extension; Erase>]
+        static member style'(this: #SvgTag, styleObj: obj) = this
+
+        /// Usage `elem.classList(createObj ["active", true; "disabled", state.disabled ])`
+        [<Extension; Erase>]
+        static member classList(this: #SvgTag, classListObj: obj) = this
+
+        /// Adds or removes attribute without value
+        [<Extension; Erase>]
+        static member bool(this: #SvgTag, name: string, value: bool) = this
+        
+        /// Spreads the passed identifier within the Tag
+        [<Extension; Erase>]
+        static member spread(this: #SvgTag, value: obj) = this
 
     // global attributes
     // This differs from Oxpecker in that the properties provide getters so that
