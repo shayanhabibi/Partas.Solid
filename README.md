@@ -258,7 +258,7 @@ export function MyComponent(props) {
 
 ### SolidTypeComponent
 
-Any type which this attribute is applied to, must have no arguments, and be defined with `props` as the self identifier.
+Any type method/member which this attribute is applied to, must have no arguments, and be defined with `props` as the self identifier.
 
 The name of the member has no influence on the output. The compiled name is determined by the name of the type to which the member is attached to.
 

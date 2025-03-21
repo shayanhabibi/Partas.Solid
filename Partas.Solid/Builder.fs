@@ -19,6 +19,9 @@ module Builder =
     type HtmlContainer =
         inherit HtmlElement
 
+    type SvgTag =
+        inherit HtmlElement
+    
     [<Erase>]
     type RegularNode() =
         interface HtmlTag
@@ -32,6 +35,11 @@ module Builder =
     type VoidNode() =
         interface HtmlTag
 
+    [<Erase>]
+    type SvgNode() =
+        interface SvgTag
+        interface HtmlContainer
+    
     /// <summary>
     /// Explicit plugin declaration that the identifier that this
     /// is bound to can be treated as a Tag. <br/>
