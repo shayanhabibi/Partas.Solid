@@ -26,8 +26,6 @@
 <!-- TOC -->
 * [Install](#install)
   * [Compiling](#compiling)
-    * [JSX Flag](#jsx-flag)
-    * [Release Mode](#release-mode)
 * [Related Repositories](#related-repositories)
   * [Oxpecker.Solid](#oxpeckersolid)
     * [Differences](#differences)
@@ -72,15 +70,18 @@ paket install Partas.Solid
 
 ## Compiling
 
-### JSX Flag
+Fable flags and rationale:
 
-Since this is using the Solid-JS framework, you want to ensure you are compiling with the `.jsx` extension. Add the following flag to your Fable build configuration:
+<details>
+<summary><code>-e .fs.jsx</code></summary>
 
-```
--e .fs.jsx
-```
+Since this is using the Solid-JS framework, you want to ensure you are compiling with the `.jsx` extension. Add the above flag to your Fable build configuration.
 
-### Release Mode
+</details>
+
+<details>
+<summary><code>-c Release</code></summary>
+
 
 The Fable AST for Debug mode differs from Release mode. This is critical, since the plugin does a lot of heavy transformation, and is developed for Release mode.
 
@@ -89,6 +90,19 @@ This means when Fable compiles in Debug mode (such as when using `watch`), you w
 > [!IMPORTANT]
 > When using `watch`, add the `-c Release` flag.
 
+</details>
+
+<details>
+<summary>If having issues with arrays of integers: <code>--typedArrays false</code></summary>
+
+Fable defaults to using the most performant primitive. This means integer arrays compile to the typed arrays in standard JS.
+
+Libraries like Apex Charts do not expect to receive data in this format, and will reject the input.
+
+You can use strings, `box` or `unbox<obj>` to compile to the plain arrays, or disable typed array compilation using `--typedArrays false` 
+
+
+</details>
 
 # Related Repositories
 
