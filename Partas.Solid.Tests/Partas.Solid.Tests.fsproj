@@ -79,6 +79,9 @@
         <Compile Include="IssueCases\TransformGetterExtensions\TransformGetterExtensions.fs" />
         <Content Include="IssueCases\TransformGetterExtensions\TransformGetterExtensions.expected" />
         <None Include="IssueCases\TransformGetterExtensions\TransformGetterExtensions.fsproj" />
+        <Compile Include="IssueCases\ObjectExpressions\ObjectExpressions.fs" />
+        <Content Include="IssueCases\ObjectExpressions\ObjectExpressions.expected" />
+        <None Include="IssueCases\ObjectExpressions\ObjectExpressions.fsproj" />
         <Compile Include="Common.fs" />
         <Compile Include="IssueTests.fs" />
         <Compile Include="SolidTests.fs" />

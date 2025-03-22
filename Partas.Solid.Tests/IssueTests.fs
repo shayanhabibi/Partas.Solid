@@ -20,5 +20,9 @@ let ``#11 String interpolation is transformed`` () =
     runIssueCase "TransformInsideStringInterpolation"
 
 [<Fact>]
-let ``#14 Getter extensions are transformed`` () =
+let ``#13 Getter extensions are transformed`` () =
     runIssueCase "TransformGetterExtensions"
+
+[<Fact>]
+let ``#14 Object Expressions are transformed`` () =
+    runIssueCase "ObjectExpressions"

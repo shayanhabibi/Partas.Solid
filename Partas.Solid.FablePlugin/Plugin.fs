@@ -716,6 +716,14 @@ module internal rec AST =
             | _ -> kind
             |> fun kind ->
                 Get(transform ctx expr1, kind, typ, range)
+        | ObjectExpr(exprMembers, typ, exprOption) -> // transform inside Object expr
+            [                                         // eg: jsOptions<SomeType> ( ... )
+                for memb in exprMembers do
+                    { memb with
+                        Body = memb.Body |> transform ctx }
+            ]
+            |> fun exprMembers ->
+                ObjectExpr(exprMembers, typ, exprOption |> Option.map (transform ctx))
         | _ as expr -> expr
     /// Plugin support for extending Polymorphic attributes
     module Polymorphism =
