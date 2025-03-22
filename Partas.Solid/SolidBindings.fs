@@ -10,6 +10,18 @@ open System
 [<AutoOpen>]
 module Bindings =
 
+    /// <summary>
+    /// Calling the setter updates the Signal (triggering dependents to rerun) if the value actually changed.
+    /// <br/>The setter takes either the new value for the signal or a function that maps the previous value of the signal to a new value as its only argument. The updated value is also returned by the setter.
+    /// </summary>
+    /// <remarks>
+    /// To pass a handler that maps the previous value, call Invoke on the setter.
+    /// <code>
+    /// let index,setIndex = createSignal(0)
+    /// setIndex.Invoke(fun x -> x + 1)
+    /// </code>
+    /// To access the returned value, use <c>.InvokeGet</c>
+    /// </remarks>
     type Setter<'T> = 'T -> unit
     type Accessor<'T> = unit -> 'T
     type Signal<'T> = Accessor<'T> * Setter<'T>
@@ -463,6 +475,9 @@ module Bindings =
         [<Erase>]
         member this.fallback
             with set (value: HtmlElement) = ()
+        [<Erase>]
+        member this.keyed
+            with set (value: bool) = ()
 
     [<PartasImport("Match", "solid-js")>]
     [<Erase>]
@@ -551,6 +566,24 @@ module Bindings =
         static member Run(PARTAS_THIS: Switch, PARTAS_RUNEXPR: HtmlContainerFun) =
             PARTAS_RUNEXPR Unchecked.defaultof<_>
             PARTAS_THIS
+        
+        [<Extension; Erase>]
+        static member inline Invoke(setter: Setter<'T>, handler: 'T -> 'T): unit =
+            setter(unbox<'T> handler)
+            
+        [<Extension; Erase>]
+        static member inline Invoke(setter: Setter<'T>, value: 'T): unit =
+            setter(value)
+            
+        [<Extension; Erase>]
+        static member inline InvokeGet(setter: Setter<'T>, handler: 'T -> 'T): 'T =
+            setter(unbox<'T> handler) |> unbox<'T>
+            
+        [<Extension; Erase>]
+        static member inline InvokeGet(setter: Setter<'T>, value: 'T): 'T =
+            setter(value) |> unbox<'T>
+            
+            
 
     [<RequireQualifiedAccess; StringEnum>]
     type SolidResourceState =

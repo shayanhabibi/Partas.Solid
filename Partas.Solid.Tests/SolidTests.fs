@@ -50,3 +50,11 @@ let ``Field getters and records are transformed`` () =
 [<Fact>]
 let ``Tags can be used as values`` () =
     runSolidCase "TagsAsValuesSimple"
+
+[<Fact>]
+let ``FieldGets like props.words.Length are transformed`` () =
+    runSolidCase "FieldGetExpressionsTransformed"
+
+[<Fact>]
+let ``Signal Setters can be invoked with a handler`` () =
+    runSolidCase "SignalSetterInvoke"

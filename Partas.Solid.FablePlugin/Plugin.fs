@@ -710,6 +710,12 @@ module internal rec AST =
                     ),
                     typ,
                     range)
+        | Get(expr1, kind, typ, range) -> //transform inside Get expressions
+            match kind with
+            | ExprGet expr -> ExprGet (transform ctx expr)
+            | _ -> kind
+            |> fun kind ->
+                Get(transform ctx expr1, kind, typ, range)
         | _ as expr -> expr
     /// Plugin support for extending Polymorphic attributes
     module Polymorphism =

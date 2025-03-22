@@ -16,10 +16,10 @@
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
-        <Version>0.2.24</Version>
+        <Version>0.2.25</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>0.2.24</PackageVersion>
-        <PackageReleaseNotes>Svg Element Extensions</PackageReleaseNotes>
+        <PackageVersion>0.2.25</PackageVersion>
+        <PackageReleaseNotes>Signal Setters can be `.Invoke`'d with a handler that matches the prev value to new value. Misc other fixes.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>

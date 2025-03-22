@@ -44,6 +44,12 @@
         <Compile Include="SolidCases\TagsAsValuesSimple\TagsAsValuesSimple.fs" />
         <Content Include="SolidCases\TagsAsValuesSimple\TagsAsValuesSimple.expected" />
         <None Include="SolidCases\TagsAsValuesSimple\TagsAsValuesSimple.fsproj" />
+        <Compile Include="SolidCases\FieldGetExpressionsTransformed\FieldGetExpressionsTransformed.fs" />
+        <Content Include="SolidCases\FieldGetExpressionsTransformed\FieldGetExpressionsTransformed.expected" />
+        <None Include="SolidCases\FieldGetExpressionsTransformed\FieldGetExpressionsTransformed.fsproj" />
+        <Compile Include="SolidCases\SignalSetterInvoke\SignalSetterInvoke.fs" />
+        <Content Include="SolidCases\SignalSetterInvoke\SignalSetterInvoke.expected" />
+        <None Include="SolidCases\SignalSetterInvoke\SignalSetterInvoke.fsproj" />
         <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructorTypes.fs" />
         <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.fs" />
         <Content Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.expected" />
