@@ -1,0 +1,8 @@
+import { For, splitProps } from "solid-js";
+import { map } from "./fable_modules/fable-library-js.5.0.0-alpha.12/Array.js";
+
+export function WordRotate(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["words"]);
+    return <For each={map((value) => value, PARTAS_LOCAL.words.split(""))} />;
+}
+

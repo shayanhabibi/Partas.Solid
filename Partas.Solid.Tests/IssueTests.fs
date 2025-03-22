@@ -26,3 +26,7 @@ let ``#13 Getter extensions are transformed`` () =
 [<Fact>]
 let ``#14 Object Expressions are transformed`` () =
     runIssueCase "ObjectExpressions"
+
+[<Fact>]
+let ``#15 props.words.ToCharArray() |> Array.map string`` () =
+    runIssueCase "CharArrayMapping"

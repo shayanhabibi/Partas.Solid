@@ -1,6 +1,5 @@
 import { For, Show, splitProps } from "solid-js";
 import { flexRender, createSolidTable } from "@tanstack/solid-table";
-import { Types_TableOptions$1 } from "./Program.fs.jsx";
 
 export function TransformGetterExtensions(props) {
     const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["data"]);

@@ -658,7 +658,7 @@ module internal rec AST =
         | Let(ident, value, body) -> // transform other lets
             Let(ident, transform ctx value, transform ctx body)
         | Call(callee, callInfo, typ, range) -> // transform calls
-            Call(callee, { callInfo with Args = callInfo.Args |> List.map (transform ctx) }, typ, range)
+            Call(callee |> transform ctx, { callInfo with Args = callInfo.Args |> List.map (transform ctx) }, typ, range)
         | Value( // transform inside anon records
                 NewAnonymousRecord(values, fieldNames, types, isStruct),
                 range
