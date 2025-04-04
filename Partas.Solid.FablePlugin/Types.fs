@@ -20,13 +20,6 @@ type internal MemberRefType =
     | Generated
     | None
 
-// [<RequireQualifiedAccess>]
-// type EnumType =
-//     | Enumerator
-//     | CopyStruct
-//     | GetEnumerator
-//     | Next
-//     | Current
 /// Idents we are interested in that impact the flow of transformation.
 [<RequireQualifiedAccess>]
 type internal IdentType =
@@ -205,15 +198,6 @@ type internal PropInfo = string * Expr
 /// Alias for a list of PropInfos (which in turn is an alias for a string Expr tuple)
 type internal PropList = PropInfo list
 
-// TODO - refactor TagInfo DU out
-/// Helper DU to help discriminate between a tag which is just a constructor (ie no children), an empty constructor with a
-/// builder computation (ie has children, but no properties), or a combination of both a constructor with properties, and
-/// a builder computation (has children)
-type internal TagInfo =
-    | WithBuilder of tagName: TagSource * propsAndChildren: Expr list * range: SourceLocation option
-    | Constructor of tagName: TagSource * props: PropList * range: SourceLocation option
-    | Combined of tagName: TagSource * props: PropList * propsAndChildren: Expr list * range: SourceLocation option
-
 /// The intermediary object that clearly categorizes expressions for rendering, irregardless of whether the
 /// types like TagInfo are refactored
 type internal ElementBuilder =
@@ -221,4 +205,6 @@ type internal ElementBuilder =
         TagSource: TagSource
         Properties: PropList
         Children: Expr list
+        Range: SourceLocation option
     }
+    static member create tagSource properties range = { TagSource = tagSource; Properties = properties; Children = []; Range = range }

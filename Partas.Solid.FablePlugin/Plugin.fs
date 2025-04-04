@@ -288,7 +288,7 @@ module internal rec AST =
             }),
             ((Type.PartasName ctx (Utils.EndsWithTrimmed "_$ctor" typeName)) | (Type.PartasName ctx typeName)),
             range) ->
-            TagInfo.Constructor( TagSource.AutoImport typeName, props, range)
+            ElementBuilder.create (TagSource.AutoImport typeName) props range
             |> Some
         // Native import
         | Call(
@@ -298,7 +298,7 @@ module internal rec AST =
             },
             (Type.PartasName ctx typeName),
             range) ->
-            TagInfo.Constructor (TagSource.AutoImport typeName, props, range)
+            ElementBuilder.create (TagSource.AutoImport typeName) props range
             |> Some
         // Library Imports
         | Call(
@@ -309,7 +309,7 @@ module internal rec AST =
             },
             (Type.PartasName ctx typeName),
             range) ->
-            TagInfo.Constructor (TagSource.LibraryImport imp, props, range)
+            ElementBuilder.create (TagSource.LibraryImport imp) props range
             |> Some
         // Non LibraryImports that require LibraryImport injection via the attribute PartasImportAttribute
         | Call(
@@ -328,7 +328,7 @@ module internal rec AST =
                       Path = path
                       Kind = UserImport false },
                     t, r)
-            TagInfo.Constructor (TagSource.LibraryImport importExpr, props, range)
+            ElementBuilder.create (TagSource.LibraryImport importExpr) props range
             |> Some
         // Non LibraryImports; ie User defined imports
         | Call(
@@ -340,7 +340,7 @@ module internal rec AST =
             (Type.PartasName ctx typeName),
             range) ->
             let importExpr = Import({identee with Selector = typeName}, t, r)
-            TagInfo.Constructor (TagSource.LibraryImport importExpr, props, range)
+            ElementBuilder.create (TagSource.LibraryImport importExpr) props range
             |> Some
         // WITH PROPS
         | Let(
@@ -348,13 +348,7 @@ module internal rec AST =
             TagConstructor ctx tagInfo,
             PropCollectorFeeder ctx bodyProps
             ) ->
-            match tagInfo with
-            | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
-                TagInfo.Combined(tagSource, bodyProps @ props, propsAndChildren, range)
-            | TagInfo.Constructor(tagSource, props, range) ->
-                TagInfo.Constructor(tagSource, bodyProps @ props, range)
-            | TagInfo.WithBuilder(tagSource, propsAndChildren, range) ->
-                TagInfo.Combined(tagSource, bodyProps, propsAndChildren, range)
+            { tagInfo with Properties = bodyProps @ tagInfo.Properties }
             |> Some
         // WITH PROPS & EXTENSION
         | Call(Import({ Kind = MemberImport(MemberRef({ FullName = Utils.EndsWith "HtmlElementExtensions" | Utils.EndsWith "PolymorphicExtensions" }, _)) }, _, _) as callee, ({
@@ -365,13 +359,7 @@ module internal rec AST =
             [ Call(Expr.Value(ValueKind.UnitConstant, None), { callInfo with Args = rest }, Type.MetaType, None) ]
             |> function
                 | PropCollector ctx attributeCall ->
-                    match tagInfo with
-                    | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
-                        TagInfo.Combined(tagSource, attributeCall @ props, propsAndChildren, range)
-                    | TagInfo.Constructor(tagSource, props, range) ->
-                        TagInfo.Constructor(tagSource, attributeCall @ props, range)
-                    | TagInfo.WithBuilder(tagSource, propsAndChildren, range) ->
-                        TagInfo.Combined(tagSource, attributeCall, propsAndChildren, range)
+                    { tagInfo with Properties = attributeCall @ tagInfo.Properties }
                     |> Some
         // WITH CHILDREN
         | Call(
@@ -381,23 +369,11 @@ module internal rec AST =
             },
             typ,
             range) ->
-            match tagInfo with
-            | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
-                TagInfo.Combined(tagSource, props, rest @ propsAndChildren, range)
-            | TagInfo.Constructor(tagSource, props, range) ->
-                TagInfo.Combined(tagSource, props, rest, range)
-            | TagInfo.WithBuilder(tagSource, propsAndChildren, range)  ->
-                TagInfo.WithBuilder(tagSource, rest @ propsAndChildren, range)
+            { tagInfo with Children = rest @ tagInfo.Children }
             |> Some
         
         | Let(Ident.IdentIs ctx IdentType.Element, TagConstructor ctx tagInfo, BuilderCollectorFeedback ctx body) ->
-            match tagInfo with
-            | TagInfo.WithBuilder(tagSource, propsAndChildren, range) ->
-                TagInfo.WithBuilder(tagSource, body @ propsAndChildren, range )
-            | TagInfo.Combined(tagSource, props, propsAndChildren, range) ->
-                TagInfo.Combined(tagSource, props, body @ propsAndChildren, range)
-            | TagInfo.Constructor(tagSource, props, range) ->
-                TagInfo.Combined(tagSource, props, body, range)
+            { tagInfo with Children = body @ tagInfo.Children }
             |> Some
         // An imported context
         | CurriedApply(
@@ -409,11 +385,12 @@ module internal rec AST =
             _,
             range
             ) ->
-            TagInfo.Constructor(
-                TagSource.LibraryImport(Import({ imp with Selector = typeName + ".Provider" }, typ, irange)),
-                [("value", Sequential(props))],
-                irange
-                )
+            {
+                TagSource = TagSource.LibraryImport(Import({ imp with Selector = typeName + ".Provider" }, typ, irange))
+                Properties = [("value", Sequential(props))]
+                Children = []
+                Range = irange
+            }
             |> Some
         // Local defined context
         | CurriedApply(
@@ -422,11 +399,12 @@ module internal rec AST =
                 _,
                 range
             ) ->
-            TagInfo.Constructor(
-                TagSource.AutoImport $"{typeName}.Provider",
-                [("value", Sequential(props))],
-                range
-                )
+            {
+                TagSource = TagSource.AutoImport $"{typeName}.Provider"
+                Properties = [("value", Sequential(props))]
+                Children = []
+                Range = range
+            }
             |> Some
         | _ -> None
             
@@ -531,29 +509,19 @@ module internal rec AST =
             // Trust the F# compiler to not allow invalid elements within the builder.
             | _ ->
                 expr :: restBuilds
-                
+    
+    // TODO - correct documentation and refactor since TagInfo is refactored out            
     /// <summary>
     /// Collates TagInfos into ElementBuilders which can then be rendered via `renderElement`<br/>
     /// Performs final clean up of properties by trimming reserved identifiers of the attribute keys
     /// </summary>
-    let collectTagInfo (ctx: PluginContext): TagInfo -> ElementBuilder = function
-        | TagInfo.WithBuilder(tagSource, BuilderCollector ctx propsAndChildren, range) ->
+    let collectTagInfo (ctx: PluginContext): ElementBuilder -> ElementBuilder = function
+        | { Properties = props } as eleBuilder ->
             {
-                TagSource = tagSource
-                Children = propsAndChildren
-                Properties = []
-            }
-        | TagInfo.Combined(tagSource, props, BuilderCollector ctx propsAndChildren, range) ->
-            {
-                TagSource = tagSource
-                Children = propsAndChildren
-                Properties = props |> List.map (fun (prop,expr) -> (prop |> Utils.trimReservedIdentifiers, expr) )
-            }
-        | TagInfo.Constructor(tagSource, props, range) ->
-            {
-                TagSource = tagSource
-                Children = []
-                Properties = props |> List.map (fun (prop,expr) -> (prop |> Utils.trimReservedIdentifiers, expr) )
+                eleBuilder with
+                    Properties =
+                        props
+                        |> List.map (fun (prop,expr) -> (prop |> Utils.trimReservedIdentifiers, expr) )
             }
             
     /// <summary>
@@ -813,14 +781,7 @@ module internal rec AST =
                         UnrollTypeCast(TagConstructor ctx tagInfo) :: BuilderCollector ctx rest
                     )
                 }, _, _ ) ->
-                tagInfo
-                |> function
-                    | TagInfo.WithBuilder(tagName, propsAndChildren, range) ->
-                        TagInfo.WithBuilder(tagName, rest @ propsAndChildren, range)
-                    | TagInfo.Combined(tagName, props, propsAndChildren, range) ->
-                        TagInfo.Combined(tagName, props, rest @ propsAndChildren, range)
-                    | TagInfo.Constructor(tagName, props, range) ->
-                        TagInfo.Combined(tagName, props, rest, range)
+                { tagInfo with Children = rest @ tagInfo.Children }
                 |> collectTagInfo ctx
                 |> fun eleBuilder ->
                     match thisArg with
@@ -851,7 +812,8 @@ module internal rec AST =
                         failwith "unreachable"
                 { TagSource = TagSource.LibraryImport importExpr
                   Properties = props
-                  Children = [] }
+                  Children = []
+                  Range = range }
                 |> renderElement ctx
                 |> Some
             | _ -> None
