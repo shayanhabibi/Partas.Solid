@@ -89,6 +89,17 @@ module Builder =
         member this.render (): RegularNode = jsNative
         static member inline (%) (left: TagValue, right: obj) = left.render(right)
     
+    /// <summary>
+    /// Explicit plugin declaration that the identifier that this
+    /// is bound to can be treated as a Tag. <br/>
+    /// This allows you to pass tags constructors as functions/values 
+    /// </summary>
+    /// <example><code>
+    /// // Verbose syntax
+    /// let tag = TagValue(div)
+    /// // Operator overload
+    /// let tag = !@div
+    /// </code></example>
     [<Erase>]
     let (!@) (this: unit -> 'T) = TagValue(unbox this)
     
