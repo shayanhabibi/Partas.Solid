@@ -2,6 +2,7 @@ namespace Partas.Solid.Router
 
 open System.Runtime.CompilerServices
 open Fable.Core
+open Fable.Core.JS
 open Fable.Core.JsInterop
 open System
 open Partas.Solid
@@ -13,18 +14,25 @@ open Partas.Solid
 module Bindings =
 
     [<RequireQualifiedAccess>]
-    [<StringEnum(CaseRules.None)>]
+    [<StringEnum(CaseRules.LowerFirst)>]
     type Intent =
-        | initial
-        | native
-        | navigate
-        | preload
+        | Initial
+        | Native
+        | Navigate
+        | Preload
 
-    type NavigateOptions =
-        abstract member resolve: bool with get, set
-        abstract member replace: bool with get, set
-        abstract member scroll: bool with get, set
-        abstract member state: obj with get, set
+    [<Pojo>]
+    type NavigateOptions
+        (
+            ?resolve: bool,
+            ?replace: bool,
+            ?scroll: bool,
+            ?state: obj
+        )=
+        member val resolve: bool = resolve |> Option.defaultValue !!null with get,set
+        member val replace: bool = replace |> Option.defaultValue !!null with get,set
+        member val scroll: bool = scroll |> Option.defaultValue !!null with get,set
+        member val state: obj = state |> Option.defaultValue !!null with get,set
 
     type Navigator =
         [<Emit("$0($1...)")>]
@@ -75,7 +83,6 @@ module Bindings =
         inherit PathMatch
         abstract member route: RouteDescription with get, set
 
-    // [<Import("Route", "@solidjs/router")>] <--- this is injected by the plugin
     [<PartasImport("Route", "@solidjs/router")>]
     type Route() =
         interface HtmlElement
@@ -105,13 +112,15 @@ module Bindings =
         [<Erase>]
         member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
-    [<AllowNullLiteral>]
-    [<Global>]
-    type RootConfig [<ParamObject; Emit("$0")>] (path: string, ``component``: HtmlElement) =
+    [<Pojo>]
+    type RootConfig (path: string, ``component``: HtmlElement) =
         member val path: string = jsNative with get, set
         member val ``component``: HtmlElement = jsNative with get, set
+        /// <summary> Alias for <c>_.``component``</c></summary>
+        member this.component'
+            with inline set(value: HtmlElement) = this.``component`` <- value
+            and inline get(): HtmlElement = this.``component``
 
-    // [<Import("Router", "@solidjs/router")>] // <--- this is injected by the plugin
     [<PartasImport("Router", "@solidjs/router")>] // Replaces Import as it doesn't impact the builder param names
     type Router() =
         interface HtmlElement
@@ -149,14 +158,12 @@ module Bindings =
         [<Erase>]
         member inline _.Yield(PARTAS_ELEMENT: RootConfig[]) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
-    // [<Import("HashRouter", "@solidjs/router")>] <-- injected by plugin
     [<PartasImport("HashRouter", "@solidjs/router")>]
     type HashRouter() =
         inherit Router()
 
-    [<AllowNullLiteral>]
-    [<Global>]
-    type PreloadData [<ParamObject; Emit("$0")>] (preloadData: bool) =
+    [<Pojo>]
+    type PreloadData (preloadData: bool) =
         member val preloadData: bool = jsNative with get, set
 
     [<Erase>]
