@@ -89,6 +89,7 @@ module Builder =
         member this.render (): RegularNode = jsNative
         static member inline (%) (left: TagValue, right: obj) = left.render(right)
     
+    [<Erase>]
     let (!@) (this: unit -> 'T) = TagValue(unbox this)
     
     type HtmlContainerFun = HtmlContainer -> unit
