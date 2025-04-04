@@ -8,11 +8,6 @@ open Fable.Core
 
 [<AutoOpen>]
 module Builder =
-
-    [<Struct>]
-    [<Erase>]
-    type HtmlAttribute = { Name: string; Value: obj }
-
     type HtmlElement = interface end
     type HtmlTag =
         inherit HtmlElement
