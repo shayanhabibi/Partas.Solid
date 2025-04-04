@@ -25,7 +25,14 @@ module Bindings =
     type Setter<'T> = 'T -> unit
     type Accessor<'T> = unit -> 'T
     type Signal<'T> = Accessor<'T> * Setter<'T>
+    
     type ContextProvider = inherit HtmlContainer
+    
+    /// <summary>
+    /// Created by passing a <c>JS.Pojo</c> (recommended) to a createContext call as a type arg or value. Defaults
+    /// are set by calling the constructor with any default values wanted.<br/><br/>
+    /// The plugin transpiles the identifier with a <c>.Provider</c> suffix in the tag as per the SolidJS documentation.
+    /// </summary>
     type Context<'T> = 'T -> ContextProvider
 
     /// Solid on* event handlers
