@@ -8,8 +8,17 @@ open Fable.Core
 
 #nowarn 64
 
-/// If a tag has some capacity for polymorphism, then that must be explicitly
-/// labeled by interfacing with Polymorph. All Kobalte base elements do this.
+/// <summary>
+/// Support for polymorphism is explicitly provided by interfacing with the Polymorph type.<br/>
+/// By default, Partas.Solid provides support for <c>Kobalte</c> polymorphism via the <c>.as'</c> attribute.<br/><br/>
+/// Custom attributes to support polymorphism can be added by providing an alias to a member which is prefaced with
+/// <c>__PARTAS_POLYMORPHIC__</c>.
+/// </summary>
+/// <remarks>
+/// Different libraries accept different values for polymorphic attributes. Some accept the function identifier itself such
+/// as Kobalte, while others such as ArkUI will take a string instead.<br/>
+/// Partas.Solid polymorphic support transpiles the TagValues into identifiers.
+/// </remarks>
 [<Erase>]
 type Polymorph =
     inherit HtmlTag
