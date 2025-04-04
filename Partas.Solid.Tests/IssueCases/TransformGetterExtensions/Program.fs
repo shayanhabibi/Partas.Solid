@@ -132,7 +132,7 @@ module rec Types =
         inherit PaginationTableState
         inherit RowSelectionTableState
     
-    type Updater<'T> = U2<('T -> 'T), 'T> // TODO? what is this // its either a oldState -> newState or just a state object
+    type Updater<'T> = U2<('T -> 'T), 'T>
 
     [<AllowNullLiteral;Interface>]
     type TableFeature = interface end

@@ -128,7 +128,7 @@ type Sidebar() =
                             { div(class' = "flex size-full flex-col") { props.children } }
                     }
                 
-            } // TODO - this test will not pass right now because of delays and what not being rendered
+            }
             Match(when' = (isMobile() |> not)) {
                 // gap handler on desktop
                 div(
