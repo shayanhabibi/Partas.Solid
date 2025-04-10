@@ -525,10 +525,8 @@ module internal rec AST =
             }
             
     /// <summary>
-    /// This is the heart of the transformation sequence.<br/>
-    /// This must handle the transformation of every expression. All expressions parsed
-    /// into the transformer are at some point or another, passed through this
-    /// transformer.<br/>
+    /// First pass transformations of all expressions.<br/>
+    /// Reduce AST where reasonable; capture and expand tags where encountered; dispose only in exceptional circumstances.<br/>
     /// </summary>
     /// <param name="ctx">PluginContext</param>
     /// <param name="expr">Expr node to transform</param>
@@ -540,29 +538,26 @@ module internal rec AST =
     /// </remarks>
     let transform (ctx: PluginContext) (expr: Expr)=
         match expr with
-        // To enable sugar like `&&=` and `??=`, we have to ensure the arguments
-        // are transformed.
+        // Fable sugars like `&&=` and `??=` and others use Emit expressions. Their arguments must be transformed before
+        // they are injected into the Emit.
         | Emit({ CallInfo = { Args = exprs } as callInfo } as emitInfo, typ, range) ->
             let transformedExprs = exprs |> List.map (transform ctx)
             Emit({ emitInfo with CallInfo = { callInfo with Args = transformedExprs } }, typ, range)
-        | TagValue.TagValue ctx expr ->
-            expr
-        // Enables plugin magic for TagValues
-        | TagValue.TagRender ctx expr ->
-            expr
-        // Matches against any expression pattern that needs to be converted into a JSX tag
+        // TagValues are treated specially.
+        | TagValue.TagValue ctx expr -> expr
+        | TagValue.TagRender ctx expr -> expr
+        // Expression pattern that matches a JSX tag expression
         | TagConstructor ctx tagInfo ->
             tagInfo |> collectTagInfo ctx |> Baked.renderElement ctx
-        // transform each expr in the sequence
+        // Transform sequential expressions
         | Sequential exprs ->
             exprs
             |> List.map (transform ctx)
             |> Sequential
-        // any captured Getters or Setters of our self identifier are treated specially
+        // Expression match and transform any `props` accesses or assignments
         | PropsGetterOrSetter ctx expr ->
             expr
-            
-        // transform calls that should be getters
+        // Transform calls that are getters
         | Call(
             Expr.ImportedGetter ctx,
             {
@@ -587,73 +582,85 @@ module internal rec AST =
                 range = None
             )
         
-        // transform conditionals
+        // Transform branch expressions
         | IfThenElse(guardExpr, thenExpr, elseExpr, range) ->
             IfThenElse(
                 transform ctx guardExpr,
                 transform ctx thenExpr,
                 transform ctx elseExpr,
                 range )
+        // Transform branch expressions
         | DecisionTree(decisionTree, targets) ->
             DecisionTree(
                 decisionTree,
                 targets
                 |> List.map (fun (target, expr) -> target, transform ctx expr)
                 )
-        // While the more pervasive TypeCast transformation is good for 90% of cases,
-        // it can leave artifacts from using Setters in builders. We match this single case and dispose
-        // before it is passed back to the BuilderCollector
+        // Within a computation expression, property assignment for `props` is transformed out. In cases where a null
+        // lambda 'husk' remains, we reduce to a null expression.
         | Lambda(
                 { Name = name; IsCompilerGenerated = true },
                 TypeCast(IdentExpr({ Name = otherName; IsCompilerGenerated = true }), Unit),
                 None)
             when name = otherName -> Value(UnitConstant, None)
+        // Transform the contents of TypeCasts
         | TypeCast(expr, _) -> transform ctx expr
-        // Attribute expression pairs should have been captured by
-        // TagConstructor -> PropCollector. It would be invalid to have them
-        // matched here
+        // Attribute expression pairs are invalid on first pass, as they should be collected within tag expressions.
         | AttributeExpression ctx propInfo ->
             PluginContext.logWarning ctx $"Attribute expression was parsed at the top level and was reduced out:\n{propInfo}"
             snd propInfo
-        // Nested expression structures have their descendants transformed before
-        // being restored
+        // Transform nested expression structure
         | CurriedApply(applied, exprs, typ, range) ->
             CurriedApply(transform ctx applied, exprs |> List.map (transform ctx), typ, range )
+        // Transform nested expression structure
         | Delegate(args, body, name, tags) ->
             Delegate(args, transform ctx body, name, tags)
+        // Transform nested expression structure
         | Lambda(ident, expr, name) ->
             Lambda(ident, transform ctx expr, name)
+        // Transform nested expression structure
         | Let(ident, value, body) -> // transform other lets
             Let(ident, transform ctx value, transform ctx body)
+        // Transform nested expression structure
         | Call(callee, callInfo, typ, range) -> // transform calls
             Call(callee |> transform ctx, { callInfo with Args = callInfo.Args |> List.map (transform ctx) }, typ, range)
-        | Value( // transform inside anon records
-                NewAnonymousRecord(values, fieldNames, types, isStruct),
+        // Transform nested values
+        | Value(
+                (
+                 NewAnonymousRecord(_)
+                | NewArray(ArrayValues _, _, _)
+                | NewList(Some _, _)
+                | NewRecord(_)
+                | StringTemplate(_)
+                | NewOption(Some _, _, _)
+                | NewTuple(_)
+                | NewUnion(_)
+                ) as valueKind,
                 range
             ) ->
-            Value(NewAnonymousRecord(values |> List.map (transform ctx), fieldNames, types, isStruct), range)
-        | Value( // transform inside arrays
-                NewArray(ArrayValues exprs, typ, kind),
-                range
-            ) ->
-            Value(NewArray(ArrayValues (exprs |> List.map (transform ctx)), typ, kind), range)
-        | Value( // transform inside lists
-                NewList(Some(expr1, expr2), typ),
-                range
-            ) ->
-            Value(NewList(Some(transform ctx expr1, transform ctx expr2), typ), range)
-        | Value( // transform inside records
-                NewRecord(exprs, entityRef, genArgs),
-                range
-            ) ->
-            Value(NewRecord(exprs |> List.map (transform ctx), entityRef, genArgs), range)
-        | Value( // transform inside string interpolation
-            StringTemplate(exprOption, parts, values),
-            range) ->
-            let newTag = exprOption |> Option.map(transform ctx)
-            Value(StringTemplate(newTag, parts, values |> List.map (transform ctx)), range)
-        | Value(NewOption(Some expr, typ, isStruct), range) -> // transform inside options
-            Value(NewOption(Some(expr |> transform ctx), typ, isStruct), range)
+            let transformValues = List.map (transform ctx)
+            Value(
+                match valueKind with
+                | NewUnion(values, tag, ref, genArgs) ->
+                    NewUnion(transformValues values, tag, ref, genArgs)
+                | NewTuple(values, isStruct) ->
+                    NewTuple(transformValues values, isStruct)
+                | StringTemplate(tag, parts, values) ->
+                    StringTemplate(tag |> Option.map (transform ctx), parts, transformValues values)
+                | NewOption(Some expr, typ, isStruct) ->
+                    NewOption(Some (transform ctx expr), typ, isStruct)
+                | NewArray(ArrayValues values, typ, kind) ->
+                    NewArray(ArrayValues (transformValues values), typ, kind)
+                | NewList(Some(expr1, expr2), typ) ->
+                    NewList(Some(transform ctx expr1, transform ctx expr2), typ)
+                | NewRecord(values, ref, genArgs) ->
+                    NewRecord(transformValues values, ref, genArgs)
+                | NewAnonymousRecord(values, fieldNames, genArgs, isStruct) ->
+                    NewAnonymousRecord(transformValues values, fieldNames, genArgs, isStruct)
+                | _ -> failwith "unreachable"
+                , range
+            )
+        // Transform nested expressions
         | Operation(kind, tags, typ, range) ->
             Operation( // transform operations
                 match kind with
@@ -673,17 +680,19 @@ module internal rec AST =
                 // PluginContext.debugDisposal ctx "Transform of Get ExprGet" getExpr
                 Get(
                     transform ctx expr,
-                    ExprGet(
-                        getExpr
-                    ),
+                    ExprGet(getExpr),
                     typ,
                     range)
+        // Transform nested expressions
         | Get(expr1, kind, typ, range) -> //transform inside Get expressions
-            match kind with
-            | ExprGet expr -> ExprGet (transform ctx expr)
-            | _ -> kind
-            |> fun kind ->
-                Get(transform ctx expr1, kind, typ, range)
+            Get(
+                transform ctx expr1,
+                match kind with
+                | ExprGet expr -> ExprGet (transform ctx expr)
+                | _ -> kind
+                , typ, range
+                )
+        // Transform nested expressions
         | ObjectExpr(exprMembers, typ, exprOption) -> // transform inside Object expr
             [                                         // eg: jsOptions<SomeType> ( ... )
                 for memb in exprMembers do
@@ -692,7 +701,9 @@ module internal rec AST =
             ]
             |> fun exprMembers ->
                 ObjectExpr(exprMembers, typ, exprOption |> Option.map (transform ctx))
+        // No further first pass transformations applicable
         | _ as expr -> expr
+        
     /// Plugin support for extending Polymorphic attributes
     module Polymorphism =
         let (|PolymorphicAttribute|_|) (ctx: PluginContext) : string -> string option = function
