@@ -677,6 +677,16 @@ type CreateDeferredOptions(
     member val equals = equals with get,set
     member val name = name with get,set
 
+[<JS.Pojo>]
+type CreateSignalOptions(
+        ?equals: 'T * 'T -> bool,
+        ?name: string,
+        ?``internal``: bool
+    ) =
+    member val equals = equals with get,set
+    member val name = name with get,set
+    member val ``internal`` = ``internal`` with get,set
+
 [<AutoOpen>]
 [<Erase>]
 type Bindings =
@@ -696,7 +706,10 @@ type Bindings =
 
     [<ImportMember("solid-js")>]
     static member createSignal(value: 'T) : Signal<'T> = jsNative
-
+    [<ImportMember("solid-js")>]
+    static member createSignal(value: 'T, options: CreateSignalOptions): Signal<'T> = jsNative
+    static member inline createSignal(value: 'T, ?equals: 'T * 'T -> bool, ?name: string, ?internal': bool) =
+        createSignal(value, CreateSignalOptions(unbox equals, unbox name, unbox internal'))
     [<ImportMember("solid-js")>]
     static member createMemo(value: unit -> 'T) : (unit -> 'T) = jsNative
 
@@ -809,8 +822,6 @@ type Bindings =
     /// will not be set before the initial effect call. Indeed, Solid uses <c>createRenderEffect</c> to implement
     /// the rendering phase of itself, including setting of <b>refs</b>
     /// </summary>
-    /// <param name="fn"></param>
-    /// <param name="value"></param>
     [<ImportMember("solid-js")>]
     static member createRenderEffect<'T>(fn: 'T -> 'T, ?value: 'T): unit = jsNative
     /// <summary>
