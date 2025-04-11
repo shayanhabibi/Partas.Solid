@@ -23,6 +23,14 @@
 </div>
 
 ---
+
+# Docs
+
+[See the new Docs](http://shayanhabibi.github.io/partas-solid-docs/)
+
+
+---
+
 <!-- TOC -->
 * [Install](#install)
   * [Compiling](#compiling)
