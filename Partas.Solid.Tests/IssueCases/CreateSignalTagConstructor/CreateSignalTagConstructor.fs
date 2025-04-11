@@ -29,7 +29,7 @@ module App =
             MenuItem("Home", "#", div())
         |]
         let (items, setItems) = createSignal(initialItems)
-        let (item, addItem) = createSignal<MenuItem>(null)
+        let (item, addItem) = createSignal<MenuItem>(Unchecked.defaultof<_>)
         div() {
             MyItemizer(items = items())
             Imported()
