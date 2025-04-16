@@ -120,7 +120,6 @@ module Bindings =
         member this.component'
             with inline set(value: HtmlElement) = this.``component`` <- value
             and inline get(): HtmlElement = this.``component``
-
     [<PartasImport("Router", "@solidjs/router")>] // Replaces Import as it doesn't impact the builder param names
     type Router() =
         interface HtmlElement

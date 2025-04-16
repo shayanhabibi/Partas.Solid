@@ -709,6 +709,11 @@ type Bindings =
         (fetcher: unit -> JS.Promise<'T>, ?initialValue: 'T)
         : SolidResource<'T> * SolidResourceManager<'T> =
         jsNative
+    /// Injects Async.StartAsPromise to the fetcher
+    static member inline createResource
+        (fetcher: unit -> Async<'T>, ?initialValue: 'T)
+        : SolidResource<'T> * SolidResourceManager<'T> =
+            createResource(fetcher >> Async.StartAsPromise, ?initialValue = initialValue)
 
     /// Fetcher will be called only when source signal returns `Some('U)`
     [<ImportMember("solid-js"); ParamObject(fromIndex = 2)>]
@@ -716,6 +721,12 @@ type Bindings =
         (source: unit -> 'U option, fetcher: 'U -> JS.Promise<'T>, ?initialValue: 'T)
         : SolidResource<'T> * SolidResourceManager<'T> =
         jsNative
+    /// Injects Async.StartAsPromise to the fetcher
+    static member inline createResource
+        (source: unit -> 'U option, fetcher: 'U -> Async<'T>, ?initialValue: 'T)
+        : SolidResource<'T> * SolidResourceManager<'T> =
+        createResource(source, fetcher >> Async.StartAsPromise, ?initialValue = initialValue)
+    
 
     [<ImportMember("solid-js")>]
     static member createRoot(fn (* dispose *) : Action -> 'T) : 'T = jsNative
