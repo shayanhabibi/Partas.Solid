@@ -50,6 +50,9 @@
         <Compile Include="SolidCases\SignalSetterInvoke\SignalSetterInvoke.fs" />
         <Content Include="SolidCases\SignalSetterInvoke\SignalSetterInvoke.expected" />
         <None Include="SolidCases\SignalSetterInvoke\SignalSetterInvoke.fsproj" />
+        <Compile Include="SolidCases\ExperimentalBuilders\ExperimentalBuilders.fs" />
+        <Content Include="SolidCases\ExperimentalBuilders\ExperimentalBuilders.expected" />
+        <None Include="SolidCases\ExperimentalBuilders\ExperimentalBuilders.fsproj" />
         <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructorTypes.fs" />
         <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.fs" />
         <Content Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.expected" />
