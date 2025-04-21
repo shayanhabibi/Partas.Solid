@@ -16,10 +16,10 @@
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
-        <Version>0.2.29</Version>
+        <Version>0.2.30</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>0.2.29</PackageVersion>
-        <PackageReleaseNotes>Experimental builders as syntax sugar for common patterns such as createEffect are available in Partas.Solid.Experimental namespace. Use with caution.</PackageReleaseNotes>
+        <PackageVersion>0.2.30</PackageVersion>
+        <PackageReleaseNotes>Fix over val mutable overloads not rendering.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
