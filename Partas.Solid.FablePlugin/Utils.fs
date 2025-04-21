@@ -21,7 +21,7 @@ let (|EndsWithTrimmed|_|) (value: string) = function
 let rec trimReservedIdentifiers = function
     | EndsWithTrimmed "'" s -> trimReservedIdentifiers s
     | EndsWithTrimmed "`1" s -> trimReservedIdentifiers s
-    | s when s.Length > 2 && s.Substring(0, s.Length - 2).StartsWith('`') ->
+    | s when s.Length > 2 && s.Substring(s.Length - 2).StartsWith('`') ->
         s.Substring(0, s.Length - 2)
         |> trimReservedIdentifiers
     | s -> s
