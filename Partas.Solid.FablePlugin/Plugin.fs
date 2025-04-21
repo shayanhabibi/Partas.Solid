@@ -143,6 +143,17 @@ module internal rec AST =
             | Set(IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal), FieldSet(prop), _, expr, _) ->
                 (prop, transform ctx expr)
                 |> Some
+            // Inlined named overloads to `[<DefaultValue>] val mutable` properties/attributes
+            | Let(
+                    { IsThisArgument = true; IsCompilerGenerated = true },
+                    IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal),
+                    Set(
+                        IdentExpr({  IsThisArgument = true (*; IsCompilerGenerated = false *) }),
+                        FieldSet(prop),
+                        _, expr, _
+                    )
+                ) ->
+                (prop, transform ctx expr) |> Some
             // Captured method/Extension call
             | Call(
                 Value(ValueKind.UnitConstant, None),

@@ -30,3 +30,7 @@ let ``#14 Object Expressions are transformed`` () =
 [<Fact>]
 let ``#15 props.words.ToCharArray() |> Array.map string`` () =
     runIssueCase "CharArrayMapping"
+
+[<Fact>]
+let ``#16 val mutable overloads render`` () =
+    runIssueCase "ValMutableOverloads"

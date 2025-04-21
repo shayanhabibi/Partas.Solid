@@ -8,6 +8,8 @@ module Partas.Solid.Experimental
 open Partas.Solid
 open Fable.Core
 
+#nowarn 64 49
+
 /// <summary>
 /// Lambdas that are of the signature <c>unit -> unit</c> are common enough that we can
 /// build this as a base for things like <c>createEffect</c> to inherit
