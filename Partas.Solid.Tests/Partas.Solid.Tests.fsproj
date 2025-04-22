@@ -91,6 +91,9 @@
         <None Include="IssueCases\ValMutableOverloads\ValMutableOverloads.fsproj" />
         <Compile Include="IssueCases\ValMutableOverloads\ValMutableOverloads.fs" />
         <Content Include="IssueCases\ValMutableOverloads\ValMutableOverloads.expected" />
+        <None Include="IssueCases\IndexedPropSpreading\IndexedPropSpreading.fsproj" />
+        <Compile Include="IssueCases\IndexedPropSpreading\IndexedPropSpreading.fs" />
+        <Content Include="IssueCases\IndexedPropSpreading\IndexedPropSpreading.expected" />
         <Compile Include="Common.fs" />
         <Compile Include="IssueTests.fs" />
         <Compile Include="SolidTests.fs" />

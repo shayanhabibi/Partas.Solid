@@ -189,6 +189,24 @@ module internal rec AST =
                 | "spread", [ (TypeCast(IdentExpr({ Name = ident }), _) | IdentExpr({ Name = ident })) ]
                     when fable5 ->
                     Some("{..." + ident + "} bool:n$", Value(ValueKind.BoolConstant(false), None))
+                | "spread", [ (TypeCast(
+                        Get(
+                            IdentExpr({ Name = ident }),
+                            TupleIndex indx,
+                            _,
+                            _
+                            )
+                        , _
+                        )
+                    ) | (
+                        Get(
+                            IdentExpr({ Name = ident }),
+                            TupleIndex indx,
+                            _,
+                            _
+                        )
+                    ) ] ->
+                    Some("{..." + ident + "[" + string indx + "]} bool:n$", Value(ValueKind.BoolConstant(false), None))
                 | "spread", [ expr ]
                     when fable4 ->
                     $"Spread does not support this as a value in Fable 4 or below:\n{expr}"

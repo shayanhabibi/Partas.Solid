@@ -34,3 +34,7 @@ let ``#15 props.words.ToCharArray() |> Array.map string`` () =
 [<Fact>]
 let ``#16 val mutable overloads render`` () =
     runIssueCase "ValMutableOverloads"
+
+[<Fact>]
+let ``#18 indexed identifiers spread`` () =
+    runIssueCase "IndexedPropSpreading"

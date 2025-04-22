@@ -676,7 +676,9 @@ type Bindings =
     [<ImportMember("solid-js")>]
     static member mergeProps([<ParamList>] values: 'T[]): 'T = jsNative
     [<ImportMember("solid-js")>]
-    static member splitProps(o: 'T, properties: string array): 'T = jsNative
+    static member splitProps(o: 'T, properties: string array, otherProperties: string array): 'T * 'T = jsNative
+    [<ImportMember("solid-js")>]
+    static member splitProps(o: 'T, properties: string array): 'T * 'T = jsNative
     
     [<ImportMember("solid-js/web")>]
     static member render(code: unit -> #HtmlElement, element: #Element) : unit = jsNative
