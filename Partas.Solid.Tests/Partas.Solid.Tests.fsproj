@@ -126,6 +126,7 @@
     <ItemGroup>
       <Compile Include="AttributeCases\PartasImportAttr\PartasImportAttr.fs" />
       <Content Include="AttributeCases\PartasImportAttr\PartasImportAttr.expected" />
+      <Compile Include="Spec\Components.fs" />
       <None Include="AttributeCases\PartasImportAttr\PartasImportAttr.fsproj" />
       <Folder Include="General\" />
       <Folder Include="obj\" />
