@@ -75,7 +75,8 @@ module internal rec AST =
                 // This is a `props.class' <- "value"` type call that had the extension
                 // defined in a different module (Imported)
                 match callInfo with
-                | { MemberRef = MemberRef.Option.PartasName ctx name
+                | { ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.Props))
+                    MemberRef = MemberRef.Option.PartasName ctx name
                     Args = expr :: _ } ->
                     Some(name, expr)
                 | _ ->
