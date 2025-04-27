@@ -1,6 +1,7 @@
 ﻿namespace Partas.Solid.Tests.Spec
 
 open Partas.Solid
+open Fable.Core
 
 /// Let bindings compile to functions
 [<SolidComponent>]
