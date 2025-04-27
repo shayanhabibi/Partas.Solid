@@ -1,4 +1,4 @@
-﻿module Partas.Solid.Tests.Spec.Components
+﻿namespace Partas.Solid.Tests.Spec
 
 open Partas.Solid
 
