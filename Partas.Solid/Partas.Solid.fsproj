@@ -16,10 +16,10 @@
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
-        <Version>0.2.32</Version>
+        <Version>0.2.33</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>0.2.32</PackageVersion>
-        <PackageReleaseNotes>Fix Indexed Identifiers not compiling when spreading</PackageReleaseNotes>
+        <PackageVersion>0.2.33</PackageVersion>
+        <PackageReleaseNotes>createResource overloads match Solid-js spec</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
