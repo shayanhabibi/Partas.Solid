@@ -610,8 +610,7 @@ module Bindings =
     /// if any was provided (else null), and the second is an object with two properties, the previous
     /// value via <c>_.value</c>, and whether the fetcher was initiated by a <c>refetch</c> via <c>_.refetching</c>.
     /// </summary>
-    /// <remarks>The signature was chosen as a tuple because it is easier to dispose, and has better backwards compatibility.</remarks>
-    type ResourceFetcher<'U, 'T> = 'U * ResourceFetcherInfo<'T> -> JS.Promise<'T> 
+    type ResourceFetcher<'U, 'T> = 'U -> ResourceFetcherInfo<'T> -> JS.Promise<'T> 
 
     [<RequireQualifiedAccess; StringEnum>]
     type SolidResourceState =
