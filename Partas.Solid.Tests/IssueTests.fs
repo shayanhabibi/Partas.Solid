@@ -38,3 +38,7 @@ let ``#16 val mutable overloads render`` () =
 [<Fact>]
 let ``#18 indexed identifiers spread`` () =
     runIssueCase "IndexedPropSpreading"
+
+[<Fact>]
+let ``#27 list CE 'empty' rendered out`` () =
+    runIssueCase "EmptyCE"

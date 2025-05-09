@@ -94,6 +94,9 @@
         <None Include="IssueCases\IndexedPropSpreading\IndexedPropSpreading.fsproj" />
         <Compile Include="IssueCases\IndexedPropSpreading\IndexedPropSpreading.fs" />
         <Content Include="IssueCases\IndexedPropSpreading\IndexedPropSpreading.expected" />
+        <None Include="IssueCases\EmptyCE\EmptyCE.fsproj" />
+        <Compile Include="IssueCases\EmptyCE\EmptyCE.fs" />
+        <Content Include="IssueCases\EmptyCE\EmptyCE.expected" />
         <Compile Include="Common.fs" />
         <Compile Include="IssueTests.fs" />
         <Compile Include="SolidTests.fs" />

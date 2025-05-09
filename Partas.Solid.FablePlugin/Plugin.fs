@@ -49,6 +49,8 @@ module internal rec AST =
                     exprs @ rest
                 | Call(Import({Selector = Utils.StartsWith "singleton"}, Any, None), { Args = value :: ValueUnroller exprs }, typ, range) ->
                     exprs @ (value :: rest)
+                | Call(Import({ Selector = Utils.StartsWith "empty"; Path = Utils.EndsWith "Seq.js" }, Any, None), { Args = []; GenericArgs = typ :: _ }, _, _) ->
+                    Value(ValueKind.Null(typ), None) :: rest
                 | Call(callee, ({ Args = ValueUnroller exprs } as callInfo), typ, range) ->
                     Call(callee, { callInfo with Args = exprs }, typ, range) :: rest
                 | TypeCast(ValueUnrollerFeedback exprs, typ) ->
