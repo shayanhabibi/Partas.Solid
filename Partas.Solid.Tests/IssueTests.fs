@@ -42,3 +42,7 @@ let ``#18 indexed identifiers spread`` () =
 [<Fact>]
 let ``#27 list CE 'empty' rendered out`` () =
     runIssueCase "EmptyCE"
+
+[<Fact>]
+let ``#28 ThisArg is transformed`` () =
+    runIssueCase "ThisArgTransforms"

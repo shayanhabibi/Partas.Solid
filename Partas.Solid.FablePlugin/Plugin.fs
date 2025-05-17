@@ -654,6 +654,9 @@ module internal rec AST =
         | Let(ident, value, body) -> // transform other lets
             Let(ident, transform ctx value, transform ctx body)
         // Transform nested expression structure
+        | Call(callee, ({ ThisArg = Some ident } as callInfo), typ, range) -> // transform calls
+            Call(callee |> transform ctx, { callInfo with ThisArg = Some (transform ctx ident); Args = callInfo.Args |> List.map (transform ctx) }, typ, range)
+        // Transform nested expression structure
         | Call(callee, callInfo, typ, range) -> // transform calls
             Call(callee |> transform ctx, { callInfo with Args = callInfo.Args |> List.map (transform ctx) }, typ, range)
         // Transform nested values
