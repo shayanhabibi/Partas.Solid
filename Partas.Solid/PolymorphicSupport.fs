@@ -1,5 +1,6 @@
 ﻿/// Provides scaffolding plugin support for Kobalte
 /// polymorphism
+[<AutoOpen>]
 module Partas.Solid.Polymorphism
 
 open System.Runtime.CompilerServices

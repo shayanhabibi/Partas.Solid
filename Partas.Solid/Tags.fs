@@ -95,17 +95,13 @@ module Tags =
     // This differs from Oxpecker in that the properties provide getters so that
     // they can be referenced within the JSX DSL
     type HtmlTag with
-        // [<Erase>]
-        // member this.``__SPREAD_PROPERTY__``
-        //     with set (value: obj) = ()
-        // member this.spreadObj
-        //     with inline set (value: obj) = this.``__SPREAD_PROPERTY__`` <- value
         [<Erase>]
         member this.children
             with get(): HtmlElement = jsNative
         [<Erase>]
         member this.``class``
             with get() : string = ""
+            and set(value: string) = ()
         [<Erase>]
         member this.id
             with set (value: string) = ()
@@ -114,6 +110,11 @@ module Tags =
         member this.class'
             with set (value: string) = ()
             and inline get () : string = this.``class``
+        /// Alias for `class'` and ```class``` for React folks
+        [<Erase>]
+        member this.className
+            with inline set (value: string) = this.``class`` <- value
+            and inline get(): string = this.``class``
         [<LanguageInjection(InjectedLanguage.CSS, Prefix = ".x{", Suffix = ";}")>]
         [<Erase>]
         member this.style
