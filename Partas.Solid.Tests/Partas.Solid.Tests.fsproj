@@ -94,6 +94,13 @@
         <None Include="IssueCases\IndexedPropSpreading\IndexedPropSpreading.fsproj" />
         <Compile Include="IssueCases\IndexedPropSpreading\IndexedPropSpreading.fs" />
         <Content Include="IssueCases\IndexedPropSpreading\IndexedPropSpreading.expected" />
+        <None Include="IssueCases\EmptyCE\EmptyCE.fsproj" />
+        <Compile Include="IssueCases\EmptyCE\EmptyCE.fs" />
+        <Content Include="IssueCases\EmptyCE\EmptyCE.expected" />
+        <None Include="IssueCases\ThisArgTransforms\ThisArgTransforms.fsproj" />
+        <Compile Include="IssueCases\ThisArgTransforms\ThisArgTransformsTypes.fs" />
+        <Compile Include="IssueCases\ThisArgTransforms\ThisArgTransforms.fs" />
+        <Content Include="IssueCases\ThisArgTransforms\ThisArgTransforms.expected" />
         <Compile Include="Common.fs" />
         <Compile Include="IssueTests.fs" />
         <Compile Include="SolidTests.fs" />
@@ -126,6 +133,7 @@
     <ItemGroup>
       <Compile Include="AttributeCases\PartasImportAttr\PartasImportAttr.fs" />
       <Content Include="AttributeCases\PartasImportAttr\PartasImportAttr.expected" />
+      <Compile Include="Spec\Components.fs" />
       <None Include="AttributeCases\PartasImportAttr\PartasImportAttr.fsproj" />
       <Folder Include="General\" />
       <Folder Include="obj\" />
