@@ -56,6 +56,9 @@
         <Compile Include="SolidCases\CssStyles\CssStyles.fs" />
         <Content Include="SolidCases\CssStyles\CssStyles.expected" />
         <None Include="SolidCases\CssStyles\CssStyles.fsproj" />
+        <Compile Include="SolidCases\ChildLambdaProvider\ChildLambdaProvider.fs" />
+        <Content Include="SolidCases\ChildLambdaProvider\ChildLambdaProvider.expected" />
+        <None Include="SolidCases\ChildLambdaProvider\ChildLambdaProvider.fsproj" />
         <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructorTypes.fs" />
         <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.fs" />
         <Content Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.expected" />

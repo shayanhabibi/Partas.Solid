@@ -1,0 +1,15 @@
+import { OnlyTakesButtons, SomeComponent } from "FakeLibrary";
+
+export function TestProvider() {
+    return <SomeComponent>
+        {(i, s, f) => <>
+            <div tabindex={i}>
+                {s()}
+            </div>
+            <OnlyTakesButtons>
+                {(b) => <button tabindex={b} />}
+            </OnlyTakesButtons>
+        </>}
+    </SomeComponent>;
+}
+

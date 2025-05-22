@@ -66,3 +66,7 @@ let ``Experimental Builders compile correct output`` () =
 [<Fact>]
 let ``CssStyle definitions compile correct output`` () =
     runSolidCase "CssStyles"
+
+[<Fact>]
+let ``ChildLambdaProvider interfaces`` () =
+    runSolidCase "ChildLambdaProvider"
