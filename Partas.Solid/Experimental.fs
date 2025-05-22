@@ -158,11 +158,17 @@ module Builders =
     /// <summary>
     /// Wraps the computation in <c>children(fun () -> ...)</c>
     /// </summary>
-    /// <example><code>
-    /// let childs = children {
-    ///     props.children
+    /// <example>
+    /// A common pattern to optimise conditional child expressions:
+    /// <code>
+    /// let resolvedChildren = children { props.children }
+    /// let hasChildren = lambda {
+    ///     resolvedChildren
+    ///     |> JS.Constructors.Array.from
+    ///     |> fun a -> a.Length > 0
     /// }
-    /// div() { childs() }
+    /// // ...
+    /// if hasChildren() then resolvedChildren()
     /// </code></example>
     let [<Erase>] children = ChildrenBuilder()
 
