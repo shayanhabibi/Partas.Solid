@@ -1,0 +1,99 @@
+import { children, splitProps, createEffect, createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
+import { MatchFailureException } from "./fable_modules/fable-library-js.5.0.0-alpha.12/Types.js";
+
+export const patternInput$004013 = createSignal(10);
+
+export const setter = patternInput$004013[1];
+
+export const getter = patternInput$004013[0];
+
+export const patternInput$004014$002D1 = createStore([]);
+
+export const store = patternInput$004014$002D1[1];
+
+export const data = patternInput$004014$002D1[0];
+
+createEffect(() => {
+    (getter() === 10) ? ((store([]), (value) => {
+    })) : ((setter(10), (value_1) => {
+    }));
+});
+
+export const getGetter = () => {
+    let matchValue;
+    let check = 10;
+    (matchValue = (getter() | 0), (matchValue === 5) ? ((check = 10, (value_1) => {
+    })) : ((matchValue === 10) ? ((check = 5, (value) => {
+    })) : (() => {
+        throw new MatchFailureException("C:/Users/shaya/RiderProjects/Partas.Solid/Partas.Solid.Tests/SolidCases/ExperimentalBuilders/ExperimentalBuilders.fs", 24, 10);
+    })()));
+    return check | 0;
+};
+
+export const getSetter = () => {
+    store((o) => {
+        void (o.push({
+            value: 5,
+            label: "Test",
+        }));
+        return o;
+    });
+    return (data.length > 0) ? setter : ((value) => {
+    });
+};
+
+export function ComponentWrap() {
+    createEffect(() => {
+        if (getter() === 10) {
+            store([]);
+        }
+        else {
+            setter(10);
+        }
+    });
+    if (getter() === 0) {
+        return () => {
+            let check = 10;
+            const matchValue = getter() | 0;
+            switch (matchValue) {
+                case 5: {
+                    check = 10;
+                    break;
+                }
+                case 10: {
+                    check = 5;
+                    break;
+                }
+                default:
+                    throw new MatchFailureException("C:/Users/shaya/RiderProjects/Partas.Solid/Partas.Solid.Tests/SolidCases/ExperimentalBuilders/ExperimentalBuilders.fs", 46, 14);
+            }
+            return check | 0;
+        };
+    }
+    else {
+        return () => ((() => {
+            store((o) => {
+                void (o.push({
+                    value: 5,
+                    label: "Test",
+                }));
+                return o;
+            });
+            if (data.length > 0) {
+                return setter;
+            }
+            else {
+                return undefined;
+            }
+        })() | 0);
+    }
+}
+
+export function TestComponent(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["children"]);
+    const childs = children(() => PARTAS_LOCAL.children);
+    return <div>
+        {childs()}
+    </div>;
+}

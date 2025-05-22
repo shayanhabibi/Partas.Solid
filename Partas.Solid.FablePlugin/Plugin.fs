@@ -77,7 +77,8 @@ module internal rec AST =
                 // This is a `props.class' <- "value"` type call that had the extension
                 // defined in a different module (Imported)
                 match callInfo with
-                | { MemberRef = MemberRef.Option.PartasName ctx name
+                | { ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.Props))
+                    MemberRef = MemberRef.Option.PartasName ctx name
                     Args = expr :: _ } ->
                     Some(name, expr)
                 | _ ->
@@ -467,6 +468,23 @@ module internal rec AST =
             | CurriedApply(BuilderCollectorFeedback ctx applied, BuilderCollector ctx args, typ, range) ->
                 if args.IsEmpty then applied @ restBuilds
                 else CurriedApply(applied.Head, args, typ, range) :: restBuilds
+            // Note: this must come before recognizer for lambda with 3 and lambda with 2 parameters
+            // Captures and correctly generates lambda in ChildLambdaProvider4
+            | Lambda(
+                Ident.IdentIs ctx IdentType.Cont,
+                TypeCast(Lambda(p1, Lambda(p2, Lambda(p3, Lambda(p4, BuilderCollectorFeedback ctx expr, _), _), _), _), _),
+                _
+                ) ->
+                let getHead = List.tryHead >> Option.defaultValue (Value(UnitConstant, None))
+                Delegate([ p1; p2; p3; p4], getHead expr, None, []) :: restBuilds
+            // Captures and correctly generates lambda in ChildLambdaProvider3
+            | Lambda(
+                Ident.IdentIs ctx IdentType.Cont,
+                TypeCast(Lambda(p1, Lambda(p2, Lambda(p3, BuilderCollectorFeedback ctx expr, _), _), _), _),
+                _
+                ) ->
+                let getHead = List.tryHead >> Option.defaultValue (Value(UnitConstant, None))
+                Delegate([ p1; p2; p3], getHead expr, None, []) :: restBuilds
             // This captures and correctly generates the lambda in the For and Index bindings
             | Lambda(
                 Ident.IdentIs ctx IdentType.Cont,
@@ -880,7 +898,6 @@ type SolidTypeComponentAttribute(flag: int) =
             Console.WriteLine "END MEMBER DECL!!!\n"
         | _ -> ()
         let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
-        
         match memberDecl with
         // Check that the memberDecl has the correct self identifier of `props`
         | SchemaRules.ValidMemberRef ctx finalName ->

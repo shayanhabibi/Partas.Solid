@@ -58,3 +58,15 @@ let ``FieldGets like props.words.Length are transformed`` () =
 [<Fact>]
 let ``Signal Setters can be invoked with a handler`` () =
     runSolidCase "SignalSetterInvoke"
+
+[<Fact>]
+let ``Experimental Builders compile correct output`` () =
+    runSolidCase "ExperimentalBuilders"
+
+[<Fact>]
+let ``CssStyle definitions compile correct output`` () =
+    runSolidCase "CssStyles"
+
+[<Fact>]
+let ``ChildLambdaProvider interfaces`` () =
+    runSolidCase "ChildLambdaProvider"

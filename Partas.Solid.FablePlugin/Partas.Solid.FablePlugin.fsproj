@@ -23,7 +23,6 @@
         <Compile Include="Utils.fs" />
         <Compile Include="Spec.fs" />
         <Compile Include="Plugin.fs" />
-        <None Include="HISTORICAL.fs" />
     </ItemGroup>
 
     <ItemGroup>

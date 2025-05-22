@@ -17,6 +17,80 @@ module Builder =
     type SvgTag =
         inherit HtmlElement
     
+    type IChildLambdaProvider = inherit HtmlElement
+    /// <summary>
+    /// Interface this with the parameter type and the type of children
+    /// and their descendants to accept to allow the component to accept
+    /// a lambda function passing that parameter which returns the type of children
+    /// provided.
+    /// </summary>
+    /// <typeparam name="'Param1">Type parameter for the lambda</typeparam>
+    /// <typeparam name="'Children">Type parameter for the children</typeparam>
+    type ChildLambdaProviderStrict<'Param1, 'Children> = inherit IChildLambdaProvider
+    /// <summary>
+    /// Interface this with the parameter type and the type of children
+    /// and their descendants to accept to allow the component to accept
+    /// a lambda function passing that parameter which returns the type of children
+    /// provided.
+    /// </summary>
+    /// <typeparam name="'Param1">Type parameter for the first parameter of the lambda</typeparam>
+    /// <typeparam name="'Param2">Type parameter for the second parameter of the lambda</typeparam>
+    /// <typeparam name="'Children">Type parameter for the children</typeparam>
+    type ChildLambdaProviderStrict2<'Param1, 'Param2, 'Children> = inherit IChildLambdaProvider
+    /// <summary>
+    /// Interface this with the parameter type and the type of children
+    /// and their descendants to accept to allow the component to accept
+    /// a lambda function passing that parameter which returns the type of children
+    /// provided.
+    /// </summary>
+    /// <typeparam name="'Param1">Type parameter for the first parameter of the lambda</typeparam>
+    /// <typeparam name="'Param2">Type parameter for the second parameter of the lambda</typeparam>
+    /// <typeparam name="'Param3">Type parameter for the third parameter of the lambda</typeparam>
+    /// <typeparam name="'Children">Type parameter for the children</typeparam>
+    type ChildLambdaProviderStrict3<'Param1, 'Param2, 'Param3, 'Children> = inherit IChildLambdaProvider
+    /// <summary>
+    /// Interface this with the parameter type and the type of children
+    /// and their descendants to accept to allow the component to accept
+    /// a lambda function passing that parameter which returns the type of children
+    /// provided.
+    /// </summary>
+    /// <typeparam name="'Param1">Type parameter for the first parameter of the lambda</typeparam>
+    /// <typeparam name="'Param2">Type parameter for the second parameter of the lambda</typeparam>
+    /// <typeparam name="'Param3">Type parameter for the third parameter of the lambda</typeparam>
+    /// <typeparam name="'Param4">Type parameter for the fourth parameter of the lambda</typeparam>
+    /// <typeparam name="'Children">Type parameter for the children</typeparam>
+    type ChildLambdaProviderStrict4<'Param1, 'Param2, 'Param3, 'Param4, 'Children> = inherit IChildLambdaProvider
+    /// <summary>
+    /// Interface this with the parameter type to allow the component to accept
+    /// a lambda function passing that parameter to the children
+    /// </summary>
+    /// <typeparam name="'Param1">Type parameter for the first parameter of the lambda</typeparam>
+    type ChildLambdaProvider<'Param1> = inherit IChildLambdaProvider
+    /// <summary>
+    /// Interface this with the parameter type to allow the component to accept
+    /// a lambda function passing that parameter to the children
+    /// </summary>
+    /// <typeparam name="'Param1">Type parameter for the first parameter of the lambda</typeparam>
+    /// <typeparam name="'Param2">Type parameter for the second parameter of the lambda</typeparam>
+    type ChildLambdaProvider2<'Param1, 'Param2> = inherit IChildLambdaProvider
+    /// <summary>
+    /// Interface this with the parameter type to allow the component to accept
+    /// a lambda function passing that parameter to the children
+    /// </summary>
+    /// <typeparam name="'Param1">Type parameter for the first parameter of the lambda</typeparam>
+    /// <typeparam name="'Param2">Type parameter for the second parameter of the lambda</typeparam>
+    /// <typeparam name="'Param3">Type parameter for the third parameter of the lambda</typeparam>
+    type ChildLambdaProvider3<'Param1, 'Param2, 'Param3> = inherit IChildLambdaProvider
+    /// <summary>
+    /// Interface this with the parameter type to allow the component to accept
+    /// a lambda function passing that parameter to the children
+    /// </summary>
+    /// <typeparam name="'Param1">Type parameter for the first parameter of the lambda</typeparam>
+    /// <typeparam name="'Param2">Type parameter for the second parameter of the lambda</typeparam>
+    /// <typeparam name="'Param3">Type parameter for the third parameter of the lambda</typeparam>
+    /// <typeparam name="'Param4">Type parameter for the fourth parameter of the lambda</typeparam>
+    type ChildLambdaProvider4<'Param1, 'Param2, 'Param3, 'Param4> = inherit IChildLambdaProvider
+    
     [<Erase>]
     type RegularNode() =
         interface HtmlTag
@@ -103,8 +177,10 @@ module Builder =
     [<Erase>]
     let (!@) (this: unit -> 'T) = TagValue(unbox this)
     
+    /// Alias used in the provided builder
     type HtmlContainerFun = HtmlContainer -> unit
-
+    /// Alias used in the provided builder
+    type ChildProviderFun = IChildLambdaProvider -> unit
     type HtmlContainer with
         member inline _.Combine
             ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
@@ -134,9 +210,42 @@ module Builder =
         //         for PARTAS_VALUE in PARTAS_VALUES do
         //             PARTAS_BODY PARTAS_VALUE PARTAS_BUILDER
 
+    
+    type IChildLambdaProvider with
+        [<Erase>]
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> ChildProviderFun): ChildProviderFun = PARTAS_DELAY()
+    type ChildLambdaProviderStrict<'Param1, 'Children> with
+        [<Erase>]
+        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Children): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+    type ChildLambdaProviderStrict2<'Param1, 'Param2, 'Children> with
+        [<Erase>]
+        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Children): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+    type ChildLambdaProviderStrict3<'Param1, 'Param2, 'Param3, 'Children> with
+        [<Erase>]
+        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Children): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+    type ChildLambdaProviderStrict4<'Param1, 'Param2, 'Param3, 'Param4, 'Children> with
+        [<Erase>]
+        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Param4 -> #'Children): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+    type ChildLambdaProvider<'Param1> with
+        [<Erase>]
+        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #HtmlElement): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+    type ChildLambdaProvider2<'Param1, 'Param2> with
+        [<Erase>]
+        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #HtmlElement): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+    type ChildLambdaProvider3<'Param1, 'Param2, 'Param3> with
+        [<Erase>]
+        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #HtmlElement): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+    type ChildLambdaProvider4<'Param1, 'Param2, 'Param3, 'Param4> with
+        [<Erase>]
+        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Param4 -> #HtmlElement): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+    
     [<Erase>]
     type HtmlContainerExtensions =
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: #HtmlContainer, PARTAS_RUN: HtmlContainerFun) =
+            PARTAS_RUN PARTAS_THIS
+            PARTAS_THIS
+        [<Erase; Extension>]
+        static member Run(PARTAS_THIS: #IChildLambdaProvider, PARTAS_RUN: ChildProviderFun) =
             PARTAS_RUN PARTAS_THIS
             PARTAS_THIS
