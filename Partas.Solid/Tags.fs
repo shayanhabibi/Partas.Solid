@@ -42,6 +42,11 @@ module Tags =
         /// Usage `elem.style(createObj ["color", "green"; "background-color", state.myColor ])`
         [<Extension; Erase>]
         static member style'(this: #HtmlTag, styleObj: obj) = this
+        /// <summary>
+        /// Usage <c>elem.style' [Style.backgroundColor BackgroundColor.Blue; "--my-variable" ==> BackgroundColor.Black]</c>
+        /// </summary>
+        [<Extension; Erase>]
+        static member inline style'(this: #HtmlTag, styles: (string * obj) list) = this.style'(createObj styles)
 
         /// Usage `elem.classList(createObj ["active", true; "disabled", state.disabled ])`
         [<Extension; Erase>]

@@ -33,6 +33,9 @@
       <Compile Include="Aria.fs" />
       <Compile Include="PolymorphicSupport.fs" />
       <Compile Include="Experimental.fs" />
+      <Compile Include="CssStyle\Spec.fs" />
+      <Compile Include="CssStyle\Style.fs" />
+      <Content Include="CssStyle\README.md" />
     </ItemGroup>
 
     <ItemGroup>

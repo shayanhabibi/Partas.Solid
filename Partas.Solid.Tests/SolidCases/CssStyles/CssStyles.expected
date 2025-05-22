@@ -1,0 +1,8 @@
+
+export function CssPropStyleTest() {
+    return <div style={{
+            "background-color": "slategray",
+            "--custom-var": "Chocolate",
+        }} />;
+}
+
