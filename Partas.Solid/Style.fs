@@ -52,7 +52,7 @@ type Style =
     ///<b>Syntax</b>: <c>time#</c>
     /// <br/><b>Initial value</b>: <c>0s</c>
     /// </summary>
-    static member inline animationDelay (value: U2<string, AnimationDelay>) = "animation-delay" ==> value
+    static member inline animationDelay (value: U4<string, int, float, AnimationDelay>) = "animation-delay" ==> value
     /// <summary>
     /// The<b><c>animation-direction</c></b> CSS property sets whether an animation should play forward, backward, or alternate back and forth between playing the sequence forward and backward.<br/><br/>
     ///<b>Syntax</b>: <c>single-animation-direction#</c>
@@ -64,7 +64,7 @@ type Style =
     ///<b>Syntax</b>: <c>time#</c>
     /// <br/><b>Initial value</b>: <c>0s</c>
     /// </summary>
-    static member inline animationDuration (value: U2<string, AnimationDuration>) = "animation-duration" ==> value
+    static member inline animationDuration (value: U3<string, int, AnimationDuration>) = "animation-duration" ==> value
     /// <summary>
     /// The<b><c>animation-fill-mode</c></b> CSS property sets how a CSS animation applies styles to its target before and after its execution.<br/><br/>
     ///<b>Syntax</b>: <c>single-animation-fill-mode#</c>
@@ -178,13 +178,13 @@ type Style =
     ///<b>Syntax</b>: <c>[ center | [ [ left | right | x-start | x-end ]? length-percentage? ]! ]#</c>
     /// <br/><b>Initial value</b>: <c>0%</c>
     /// </summary>
-    static member inline backgroundPositionX (value: U2<string, BackgroundPositionX>) = "background-position-x" ==> value
+    static member inline backgroundPositionX (value: U3<string, int, BackgroundPositionX>) = "background-position-x" ==> value
     /// <summary>
     /// The<b><c>background-position-y</c></b> CSS property sets the initial vertical position for each background image. The position is relative to the position layer set by <c>background-origin</c>.<br/><br/>
     ///<b>Syntax</b>: <c>[ center | [ [ top | bottom | y-start | y-end ]? length-percentage? ]! ]#</c>
     /// <br/><b>Initial value</b>: <c>0%</c>
     /// </summary>
-    static member inline backgroundPositionY (value: U2<string, BackgroundPositionY>) = "background-position-y" ==> value
+    static member inline backgroundPositionY (value: U3<string, int, BackgroundPositionY>) = "background-position-y" ==> value
     /// <summary>
     /// The<b><c>background-repeat</c></b> CSS property sets how background images are repeated. A background image can be repeated along the horizontal and vertical axes, or not repeated at all.<br/><br/>
     ///<b>Syntax</b>: <c>repeat-style#</c>
@@ -258,7 +258,7 @@ type Style =
     ///<b>Syntax</b>: <c>'border-top-width'</c>
     /// <br/><b>Initial value</b>: <c>medium</c>
     /// </summary>
-    static member inline borderBlockWidth (value: U2<string, BorderBlockWidth>) = "border-block-width" ==> value
+    static member inline borderBlockWidth (value: U3<string, int, BorderBlockWidth>) = "border-block-width" ==> value
     /// <summary>
     /// The<b><c>border-bottom-color</c></b> CSS property sets the color of an element's bottom border. It can also be set with the shorthand CSS properties <c>border-color</c> or <c>border-bottom</c>.<br/><br/>
     ///<b>Syntax</b>: <c>'border-top-color'</c>
@@ -270,13 +270,13 @@ type Style =
     ///<b>Syntax</b>: <c>length-percentage{1,2}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderBottomLeftRadius (value: U2<string, BorderBottomLeftRadius>) = "border-bottom-left-radius" ==> value
+    static member inline borderBottomLeftRadius (value: U3<string, int, BorderBottomLeftRadius>) = "border-bottom-left-radius" ==> value
     /// <summary>
     /// The<b><c>border-bottom-right-radius</c></b> CSS property rounds the bottom-right corner of an element by specifying the radius (or the radius of the semi-major and semi-minor axes) of the ellipse defining the curvature of the corner.<br/><br/>
     ///<b>Syntax</b>: <c>length-percentage{1,2}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderBottomRightRadius (value: U2<string, BorderBottomRightRadius>) = "border-bottom-right-radius" ==> value
+    static member inline borderBottomRightRadius (value: U3<string, int, BorderBottomRightRadius>) = "border-bottom-right-radius" ==> value
     /// <summary>
     /// The<b><c>border-bottom-style</c></b> CSS property sets the line style of an element's bottom <c>border</c>.<br/><br/>
     ///<b>Syntax</b>: <c>line-style</c>
@@ -288,7 +288,7 @@ type Style =
     ///<b>Syntax</b>: <c>line-width</c>
     /// <br/><b>Initial value</b>: <c>medium</c>
     /// </summary>
-    static member inline borderBottomWidth (value: U2<string, BorderBottomWidth>) = "border-bottom-width" ==> value
+    static member inline borderBottomWidth (value: U3<string, int, BorderBottomWidth>) = "border-bottom-width" ==> value
     /// <summary>
     /// The<b><c>border-collapse</c></b> CSS property sets whether cells inside a <c>table</c> have shared or separate borders.<br/><br/>
     ///<b>Syntax</b>: <c>collapse | separate</c>
@@ -2561,44 +2561,44 @@ type SvgStyle =
     static member inline display (value: U2<string, Display>) = "display" ==> value
     static member inline dominantBaseline (value: U2<string, DominantBaseline>) = "dominant-baseline" ==> value
     static member inline fill (value: U2<string, Fill>) = "fill" ==> value
-    static member inline fillOpacity (value: U2<string, FillOpacity>) = "fill-opacity" ==> value
+    static member inline fillOpacity (value: U4<string, int, float, FillOpacity>) = "fill-opacity" ==> value
     static member inline fillRule (value: U2<string, FillRule>) = "fill-rule" ==> value
     static member inline filter (value: U2<string, Filter>) = "filter" ==> value
     static member inline floodColor (value: U2<string, FloodColor>) = "flood-color" ==> value
-    static member inline floodOpacity (value: U2<string, FloodOpacity>) = "flood-opacity" ==> value
+    static member inline floodOpacity (value: U4<string, int, float, FloodOpacity>) = "flood-opacity" ==> value
     static member inline font (value: U2<string, Font>) = "font" ==> value
     static member inline fontFamily (value: U2<string, FontFamily>) = "font-family" ==> value
-    static member inline fontSize (value: U2<string, FontSize>) = "font-size" ==> value
+    static member inline fontSize (value: U3<string, int, FontSize>) = "font-size" ==> value
     static member inline fontSizeAdjust (value: U2<string, FontSizeAdjust>) = "font-size-adjust" ==> value
     static member inline fontStretch (value: U2<string, FontStretch>) = "font-stretch" ==> value
     static member inline fontStyle (value: U2<string, FontStyle>) = "font-style" ==> value
     static member inline fontVariant (value: U2<string, FontVariant>) = "font-variant" ==> value
-    static member inline fontWeight (value: U2<string, FontWeight>) = "font-weight" ==> value
+    static member inline fontWeight (value: U3<string, int, FontWeight>) = "font-weight" ==> value
     static member inline glyphOrientationVertical (value: U2<string, GlyphOrientationVertical>) = "glyph-orientation-vertical" ==> value
     static member inline imageRendering (value: U2<string, ImageRendering>) = "image-rendering" ==> value
     static member inline letterSpacing (value: U2<string, LetterSpacing>) = "letter-spacing" ==> value
     static member inline lightingColor (value: U2<string, LightingColor>) = "lighting-color" ==> value
-    static member inline lineHeight (value: U2<string, LineHeight>) = "line-height" ==> value
+    static member inline lineHeight (value: U3<string, int, LineHeight>) = "line-height" ==> value
     static member inline marker (value: U2<string, Marker>) = "marker" ==> value
     static member inline markerEnd (value: U2<string, MarkerEnd>) = "marker-end" ==> value
     static member inline markerMid (value: U2<string, MarkerMid>) = "marker-mid" ==> value
     static member inline markerStart (value: U2<string, MarkerStart>) = "marker-start" ==> value
     static member inline mask (value: U2<string, Mask>) = "mask" ==> value
-    static member inline opacity (value: U2<string, Opacity>) = "opacity" ==> value
+    static member inline opacity (value: U4<string, int, float, Opacity>) = "opacity" ==> value
     static member inline overflow (value: U2<string, Overflow>) = "overflow" ==> value
     static member inline paintOrder (value: U2<string, PaintOrder>) = "paint-order" ==> value
     static member inline pointerEvents (value: U2<string, PointerEvents>) = "pointer-events" ==> value
     static member inline shapeRendering (value: U2<string, ShapeRendering>) = "shape-rendering" ==> value
     static member inline stopColor (value: U2<string, StopColor>) = "stop-color" ==> value
-    static member inline stopOpacity (value: U2<string, StopOpacity>) = "stop-opacity" ==> value
+    static member inline stopOpacity (value: U4<string, int,float, StopOpacity>) = "stop-opacity" ==> value
     static member inline stroke (value: U2<string, Stroke>) = "stroke" ==> value
     static member inline strokeDasharray (value: U2<string, StrokeDasharray>) = "stroke-dasharray" ==> value
     static member inline strokeDashoffset (value: U2<string, StrokeDashoffset>) = "stroke-dashoffset" ==> value
     static member inline strokeLinecap (value: U2<string, StrokeLinecap>) = "stroke-linecap" ==> value
     static member inline strokeLinejoin (value: U2<string, StrokeLinejoin>) = "stroke-linejoin" ==> value
     static member inline strokeMiterlimit (value: U2<string, StrokeMiterlimit>) = "stroke-miterlimit" ==> value
-    static member inline strokeOpacity (value: U2<string, StrokeOpacity>) = "stroke-opacity" ==> value
-    static member inline strokeWidth (value: U2<string, StrokeWidth>) = "stroke-width" ==> value
+    static member inline strokeOpacity (value: U4<string, int,float, StrokeOpacity>) = "stroke-opacity" ==> value
+    static member inline strokeWidth (value: U4<string, int,float, StrokeWidth>) = "stroke-width" ==> value
     static member inline textAnchor (value: U2<string, TextAnchor>) = "text-anchor" ==> value
     static member inline textDecoration (value: U2<string, TextDecoration>) = "text-decoration" ==> value
     static member inline textRendering (value: U2<string, TextRendering>) = "text-rendering" ==> value
