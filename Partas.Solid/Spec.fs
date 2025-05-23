@@ -1,11 +1,11 @@
-﻿namespace Partas.Solid
+﻿module Partas.Solid.Types
 
 open Fable.Core
 open Fable.Core.JS
 open Fable.Core.JsInterop
 open Partas.Solid.Experimental.U
 
-module StyleSpec =
+module Style =
     [<RequireQualifiedAccess>]
     [<StringEnum(CaseRules.KebabCase)>]
     type AtRules =
