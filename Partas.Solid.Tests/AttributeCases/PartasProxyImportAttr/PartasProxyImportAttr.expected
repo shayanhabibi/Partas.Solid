@@ -1,0 +1,12 @@
+﻿import { motion } from "motion-one";
+import { Route } from "@solidjs/router";
+
+
+export function Bock() {
+    return <motion.div />;
+}
+
+export function chock() {
+    return <Route />;
+}
+

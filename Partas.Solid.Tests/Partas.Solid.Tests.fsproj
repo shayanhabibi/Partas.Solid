@@ -138,6 +138,9 @@
     <ItemGroup>
       <Compile Include="AttributeCases\PartasImportAttr\PartasImportAttr.fs" />
       <Content Include="AttributeCases\PartasImportAttr\PartasImportAttr.expected" />
+      <Compile Include="AttributeCases\PartasProxyImportAttr\PartasProxyImportAttr.fs" />
+      <Content Include="AttributeCases\PartasProxyImportAttr\PartasProxyImportAttr.expected" />
+      <Content Include="AttributeCases\PartasProxyImportAttr\PartasProxyImportAttr.fsproj" />
       <Compile Include="Spec\Components.fs" />
       <None Include="AttributeCases\PartasImportAttr\PartasImportAttr.fsproj" />
       <Folder Include="General\" />

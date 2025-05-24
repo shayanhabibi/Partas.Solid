@@ -10,3 +10,7 @@ let runAttributeCase caseName =
 [<Fact>]
 let ``PartasImport Attribute`` () =
     runAttributeCase "PartasImportAttr"
+
+[<Fact>]
+let ``PartasProxyImport Attribute`` () =
+    runAttributeCase "PartasProxyImportAttr"
