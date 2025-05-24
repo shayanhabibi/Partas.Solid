@@ -421,6 +421,7 @@ type Style =
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
     static member inline borderRightStyle (value: U2<string, BorderRightStyle>) = "border-right-style" ==> value
+    static member inline borderWidth (value: U2<string, BorderWidth>) = "border-width" ==> value
     /// <summary>
     /// The<b><c>border-right-width</c></b> CSS property sets the width of the right border of an element.<br/><br/>
     ///<b>Syntax</b>: <c>line-width</c>
