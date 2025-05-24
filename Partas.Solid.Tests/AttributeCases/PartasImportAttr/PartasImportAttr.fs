@@ -1,4 +1,4 @@
-﻿module Partas.Solid.Tests.AttributeCases.PartasImportAttr
+﻿module Partas.Solid.Tests.AttributeCases.PartasProxyImportAttr
 
 open Partas.Solid
 open Partas.Solid.Router

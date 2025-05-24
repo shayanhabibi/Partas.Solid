@@ -797,7 +797,7 @@ module Bindings =
         static member inline refetchingWith<'T, 'U>(this: ResourceFetcherInfo<'U>): U2<'T, bool> = unbox<U2<'T, bool>> this.refetching
         [<Emit("$0.refetch($1)")>]
         [<Extension; Erase>]
-        static member inline refetchWith<'U>(this: SolidResourceManager<'T>, input: 'U): JS.Promise<'T> = jsNative 
+        static member inline refetchWith<'U>(this: SolidResourceManager<obj>, input: 'U): JS.Promise<obj> = jsNative 
         [<Emit("$0.refetch($1)")>]
         [<Extension; Erase>]
         static member inline refetchWith<'U, 'T>(this: SolidResourceManager<'T>, input: 'U): JS.Promise<'T> = jsNative 
