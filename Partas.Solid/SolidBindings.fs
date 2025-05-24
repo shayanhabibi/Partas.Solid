@@ -40,168 +40,223 @@ module Bindings =
         [<Erase>]
         member this.onClick
             with set (_: MouseEvent -> unit) = ()
+            and [<Erase>] get(): (MouseEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onDblClick
             with set (_: MouseEvent -> unit) = ()
+            and [<Erase>] get(): (MouseEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onBlur
             with set (_: FocusEvent -> unit) = ()
+            and [<Erase>] get(): (FocusEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onFocus
             with set (_: FocusEvent -> unit) = ()
+            and [<Erase>] get(): (FocusEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onContextMenu
             with set (_: MouseEvent -> unit) = ()
+            and [<Erase>] get(): (MouseEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onMouseDown
             with set (_: MouseEvent -> unit) = ()
+            and [<Erase>] get(): (MouseEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onMouseUp
             with set (_: MouseEvent -> unit) = ()
+            and [<Erase>] get(): (MouseEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onMouseEnter
             with set (_: MouseEvent -> unit) = ()
+            and [<Erase>] get(): (MouseEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onMouseLeave
             with set (_: MouseEvent -> unit) = ()
+            and [<Erase>] get(): (MouseEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onMouseOver
             with set (_: MouseEvent -> unit) = ()
+            and [<Erase>] get(): (MouseEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onMouseOut
             with set (_: MouseEvent -> unit) = ()
+            and [<Erase>] get(): (MouseEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onMouseMove
             with set (_: MouseEvent -> unit) = ()
+            and [<Erase>] get(): (MouseEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onWheel
             with set (_: WheelEvent -> unit) = ()
+            and [<Erase>] get(): (WheelEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onKeyDown
             with set (_: KeyboardEvent -> unit) = ()
+            and [<Erase>] get(): (KeyboardEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onKeyUp
             with set (_: KeyboardEvent -> unit) = ()
+            and [<Erase>] get(): (KeyboardEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onKeyPress
             with set (_: KeyboardEvent -> unit) = ()
+            and [<Erase>] get(): (KeyboardEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onDrag
             with set (_: DragEvent -> unit) = ()
+            and [<Erase>] get(): (DragEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onDragEnd
             with set (_: DragEvent -> unit) = ()
+            and [<Erase>] get(): (DragEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onDragEnter
             with set (_: DragEvent -> unit) = ()
+            and [<Erase>] get(): (DragEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onDragLeave
             with set (_: DragEvent -> unit) = ()
+            and [<Erase>] get(): (DragEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onDragOver
             with set (_: DragEvent -> unit) = ()
+            and [<Erase>] get(): (DragEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onDragStart
             with set (_: DragEvent -> unit) = ()
+            and [<Erase>] get(): (DragEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onDrop
             with set (_: DragEvent -> unit) = ()
+            and [<Erase>] get(): (DragEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onScroll
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onPointerDown
             with set (_: PointerEvent -> unit) = ()
+            and [<Erase>] get(): (PointerEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onPointerMove
             with set (_: PointerEvent -> unit) = ()
+            and [<Erase>] get(): (PointerEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onPointerUp
             with set (_: PointerEvent -> unit) = ()
+            and [<Erase>] get(): (PointerEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onPointerCancel
             with set (_: PointerEvent -> unit) = ()
+            and [<Erase>] get(): (PointerEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onPointerEnter
             with set (_: PointerEvent -> unit) = ()
+            and [<Erase>] get(): (PointerEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onPointerLeave
             with set (_: PointerEvent -> unit) = ()
+            and [<Erase>] get(): (PointerEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onPointerOver
             with set (_: PointerEvent -> unit) = ()
+            and [<Erase>] get(): (PointerEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onPointerOut
             with set (_: PointerEvent -> unit) = ()
+            and [<Erase>] get(): (PointerEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onGotPointerCapture
             with set (_: PointerEvent -> unit) = ()
+            and [<Erase>] get(): (PointerEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onLostPointerCapture
             with set (_: PointerEvent -> unit) = ()
+            and [<Erase>] get(): (PointerEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onAnimationStart
             with set (_: AnimationEvent -> unit) = ()
+            and [<Erase>] get(): (AnimationEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onAnimationEnd
             with set (_: AnimationEvent -> unit) = ()
+            and [<Erase>] get(): (AnimationEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onAnimationIteration
             with set (_: AnimationEvent -> unit) = ()
+            and [<Erase>] get(): (AnimationEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onTransitionEnd
             with set (_: TransitionEvent -> unit) = ()
+            and [<Erase>] get(): (TransitionEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onTransitionRun
             with set (_: TransitionEvent -> unit) = ()
+            and [<Erase>] get(): (TransitionEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onTransitionStart
             with set (_: TransitionEvent -> unit) = ()
+            and [<Erase>] get(): (TransitionEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onTransitionCancel
             with set (_: TransitionEvent -> unit) = ()
+            and [<Erase>] get(): (TransitionEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onTouchStart
             with set (_: TouchEvent -> unit) = ()
+            and [<Erase>] get(): (TouchEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onTouchMove
             with set (_: TouchEvent -> unit) = ()
+            and [<Erase>] get(): (TouchEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onTouchEnd
             with set (_: TouchEvent -> unit) = ()
+            and [<Erase>] get(): (TouchEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onTouchCancel
             with set (_: TouchEvent -> unit) = ()
+            and [<Erase>] get(): (TouchEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onCopy
             with set (_: ClipboardEvent -> unit) = ()
+            and [<Erase>] get(): (ClipboardEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onCut
             with set (_: ClipboardEvent -> unit) = ()
+            and [<Erase>] get(): (ClipboardEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onPaste
             with set (_: ClipboardEvent -> unit) = ()
+            and [<Erase>] get(): (ClipboardEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onCompositionStart
             with set (_: CompositionEvent -> unit) = ()
+            and [<Erase>] get(): (CompositionEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onCompositionEnd
             with set (_: CompositionEvent -> unit) = ()
+            and [<Erase>] get(): (CompositionEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onCompositionUpdate
             with set (_: CompositionEvent -> unit) = ()
+            and [<Erase>] get(): (CompositionEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onFocusIn
             with set (_: FocusEvent -> unit) = ()
+            and [<Erase>] get(): (FocusEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onFocusOut
             with set (_: FocusEvent -> unit) = ()
+            and [<Erase>] get(): (FocusEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onEncrypted
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onDragExit
             with set (_: DragEvent -> unit) = ()
+            and [<Erase>] get(): (DragEvent -> unit) = JS.undefined
 
     type RegularNode with
         [<Erase>]
@@ -215,238 +270,307 @@ module Bindings =
         [<Erase>]
         member this.onSubmit
             with set (_: SubmitEvent -> unit) = ()
+            and [<Erase>] get(): (SubmitEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onReset
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type input with
         [<Erase>]
         member this.onChange
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onInvalid
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onInput
             with set (_: InputEvent -> unit) = ()
+            and [<Erase>] get(): (InputEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onSelect
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onError
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoad
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type select with
         [<Erase>]
         member this.onChange
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onInput
             with set (_: InputEvent -> unit) = ()
+            and [<Erase>] get(): (InputEvent -> unit) = JS.undefined
 
     type textarea with
         [<Erase>]
         member this.onChange
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onInput
             with set (_: InputEvent -> unit) = ()
+            and [<Erase>] get(): (InputEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onSelect
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type details with
         [<Erase>]
         member this.onToggle
             with set (_: ToggleEvent -> unit) = ()
+            and [<Erase>] get(): (ToggleEvent -> unit) = JS.undefined
 
     type img with
         [<Erase>]
         member this.onError
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoad
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type object' with
         [<Erase>]
         member this.onError
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoad
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type link with
         [<Erase>]
         member this.onError
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoad
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type script with
         [<Erase>]
         member this.onError
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoad
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type style with
         [<Erase>]
         member this.onError
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoad
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type body with
         [<Erase>]
         member this.onLoad
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type iframe with
         [<Erase>]
         member this.onLoad
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type embed with
         [<Erase>]
         member this.onLoad
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type audio with
         [<Erase>]
         member this.onError
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onPlay
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onPause
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onEnded
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onVolumeChange
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onSeeked
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onSeeking
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onTimeUpdate
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onDurationChange
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onRateChange
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onCanPlay
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onCanPlayThrough
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onStalled
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onWaiting
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onEmptied
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoadedData
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoadedMetadata
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoadStart
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onProgress
             with set (_: ProgressEvent -> unit) = ()
+            and [<Erase>] get(): (ProgressEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onSuspend
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onAbort
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
 
     type video with
         [<Erase>]
         member this.onError
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onPlay
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onPause
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onEnded
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onVolumeChange
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onSeeked
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onSeeking
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onTimeUpdate
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onDurationChange
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onRateChange
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onCanPlay
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onCanPlayThrough
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onStalled
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onWaiting
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onEmptied
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoadedData
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoadedMetadata
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onLoadStart
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onProgress
             with set (_: ProgressEvent -> unit) = ()
+            and [<Erase>] get(): (ProgressEvent -> unit) = JS.undefined
         [<Erase>]
         member this.onSuspend
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
         [<Erase>]
         member this.onAbort
             with set (_: Event -> unit) = ()
+            and [<Erase>] get(): (Event -> unit) = JS.undefined
     
     [<PartasImport("For", "solid-js")>]
     [<Erase>]
@@ -574,21 +698,42 @@ module Bindings =
             PARTAS_RUNEXPR Unchecked.defaultof<_>
             PARTAS_THIS
         
-        [<Extension; Erase>]
-        static member inline Invoke(setter: Setter<'T>, handler: 'T -> 'T): unit =
-            setter(unbox<'T> handler)
-            
+        /// <summary>
+        /// Replace a signals value. This is synonymous with using the Setters as normal.
+        /// </summary>
+        /// <param name="setter">The signal setter</param>
+        /// <param name="value">The next value</param>
         [<Extension; Erase>]
         static member inline Invoke(setter: Setter<'T>, value: 'T): unit =
             setter(value)
-            
+        // In the case of calling Invoke on a setter, we want the alternate behaviour to be suggested first.
+        /// <summary>
+        /// Modify a signal value by performing computation on its previous value
+        /// </summary>
+        /// <param name="setter">The signal setter</param>
+        /// <param name="handler">The handler that takes the previous value and returns the next.</param>
         [<Extension; Erase>]
-        static member inline InvokeAndGet(setter: Setter<'T>, handler: 'T -> 'T): 'T =
-            setter(unbox<'T> handler) |> unbox<'T>
-            
+        static member inline Invoke(setter: Setter<'T>, handler: 'T -> 'T): unit =
+            setter(unbox<'T> handler)
+        
+        /// <summary>
+        /// Modify a signal value by replacing it with a new value.
+        /// </summary>
+        /// <param name="setter">The signal setter</param>
+        /// <param name="value">The new value</param>
+        /// <returns>The new value</returns>
         [<Extension; Erase>]
         static member inline InvokeAndGet(setter: Setter<'T>, value: 'T): 'T =
             setter(value) |> unbox<'T>
+        /// <summary>
+        /// Modify a signal value by performing computation its previous value.
+        /// </summary>
+        /// <param name="setter">The signal setter</param>
+        /// <param name="handler">The handler that takes the previous value and returns the next.</param>
+        /// <returns>The new value</returns>
+        [<Extension; Erase>]
+        static member inline InvokeAndGet(setter: Setter<'T>, handler: 'T -> 'T): 'T =
+            setter(unbox<'T> handler) |> unbox<'T>
             
     [<Interface; AllowNullLiteral>]
     type ResourceFetcherInfo<'T> =
