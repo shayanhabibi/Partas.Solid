@@ -367,6 +367,18 @@ module internal Type =
             |> Seq.tryFind (_.Entity >> _.FullName >> (=)"Partas.Solid.PartasImportAttribute")
             |> Option.map (_.ConstructorArgs >> List.map _.ToString() >> List.pairwise >> List.head)
         | _ -> None
+    /// Digs into a type to see if it can find a DeclaredType node; if so, it extracts the attribute key,selector,path for
+    /// PartasProxyImportAttribute if it is present and returns them
+    let (|HasPartasProxyImport|_|) (ctx: PluginContext): Type -> (string * string * string) option = function
+        | GetDeclaredType ctx (
+                Type.DeclaredType(entityRef, _)
+            ) ->
+            entityRef
+            |> PluginContext.getEntity ctx
+            |> _.Attributes
+            |> Seq.tryFind (_.Entity >> _.FullName >> (=)"Partas.Solid.PartasProxyImportAttribute")
+            |> Option.bind (_.ConstructorArgs >> List.map _.ToString() >> function [p1;p2;p3] -> Some(p1,p2,p3) | _ -> None)
+        | _ -> None
 module internal Ident =
     /// where we can, we use ridiculous names in computations so that the chance of user AST
     /// accidentally being transformed as one of these patterns is almost nil. It also simplifies

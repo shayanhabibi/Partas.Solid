@@ -312,6 +312,51 @@ module internal rec AST =
     by the BuilderCollectors
     *)
     let (|TagConstructor|_|) (ctx: PluginContext) = function
+        // If we do not position this above the local tag recogniser, then it will never be reached in cases that it is
+        // a local tag using the PartasImport attribute
+        // Non LibraryImports that require LibraryImport injection via the attribute PartasImportAttribute
+        | Call(
+            (   (* Callee *)
+                (Expr.ImportedConstructor ctx & Import(_, t, r)) // Captures constructors from other modules with PartasImportAttribute
+              | (IdentExpr(Ident.IdentIs ctx IdentType.Constructor) & IdentExpr({ Type = t; Range = r })) // Captures constructors defined in the same module with PartasImportAttribute
+            ),
+            {   (* CallInfo *)
+                Args = PropCollector ctx props
+            }, (* Type *)
+            (Type.PartasName ctx typeName & Type.HasPartasImport ctx (selector, path)),
+            range) ->
+            let importExpr =
+                Import(
+                    { Selector = selector
+                      Path = path
+                      Kind = UserImport false },
+                    t, r)
+            ElementBuilder.create (TagSource.LibraryImport importExpr) props range
+            |> Some
+        // If we do not position this above the local tag recogniser, then it will never be reached in cases that it is
+        // a local tag using the PartasImport attribute
+        // Non LibraryImports that require LibraryImport injection via the attribute PartasProxyImportAttribute
+        | Call(
+            (   (* Callee *)
+                (Expr.ImportedConstructor ctx & Import(_, t, r)) // Captures constructors from other modules with PartasImportAttribute
+              | (IdentExpr(Ident.IdentIs ctx IdentType.Constructor) & IdentExpr({ Type = t; Range = r })) // Captures constructors defined in the same module with PartasImportAttribute
+            ),
+            {   (* CallInfo *)
+                Args = PropCollector ctx props
+            }, (* Type *)
+            (Type.PartasName ctx typeName & Type.HasPartasProxyImport ctx (key, selector, path)),
+            range) ->
+            let importExpr =
+                Get(
+                    Import(
+                        { Selector = selector
+                          Path = path
+                          Kind = UserImport false },
+                        t, r),
+                    FieldInfo.Create(key),
+                    t,r)
+            ElementBuilder.create (TagSource.LibraryImport importExpr) props range
+            |> Some
         // Local tag
         | Call(
             (IdentExpr(Ident.IdentIs ctx IdentType.Constructor)),
@@ -342,25 +387,6 @@ module internal rec AST =
             (Type.PartasName ctx typeName),
             range) ->
             ElementBuilder.create (TagSource.LibraryImport imp) props range
-            |> Some
-        // Non LibraryImports that require LibraryImport injection via the attribute PartasImportAttribute
-        | Call(
-            (   (* Callee *)
-                (Expr.ImportedConstructor ctx & Import(_, t, r)) // Captures constructors from other modules with PartasImportAttribute
-              | (IdentExpr(Ident.IdentIs ctx IdentType.Constructor) & IdentExpr({ Type = t; Range = r })) // Captures constructors defined in the same module with PartasImportAttribute
-            ),
-            {   (* CallInfo *)
-                Args = PropCollector ctx props
-            }, (* Type *)
-            (Type.PartasName ctx typeName & Type.HasPartasImport ctx (selector, path)),
-            range) ->
-            let importExpr =
-                Import(
-                    { Selector = selector
-                      Path = path
-                      Kind = UserImport false },
-                    t, r)
-            ElementBuilder.create (TagSource.LibraryImport importExpr) props range
             |> Some
         // Non LibraryImports; ie User defined imports
         | Call(
