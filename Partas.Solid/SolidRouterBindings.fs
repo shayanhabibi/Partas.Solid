@@ -37,8 +37,9 @@ module Bindings =
     type Navigator =
         [<Emit("$0($1...)")>]
         abstract member Invoke: ``to``: string * ?options: NavigateOptions -> unit
+        /// Replaces NavigateOptions
         [<Emit("$0($1...)"); ParamObject(1)>]
-        abstract member Invoke: ``to``: string * ?resolve: bool * ?replace: bool * ?scroll: bool * ?state: obj -> unit
+        abstract member InvokeOptions: ``to``: string * ?resolve: bool * ?replace: bool * ?scroll: bool * ?state: obj -> unit
         [<Emit("$0($1...)")>]
         abstract member Invoke: delta: float -> unit
 
