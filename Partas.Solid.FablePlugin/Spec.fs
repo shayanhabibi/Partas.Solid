@@ -263,7 +263,22 @@ module internal MemberRef =
                 | Utils.EndsWithTrimmed "_$ctor" memberName
                 | memberName -> memberName |> Utils.trimReservedIdentifiers |> Some
         | GeneratedMemberRef(_) -> None
-        
+    /// <summary>
+    /// Used for POJO constructors to extract the prop names from the constructor
+    /// </summary>
+    let (|ParameterNames|) (ctx: PluginContext): MemberRef -> _ =
+        PluginContext.getMember ctx
+        >> _.CurriedParameterGroups
+        >> (
+            fun lst ->
+                if lst.Length > 1 then
+                    "This member has more than one parameter group which may cause undefined behaviour with the plugin. Please monitor and report any issues."
+                    |> PluginContext.logWarning ctx
+                lst
+            )
+        >> List.collect id
+        >> List.distinctBy (fun x -> x.Name, x.Type)
+        >> List.map _.Name
     module internal Option =
         let (|PartasName|_|) (ctx: PluginContext): MemberRef option -> string option = function
             | Some(PartasName ctx name) -> Some name
@@ -355,29 +370,54 @@ module internal Type =
             |> Utils.trimReservedIdentifiers
             |> Some
         | _ -> None
-    /// Digs into a type to see if it can find a DeclaredType node; if so, it extracts the attribute key,value pair for
-    /// PartasImportAttribute if it is present and returns them
-    let (|HasPartasImport|_|) (ctx: PluginContext): Type -> (string * string) option = function
+    /// Digs into a type to see if it can find a DeclaredType node; if so, it matches the provided attribute name
+    /// and then emits the attribute
+    let (|HasAttribute|_|) (ctx: PluginContext) (attrName: string): Type -> Attribute option = function
         | GetDeclaredType ctx (
                 Type.DeclaredType(entityRef, _)
             ) ->
             entityRef
             |> PluginContext.getEntity ctx
             |> _.Attributes
-            |> Seq.tryFind (_.Entity >> _.FullName >> (=)"Partas.Solid.PartasImportAttribute")
-            |> Option.map (_.ConstructorArgs >> List.map _.ToString() >> List.pairwise >> List.head)
+            |> Seq.tryFind(_.Entity >> _.FullName >> (=) attrName)
+        | _ -> None
+    /// Digs into a type to see if it can find a DeclaredType node; if so, it extracts the attribute key,value pair for
+    /// PartasImportAttribute if it is present and returns them
+    let (|HasPartasImport|_|) (ctx: PluginContext): Type -> (string * string) option = function
+        | HasAttribute ctx "Partas.Solid.PartasImportAttribute" attr ->
+            attr
+            |> _.ConstructorArgs
+            |> List.map _.ToString()
+            |> List.pairwise
+            |> List.head
+            |> Some
         | _ -> None
     /// Digs into a type to see if it can find a DeclaredType node; if so, it extracts the attribute key,selector,path for
     /// PartasProxyImportAttribute if it is present and returns them
     let (|HasPartasProxyImport|_|) (ctx: PluginContext): Type -> (string * string * string) option = function
-        | GetDeclaredType ctx (
-                Type.DeclaredType(entityRef, _)
-            ) ->
-            entityRef
-            |> PluginContext.getEntity ctx
-            |> _.Attributes
-            |> Seq.tryFind (_.Entity >> _.FullName >> (=)"Partas.Solid.PartasProxyImportAttribute")
-            |> Option.bind (_.ConstructorArgs >> List.map _.ToString() >> function [p1;p2;p3] -> Some(p1,p2,p3) | _ -> None)
+        | HasAttribute ctx "Partas.Solid.PartasProxyImportAttribute" attr ->
+            attr
+            |> _.ConstructorArgs
+            |> List.map _.ToString()
+            |> function [p1;p2;p3] -> Some(p1,p2,p3) | _ -> None
+        | _ -> None
+    /// Determines if type has POJO attribute
+    let (|HasPojo|_|) (ctx: PluginContext): Type -> unit option = function
+        | HasAttribute ctx "Fable.Core.JS.PojoAttribute" _ -> Some ()
+        | _ -> None
+/// <summary>
+/// Pattern matches for EntityRef expr nodes
+/// </summary>
+module internal EntityRef =
+    /// <seealso cref="Partas.Solid.Type.(|HasAttribute|_)"/>
+    let (|HasAttribute|_|) (ctx: PluginContext) (attrName: string): EntityRef -> Attribute option =
+        PluginContext.getEntity ctx
+        >> _.Attributes
+        >> Seq.tryFind(
+            _.Entity >> _.FullName >> (=) attrName
+            )
+    let (|HasPojo|_|) (ctx: PluginContext): EntityRef -> unit option = function
+        | HasAttribute ctx "Fable.Core.JS.PojoAttribute" _ -> Some ()
         | _ -> None
 module internal Ident =
     /// where we can, we use ridiculous names in computations so that the chance of user AST
@@ -414,6 +454,11 @@ module internal Ident =
         | { Name = Utils.StartsWith "PARTAS_VALUE" } -> IdentType.Value
         | { Name = Utils.StartsWith "PARTAS_TEXT" } -> IdentType.Text
         | _ -> IdentType.Other
+    
+    let (|HasPojo|_|) (ctx: PluginContext): Ident -> unit option = function
+        | { Type = Type.HasPojo ctx } -> Some ()
+        | _ -> None
+        
 /// Contains patterns to match CallInfo's with common member ref or thisarg patterns.
 /// Honestly, they're only used probably once each in current iterations, but I think
 /// it helps with the readability of the more complicated patterns.
@@ -425,4 +470,26 @@ module internal CallInfo =
     let (|Constructor|_|) (ctx: PluginContext) = function
         | { MemberRef = Some(MemberRef.MemberRefIs ctx MemberRefType.Constructor) } ->
             Some()
+        | _ -> None
+    let (|Pojo|_|) (ctx: PluginContext) = function
+        | { MemberRef = Some(MemberRef(EntityRef.HasPojo ctx, _)) } ->
+            Some()
+        | _ -> None
+    /// Matches a constructor which has the Pojo attribute. It extracts the parameter names and matches
+    /// them to the values in the call and emits them.
+    let (|PojoConstructorArgs|_|) (ctx: PluginContext): CallInfo -> PropList option = function
+        | { MemberRef = Some(
+            MemberRef(EntityRef.HasPojo ctx, _)
+            & MemberRef.MemberRefIs ctx MemberRefType.Constructor
+            & MemberRef.ParameterNames ctx argNames
+            )
+            Args =  args} ->
+            let length =
+                [ argNames.Length ; args.Length ]
+                |> List.min
+            (argNames |> List.truncate length, args |> List.truncate length)
+            ||> List.zip
+            |> List.filter ( fst >> Option.exists (String.IsNullOrWhiteSpace >> not))
+            |> List.map (fun (key,value) -> key.Value,value)
+            |> Some
         | _ -> None

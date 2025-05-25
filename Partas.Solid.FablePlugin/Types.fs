@@ -49,7 +49,11 @@ type internal IdentType =
 
     // Unknown
     | Other
-    
+
+module Attributes =
+    [<Literal>]
+    let pojo = "Fable.Core.JS.PojoAttribute"
+
 /// A record which is passed through almost all transformation patterns and methods.
 /// It can therefor be used to pass contextual information, or access the plugin helper
 /// from within the transformation tree (to shoot out a warning or something)

@@ -598,7 +598,33 @@ module internal rec AST =
                         props
                         |> List.map (fun (prop,expr) -> (prop |> Utils.trimReservedIdentifiers, expr) )
             }
-            
+    module SpecialAttributeTransformation =
+        let (|Pojo|_|) (ctx: PluginContext): Expr -> Expr option = function
+            // If we find an intermediary binding to a constructor of a pojo, the following will be
+            // related expressions which are going to be other members.
+            // We emit the property setters. For the moment, we are disposing other members, as I do not
+            // see what situation they would be utilised.
+            // We will capture them and compound them into a single expression
+            | Let(
+                Ident.IdentIs ctx IdentType.ReturnVal
+                & Ident.HasPojo ctx,
+                Call(_, CallInfo.PojoConstructorArgs ctx args, _, range),
+                PropCollectorFeeder ctx props) ->
+                let keys,values = args @ props |> List.unzip
+                Value(
+                    ValueKind.NewAnonymousRecord(
+                        values = (values |> List.map (transform ctx)),
+                        fieldNames = (keys |> List.toArray),
+                        genArgs = (keys |> List.map (fun _ -> Any)),
+                        isStruct = false
+                        ),
+                    range
+                    )
+                |> Some
+            | _ -> None
+    let (|SpecialAttributeTransformation|_|) (ctx: PluginContext): Expr -> Expr option = function
+        | SpecialAttributeTransformation.Pojo ctx expr -> Some expr
+        | _ -> None    
     /// <summary>
     /// First pass transformations of all expressions.<br/>
     /// Reduce AST where reasonable; capture and expand tags where encountered; dispose only in exceptional circumstances.<br/>
@@ -621,6 +647,9 @@ module internal rec AST =
         // TagValues are treated specially.
         | TagValue.TagValue ctx expr -> expr
         | TagValue.TagRender ctx expr -> expr
+        // Expression pattern that prevents/alters the transformation
+        // of some special attributes expressions which are transformed by fable
+        | SpecialAttributeTransformation ctx expr -> expr
         // Expression pattern that matches a JSX tag expression
         | TagConstructor ctx tagInfo ->
             tagInfo |> collectTagInfo ctx |> Baked.renderElement ctx

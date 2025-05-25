@@ -141,6 +141,9 @@
       <Compile Include="AttributeCases\PartasProxyImportAttr\PartasProxyImportAttr.fs" />
       <Content Include="AttributeCases\PartasProxyImportAttr\PartasProxyImportAttr.expected" />
       <Content Include="AttributeCases\PartasProxyImportAttr\PartasProxyImportAttr.fsproj" />
+      <Compile Include="AttributeCases\Pojo\Pojo.fs" />
+      <Content Include="AttributeCases\Pojo\Pojo.expected" />
+      <Content Include="AttributeCases\Pojo\Pojo.fsproj" />
       <Compile Include="Spec\Components.fs" />
       <None Include="AttributeCases\PartasImportAttr\PartasImportAttr.fsproj" />
       <Folder Include="General\" />
