@@ -3,6 +3,7 @@
 // Attributes that are matched in Partas.Solid.FablePlugin to support special transformations
 
 open System
+open Fable.Core
 
 /// Used for types that have inbuilt Builder computation support but are an imported
 /// component from an external library.
@@ -18,6 +19,7 @@ type PartasImportAttribute(selector: string, path: string) =
 /// proxies, but there is no reason to increase bundle sizes doing so.
 /// </summary>
 /// <param name="key">The extra parameter 'key' is '.' appended to the selector</param>
+[<Obsolete("Redundant. Importing with a dot selector actually is smarter than I thought. This now routes through Import")>]
 type PartasProxyImportAttribute(key: string, selector: string, path: string) =
-    inherit Attribute()
+    inherit ImportAttribute($"{selector}.{key}", path)
 
