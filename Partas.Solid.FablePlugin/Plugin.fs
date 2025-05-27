@@ -171,11 +171,11 @@ module internal rec AST =
                 let fable5 = ctx |> PluginContext.helper |> _.Options |> _.Define |> List.contains "FABLE_COMPILER_5"
                 match extensionName, exprs with
                 | (
-                    "on" | "bool" | "data" | "attr"
+                    "on" | "bool" | "data" | "attr" | "use"
                     ), [ Value(StringConstant prop, _); value ] ->
                     let propName =
                         match extensionName with
-                        | "bool" | "on" -> $"{extensionName}:{prop}"
+                        | "bool" | "on" | "use" -> $"{extensionName}:{prop}"
                         | "data" -> $"data-{prop}" 
                         | "attr" -> prop
                         | _ -> failwith "Unreachable"

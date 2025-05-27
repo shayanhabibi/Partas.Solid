@@ -59,6 +59,9 @@ module Tags =
         /// Spreads the passed identifier within the Tag
         [<Extension; Erase>]
         static member spread(this: #HtmlTag, value: obj) = this
+        /// Directive usage
+        [<Extension; Erase>]
+        static member use'(this: #HtmlTag, name: string, value: obj) = this
     /// Set of html extensions that keep original type
     [<Extension>]
     [<Erase>]
