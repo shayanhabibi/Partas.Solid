@@ -4,7 +4,7 @@ open Fable.Core
 open Fable.Core.JS
 open Fable.Core.JsInterop
 open Partas.Solid
-open Partas.Solid.Types.Style
+open Partas.Solid.Style
 open Partas.Solid.Experimental.U
 
 [<SolidComponent>]

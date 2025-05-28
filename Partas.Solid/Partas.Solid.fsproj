@@ -30,9 +30,10 @@
       <Compile Include="Tags.fs" />
       <Compile Include="SolidBindings.fs" />
       <Compile Include="SolidRouterBindings.fs" />
+      <Compile Include="Experimental.fs" />
+      <Compile Include="HtmlAttributes.fs" />
       <Compile Include="Aria.fs" />
       <Compile Include="PolymorphicSupport.fs" />
-      <Compile Include="Experimental.fs" />
       <Compile Include="Spec.fs" />
       <Compile Include="Style.fs" />
     </ItemGroup>
