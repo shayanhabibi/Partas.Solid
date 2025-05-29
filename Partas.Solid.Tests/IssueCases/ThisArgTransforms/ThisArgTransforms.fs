@@ -11,7 +11,7 @@ type PartasTable<'Data>() =
     inherit RegularNode()
     [<Erase>]
     member val dataStack: DataStack<'Data> = undefined with get,set
-    [<SolidTypeComponent(PartasCompileFlag.DebugMode)>]
+    [<SolidTypeComponent(ComponentFlag.DebugMode)>]
     member props.__ =
         
         let options =

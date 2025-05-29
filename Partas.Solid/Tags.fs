@@ -21,7 +21,7 @@ module Tags =
 
         /// Add an attribute to the element
         [<Extension; Erase>]
-        static member attr(this: #HtmlTag, name: string, value: string) = this
+        static member attr(this: #HtmlTag, name: string, value: obj) = this
 
         /// Add event handler to the element through the corresponding attribute
         [<Extension; Erase>]

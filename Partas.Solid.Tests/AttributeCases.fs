@@ -12,9 +12,5 @@ let ``PartasImport Attribute`` () =
     runAttributeCase "PartasImportAttr"
 
 [<Fact>]
-let ``PartasProxyImport Attribute`` () =
-    runAttributeCase "PartasProxyImportAttr"
-
-[<Fact>]
 let ``Pojo Optimisation`` () =
     runAttributeCase "Pojo"

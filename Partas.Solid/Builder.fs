@@ -10,6 +10,7 @@ open Fable.Core
 module Builder =
     [<AllowNullLiteral>]
     [<Interface>]
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type HTMLAttributes = interface end
     [<AllowNullLiteral; Interface>]
     type HtmlElement = interface end
@@ -22,6 +23,7 @@ module Builder =
     [<AllowNullLiteral; Interface>]
     type SvgTag = inherit HtmlElement
     
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type IChildLambdaProvider = inherit HtmlElement
     /// <summary>
     /// Interface this with the parameter type and the type of children
@@ -183,8 +185,10 @@ module Builder =
     let (!@) (this: unit -> 'T) = TagValue(unbox this)
     
     /// Alias used in the provided builder
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type HtmlContainerFun = HtmlContainer -> unit
     /// Alias used in the provided builder
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type ChildProviderFun = IChildLambdaProvider -> unit
     type HtmlContainer with
         member inline _.Combine
@@ -255,257 +259,309 @@ module Builder =
             PARTAS_RUN PARTAS_THIS
             PARTAS_THIS
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MediaHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AnchorHTMLAttributes =
         inherit HTMLAttributes
         
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AudioHTMLAttributes =
         inherit MediaHTMLAttributes
         
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AreaHTMLAttributes =
         inherit HTMLAttributes
         
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type BaseHTMLAttributes =
         inherit HTMLAttributes
         
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type BlockquoteHTMLAttributes =
         inherit HTMLAttributes
         
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ButtonHTMLAttributes =
         inherit HTMLAttributes
         
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type CanvasHTMLAttributes =
         inherit HTMLAttributes
         
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ColHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ColgroupHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type DataHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type DetailsHtmlAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type DialogHtmlAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type EmbedHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FieldsetHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FormHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type IframeHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ImgHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type InputHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type InsHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type KeygenHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type LabelHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type LiHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type LinkHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MapHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MenuHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MetaHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MeterHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type QuoteHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ObjectHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type OlHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type OptgroupHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type OptionHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type OutputHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ParamHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ProgressHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ScriptHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type SelectHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type HTMLSlotElementAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type SourceHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type StyleHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TdHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TemplateHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TextareaHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ThHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TimeHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TrackHTMLAttributes =
         inherit HTMLAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type VideoHTMLAttributes =
         inherit MediaHTMLAttributes
         
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type CoreSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ExternalResourceSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ConditionalProcessingSVGAttributes = interface end
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AnimationElementSVGAttributes =
@@ -513,64 +569,78 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit ConditionalProcessingSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ShapeElementSVGAttributes =
         inherit CoreSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ContainerElementSVGAttributes =
         inherit CoreSVGAttributes
         inherit ShapeElementSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FilterPrimitiveElementSVGAttributes =
         inherit CoreSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type StylableSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TransformableSVGAttributes = interface end
 
 
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AnimationTimingSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AnimationValueSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AnimationAdditionSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AnimationAttributeTargetSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type PresentationSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type SingleInputFilterSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type DoubleInputFilterSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FitToViewBoxSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type GradientElementSVGAttributes =
@@ -578,16 +648,19 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type GraphicsElementSVGAttributes =
         inherit CoreSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type LightSourceElementSVGAttributes =
         inherit CoreSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type NewViewportSVGAttributes =
@@ -595,15 +668,18 @@ module Builder =
 
 
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TextContentElementSVGAttributes =
         inherit CoreSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ZoomAndPanSVGAttributes = interface end
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AnimateSVGAttributes =
@@ -613,6 +689,7 @@ module Builder =
         inherit AnimationValueSVGAttributes
         inherit AnimationAdditionSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AnimateMotionSVGAttributes =
@@ -621,6 +698,7 @@ module Builder =
         inherit AnimationValueSVGAttributes
         inherit AnimationAdditionSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AnimateTransformSVGAttributes =
@@ -630,6 +708,7 @@ module Builder =
         inherit AnimationValueSVGAttributes
         inherit AnimationAdditionSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type CircleSVGAttributes =
@@ -639,6 +718,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ClipPathSVGAttributes =
@@ -648,6 +728,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type DefsSVGAttributes =
@@ -657,12 +738,14 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type DescSVGAttributes =
         inherit CoreSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type EllipseSVGAttributes =
@@ -673,6 +756,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeBlendSVGAttributes =
@@ -680,6 +764,7 @@ module Builder =
         inherit DoubleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeColorMatrixSVGAttributes =
@@ -687,6 +772,7 @@ module Builder =
         inherit SingleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeComponentTransferSVGAttributes =
@@ -694,6 +780,7 @@ module Builder =
         inherit SingleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeCompositeSVGAttributes =
@@ -701,6 +788,7 @@ module Builder =
         inherit DoubleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeConvolveMatrixSVGAttributes =
@@ -708,6 +796,7 @@ module Builder =
         inherit SingleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeDiffuseLightingSVGAttributes =
@@ -715,6 +804,7 @@ module Builder =
         inherit SingleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeDisplacementMapSVGAttributes =
@@ -722,11 +812,13 @@ module Builder =
         inherit DoubleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeDistantLightSVGAttributes =
         inherit LightSourceElementSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeDropShadowSVGAttributes =
@@ -734,17 +826,20 @@ module Builder =
         inherit FilterPrimitiveElementSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeFloodSVGAttributes =
         inherit FilterPrimitiveElementSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeFuncSVGAttributes =
         inherit CoreSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeGaussianBlurSVGAttributes =
@@ -752,6 +847,7 @@ module Builder =
         inherit SingleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeImageSVGAttributes =
@@ -759,18 +855,21 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeMergeSVGAttributes =
         inherit FilterPrimitiveElementSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeMergeNodeSVGAttributes =
         inherit CoreSVGAttributes
         inherit SingleInputFilterSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeMorphologySVGAttributes =
@@ -778,6 +877,7 @@ module Builder =
         inherit SingleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeOffsetSVGAttributes =
@@ -785,11 +885,13 @@ module Builder =
         inherit SingleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FePointLightSVGAttributes =
         inherit LightSourceElementSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeSpecularLightingSVGAttributes =
@@ -797,11 +899,13 @@ module Builder =
         inherit SingleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeSpotLightSVGAttributes =
         inherit LightSourceElementSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeTileSVGAttributes =
@@ -809,12 +913,14 @@ module Builder =
         inherit SingleInputFilterSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FeTurbulanceSVGAttributes =
         inherit FilterPrimitiveElementSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FilterSVGAttributes =
@@ -822,6 +928,7 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ForeignObjectSVGAttributes =
@@ -831,6 +938,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type GSVGAttributes =
@@ -840,6 +948,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ImageSVGAttributes =
@@ -849,6 +958,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type LineSVGAttributes =
@@ -859,11 +969,13 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type LinearGradientSVGAttributes =
         inherit GradientElementSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MarkerSVGAttributes =
@@ -872,6 +984,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit FitToViewBoxSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MaskSVGAttributes =
@@ -879,16 +992,19 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MetadataSVGAttributes =
         inherit CoreSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MPathSVGAttributes =
         inherit CoreSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type PathSVGAttributes =
@@ -899,6 +1015,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type PatternSVGAttributes =
@@ -908,6 +1025,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit FitToViewBoxSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type PolygonSVGAttributes =
@@ -918,6 +1036,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type PolylineSVGAttributes =
@@ -928,10 +1047,12 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type RadialGradientSVGAttributes =
         inherit GradientElementSVGAttributes
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type RectSVGAttributes =
@@ -942,6 +1063,7 @@ module Builder =
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type SetSVGAttributes =
@@ -949,11 +1071,13 @@ module Builder =
         inherit StylableSVGAttributes
         inherit AnimationTimingSVGAttributes
 
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type StopSVGAttributes =
         inherit CoreSVGAttributes
         inherit StylableSVGAttributes
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type SvgSVGAttributes =
@@ -965,6 +1089,7 @@ module Builder =
         inherit FitToViewBoxSVGAttributes
         inherit ZoomAndPanSVGAttributes
         inherit PresentationSVGAttributes
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type SwitchSVGAttributes =
@@ -973,6 +1098,7 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type SymbolSVGAttributes =
@@ -981,6 +1107,7 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
         inherit FitToViewBoxSVGAttributes
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TextSVGAttributes =
@@ -990,6 +1117,7 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TextPathSVGAttributes =
@@ -997,6 +1125,7 @@ module Builder =
         inherit ConditionalProcessingSVGAttributes
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TSpanSVGAttributes =
@@ -1004,6 +1133,7 @@ module Builder =
         inherit ConditionalProcessingSVGAttributes
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type UseSVGAttributes =
@@ -1014,6 +1144,7 @@ module Builder =
         inherit PresentationSVGAttributes
         inherit ExternalResourceSVGAttributes
         inherit TransformableSVGAttributes
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ViewSVGAttributes =

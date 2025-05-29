@@ -8,6 +8,7 @@ open Partas.Solid.Experimental.U
 module Types =
     [<RequireQualifiedAccess>]
     [<StringEnum(CaseRules.KebabCase)>]
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
     type AtRules =
         | [<CompiledName("@charset")>] CharSet
         | [<CompiledName("@counter-style")>] CounterStyle
@@ -29,6 +30,7 @@ module Types =
         | [<CompiledName("@viewport")>] Viewport
     
     [<RequireQualifiedAccess>]
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
     [<StringEnum(CaseRules.KebabCase)>]
     type Globals =
         | [<CompiledName("-moz-initial")>] MozInitial
@@ -39,9 +41,11 @@ module Types =
         | Unset
     
     [<AutoOpen>]
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
     module Property =
     
         [<RequireQualifiedAccess>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
         [<StringEnum(CaseRules.KebabCase)>]
         type AccentColor =
             | [<CompiledName("-moz-initial")>] MozInitial
@@ -18606,6 +18610,7 @@ module Types =
             | NonScalingStroke
             | None
     
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
     module AtRule =
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
@@ -18983,6 +18988,7 @@ module Types =
             abstract member zoom: Zoom option with get, set
     
     
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
     module DataType =
     
         [<RequireQualifiedAccess>]

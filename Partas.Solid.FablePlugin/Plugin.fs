@@ -24,8 +24,11 @@ do ()
 module internal rec AST =
     [<AutoOpen>]
     module AttributesAndProperties =
-        let (|ValueUnrollerFeedback|) (expr: Expr): Expr list = [ expr ] |> function
-            | ValueUnroller exprs -> exprs
+        let (|ValueUnrollerFeedback|) (ctx: PluginContext) (expr: Expr): Expr list =
+            if ctx |> PluginContext.hasFlag ComponentFlag.SkipCEOptimisation
+            then [ expr ]
+            else [ expr ] |> function
+                | ValueUnroller ctx exprs -> exprs
         /// There is a tendency for `toArray` and `delay` to generate in property value scenarios.
         /// As I do not know their purpose outside of this use case, I am hesitant to pervasively
         /// flatten these expressions out. Instead, I choose to only perform this action exclusively
@@ -33,29 +36,29 @@ module internal rec AST =
         /// SolidJs
         /// Unlike the builder collectors, the procedure of unrolling these type of list expressions
         /// does not further transformation the expressions. This is left to the caller.
-        let private (|ValueUnroller|): Expr list -> Expr list = function
+        let private (|ValueUnroller|) (ctx: PluginContext): Expr list -> Expr list = function
             | [] -> []
-            | Sequential(ValueUnroller exprs) :: ValueUnroller rest ->
+            | Sequential(ValueUnroller ctx exprs) :: ValueUnroller ctx rest ->
                 exprs @ rest
-            | expr :: ValueUnroller rest ->
+            | expr :: ValueUnroller ctx rest ->
                 match expr with
-                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = ValueUnroller exprs }, typ, range) ->
+                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = ValueUnroller ctx exprs }, typ, range) ->
                     Value(NewArray(ArrayValues exprs, Any, ArrayKind.MutableArray), range) :: rest
-                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = ValueUnroller exprs }, typ, range) ->
+                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = ValueUnroller ctx exprs }, typ, range) ->
                     exprs @ rest
-                | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, ValueUnrollerFeedback exprs, range) ->
+                | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, ValueUnrollerFeedback ctx exprs, range) ->
                     exprs @ rest
-                | Call(Import({ Selector = Utils.StartsWith "append" }, Any, None), { Args = ValueUnroller exprs }, typ, range) ->
+                | Call(Import({ Selector = Utils.StartsWith "append" }, Any, None), { Args = ValueUnroller ctx exprs }, typ, range) ->
                     exprs @ rest
-                | Call(Import({Selector = Utils.StartsWith "singleton"}, Any, None), { Args = value :: ValueUnroller exprs }, typ, range) ->
+                | Call(Import({Selector = Utils.StartsWith "singleton"}, Any, None), { Args = value :: ValueUnroller ctx exprs }, typ, range) ->
                     exprs @ (value :: rest)
                 | Call(Import({ Selector = Utils.StartsWith "empty"; Path = Utils.EndsWith "Seq.js" }, Any, None), { Args = []; GenericArgs = typ :: _ }, _, _) ->
                     Value(ValueKind.Null(typ), None) :: rest
-                | Call(callee, ({ Args = ValueUnroller exprs } as callInfo), typ, range) ->
+                | Call(callee, ({ Args = ValueUnroller ctx exprs } as callInfo), typ, range) ->
                     Call(callee, { callInfo with Args = exprs }, typ, range) :: rest
-                | TypeCast(ValueUnrollerFeedback exprs, typ) ->
+                | TypeCast(ValueUnrollerFeedback ctx exprs, typ) ->
                     exprs @ rest
-                | IfThenElse(ValueUnrollerFeedback guardExprs, ValueUnrollerFeedback thenExprs, ValueUnrollerFeedback elseExprs, range) ->
+                | IfThenElse(ValueUnrollerFeedback ctx guardExprs, ValueUnrollerFeedback ctx thenExprs, ValueUnrollerFeedback ctx elseExprs, range) ->
                     IfThenElse(Sequential guardExprs, Sequential thenExprs, Sequential elseExprs, range) :: rest
                 | expr -> expr :: rest
             
@@ -129,8 +132,7 @@ module internal rec AST =
                     ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal))
                     Args = (
                         TagValue.TagValue ctx expr // Before unrolling, check if it's a TagValue ident expression
-                      | ValueUnrollerFeedback [ expr ]
-                      |  expr
+                      | ValueUnrollerFeedback ctx [ expr ]
                       ) :: _
                     MemberRef = MemberRef.Option.PartasName ctx prop as memberRef
                 },
@@ -269,7 +271,7 @@ module internal rec AST =
                         Some(MemberRef.MemberRefIs ctx MemberRefType.Setter)
                          & MemberRef.Option.PartasName ctx propName
                     )
-                    Args = (ValueUnrollerFeedback [ value ] | value ) :: _
+                    Args = ValueUnrollerFeedback ctx [ value ] :: _
                 }, _, _) ->
                 let transformedPropName =
                     match propName with
@@ -609,18 +611,23 @@ module internal rec AST =
                 Ident.IdentIs ctx IdentType.ReturnVal
                 & Ident.HasPojo ctx,
                 Call(_, CallInfo.PojoConstructorArgs ctx args, _, range),
-                PropCollectorFeeder ctx props) ->
-                let keys,values = args @ props |> List.unzip
-                Value(
-                    ValueKind.NewAnonymousRecord(
-                        values = (values |> List.map (transform ctx)),
-                        fieldNames = (keys |> List.toArray),
-                        genArgs = (keys |> List.map (fun _ -> Any)),
-                        isStruct = false
-                        ),
-                    range
-                    )
-                |> Some
+                PropCollectorFeeder ctx props) as original ->
+                let optimisedExpr =
+                    let keys,values = args @ props |> List.unzip
+                    Value(
+                        ValueKind.NewAnonymousRecord(
+                            values = (values |> List.map (transform ctx)),
+                            fieldNames = (keys |> List.toArray),
+                            genArgs = (keys |> List.map (fun _ -> Any)),
+                            isStruct = false
+                            ),
+                        range
+                        )
+                    |> Some
+                if ctx |> PluginContext.hasFlag ComponentFlag.SkipPojoOptimisation
+                then original |> Some
+                else optimisedExpr
+                    
             | _ -> None
     let (|SpecialAttributeTransformation|_|) (ctx: PluginContext): Expr -> Expr option = function
         | SpecialAttributeTransformation.Pojo ctx expr -> Some expr
@@ -936,23 +943,20 @@ module internal rec AST =
                 |> Some
             | _ -> None
             
-            
+[<AutoOpen>]
+module internal SolidComponentFlagsExtensions =
+    let debug (memberDecl: MemberDecl) =
+        Console.WriteLine "\nSTART MEMBER DECL!!!"
+        Console.WriteLine memberDecl.Body
+        Console.WriteLine "END MEMBER DECL!!!\n"
                 
-type PartasCompileFlag =
-    | Default = 0
-    | DebugMode = 1
-
 type SolidTypeComponentAttribute(flag: int) =
     inherit MemberDeclarationPluginAttribute()
+    let flags = enum<ComponentFlag> flag
     override _.FableMinimumVersion = FableRequirements.version
-    override this.Transform(pluginHelper, file, memberDecl) =
-        match enum<PartasCompileFlag> flag with
-        | PartasCompileFlag.DebugMode ->
-            Console.WriteLine "\nSTART MEMBER DECL!!!"
-            Console.WriteLine memberDecl.Body
-            Console.WriteLine "END MEMBER DECL!!!\n"
-        | _ -> ()
-        let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl
+    override this.Transform(pluginHelper, _, memberDecl) =
+        let ctx = PluginContext.create pluginHelper TransformationKind.TypeMemberDecl flags
+        if ctx.HasFlag ComponentFlag.DebugMode then debug memberDecl
         match memberDecl with
         // Check that the memberDecl has the correct self identifier of `props`
         | SchemaRules.ValidMemberRef ctx finalName ->
@@ -972,33 +976,28 @@ type SolidTypeComponentAttribute(flag: int) =
                     Body = memberDecl.Body
                            |> AST.transform ctx
             }
-    override this.TransformCall(pluginHelper, memb, expr) =
-        let ctx = PluginContext.create pluginHelper TransformationKind.MemberCall
+    override this.TransformCall(_, _, expr) =
         expr
     
-    new() = SolidTypeComponentAttribute(int PartasCompileFlag.Default)
-    new(compileOptions: PartasCompileFlag) = SolidTypeComponentAttribute(int compileOptions)
+    new() = SolidTypeComponentAttribute(int ComponentFlag.Default)
+    new(compileOptions: ComponentFlag) = SolidTypeComponentAttribute(int compileOptions)
 
 /// Applies Solid transformations to `let` bindings.
 /// Use SolidTypeComponentAttribute for Type member definitions such
 /// as `member props.typeDef =`.
 type SolidComponentAttribute(flag: int) =
     inherit MemberDeclarationPluginAttribute()
+    let flags = enum<ComponentFlag> flag
     override _.FableMinimumVersion = FableRequirements.version
-    override this.Transform(pluginHelper, file, memberDecl) =
-        match enum<PartasCompileFlag> flag with
-        | PartasCompileFlag.DebugMode ->
-            Console.WriteLine "\nSTART MEMBER DECL!!!"
-            Console.WriteLine memberDecl.Body
-            Console.WriteLine "END MEMBER DECL!!!\n"
-        | _ -> ()
-        let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
+    override this.Transform(pluginHelper, _, memberDecl) =
+        let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl flags
+        if ctx.HasFlag ComponentFlag.DebugMode then debug memberDecl
         {
             memberDecl with
                 Body = memberDecl.Body |> AST.transform ctx
         }
-    override this.TransformCall(pluginHelper, memb, expr) =
+    override this.TransformCall(_, _, expr) =
         expr
     
-    new() = SolidComponentAttribute(int PartasCompileFlag.Default)
-    new(compileOptions: PartasCompileFlag) = SolidComponentAttribute(int compileOptions)
+    new() = SolidComponentAttribute(int ComponentFlag.Default)
+    new(compileOptions: ComponentFlag) = SolidComponentAttribute(int compileOptions)

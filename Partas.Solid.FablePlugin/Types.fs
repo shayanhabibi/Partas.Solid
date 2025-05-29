@@ -54,6 +54,32 @@ module Attributes =
     [<Literal>]
     let pojo = "Fable.Core.JS.PojoAttribute"
 
+type ComponentFlag =
+    /// Default transformations.
+    | Default = 0b0000
+    /// Prints the AST tree before transformation. Please supply a minimal
+    /// example with this flag set when submitting issues.
+    | DebugMode = 0b0001
+    /// SolidComponents optimise Pojo constructors so that
+    /// setter members which are not in the primary constructor that
+    /// are used when building the pojo, are compiled into the object
+    /// initialiser in JS instead of being deferred
+    | SkipPojoOptimisation = 0b0010
+    /// Noisy. Prints any expressions that are disposed of in transformation.
+    | PrintDisposals = 0b0100
+    /// SolidComponents optimise out computation expressions, particularly of
+    /// lists etc. In Fable 5, this should be handled by the compiler.
+    | SkipCEOptimisation = 0b1000
+
+[<RequireQualifiedAccess>]
+module ComponentFlag =
+    /// Minimal transformations. Any optimisations that are skippable are skipped.
+    [<Literal>]
+    let None =
+        ComponentFlag.SkipPojoOptimisation ||| ComponentFlag.SkipCEOptimisation
+
+    [<Literal>]
+    let VerboseDebugMode = ComponentFlag.DebugMode ||| ComponentFlag.PrintDisposals
 /// A record which is passed through almost all transformation patterns and methods.
 /// It can therefor be used to pass contextual information, or access the plugin helper
 /// from within the transformation tree (to shoot out a warning or something)
@@ -65,7 +91,9 @@ type internal PluginContext =
         GetterArray: ResizeArray<string>
         SetterCollector: (string * Expr) -> unit
         GetterCollector: string -> unit
+        Flags: ComponentFlag
     }
+    member this.HasFlag flag = this.Flags.HasFlag flag
 
 /// Container for Funcs of the PluginContext type
 [<RequireQualifiedAccess>]
@@ -76,14 +104,15 @@ module internal PluginContext =
     /// </summary>
     /// <param name="helper">PluginHelper provided in the <c>Transform</c> and <c>TransformCall</c>
     /// parameters</param>
-    /// <param name="kind">Untilised. Pass a <c>TransformationKind</c> DU</param>
+    /// <param name="kind">Unutilised. Pass a <c>TransformationKind</c> DU</param>
+    /// <param name="flags">Flags to modify transformations</param>
     /// <example><code>
     /// type SolidComponentAttribute() =
     ///     inherit MemberDeclarationPluginAttribute()
     ///     override this.Transform(pluginHelper, file, memberDecl) =
     ///     let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
     /// </code></example>
-    let create helper kind =
+    let create helper kind flags =
         let ctx = {
             Helper = helper
             Kind = kind
@@ -91,9 +120,13 @@ module internal PluginContext =
             GetterArray = new ResizeArray<string> [||]
             SetterCollector = fun _  -> ()
             GetterCollector = fun _ -> ()
+            Flags = flags
         }
         { ctx with SetterCollector = ctx.SetterArray.Add; GetterCollector = ctx.GetterArray.Add }
-        
+    
+    /// Condition. Check if flags contains enum
+    let hasFlag flag (ctx: PluginContext)= ctx.HasFlag flag
+    
     /// Get the PluginHelper from the context    
     let helper = _.Helper
     
@@ -122,7 +155,7 @@ module internal PluginContext =
         |> _.SetterArray
         |> _.Exists(fst >> (=) (fst setter))
         |> function
-            | true -> $"Multiple defaults for the same property in a `SolidTypeComponent` are not allowed: '{fst setter}' was set more than once" |> logWarning ctx
+            | true -> $"Multiple defaults for the same property in a `SolidTypeComponent` are not allowed: '{fst setter}' was set more than once" |> logError ctx
             | false -> ()
             
     /// <summary>
@@ -168,24 +201,17 @@ module internal PluginContext =
     /// <param name="disposalContext"></param>
     /// <param name="expr"></param>
     let debugDisposal (ctx: PluginContext) (disposalContext: string) (expr: Expr)=
-        ctx
-        |> helper
-        |> _.Options
-        |> _.Verbosity
-        |> function
-            | Verbosity.Silent -> ()
-            | Verbosity.Normal -> ()
-            | Verbosity.Verbose ->
-                match expr with
-                | Value(UnitConstant, _)
-                | IdentExpr({ Name = "returnVal" }) -> ()
-                | expr ->
-                    let helper = ctx |> helper
-                    let msg = $"An expression was disposed of during {disposalContext}:\n{expr}"
-                    match expr.Range with
-                    | Some range ->
-                        helper.LogWarning(msg, range)
-                    | _ -> helper.LogWarning(msg)
+        if ctx|> hasFlag ComponentFlag.PrintDisposals then
+            match expr with
+            | Value(UnitConstant, _)
+            | IdentExpr({ Name = "returnVal" }) -> ()
+            | expr ->
+                let helper = ctx |> helper
+                let msg = $"An expression was disposed of during {disposalContext}:\n{expr}"
+                match expr.Range with
+                | Some range ->
+                    helper.LogWarning(msg, range)
+                | _ -> helper.LogWarning(msg)
 
 /// DU which holds a string of the name for the Tag, or an expression containing the name of the tag, and where it
 /// should be imported from on compilation.

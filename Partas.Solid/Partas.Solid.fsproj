@@ -16,10 +16,10 @@
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
-        <Version>1.0.0-alpha5</Version>
+        <Version>1.0.0-alpha6</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.0.0-alpha5</PackageVersion>
-        <PackageReleaseNotes>Add support for binding components precomposed via proxies using PartasProxyImportAttribute</PackageReleaseNotes>
+        <PackageVersion>1.0.0-alpha6</PackageVersion>
+        <PackageReleaseNotes>Refactor</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
@@ -31,11 +31,11 @@
       <Compile Include="SolidBindings.fs" />
       <Compile Include="SolidRouterBindings.fs" />
       <Compile Include="Experimental.fs" />
-      <Compile Include="HtmlAttributes.fs" />
-      <Compile Include="Aria.fs" />
       <Compile Include="PolymorphicSupport.fs" />
-      <Compile Include="Spec.fs" />
-      <Compile Include="Style.fs" />
+      <Compile Include="Attributes\HtmlAttributes.fs" />
+      <Compile Include="Attributes\AriaAttributes.fs" />
+      <Compile Include="Attributes\StyleSpec.fs" />
+      <Compile Include="Attributes\Style.fs" />
     </ItemGroup>
 
     <ItemGroup>

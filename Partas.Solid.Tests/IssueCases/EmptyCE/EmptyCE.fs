@@ -5,7 +5,7 @@ open Fable.Core
 open Fable.Core.JsInterop
 
 let cn (listofclasses: string list) = listofclasses |> List.fold ((+) >> id) ""
-[<SolidComponent(PartasCompileFlag.DebugMode)>]
+[<SolidComponent(ComponentFlag.DebugMode)>]
 let Compponent (show: bool) =
     div(class' = cn [
         "testcase"
