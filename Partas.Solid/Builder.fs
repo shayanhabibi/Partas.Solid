@@ -21,7 +21,9 @@ module Builder =
     [<AllowNullLiteral; Interface>]
     type HtmlContainer = inherit HtmlElement
     [<AllowNullLiteral; Interface>]
-    type SvgTag = inherit HtmlElement
+    type SvgTag =
+        inherit HtmlTag
+        inherit HtmlElement
     
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type IChildLambdaProvider = inherit HtmlElement
@@ -191,6 +193,7 @@ module Builder =
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type ChildProviderFun = IChildLambdaProvider -> unit
     type HtmlContainer with
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Combine
             ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
@@ -199,18 +202,23 @@ module Builder =
                 PARTAS_SECOND PARTAS_BUILDER
 
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Zero() : HtmlContainerFun = ignore
 
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun = PARTAS_DELAY()
 
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: #HtmlElement) : HtmlContainerFun = fun PARTAS_YIELD -> ignore PARTAS_ELEMENT
 
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_TEXT: string) : HtmlContainerFun = fun PARTAS_YIELD -> ignore PARTAS_TEXT
 
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_TEXT: int) : HtmlContainerFun = fun PARTAS_YIELD -> ignore PARTAS_TEXT
         
         // [<Erase>]
@@ -222,39 +230,50 @@ module Builder =
     
     type IChildLambdaProvider with
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> ChildProviderFun): ChildProviderFun = PARTAS_DELAY()
     type ChildLambdaProviderStrict<'Param1, 'Children> with
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Children): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
     type ChildLambdaProviderStrict2<'Param1, 'Param2, 'Children> with
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Children): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
     type ChildLambdaProviderStrict3<'Param1, 'Param2, 'Param3, 'Children> with
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Children): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
     type ChildLambdaProviderStrict4<'Param1, 'Param2, 'Param3, 'Param4, 'Children> with
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Param4 -> #'Children): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
     type ChildLambdaProvider<'Param1> with
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #HtmlElement): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
     type ChildLambdaProvider2<'Param1, 'Param2> with
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #HtmlElement): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
     type ChildLambdaProvider3<'Param1, 'Param2, 'Param3> with
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #HtmlElement): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
     type ChildLambdaProvider4<'Param1, 'Param2, 'Param3, 'Param4> with
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Param4 -> #HtmlElement): ChildProviderFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
     
     [<Erase>]
     type HtmlContainerExtensions =
         [<Extension; Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         static member Run(PARTAS_THIS: #HtmlContainer, PARTAS_RUN: HtmlContainerFun) =
             PARTAS_RUN PARTAS_THIS
             PARTAS_THIS
         [<Erase; Extension>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         static member Run(PARTAS_THIS: #IChildLambdaProvider, PARTAS_RUN: ChildProviderFun) =
             PARTAS_RUN PARTAS_THIS
             PARTAS_THIS
@@ -505,6 +524,22 @@ module Builder =
     [<AllowNullLiteral>]
     [<Interface>]
     type CoreSVGAttributes = interface end
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    [<AllowNullLiteral>]
+    [<Interface>]
+    type AttributeNameSVGAttribute = interface end
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    [<AllowNullLiteral>]
+    [<Interface>]
+    type FillSvgAttribute = interface end
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    [<AllowNullLiteral>]
+    [<Interface>]
+    type ViewBoxSvgAttribute = interface end
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    [<AllowNullLiteral>]
+    [<Interface>]
+    type CanvasSvgAttribute = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -541,7 +576,8 @@ module Builder =
     [<Interface>]
     type FilterPrimitiveElementSVGAttributes =
         inherit CoreSVGAttributes
-
+        inherit CanvasSvgAttribute
+    
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
@@ -557,7 +593,8 @@ module Builder =
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type AnimationTimingSVGAttributes = interface end
+    type AnimationTimingSVGAttributes =
+        inherit FillSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -567,17 +604,20 @@ module Builder =
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type AnimationAdditionSVGAttributes = interface end
+    type AnimationAdditionSVGAttributes =
+        inherit AttributeNameSVGAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type AnimationAttributeTargetSVGAttributes = interface end
+    type AnimationAttributeTargetSVGAttributes =
+        inherit AttributeNameSVGAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type PresentationSVGAttributes = interface end
+    type PresentationSVGAttributes =
+        inherit FillSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -592,7 +632,8 @@ module Builder =
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type FitToViewBoxSVGAttributes = interface end
+    type FitToViewBoxSVGAttributes =
+        inherit ViewBoxSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -607,6 +648,7 @@ module Builder =
     [<Interface>]
     type GraphicsElementSVGAttributes =
         inherit CoreSVGAttributes
+        inherit FillSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -619,6 +661,7 @@ module Builder =
     [<Interface>]
     type NewViewportSVGAttributes =
         inherit CoreSVGAttributes
+        inherit ViewBoxSvgAttribute
 
 
 
@@ -627,6 +670,7 @@ module Builder =
     [<Interface>]
     type TextContentElementSVGAttributes =
         inherit CoreSVGAttributes
+        inherit FillSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -881,6 +925,7 @@ module Builder =
         inherit CoreSVGAttributes
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
+        inherit CanvasSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -891,6 +936,7 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
+        inherit CanvasSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -911,6 +957,7 @@ module Builder =
         inherit ConditionalProcessingSVGAttributes
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
+        inherit CanvasSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -945,6 +992,7 @@ module Builder =
         inherit ConditionalProcessingSVGAttributes
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
+        inherit CanvasSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -978,6 +1026,7 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
         inherit FitToViewBoxSVGAttributes
+        inherit CanvasSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -1016,6 +1065,7 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
         inherit TransformableSVGAttributes
+        inherit CanvasSvgAttribute
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -1043,6 +1093,8 @@ module Builder =
         inherit FitToViewBoxSVGAttributes
         inherit ZoomAndPanSVGAttributes
         inherit PresentationSVGAttributes
+        inherit ViewBoxSvgAttribute
+        inherit CanvasSvgAttribute
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
@@ -1061,6 +1113,8 @@ module Builder =
         inherit ExternalResourceSVGAttributes
         inherit StylableSVGAttributes
         inherit FitToViewBoxSVGAttributes
+        inherit ViewBoxSvgAttribute
+        inherit CanvasSvgAttribute
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
@@ -1098,6 +1152,7 @@ module Builder =
         inherit PresentationSVGAttributes
         inherit ExternalResourceSVGAttributes
         inherit TransformableSVGAttributes
+        inherit CanvasSvgAttribute
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]

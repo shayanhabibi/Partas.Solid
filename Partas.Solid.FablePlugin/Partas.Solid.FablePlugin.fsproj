@@ -13,8 +13,8 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Authors>Shayan Habibi based on work by Vladimir Schur and contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
-        <Version>1.0.0-alpha9</Version>
-        <PackageVersion>1.0.0-alpha9</PackageVersion>
+        <Version>1.0.0-alpha11</Version>
+        <PackageVersion>1.0.0-alpha11</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>

@@ -5,6 +5,7 @@ open Browser.Types
 open JetBrains.Annotations
 open Fable.Core
 open Fable.Core.JsInterop
+open Partas.Solid.Experimental.U
 
 #nowarn 1182
 
@@ -373,12 +374,10 @@ module Tags =
     [<Erase>]
     type abbr() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type address() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type area() =
@@ -388,12 +387,10 @@ module Tags =
     [<Erase>]
     type article() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type aside() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type audio() =
@@ -403,22 +400,18 @@ module Tags =
     [<Erase>]
     type b() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type base'() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLBaseElement = unbox this
     [<Erase>]
     type bdi() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type bdo() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type blockquote() =
@@ -428,12 +421,10 @@ module Tags =
     [<Erase>]
     type body() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLBodyElement = unbox this
     [<Erase>]
     type br() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLBRElement = unbox this
     [<Erase>]
     type button() =
@@ -448,17 +439,14 @@ module Tags =
     [<Erase>]
     type caption() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type cite() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type code() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type col() =
@@ -478,17 +466,14 @@ module Tags =
     [<Erase>]
     type datalist() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLDataListElement = unbox this
     [<Erase>]
     type dd() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type del() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type details() =
@@ -498,7 +483,6 @@ module Tags =
     [<Erase>]
     type dfn() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type dialog() =
@@ -508,22 +492,18 @@ module Tags =
     [<Erase>]
     type div() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLDivElement = unbox this
     [<Erase>]
     type dl() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLDListElement = unbox this
     [<Erase>]
     type dt() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type em() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type embed() =
@@ -538,17 +518,14 @@ module Tags =
     [<Erase>]
     type figcaption() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type figure() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type footer() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type form() =
@@ -558,62 +535,50 @@ module Tags =
     [<Erase>]
     type h1() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLHeadingElement = unbox this
     [<Erase>]
     type h2() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLHeadingElement = unbox this
     [<Erase>]
     type h3() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLHeadingElement = unbox this
     [<Erase>]
     type h4() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLHeadingElement = unbox this
     [<Erase>]
     type h5() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLHeadingElement = unbox this
     [<Erase>]
     type h6() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLHeadingElement = unbox this
     [<Erase>]
     type head() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLHeadElement = unbox this
     [<Erase>]
     type header() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type hgroup() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type hr() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLHRElement = unbox this
     [<Erase>]
     type html() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLHtmlElement = unbox this
     [<Erase>]
     type i() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type iframe() =
@@ -638,7 +603,6 @@ module Tags =
     [<Erase>]
     type kbd() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type label() =
@@ -648,7 +612,6 @@ module Tags =
     [<Erase>]
     type legend() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLLegendElement = unbox this
     [<Erase>]
     type li() =
@@ -663,7 +626,6 @@ module Tags =
     [<Erase>]
     type main() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type map() =
@@ -673,7 +635,6 @@ module Tags =
     [<Erase>]
     type mark() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type menu() =
@@ -693,12 +654,10 @@ module Tags =
     [<Erase>]
     type nav() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type noscript() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type object'() =
@@ -728,17 +687,14 @@ module Tags =
     [<Erase>]
     type p() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLParagraphElement = unbox this
     [<Erase>]
     type picture() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type pre() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLPreElement = unbox this
     [<Erase>]
     type progress() =
@@ -753,27 +709,22 @@ module Tags =
     [<Erase>]
     type rp() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type rt() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type ruby() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type s() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type samp() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type script() =
@@ -783,12 +734,10 @@ module Tags =
     [<Erase>]
     type search() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type section() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type select() =
@@ -798,7 +747,6 @@ module Tags =
     [<Erase>]
     type small() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type source() =
@@ -808,12 +756,10 @@ module Tags =
     [<Erase>]
     type span() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLSpanElement = unbox this
     [<Erase>]
     type strong() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type style() =
@@ -823,27 +769,22 @@ module Tags =
     [<Erase>]
     type sub() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type summary() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type sup() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type table() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLTableElement = unbox this
     [<Erase>]
     type tbody() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLTableSectionElement = unbox this
     [<Erase>]
     type td() =
@@ -858,7 +799,6 @@ module Tags =
     [<Erase>]
     type tfoot() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLTableSectionElement = unbox this
     [<Erase>]
     type th() =
@@ -868,7 +808,6 @@ module Tags =
     [<Erase>]
     type thead() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLTableSectionElement = unbox this
     [<Erase>]
     type time() =
@@ -878,12 +817,10 @@ module Tags =
     [<Erase>]
     type title() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLTitleElement = unbox this
     [<Erase>]
     type tr() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLTableRowElement = unbox this
     [<Erase>]
     type track() =
@@ -893,17 +830,14 @@ module Tags =
     [<Erase>]
     type u() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type ul() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLUListElement = unbox this
     [<Erase>]
     type var() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
     [<Erase>]
     type video() =
@@ -913,5 +847,4 @@ module Tags =
     [<Erase>]
     type wbr() =
         inherit RegularNode()
-        interface HTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this

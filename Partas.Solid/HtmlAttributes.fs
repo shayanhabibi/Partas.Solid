@@ -7,8 +7,6 @@ open Fable.Core
 open Fable.Core.JsInterop
 open Partas.Solid.Experimental.U
 
-#nowarn 1182
-
 [<AutoOpen>]
 module HtmlAttributes =
     type HtmlContainer with
@@ -427,7 +425,7 @@ module HtmlAttributes =
         member _.style''
             with set(_: obj) = ()
             and get(): obj = unbox ()
-        [<Erase; LanguageInjection("jsx", Prefix = "<div style={", Suffix = "} />")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div style='", Suffix = "' />")>]
         member this.style 
             with inline set (value: string) = this.style'' <- JSX.jsx value
             and inline [<Erase>] get(): string = !!this.style''
@@ -2312,33 +2310,25 @@ module HtmlAttributes =
         member _.disableremoteplayback
             with set(_: bool) = ()
             and [<Erase>] get(): bool = unbox ()
-    
-    type CoreSVGAttributes with
+    type FillSvgAttribute with
         [<Erase>]
-        member _.id 
-            with set(_: string) = ()
-            and get() = unbox () 
-        [<Erase>]
-        member _.lang 
-            with set(_: string) = ()
-            and [<Erase>] get(): string = unbox () 
-        [<Erase>]
-        member _.tabIndex 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.tabindex 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-    type StylableSVGAttributes with
-        [<Erase>]
-        member _.class' 
-            with set(_: string) = ()
-            and [<Erase>] get(): string = unbox () 
-        [<Erase>]
-        member _.style 
+        member _.fill
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
+    type ViewBoxSvgAttribute with
+        [<Erase>]
+        member _.viewBox 
+            with set(_: string) = ()
+            and [<Erase>] get(): string = unbox ()
+    type CanvasSvgAttribute with
+        [<Erase>]
+        member _.width
+            with set(_: U2<float, string>) = ()
+            and [<Erase>] get(): U2<float, string> = unbox ()
+        [<Erase>]
+        member _.height
+            with set(_: U2<float, string>) = ()
+            and [<Erase>] get(): U2<float, string> = unbox ()
     type TransformableSVGAttributes with
         [<Erase>]
         member _.transform 
@@ -2395,10 +2385,6 @@ module HtmlAttributes =
         member _.repeatDur 
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox () 
-        [<Erase>]
-        member _.fill 
-            with set(_: string) = ()
-            and [<Erase>] get(): string = unbox ()
     type AnimationValueSVGAttributes with
         [<Erase>]
         member _.calcMode 
@@ -2428,11 +2414,12 @@ module HtmlAttributes =
         member _.by 
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
-    type AnimationAdditionSVGAttributes with
+    type AttributeNameSVGAttribute with
         [<Erase>]
         member _.attributeName 
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox () 
+    type AnimationAdditionSVGAttributes with
         [<Erase>]
         member _.additive 
             with set(_: string) = ()
@@ -2442,10 +2429,6 @@ module HtmlAttributes =
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox () 
     type AnimationAttributeTargetSVGAttributes with
-        [<Erase>]
-        member _.attributeName 
-            with set(_: string) = ()
-            and [<Erase>] get(): string = unbox () 
         [<Erase>]
         member _.attributeType 
             with set(_: string) = ()
@@ -2550,7 +2533,6 @@ module HtmlAttributes =
         member this.colorRendering
             with inline set(value: string) = this.``color-rendering`` <- value
             and inline get() = this.``color-rendering``
-
         [<Erase>]
         member _.stroke 
             with set(_: string) = ()
@@ -2606,10 +2588,6 @@ module HtmlAttributes =
             and inline get() = this.``stroke-width``
         [<Erase>]
         member _.color 
-            with set(_: string) = ()
-            and [<Erase>] get(): string = unbox () 
-        [<Erase>]
-        member _.fill 
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox () 
         [<Erase>]
@@ -2754,10 +2732,6 @@ module HtmlAttributes =
             and inline get() = this.``dominant-baseline``
         [<Erase>]
         member _.color 
-            with set(_: string) = ()
-            and [<Erase>] get(): string = unbox () 
-        [<Erase>]
-        member _.fill 
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox () 
         [<Erase>]
@@ -2946,10 +2920,6 @@ module HtmlAttributes =
         member this.enableBackground
             with inline set(value: string) = this.``enable-background`` <- value
             and inline get() = this.``enable-background``
-        [<Erase>]
-        member _.fill 
-            with set(_: string) = ()
-            and [<Erase>] get(): string = unbox () 
         [<Erase>]
         member _.``fill-opacity`` 
             with set(_: string) = ()
@@ -3246,14 +3216,6 @@ module HtmlAttributes =
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
-        member _.width 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.height 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
         member _.result 
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox () 
@@ -3281,10 +3243,6 @@ module HtmlAttributes =
             and [<Erase>] get(): string = unbox () 
     type FitToViewBoxSVGAttributes with
         [<Erase>]
-        member _.viewBox 
-            with set(_: string) = ()
-            and [<Erase>] get(): string = unbox () 
-        [<Erase>]
         member _.preserveAspectRatio 
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox () 
@@ -3306,10 +3264,6 @@ module HtmlAttributes =
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox () 
     type NewViewportSVGAttributes with
-        [<Erase>]
-        member _.viewBox 
-            with set(_: string) = ()
-            and [<Erase>] get(): string = unbox () 
         [<Erase>]
         member _.overflow 
             with set(_: string) = ()
@@ -3731,14 +3685,6 @@ module HtmlAttributes =
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
-        member _.width 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.height 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
         member _.filterRes 
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
@@ -3757,14 +3703,6 @@ module HtmlAttributes =
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
         member _.y 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.width 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.height 
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
     type GSVGAttributes with
@@ -3798,14 +3736,6 @@ module HtmlAttributes =
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
         member _.y 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.width 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.height 
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
@@ -3929,14 +3859,6 @@ module HtmlAttributes =
         member _.y 
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.width 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.height 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
     type PathSVGAttributes with
         [<Erase>]
         member _.``marker-end`` 
@@ -3974,14 +3896,6 @@ module HtmlAttributes =
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
         member _.y 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.width 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.height 
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
@@ -4093,14 +4007,6 @@ module HtmlAttributes =
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
-        member _.width 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.height 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
         member _.rx 
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
@@ -4150,14 +4056,6 @@ module HtmlAttributes =
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
-        member _.width 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.height 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
         member _.contentScriptType 
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox () 
@@ -4170,16 +4068,7 @@ module HtmlAttributes =
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox () 
 
-
     type SymbolSVGAttributes with
-        [<Erase>]
-        member _.width 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.height 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
         member _.preserveAspectRatio 
             with set(_: string) = ()
@@ -4192,10 +4081,6 @@ module HtmlAttributes =
         member _.refY 
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.viewBox 
-            with set(_: string) = ()
-            and [<Erase>] get(): string = unbox () 
         [<Erase>]
         member _.x 
             with set(_: U2<float, string>) = ()
@@ -4348,14 +4233,6 @@ module HtmlAttributes =
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
         member _.y 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.width 
-            with set(_: U2<float, string>) = ()
-            and [<Erase>] get(): U2<float, string> = unbox () 
-        [<Erase>]
-        member _.height 
             with set(_: U2<float, string>) = ()
             and [<Erase>] get(): U2<float, string> = unbox () 
         [<Erase>]
