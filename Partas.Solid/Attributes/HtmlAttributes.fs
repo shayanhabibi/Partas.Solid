@@ -16,6 +16,7 @@ module HtmlAttributes =
         member _.children
             with get(): HtmlElement = jsNative
     type HTMLAttributes with
+        [<LanguageInjection(InjectedLanguage.HTML)>]
         [<Erase>]
         member _.innerHTML
             with set(value: string) = ()
@@ -374,242 +375,246 @@ module HtmlAttributes =
         member _.onWheel 
             with set(value: WheelEvent -> unit) = ()
             and [<Erase>] get(): WheelEvent -> unit = unbox ()
-        [<Erase>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div class='", Suffix = "' >")>]
         member _.class'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div accessKey='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div accessKey='", Suffix = "' >")>]
         member _.accessKey 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div contenteditable='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div contenteditable='", Suffix = "' >")>]
         member _.contenteditable 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div contextmenu='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div contextmenu='", Suffix = "' >")>]
         member _.contextmenu 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div dir='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div dir='", Suffix = "' >")>]
         member _.dir 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div draggable='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div draggable='", Suffix = "' >")>]
         member _.draggable 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div hidden='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div hidden='", Suffix = "' >")>]
         member _.hidden 
             with set (_: U2<string, bool>) = ()
             and [<Erase>] get(): U2<string, bool> = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div id='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div id='", Suffix = "' >")>]
         member _.id 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div is='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div is='", Suffix = "' >")>]
         member _.is 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div inert='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div inert='", Suffix = "' >")>]
         member _.inert 
             with set (_: bool) = ()
             and [<Erase>] get(): bool = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div lang='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div lang='", Suffix = "' >")>]
         member _.lang 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div spellcheck='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div spellcheck='", Suffix = "' >")>]
         member _.spellcheck 
             with set (_: bool) = ()
             and [<Erase>] get(): bool = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.JAVASCRIPT, Prefix = "<div style='", Suffix = "' />")>]
-        member _.style 
-            with set (_: string) = ()
-            and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div tabindex='", Suffix = "' >")>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never); Erase>]
+        member _.style''
+            with set(_: obj) = ()
+            and get(): obj = unbox ()
+        [<Erase; LanguageInjection("jsx", Prefix = "<div style={", Suffix = "} />")>]
+        member this.style 
+            with inline set (value: string) = this.style'' <- JSX.jsx value
+            and inline [<Erase>] get(): string = !!this.style''
+        [<Erase; LanguageInjection("jsx", Prefix = "<div tabindex='", Suffix = "' >")>]
         member _.tabindex 
             with set (_: int) = ()
             and [<Erase>] get(): int = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div title='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div title='", Suffix = "' >")>]
         member _.title 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div translate='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div translate='", Suffix = "' >")>]
         member _.translate 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div about='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div about='", Suffix = "' >")>]
         member _.about 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div datatype='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div datatype='", Suffix = "' >")>]
         member _.datatype 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div inlist='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div inlist='", Suffix = "' >")>]
         member _.inlist 
             with set (_: obj) = ()
             and [<Erase>] get() = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div popover='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div popover='", Suffix = "' >")>]
         member _.popover 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div prefix='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div prefix='", Suffix = "' >")>]
         member _.prefix 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div property='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div property='", Suffix = "' >")>]
         member _.property 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div resource='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div resource='", Suffix = "' >")>]
         member _.resource 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div typeof='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div typeof='", Suffix = "' >")>]
         member _.typeof 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div vocab='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div vocab='", Suffix = "' >")>]
         member _.vocab 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div autocapitalize='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div autocapitalize='", Suffix = "' >")>]
         member _.autocapitalize 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div slot='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div slot='", Suffix = "' >")>]
         member _.slot 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div color='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div color='", Suffix = "' >")>]
         member _.color 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div itemprop='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div itemprop='", Suffix = "' >")>]
         member _.itemprop 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div itemscope='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div itemscope='", Suffix = "' >")>]
         member _.itemscope 
             with set (_: bool) = ()
             and [<Erase>] get(): bool = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div itemtype='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div itemtype='", Suffix = "' >")>]
         member _.itemtype 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div itemid='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div itemid='", Suffix = "' >")>]
         member _.itemid 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div itemref='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div itemref='", Suffix = "' >")>]
         member _.itemref 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div part='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div part='", Suffix = "' >")>]
         member _.part 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div exportparts='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div exportparts='", Suffix = "' >")>]
         member _.exportparts 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div inputmode='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div inputmode='", Suffix = "' >")>]
         member _.inputmode 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div contentEditable='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div contentEditable='", Suffix = "' >")>]
         member _.contentEditable 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div contextMenu='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div contextMenu='", Suffix = "' >")>]
         member _.contextMenu 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div tabIndex='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div tabIndex='", Suffix = "' >")>]
         member _.tabIndex 
             with set (_: int) = ()
             and [<Erase>] get(): int = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div autoCapitalize='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div autoCapitalize='", Suffix = "' >")>]
         member _.autoCapitalize 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div itemProp='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div itemProp='", Suffix = "' >")>]
         member _.itemProp 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div itemScope='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div itemScope='", Suffix = "' >")>]
         member _.itemScope 
             with set (_: bool) = ()
             and [<Erase>] get(): bool = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div itemType='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div itemType='", Suffix = "' >")>]
         member _.itemType 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div itemId='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div itemId='", Suffix = "' >")>]
         member _.itemId 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div itemRef='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div itemRef='", Suffix = "' >")>]
         member _.itemRef 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div exportParts='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div exportParts='", Suffix = "' >")>]
         member _.exportParts 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<div inputMode='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<div inputMode='", Suffix = "' >")>]
         member _.inputMode 
             with set (_: string) = ()
             and [<Erase>] get(): string = unbox ()
 
     type AnchorHTMLAttributes with
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<a download='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a download='", Suffix = "' >")>]
         member _.download
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<a href='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a href='", Suffix = "' >")>]
         member _.href
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<a hreflang='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a hreflang='", Suffix = "' >")>]
         member _.hreflang
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<a media='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a media='", Suffix = "' >")>]
         member _.media
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<a ping='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a ping='", Suffix = "' >")>]
         member _.ping
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<a referrerpolicy='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a referrerpolicy='", Suffix = "' >")>]
         member _.referrerpolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<a rel='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a rel='", Suffix = "' >")>]
         member _.rel
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<a target='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a target='", Suffix = "' >")>]
         member _.target
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<a type='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a type='", Suffix = "' >")>]
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
-        [<Erase; LanguageInjection(InjectedLanguage.HTML, Prefix = "<a referrerPolicy='", Suffix = "' >")>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a referrerPolicy='", Suffix = "' >")>]
         member _.referrerPolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -618,67 +623,67 @@ module HtmlAttributes =
 
     type AreaHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area alt='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area alt='", Suffix = "' >")>]
         member _.alt
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area coords='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area coords='", Suffix = "' >")>]
         member _.coords
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area download='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area download='", Suffix = "' >")>]
         member _.download
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area href='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area href='", Suffix = "' >")>]
         member _.href
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area hreflang='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area hreflang='", Suffix = "' >")>]
         member _.hreflang
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area ping='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area ping='", Suffix = "' >")>]
         member _.ping
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area referrerpolicy='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area referrerpolicy='", Suffix = "' >")>]
         member _.referrerpolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area rel='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area rel='", Suffix = "' >")>]
         member _.rel
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area shape='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area shape='", Suffix = "' >")>]
         member _.shape
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area target='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area target='", Suffix = "' >")>]
         member _.target
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<area referrerPolicy='", Suffix = "' >")>]
+        [<LanguageInjection("jsx", Prefix = "<area referrerPolicy='", Suffix = "' >")>]
         member _.referrerPolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -686,13 +691,13 @@ module HtmlAttributes =
 
     type BaseHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<base href='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<base href='", Suffix = "' >")>]        
         member _.href
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<base target='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<base target='", Suffix = "' >")>]        
         member _.target
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -700,7 +705,7 @@ module HtmlAttributes =
 
     type BlockquoteHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<blockquote cite='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<blockquote cite='", Suffix = "' >")>]        
         member _.cite
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -718,7 +723,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<button form='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<button form='", Suffix = "' >")>]        
         member _.form
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -729,55 +734,55 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<button name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<button name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<button type='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<button type='", Suffix = "' >")>]        
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<button value='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<button value='", Suffix = "' >")>]        
         member _.value
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<button formAction='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<button formAction='", Suffix = "' >")>]        
         member _.formAction
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<button formEnctype='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<button formEnctype='", Suffix = "' >")>]        
         member _.formEnctype
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<button formMethod='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<button formMethod='", Suffix = "' >")>]        
         member _.formMethod
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<button formTarget='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<button formTarget='", Suffix = "' >")>]        
         member _.formTarget
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<button popoverTarget='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<button popoverTarget='", Suffix = "' >")>]        
         member _.popoverTarget
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<button popoverTargetAction='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<button popoverTargetAction='", Suffix = "' >")>]        
         member _.popoverTargetAction
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -816,7 +821,7 @@ module HtmlAttributes =
 
     type DataHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<data value='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<data value='", Suffix = "' >")>]        
         member _.value
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -858,13 +863,13 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<embed src='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<embed src='", Suffix = "' >")>]        
         member _.src
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<embed type='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<embed type='", Suffix = "' >")>]        
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -882,13 +887,13 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<fieldset form='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<fieldset form='", Suffix = "' >")>]        
         member _.form
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<fieldset name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<fieldset name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -896,55 +901,55 @@ module HtmlAttributes =
 
     type FormHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<form accept='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<form accept='", Suffix = "' >")>]        
         member _.accept
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<form action='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<form action='", Suffix = "' >")>]        
         member _.action
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<form autocomplete='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<form autocomplete='", Suffix = "' >")>]        
         member _.autocomplete
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "< encoding='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "< encoding='", Suffix = "' >")>]        
         member _.encoding
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<form enctype='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<form enctype='", Suffix = "' >")>]        
         member _.enctype
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<form method='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<form method='", Suffix = "' >")>]        
         member _.method
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<form name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<form name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<form noValidate='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<form noValidate='", Suffix = "' >")>]        
         member _.noValidate
             with set(_: bool) = ()
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<form target='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<form target='", Suffix = "' >")>]        
         member _.target
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -953,13 +958,13 @@ module HtmlAttributes =
 
     type IframeHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<iframe allow='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<iframe allow='", Suffix = "' >")>]        
         member _.allow
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<iframe allowfullscreen='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<iframe allowfullscreen='", Suffix = "' >")>]        
         member _.allowfullscreen
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -970,37 +975,37 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<iframe loading='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<iframe loading='", Suffix = "' >")>]        
         member _.loading
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<iframe name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<iframe name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<iframe referrerpolicy='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<iframe referrerpolicy='", Suffix = "' >")>]        
         member _.referrerpolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<iframe sandbox='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<iframe sandbox='", Suffix = "' >")>]        
         member _.sandbox
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<iframe src='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<iframe src='", Suffix = "' >")>]        
         member _.src
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<iframe srcdoc='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<iframe srcdoc='", Suffix = "' >")>]        
         member _.srcdoc
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1011,7 +1016,7 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<iframe referrerPolicy='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<iframe referrerPolicy='", Suffix = "' >")>]        
         member _.referrerPolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1019,19 +1024,19 @@ module HtmlAttributes =
 
     type ImgHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img alt='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img alt='", Suffix = "' >")>]        
         member _.alt
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img crossorigin='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img crossorigin='", Suffix = "' >")>]        
         member _.crossorigin
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img decoding='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img decoding='", Suffix = "' >")>]        
         member _.decoding
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1047,55 +1052,55 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img loading='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img loading='", Suffix = "' >")>]        
         member _.loading
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img referrerpolicy='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img referrerpolicy='", Suffix = "' >")>]        
         member _.referrerpolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img referrerPolicy='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img referrerPolicy='", Suffix = "' >")>]        
         member _.referrerPolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img sizes='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img sizes='", Suffix = "' >")>]        
         member _.sizes
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img src='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img src='", Suffix = "' >")>]        
         member _.src
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img srcset='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img srcset='", Suffix = "' >")>]        
         member _.srcset
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img srcSet='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img srcSet='", Suffix = "' >")>]        
         member _.srcSet
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img usemap='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img usemap='", Suffix = "' >")>]        
         member _.usemap
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img useMap='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img useMap='", Suffix = "' >")>]        
         member _.useMap
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1106,19 +1111,19 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img crossOrigin='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img crossOrigin='", Suffix = "' >")>]        
         member _.crossOrigin
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img elementtiming='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img elementtiming='", Suffix = "' >")>]        
         member _.elementtiming
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<img fetchpriority='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<img fetchpriority='", Suffix = "' >")>]        
         member _.fetchpriority
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1126,25 +1131,25 @@ module HtmlAttributes =
 
     type InputHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input accept='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input accept='", Suffix = "' >")>]        
         member _.accept
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input alt='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input alt='", Suffix = "' >")>]        
         member _.alt
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input autocomplete='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input autocomplete='", Suffix = "' >")>]        
         member _.autocomplete
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input autocorrect='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input autocorrect='", Suffix = "' >")>]        
         member _.autocorrect
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1155,7 +1160,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input capture='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input capture='", Suffix = "' >")>]        
         member _.capture
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1166,25 +1171,25 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input crossorigin='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input crossorigin='", Suffix = "' >")>]        
         member _.crossorigin
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input disabled='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input disabled='", Suffix = "' >")>]        
         member _.disabled
             with set(_: bool) = ()
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input enterkeyhint='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input enterkeyhint='", Suffix = "' >")>]        
         member _.enterkeyhint
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input form='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input form='", Suffix = "' >")>]        
         member _.form
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1195,7 +1200,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input formtarget='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input formtarget='", Suffix = "' >")>]        
         member _.formtarget
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1206,13 +1211,13 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input incremental='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input incremental='", Suffix = "' >")>]        
         member _.incremental
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input list='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input list='", Suffix = "' >")>]        
         member _.list
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1243,19 +1248,19 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input pattern='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input pattern='", Suffix = "' >")>]        
         member _.pattern
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input placeholder='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input placeholder='", Suffix = "' >")>]        
         member _.placeholder
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1266,7 +1271,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input results='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input results='", Suffix = "' >")>]        
         member _.results
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1282,25 +1287,25 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input src='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input src='", Suffix = "' >")>]        
         member _.src
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input step='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input step='", Suffix = "' >")>]        
         member _.step
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input type='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input type='", Suffix = "' >")>]        
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input value='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input value='", Suffix = "' >")>]        
         member _.value
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1311,25 +1316,25 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input crossOrigin='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input crossOrigin='", Suffix = "' >")>]        
         member _.crossOrigin
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input formAction='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input formAction='", Suffix = "' >")>]        
         member _.formAction
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input formEnctype='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input formEnctype='", Suffix = "' >")>]        
         member _.formEnctype
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input formMethod='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input formMethod='", Suffix = "' >")>]        
         member _.formMethod
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1340,7 +1345,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<input formTarget='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<input formTarget='", Suffix = "' >")>]        
         member _.formTarget
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1363,13 +1368,13 @@ module HtmlAttributes =
 
     type InsHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<ins cite='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<ins cite='", Suffix = "' >")>]        
         member _.cite
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<ins dateTime='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<ins dateTime='", Suffix = "' >")>]        
         member _.dateTime
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1382,7 +1387,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<keygen challenge='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<keygen challenge='", Suffix = "' >")>]        
         member _.challenge
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1393,25 +1398,25 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<keygen form='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<keygen form='", Suffix = "' >")>]        
         member _.form
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<keygen keytype='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<keygen keytype='", Suffix = "' >")>]        
         member _.keytype
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<keygen keyparams='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<keygen keyparams='", Suffix = "' >")>]        
         member _.keyparams
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<keygen name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<keygen name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1419,13 +1424,13 @@ module HtmlAttributes =
 
     type LabelHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<label for='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<label for='", Suffix = "' >")>]        
         member _.for'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<label form='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<label form='", Suffix = "' >")>]        
         member _.form
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1433,7 +1438,7 @@ module HtmlAttributes =
 
     type LiHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<li value='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<li value='", Suffix = "' >")>]        
         member _.value
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1441,13 +1446,13 @@ module HtmlAttributes =
 
     type LinkHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link as='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link as='", Suffix = "' >")>]        
         member _.as'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link crossorigin='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link crossorigin='", Suffix = "' >")>]        
         member _.crossorigin
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1458,79 +1463,79 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link fetchpriority='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link fetchpriority='", Suffix = "' >")>]        
         member _.fetchpriority
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link href='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link href='", Suffix = "' >")>]        
         member _.href
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link hreflang='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link hreflang='", Suffix = "' >")>]        
         member _.hreflang
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link imagesizes='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link imagesizes='", Suffix = "' >")>]        
         member _.imagesizes
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link imagesrcset='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link imagesrcset='", Suffix = "' >")>]        
         member _.imagesrcset
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link integrity='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link integrity='", Suffix = "' >")>]        
         member _.integrity
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link media='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link media='", Suffix = "' >")>]        
         member _.media
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link referrerpolicy='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link referrerpolicy='", Suffix = "' >")>]        
         member _.referrerpolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link rel='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link rel='", Suffix = "' >")>]        
         member _.rel
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link sizes='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link sizes='", Suffix = "' >")>]        
         member _.sizes
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link type='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link type='", Suffix = "' >")>]        
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link crossOrigin='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link crossOrigin='", Suffix = "' >")>]        
         member _.crossOrigin
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<link referrerPolicy='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<link referrerPolicy='", Suffix = "' >")>]        
         member _.referrerPolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1538,7 +1543,7 @@ module HtmlAttributes =
 
     type MapHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<map name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<map name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1556,13 +1561,13 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<media controlslist='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<media controlslist='", Suffix = "' >")>]        
         member _.controlslist
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<media crossorigin='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<media crossorigin='", Suffix = "' >")>]        
         member _.crossorigin
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1573,7 +1578,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<media mediagroup='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<media mediagroup='", Suffix = "' >")>]        
         member _.mediagroup
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1584,25 +1589,25 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<media preload='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<media preload='", Suffix = "' >")>]        
         member _.preload
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<media src='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<media src='", Suffix = "' >")>]        
         member _.src
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<media crossOrigin='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<media crossOrigin='", Suffix = "' >")>]        
         member _.crossOrigin
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<media mediaGroup='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<media mediaGroup='", Suffix = "' >")>]        
         member _.mediaGroup
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1610,44 +1615,44 @@ module HtmlAttributes =
 
     type MenuHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<menu label='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<menu label='", Suffix = "' >")>]        
         member _.label
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<menu type='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<menu type='", Suffix = "' >")>]        
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
 
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<menu charset='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<menu charset='", Suffix = "' >")>]        
         member _.charset
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<menu content='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<menu content='", Suffix = "' >")>]        
         member _.content
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<menu http='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<menu http='", Suffix = "' >")>]        
         member _.http
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<menu name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<menu name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<menu media='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<menu media='", Suffix = "' >")>]        
         member _.media
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1655,7 +1660,7 @@ module HtmlAttributes =
 
     type MeterHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<meter form='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<meter form='", Suffix = "' >")>]        
         member _.form
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1693,7 +1698,7 @@ module HtmlAttributes =
 
     type QuoteHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<quote cite='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<quote cite='", Suffix = "' >")>]        
         member _.cite
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1701,13 +1706,13 @@ module HtmlAttributes =
 
     type ObjectHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<object data='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<object data='", Suffix = "' >")>]        
         member _.data
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<object form='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<object form='", Suffix = "' >")>]        
         member _.form
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1718,19 +1723,19 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<object name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<object name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<object type='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<object type='", Suffix = "' >")>]        
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<object usemap='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<object usemap='", Suffix = "' >")>]        
         member _.usemap
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1741,7 +1746,7 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<object useMap='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<object useMap='", Suffix = "' >")>]        
         member _.useMap
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1749,19 +1754,19 @@ module HtmlAttributes =
 
     type OlHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<ol reversed='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<ol reversed='", Suffix = "' >")>]        
         member _.reversed
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<ol start='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<ol start='", Suffix = "' >")>]        
         member _.start
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<ol type='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<ol type='", Suffix = "' >")>]        
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1774,7 +1779,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<optgroup label='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<optgroup label='", Suffix = "' >")>]        
         member _.label
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1787,7 +1792,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<option label='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<option label='", Suffix = "' >")>]        
         member _.label
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1798,7 +1803,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<option value='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<option value='", Suffix = "' >")>]        
         member _.value
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1806,19 +1811,19 @@ module HtmlAttributes =
 
     type OutputHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<output form='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<output form='", Suffix = "' >")>]        
         member _.form
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<output for='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<output for='", Suffix = "' >")>]        
         member _.for'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<output name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<output name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1826,13 +1831,13 @@ module HtmlAttributes =
 
     type ParamHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<param name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<param name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<param value='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<param value='", Suffix = "' >")>]        
         member _.value
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1845,7 +1850,7 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<progress value='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<progress value='", Suffix = "' >")>]        
         member _.value
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1858,25 +1863,25 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<script charset='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<script charset='", Suffix = "' >")>]        
         member _.charset
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<script crossorigin='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<script crossorigin='", Suffix = "' >")>]        
         member _.crossorigin
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<script defer='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<script defer='", Suffix = "' >")>]        
         member _.defer
             with set(_: bool) = ()
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<script integrity='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<script integrity='", Suffix = "' >")>]        
         member _.integrity
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1887,31 +1892,31 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<script nonce='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<script nonce='", Suffix = "' >")>]        
         member _.nonce
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<script referrerpolicy='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<script referrerpolicy='", Suffix = "' >")>]        
         member _.referrerpolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<script src='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<script src='", Suffix = "' >")>]        
         member _.src
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<script type='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<script type='", Suffix = "' >")>]        
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<script crossOrigin='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<script crossOrigin='", Suffix = "' >")>]        
         member _.crossOrigin
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1922,7 +1927,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<script referrerPolicy='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<script referrerPolicy='", Suffix = "' >")>]        
         member _.referrerPolicy
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1930,7 +1935,7 @@ module HtmlAttributes =
 
     type SelectHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<select autocomplete='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<select autocomplete='", Suffix = "' >")>]        
         member _.autocomplete
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1946,7 +1951,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<select form='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<select form='", Suffix = "' >")>]        
         member _.form
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1957,7 +1962,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<select name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<select name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1973,7 +1978,7 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<select value='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<select value='", Suffix = "' >")>]        
         member _.value
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1981,7 +1986,7 @@ module HtmlAttributes =
 
     type HTMLSlotElementAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<slot name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<slot name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -1989,31 +1994,31 @@ module HtmlAttributes =
 
     type SourceHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<source media='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<source media='", Suffix = "' >")>]        
         member _.media
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<source sizes='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<source sizes='", Suffix = "' >")>]        
         member _.sizes
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<source src='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<source src='", Suffix = "' >")>]        
         member _.src
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<source srcset='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<source srcset='", Suffix = "' >")>]        
         member _.srcset
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<source type='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<source type='", Suffix = "' >")>]        
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2031,25 +2036,25 @@ module HtmlAttributes =
 
     type StyleHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<style media='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<style media='", Suffix = "' >")>]        
         member _.media
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<style nonce='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<style nonce='", Suffix = "' >")>]        
         member _.nonce
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<style scoped='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<style scoped='", Suffix = "' >")>]        
         member _.scoped
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<style type='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<style type='", Suffix = "' >")>]        
         member _.type'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2062,7 +2067,7 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<td headers='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<td headers='", Suffix = "' >")>]        
         member _.headers
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2085,7 +2090,7 @@ module HtmlAttributes =
 
     type TemplateHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<template content='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<template content='", Suffix = "' >")>]        
         member _.content
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2093,7 +2098,7 @@ module HtmlAttributes =
 
     type TextareaHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<textarea autocomplete='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<textarea autocomplete='", Suffix = "' >")>]        
         member _.autocomplete
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2109,7 +2114,7 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<textarea dirname='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<textarea dirname='", Suffix = "' >")>]        
         member _.dirname
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2120,13 +2125,13 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<textarea enterkeyhint='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<textarea enterkeyhint='", Suffix = "' >")>]        
         member _.enterkeyhint
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<textarea form='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<textarea form='", Suffix = "' >")>]        
         member _.form
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2142,13 +2147,13 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<textarea name='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<textarea name='", Suffix = "' >")>]        
         member _.name
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<textarea placeholder='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<textarea placeholder='", Suffix = "' >")>]        
         member _.placeholder
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2169,13 +2174,13 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<textarea value='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<textarea value='", Suffix = "' >")>]        
         member _.value
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<textarea wrap='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<textarea wrap='", Suffix = "' >")>]        
         member _.wrap
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2203,7 +2208,7 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<th headers='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<th headers='", Suffix = "' >")>]        
         member _.headers
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2224,7 +2229,7 @@ module HtmlAttributes =
             and [<Erase>] get(): int = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<th scope='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<th scope='", Suffix = "' >")>]        
         member _.scope
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2232,13 +2237,13 @@ module HtmlAttributes =
 
     type TimeHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<time datetime='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<time datetime='", Suffix = "' >")>]        
         member _.datetime
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<time dateTime='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<time dateTime='", Suffix = "' >")>]        
         member _.dateTime
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2246,31 +2251,31 @@ module HtmlAttributes =
 
     type TrackHTMLAttributes with
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<track default='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<track default='", Suffix = "' >")>]        
         member _.default'
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<track kind='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<track kind='", Suffix = "' >")>]        
         member _.kind
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<track label='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<track label='", Suffix = "' >")>]        
         member _.label
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<track src='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<track src='", Suffix = "' >")>]        
         member _.src
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<track srclang='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<track srclang='", Suffix = "' >")>]        
         member _.srclang
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
@@ -2288,7 +2293,7 @@ module HtmlAttributes =
             and [<Erase>] get(): bool = unbox ()
             
         [<Erase>]
-        [<LanguageInjection(InjectedLanguage.HTML, Prefix = "<video poster='", Suffix = "' >")>]        
+        [<LanguageInjection("jsx", Prefix = "<video poster='", Suffix = "' >")>]        
         member _.poster
             with set(_: string) = ()
             and [<Erase>] get(): string = unbox ()
