@@ -262,14 +262,12 @@ module Builder =
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type MediaHTMLAttributes =
-        inherit HTMLAttributes
+    type MediaHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type AnchorHTMLAttributes =
-        inherit HTMLAttributes
+    type AnchorHTMLAttributes = interface end
         
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
@@ -280,266 +278,222 @@ module Builder =
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type AreaHTMLAttributes =
-        inherit HTMLAttributes
+    type AreaHTMLAttributes = interface end
         
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type BaseHTMLAttributes =
-        inherit HTMLAttributes
+    type BaseHTMLAttributes = interface end
         
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type BlockquoteHTMLAttributes =
-        inherit HTMLAttributes
+    type BlockquoteHTMLAttributes = interface end
         
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type ButtonHTMLAttributes =
-        inherit HTMLAttributes
+    type ButtonHTMLAttributes = interface end
         
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type CanvasHTMLAttributes =
-        inherit HTMLAttributes
+    type CanvasHTMLAttributes = interface end
         
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type ColHTMLAttributes =
-        inherit HTMLAttributes
+    type ColHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type ColgroupHTMLAttributes =
-        inherit HTMLAttributes
+    type ColgroupHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type DataHTMLAttributes =
-        inherit HTMLAttributes
+    type DataHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type DetailsHtmlAttributes =
-        inherit HTMLAttributes
+    type DetailsHtmlAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type DialogHtmlAttributes =
-        inherit HTMLAttributes
+    type DialogHtmlAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type EmbedHTMLAttributes =
-        inherit HTMLAttributes
+    type EmbedHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type FieldsetHTMLAttributes =
-        inherit HTMLAttributes
+    type FieldsetHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type FormHTMLAttributes =
-        inherit HTMLAttributes
+    type FormHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type IframeHTMLAttributes =
-        inherit HTMLAttributes
+    type IframeHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type ImgHTMLAttributes =
-        inherit HTMLAttributes
+    type ImgHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type InputHTMLAttributes =
-        inherit HTMLAttributes
+    type InputHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type InsHTMLAttributes =
-        inherit HTMLAttributes
+    type InsHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type KeygenHTMLAttributes =
-        inherit HTMLAttributes
+    type KeygenHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type LabelHTMLAttributes =
-        inherit HTMLAttributes
+    type LabelHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type LiHTMLAttributes =
-        inherit HTMLAttributes
+    type LiHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type LinkHTMLAttributes =
-        inherit HTMLAttributes
+    type LinkHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type MapHTMLAttributes =
-        inherit HTMLAttributes
+    type MapHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type MenuHTMLAttributes =
-        inherit HTMLAttributes
+    type MenuHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type MetaHTMLAttributes =
-        inherit HTMLAttributes
+    type MetaHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type MeterHTMLAttributes =
-        inherit HTMLAttributes
+    type MeterHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type QuoteHTMLAttributes =
-        inherit HTMLAttributes
+    type QuoteHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type ObjectHTMLAttributes =
-        inherit HTMLAttributes
+    type ObjectHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type OlHTMLAttributes =
-        inherit HTMLAttributes
+    type OlHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type OptgroupHTMLAttributes =
-        inherit HTMLAttributes
+    type OptgroupHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type OptionHTMLAttributes =
-        inherit HTMLAttributes
+    type OptionHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type OutputHTMLAttributes =
-        inherit HTMLAttributes
+    type OutputHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type ParamHTMLAttributes =
-        inherit HTMLAttributes
+    type ParamHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type ProgressHTMLAttributes =
-        inherit HTMLAttributes
+    type ProgressHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type ScriptHTMLAttributes =
-        inherit HTMLAttributes
+    type ScriptHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type SelectHTMLAttributes =
-        inherit HTMLAttributes
+    type SelectHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type HTMLSlotElementAttributes =
-        inherit HTMLAttributes
+    type HTMLSlotElementAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type SourceHTMLAttributes =
-        inherit HTMLAttributes
+    type SourceHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type StyleHTMLAttributes =
-        inherit HTMLAttributes
+    type StyleHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type TdHTMLAttributes =
-        inherit HTMLAttributes
+    type TdHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type TemplateHTMLAttributes =
-        inherit HTMLAttributes
+    type TemplateHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type TextareaHTMLAttributes =
-        inherit HTMLAttributes
+    type TextareaHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type ThHTMLAttributes =
-        inherit HTMLAttributes
+    type ThHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type TimeHTMLAttributes =
-        inherit HTMLAttributes
+    type TimeHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
-    type TrackHTMLAttributes =
-        inherit HTMLAttributes
+    type TrackHTMLAttributes = interface end
 
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     [<AllowNullLiteral>]
