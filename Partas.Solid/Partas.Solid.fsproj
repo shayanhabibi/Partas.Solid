@@ -16,31 +16,32 @@
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
-        <Version>1.0.0-alpha7</Version>
+        <Version>1.0.0-alpha8</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.0.0-alpha7</PackageVersion>
+        <PackageVersion>1.0.0-alpha8</PackageVersion>
         <PackageReleaseNotes>Refactor</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
       <None Include="../README.md" Pack="true" PackagePath="\" />
+      <Compile Include="U.fs" />
       <Compile Include="PluginSupport.fs" />
       <Compile Include="IdeTweaks.fs" />
       <Compile Include="Builder.fs" />
+      <Compile Include="Attributes\HtmlAttributes.fs" />
+      <Compile Include="Attributes\AriaAttributes.fs" />
+      <Compile Include="Attributes\StyleSpec.fs" />
+      <Compile Include="Attributes\Style.fs" />
       <Compile Include="Tags.fs" />
       <Compile Include="SolidBindings.fs" />
       <Compile Include="SolidRouterBindings.fs" />
       <Compile Include="Experimental.fs" />
       <Compile Include="PolymorphicSupport.fs" />
-      <Compile Include="Attributes\HtmlAttributes.fs" />
-      <Compile Include="Attributes\AriaAttributes.fs" />
-      <Compile Include="Attributes\StyleSpec.fs" />
-      <Compile Include="Attributes\Style.fs" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Fable.Browser.Dom" Version="2.18.1" />
-      <PackageReference Include="Fable.Core" Version="4.4.0" />
+      <PackageReference Include="Fable.Core" Version="4.5.0" />
       <PackageReference Include="Fable.Package.SDK" Version="1.3.0">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
