@@ -1,5 +1,5 @@
 import { Record } from "./fable_modules/fable-library-js.5.0.0-alpha.12/Types.js";
-import { record_type, string_type } from "./fable_modules/fable-library-js.5.0.0-alpha.12/Reflection.js";
+import { record_type, class_type, string_type } from "./fable_modules/fable-library-js.5.0.0-alpha.12/Reflection.js";
 import { item, singleton } from "./fable_modules/fable-library-js.5.0.0-alpha.12/List.js";
 
 export class MenuItem extends Record {
@@ -12,7 +12,7 @@ export class MenuItem extends Record {
 }
 
 export function MenuItem_$reflection() {
-    return record_type("Partas.Solid.Tests.SolidCases.FieldGettersInComputations.MenuItem", [], MenuItem, () => [["Title", string_type], ["Url", string_type], ["Icon", string_type]]);
+    return record_type("Partas.Solid.Tests.SolidCases.FieldGettersInComputations.MenuItem", [], MenuItem, () => [["Title", string_type], ["Url", string_type], ["Icon", class_type("Partas.Solid.Builder.HtmlElement")]]);
 }
 
 export function App_App() {

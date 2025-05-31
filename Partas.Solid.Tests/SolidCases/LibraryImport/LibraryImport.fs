@@ -6,25 +6,25 @@ open Partas.Solid.Tests.Shared.LibraryImport
 
 
 type [<Erase>] MyTag() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         Imported()
 
 type [<Erase>] MyOtherTag() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         CustomTag()
         
 type [<Erase>] ImportedTagWithProps() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         Imported(class' = "Test props")
 
 type [<Erase>] UserTagWithProps() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         CustomTag(class' = "test bops")

@@ -5,7 +5,7 @@ open Fable.Core
 
 [<Erase>]
 type MemberVal() =
-    inherit RegularNode()
+    interface RegularNode
     [<Erase>]
     member val index: int = unbox null with get,set 
     member this.overloaded
@@ -13,7 +13,7 @@ type MemberVal() =
 
 [<Erase>]
 type ValMutable() =
-    inherit RegularNode()
+    interface RegularNode
     [<DefaultValue>]
     val mutable index: int
     member this.overloaded

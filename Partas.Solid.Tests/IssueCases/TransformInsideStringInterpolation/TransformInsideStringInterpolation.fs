@@ -5,7 +5,7 @@ open Fable.Core
 
 [<Erase>]
 type TestStringInterpolation() =
-    inherit VoidNode()
+    interface VoidNode
     [<Erase>]
     member val index: int = unbox null with get,set
     [<SolidTypeComponentAttribute>]

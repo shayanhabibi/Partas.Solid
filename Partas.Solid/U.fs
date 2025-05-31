@@ -1,5 +1,8 @@
 ﻿namespace Partas.Solid.Experimental
 open Fable.Core
+
+#nowarn 64 49
+
 /// <summary>
 /// Reimplements the Erased Unions with implicit conversion from types into the erasure.
 /// This simplifies bindings and consuming bindings as type signatures more closely resemble

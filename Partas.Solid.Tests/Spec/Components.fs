@@ -63,7 +63,7 @@ module Section1 =
     /// But they will not generate a function (since they are an import)
     [<Import("LibraryImport", "@some/library")>]
     type FakeImport() =
-        inherit RegularNode()
+        interface RegularNode
         [<Erase>]
         member val myAttribute: string = "" with get,set
 
@@ -89,7 +89,7 @@ open Fable.Core
 /// if defined outside of a namespace starting with Partas.Solid
 [<Import("LibraryImport", "@some/library")>]
 type FakeImport() =
-    inherit RegularNode()
+    interface RegularNode
     [<Erase>]
     member val myAttribute: string = "" with get,set
 module Section2 =

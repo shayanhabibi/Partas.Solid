@@ -51,7 +51,7 @@ type Style =
     ///<b>Syntax</b>: <c>time#</c>
     /// <br/><b>Initial value</b>: <c>0s</c>
     /// </summary>
-    static member inline animationDelay (value: U4<string, int, float, AnimationDelay>) = "animation-delay" ==> value
+    static member inline animationDelay (value: U4<string, int, float, Globals>) = "animation-delay" ==> value
     /// <summary>
     /// The<b><c>animation-direction</c></b> CSS property sets whether an animation should play forward, backward, or alternate back and forth between playing the sequence forward and backward.<br/><br/>
     ///<b>Syntax</b>: <c>single-animation-direction#</c>
@@ -63,7 +63,7 @@ type Style =
     ///<b>Syntax</b>: <c>time#</c>
     /// <br/><b>Initial value</b>: <c>0s</c>
     /// </summary>
-    static member inline animationDuration (value: U3<string, int, AnimationDuration>) = "animation-duration" ==> value
+    static member inline animationDuration (value: U3<string, int, Globals>) = "animation-duration" ==> value
     /// <summary>
     /// The<b><c>animation-fill-mode</c></b> CSS property sets how a CSS animation applies styles to its target before and after its execution.<br/><br/>
     ///<b>Syntax</b>: <c>single-animation-fill-mode#</c>
@@ -81,7 +81,7 @@ type Style =
     ///<b>Syntax</b>: <c>[ none | keyframes-name ]#</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline animationName (value: U2<string, AnimationName>) = "animation-name" ==> value
+    static member inline animationName (value: U2<string, Globals>) = "animation-name" ==> value
     /// <summary>
     /// The<b><c>animation-play-state</c></b> CSS property sets whether an animation is running or paused.<br/><br/>
     ///<b>Syntax</b>: <c>single-animation-play-state#</c>
@@ -129,7 +129,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | filter-function-list</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline backdropFilter (value: U2<string, BackdropFilter>) = "backdrop-filter" ==> value
+    static member inline backdropFilter (value: U2<string, Globals>) = "backdrop-filter" ==> value
     /// <summary>
     /// The<b><c>backface-visibility</c></b> CSS property sets whether the back face of an element is visible when turned towards the user.<br/><br/>
     ///<b>Syntax</b>: <c>visible | hidden</c>
@@ -159,13 +159,13 @@ type Style =
     ///<b>Syntax</b>: <c>color</c>
     /// <br/><b>Initial value</b>: <c>transparent</c>
     /// </summary>
-    static member inline backgroundColor (value: U2<string, BackgroundColor>) = "background-color" ==> value
+    static member inline backgroundColor (value: U2<string, Color>) = "background-color" ==> value
     /// <summary>
     /// The<b><c>background-image</c></b> CSS property sets one or more background images on an element.<br/><br/>
     ///<b>Syntax</b>: <c>bg-image#</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline backgroundImage (value: U2<string, BackgroundImage>) = "background-image" ==> value
+    static member inline backgroundImage (value: U2<string, Globals>) = "background-image" ==> value
     /// <summary>
     /// The<b><c>background-origin</c></b> CSS property sets the background's origin: from the border start, inside the border, or inside the padding.<br/><br/>
     ///<b>Syntax</b>: <c>box#</c>
@@ -209,13 +209,13 @@ type Style =
     ///<b>Syntax</b>: <c>'border-top-color'{1,2}</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline borderBlockColor (value: U2<string, BorderBlockColor>) = "border-block-color" ==> value
+    static member inline borderBlockColor (value: U2<string, Color>) = "border-block-color" ==> value
     /// <summary>
     /// The<b><c>border-block-end-color</c></b> CSS property defines the color of the logical block-end border of an element, which maps to a physical border color depending on the element's writing mode, directionality, and text orientation. It corresponds to the <c>border-top-color</c>, <c>border-right-color</c>, <c>border-bottom-color</c>, or <c>border-left-color</c> property depending on the values defined for <c>writing-mode</c>, <c>direction</c>, and <c>text-orientation</c>.<br/><br/>
     ///<b>Syntax</b>: <c>'border-top-color'</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline borderBlockEndColor (value: U2<string, BorderBlockEndColor>) = "border-block-end-color" ==> value
+    static member inline borderBlockEndColor (value: U2<string, Color>) = "border-block-end-color" ==> value
     /// <summary>
     /// The<b><c>border-block-end-style</c></b> CSS property defines the style of the logical block-end border of an element, which maps to a physical border style depending on the element's writing mode, directionality, and text orientation. It corresponds to the <c>border-top-style</c>, <c>border-right-style</c>, <c>border-bottom-style</c>, or <c>border-left-style</c> property depending on the values defined for <c>writing-mode</c>, <c>direction</c>, and <c>text-orientation</c>.<br/><br/>
     ///<b>Syntax</b>: <c>'border-top-style'</c>
@@ -233,7 +233,7 @@ type Style =
     ///<b>Syntax</b>: <c>'border-top-color'</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline borderBlockStartColor (value: U2<string, BorderBlockStartColor>) = "border-block-start-color" ==> value
+    static member inline borderBlockStartColor (value: U2<string, Color>) = "border-block-start-color" ==> value
     /// <summary>
     /// The<b><c>border-block-start-style</c></b> CSS property defines the style of the logical block start border of an element, which maps to a physical border style depending on the element's writing mode, directionality, and text orientation. It corresponds to the <c>border-top-style</c>, <c>border-right-style</c>, <c>border-bottom-style</c>, or <c>border-left-style</c> property depending on the values defined for <c>writing-mode</c>, <c>direction</c>, and <c>text-orientation</c>.<br/><br/>
     ///<b>Syntax</b>: <c>'border-top-style'</c>
@@ -263,19 +263,19 @@ type Style =
     ///<b>Syntax</b>: <c>'border-top-color'</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline borderBottomColor (value: U2<string, BorderBottomColor>) = "border-bottom-color" ==> value
+    static member inline borderBottomColor (value: U2<string, Color>) = "border-bottom-color" ==> value
     /// <summary>
     /// The<b><c>border-bottom-left-radius</c></b> CSS property rounds the bottom-left corner of an element by specifying the radius (or the radius of the semi-major and semi-minor axes) of the ellipse defining the curvature of the corner.<br/><br/>
     ///<b>Syntax</b>: <c>length-percentage{1,2}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderBottomLeftRadius (value: U3<string, int, BorderBottomLeftRadius>) = "border-bottom-left-radius" ==> value
+    static member inline borderBottomLeftRadius (value: U3<string, int, Globals>) = "border-bottom-left-radius" ==> value
     /// <summary>
     /// The<b><c>border-bottom-right-radius</c></b> CSS property rounds the bottom-right corner of an element by specifying the radius (or the radius of the semi-major and semi-minor axes) of the ellipse defining the curvature of the corner.<br/><br/>
     ///<b>Syntax</b>: <c>length-percentage{1,2}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderBottomRightRadius (value: U3<string, int, BorderBottomRightRadius>) = "border-bottom-right-radius" ==> value
+    static member inline borderBottomRightRadius (value: U3<string, int, Globals>) = "border-bottom-right-radius" ==> value
     /// <summary>
     /// The<b><c>border-bottom-style</c></b> CSS property sets the line style of an element's bottom <c>border</c>.<br/><br/>
     ///<b>Syntax</b>: <c>line-style</c>
@@ -299,19 +299,19 @@ type Style =
     ///<b>Syntax</b>: <c>length-percentage{1,2}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderEndEndRadius (value: U2<string, BorderEndEndRadius>) = "border-end-end-radius" ==> value
+    static member inline borderEndEndRadius (value: U2<string, Globals>) = "border-end-end-radius" ==> value
     /// <summary>
     /// The<b><c>border-end-start-radius</c></b> CSS property defines a logical border radius on an element, which maps to a physical border radius depending on the element's <c>writing-mode</c>, <c>direction</c>, and <c>text-orientation</c>. This is useful when building styles to work regardless of the text orientation and writing mode.<br/><br/>
     ///<b>Syntax</b>: <c>length-percentage{1,2}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderEndStartRadius (value: U2<string, BorderEndStartRadius>) = "border-end-start-radius" ==> value
+    static member inline borderEndStartRadius (value: U2<string, Globals>) = "border-end-start-radius" ==> value
     /// <summary>
     /// The<b><c>border-image-outset</c></b> CSS property sets the distance by which an element's border image is set out from its border box.<br/><br/>
     ///<b>Syntax</b>: <c>[ length | number ]{1,4}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderImageOutset (value: U2<string, BorderImageOutset>) = "border-image-outset" ==> value
+    static member inline borderImageOutset (value: U2<string, Globals>) = "border-image-outset" ==> value
     /// <summary>
     /// The<b><c>border-image-repeat</c></b> CSS property defines how the edge regions and middle region of a source image are adjusted to fit the dimensions of an element's border image. The middle region can be displayed by using the keyword "fill" in the border-image-slice property.<br/><br/>
     ///<b>Syntax</b>: <c>[ stretch | repeat | round | space ]{1,2}</c>
@@ -323,13 +323,13 @@ type Style =
     ///<b>Syntax</b>: <c>number-percentage{1,4} && fill?</c>
     /// <br/><b>Initial value</b>: <c>100%</c>
     /// </summary>
-    static member inline borderImageSlice (value: U2<string, BorderImageSlice>) = "border-image-slice" ==> value
+    static member inline borderImageSlice (value: U2<string, Globals>) = "border-image-slice" ==> value
     /// <summary>
     /// The<b><c>border-image-source</c></b> CSS property sets the source image used to create an element's border image.<br/><br/>
     ///<b>Syntax</b>: <c>none | image</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline borderImageSource (value: U2<string, BorderImageSource>) = "border-image-source" ==> value
+    static member inline borderImageSource (value: U2<string, Globals>) = "border-image-source" ==> value
     /// <summary>
     /// The<b><c>border-image-width</c></b> CSS property sets the width of an element's border image.<br/><br/>
     ///<b>Syntax</b>: <c>[ length-percentage | number | auto ]{1,4}</c>
@@ -341,13 +341,13 @@ type Style =
     ///<b>Syntax</b>: <c>'border-top-color'{1,2}</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline borderInlineColor (value: U2<string, BorderInlineColor>) = "border-inline-color" ==> value
+    static member inline borderInlineColor (value: U2<string, Color>) = "border-inline-color" ==> value
     /// <summary>
     /// The<b><c>border-inline-end-color</c></b> CSS property defines the color of the logical inline-end border of an element, which maps to a physical border color depending on the element's writing mode, directionality, and text orientation. It corresponds to the <c>border-top-color</c>, <c>border-right-color</c>, <c>border-bottom-color</c>, or <c>border-left-color</c> property depending on the values defined for <c>writing-mode</c>, <c>direction</c>, and <c>text-orientation</c>.<br/><br/>
     ///<b>Syntax</b>: <c>'border-top-color'</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline borderInlineEndColor (value: U2<string, BorderInlineEndColor>) = "border-inline-end-color" ==> value
+    static member inline borderInlineEndColor (value: U2<string, Color>) = "border-inline-end-color" ==> value
     /// <summary>
     /// The<b><c>border-inline-end-style</c></b> CSS property defines the style of the logical inline end border of an element, which maps to a physical border style depending on the element's writing mode, directionality, and text orientation. It corresponds to the <c>border-top-style</c>, <c>border-right-style</c>, <c>border-bottom-style</c>, or <c>border-left-style</c> property depending on the values defined for <c>writing-mode</c>, <c>direction</c>, and <c>text-orientation</c>.<br/><br/>
     ///<b>Syntax</b>: <c>'border-top-style'</c>
@@ -365,7 +365,7 @@ type Style =
     ///<b>Syntax</b>: <c>'border-top-color'</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline borderInlineStartColor (value: U2<string, BorderInlineStartColor>) = "border-inline-start-color" ==> value
+    static member inline borderInlineStartColor (value: U2<string, Color>) = "border-inline-start-color" ==> value
     /// <summary>
     /// The<b><c>border-inline-start-style</c></b> CSS property defines the style of the logical inline start border of an element, which maps to a physical border style depending on the element's writing mode, directionality, and text orientation. It corresponds to the <c>border-top-style</c>, <c>border-right-style</c>, <c>border-bottom-style</c>, or <c>border-left-style</c> property depending on the values defined for <c>writing-mode</c>, <c>direction</c>, and <c>text-orientation</c>.<br/><br/>
     ///<b>Syntax</b>: <c>'border-top-style'</c>
@@ -395,7 +395,7 @@ type Style =
     ///<b>Syntax</b>: <c>color</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline borderLeftColor (value: U2<string, BorderLeftColor>) = "border-left-color" ==> value
+    static member inline borderLeftColor (value: U2<string, Color>) = "border-left-color" ==> value
     /// <summary>
     /// The<b><c>border-left-style</c></b> CSS property sets the line style of an element's left <c>border</c>.<br/><br/>
     ///<b>Syntax</b>: <c>line-style</c>
@@ -413,7 +413,7 @@ type Style =
     ///<b>Syntax</b>: <c>color</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline borderRightColor (value: U2<string, BorderRightColor>) = "border-right-color" ==> value
+    static member inline borderRightColor (value: U2<string, Color>) = "border-right-color" ==> value
     /// <summary>
     /// The<b><c>border-right-style</c></b> CSS property sets the line style of an element's right <c>border</c>.<br/><br/>
     ///<b>Syntax</b>: <c>line-style</c>
@@ -432,37 +432,37 @@ type Style =
     ///<b>Syntax</b>: <c>length length?</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderSpacing (value: U2<string, BorderSpacing>) = "border-spacing" ==> value
+    static member inline borderSpacing (value: U2<string, Globals>) = "border-spacing" ==> value
     /// <summary>
     /// The<b><c>border-start-end-radius</c></b> CSS property defines a logical border radius on an element, which maps to a physical border radius depending on the element's <c>writing-mode</c>, <c>direction</c>, and <c>text-orientation</c>. This is useful when building styles to work regardless of the text orientation and writing mode.<br/><br/>
     ///<b>Syntax</b>: <c>length-percentage{1,2}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderStartEndRadius (value: U2<string, BorderStartEndRadius>) = "border-start-end-radius" ==> value
+    static member inline borderStartEndRadius (value: U2<string, Globals>) = "border-start-end-radius" ==> value
     /// <summary>
     /// The<b><c>border-start-start-radius</c></b> CSS property defines a logical border radius on an element, which maps to a physical border radius that depends on the element's <c>writing-mode</c>, <c>direction</c>, and <c>text-orientation</c>. This is useful when building styles to work regardless of the text orientation and writing mode.<br/><br/>
     ///<b>Syntax</b>: <c>length-percentage{1,2}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderStartStartRadius (value: U2<string, BorderStartStartRadius>) = "border-start-start-radius" ==> value
+    static member inline borderStartStartRadius (value: U2<string, Globals>) = "border-start-start-radius" ==> value
     /// <summary>
     /// The<b><c>border-top-color</c></b> CSS property sets the color of an element's top border. It can also be set with the shorthand CSS properties <c>border-color</c> or <c>border-top</c>.<br/><br/>
     ///<b>Syntax</b>: <c>color</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline borderTopColor (value: U2<string, BorderTopColor>) = "border-top-color" ==> value
+    static member inline borderTopColor (value: U2<string, Color>) = "border-top-color" ==> value
     /// <summary>
     /// The<b><c>border-top-left-radius</c></b> CSS property rounds the top-left corner of an element by specifying the radius (or the radius of the semi-major and semi-minor axes) of the ellipse defining the curvature of the corner.<br/><br/>
     ///<b>Syntax</b>: <c>length-percentage{1,2}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderTopLeftRadius (value: U2<string, BorderTopLeftRadius>) = "border-top-left-radius" ==> value
+    static member inline borderTopLeftRadius (value: U2<string, Globals>) = "border-top-left-radius" ==> value
     /// <summary>
     /// The<b><c>border-top-right-radius</c></b> CSS property rounds the top-right corner of an element by specifying the radius (or the radius of the semi-major and semi-minor axes) of the ellipse defining the curvature of the corner.<br/><br/>
     ///<b>Syntax</b>: <c>length-percentage{1,2}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline borderTopRightRadius (value: U2<string, BorderTopRightRadius>) = "border-top-right-radius" ==> value
+    static member inline borderTopRightRadius (value: U2<string, Globals>) = "border-top-right-radius" ==> value
     /// <summary>
     /// The<b><c>border-top-style</c></b> CSS property sets the line style of an element's top <c>border</c>.<br/><br/>
     ///<b>Syntax</b>: <c>line-style</c>
@@ -492,7 +492,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | shadow#</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline boxShadow (value: U2<string, BoxShadow>) = "box-shadow" ==> value
+    static member inline boxShadow (value: U2<string, Globals>) = "box-shadow" ==> value
     /// <summary>
     /// The<b><c>box-sizing</c></b> CSS property sets how the total width and height of an element is calculated.<br/><br/>
     ///<b>Syntax</b>: <c>content-box | border-box</c>
@@ -584,7 +584,7 @@ type Style =
     ///<b>Syntax</b>: <c>color</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline columnRuleColor (value: U2<string, ColumnRuleColor>) = "column-rule-color" ==> value
+    static member inline columnRuleColor (value: U2<string, Color>) = "column-rule-color" ==> value
     /// <summary>
     /// The<b><c>column-rule-style</c></b> CSS property sets the style of the line drawn between columns in a multi-column layout.<br/><br/>
     ///<b>Syntax</b>: <c>'border-style'</c>
@@ -620,25 +620,25 @@ type Style =
     ///<b>Syntax</b>: <c>auto? [ none | length ]</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline containIntrinsicBlockSize (value: U2<string, ContainIntrinsicBlockSize>) = "contain-intrinsic-block-size" ==> value
+    static member inline containIntrinsicBlockSize (value: U2<string, Globals>) = "contain-intrinsic-block-size" ==> value
     /// <summary>
     /// The<b><c>contain-intrinsic-length</c></b> CSS property sets the height of an element that a browser can use for layout when the element is subject to size containment.<br/><br/>
     ///<b>Syntax</b>: <c>auto? [ none | length ]</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline containIntrinsicHeight (value: U2<string, ContainIntrinsicHeight>) = "contain-intrinsic-height" ==> value
+    static member inline containIntrinsicHeight (value: U2<string, Globals>) = "contain-intrinsic-height" ==> value
     /// <summary>
     /// The<b><c>contain-intrinsic-inline-size</c></b> CSS logical property defines the inline-size of an element that a browser can use for layout when the element is subject to size containment.<br/><br/>
     ///<b>Syntax</b>: <c>auto? [ none | length ]</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline containIntrinsicInlineSize (value: U2<string, ContainIntrinsicInlineSize>) = "contain-intrinsic-inline-size" ==> value
+    static member inline containIntrinsicInlineSize (value: U2<string, Globals>) = "contain-intrinsic-inline-size" ==> value
     /// <summary>
     /// The<b><c>contain-intrinsic-width</c></b> CSS property sets the width of an element that a browser will use for layout when the element is subject to size containment.<br/><br/>
     ///<b>Syntax</b>: <c>auto? [ none | length ]</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline containerName (value: U2<string, ContainerName>) = "container-name" ==> value
+    static member inline containerName (value: U2<string, Globals>) = "container-name" ==> value
     /// <summary>
     /// The<b>container-type</b> CSS property is used to define the type of containment used in a container query.<br/><br/>
     ///<b>Syntax</b>: <c>normal | size | inline-size</c>
@@ -662,19 +662,19 @@ type Style =
     ///<b>Syntax</b>: <c>[ counter-name integer? ]+ | none</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline counterIncrement (value: U2<string, CounterIncrement>) = "counter-increment" ==> value
+    static member inline counterIncrement (value: U2<string, Globals>) = "counter-increment" ==> value
     /// <summary>
     /// The<b><c>counter-reset</c></b> CSS property resets a CSS counter to a given value. This property will create a new counter or reversed counter with the given name on the specified element.<br/><br/>
     ///<b>Syntax</b>: <c>[ counter-name integer? | reversed-counter-name integer? ]+ | none</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline counterReset (value: U2<string, CounterReset>) = "counter-reset" ==> value
+    static member inline counterReset (value: U2<string, Globals>) = "counter-reset" ==> value
     /// <summary>
     /// The<b><c>counter-set</c></b> CSS property sets a CSS counter to a given value. It manipulates the value of existing counters, and will only create new counters if there isn't already a counter of the given name on the element.<br/><br/>
     ///<b>Syntax</b>: <c>[ counter-name integer? ]+ | none</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline counterSet (value: U2<string, CounterSet>) = "counter-set" ==> value
+    static member inline counterSet (value: U2<string, Globals>) = "counter-set" ==> value
     /// <summary>
     /// The<b><c>cursor</c></b> CSS property sets the mouse cursor, if any, to show when the mouse pointer is over an element.<br/><br/>
     ///<b>Syntax</b>: <c>[ [ url [ x y ]? , ]* [ auto | default | none | context-menu | help | pointer | progress | wait | cell | crosshair | text | vertical-text | alias | copy | move | no-drop | not-allowed | e-resize | n-resize | ne-resize | nw-resize | s-resize | se-resize | sw-resize | w-resize | ew-resize | ns-resize | nesw-resize | nwse-resize | col-resize | row-resize | all-scroll | zoom-in | zoom-out | grab | grabbing ] ]</c>
@@ -704,7 +704,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | filter-function-list</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline filter (value: U2<string, Filter>) = "filter" ==> value
+    static member inline filter (value: U2<string, Globals>) = "filter" ==> value
     /// <summary>
     /// The<b><c>flex-basis</c></b> CSS property sets the initial main size of a flex item. It sets the size of the content box unless otherwise set with <c>box-sizing</c>.<br/><br/>
     ///<b>Syntax</b>: <c>content | 'width'</c>
@@ -722,13 +722,13 @@ type Style =
     ///<b>Syntax</b>: <c>number</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline flexGrow (value: U2<string, FlexGrow>) = "flex-grow" ==> value
+    static member inline flexGrow (value: U2<string, Globals>) = "flex-grow" ==> value
     /// <summary>
     /// The<b><c>flex-shrink</c></b> CSS property sets the flex shrink factor of a flex item. If the size of all flex items is larger than the flex container, items shrink to fit according to <c>flex-shrink</c>.<br/><br/>
     ///<b>Syntax</b>: <c>number</c>
     /// <br/><b>Initial value</b>: <c>1</c>
     /// </summary>
-    static member inline flexShrink (value: U2<string, FlexShrink>) = "flex-shrink" ==> value
+    static member inline flexShrink (value: U2<string, Globals>) = "flex-shrink" ==> value
     /// <summary>
     /// The<b><c>flex-wrap</c></b> CSS property sets whether flex items are forced onto one line or can wrap onto multiple lines. If wrapping is allowed, it sets the direction that lines are stacked.<br/><br/>
     ///<b>Syntax</b>: <c>nowrap | wrap | wrap-reverse</c>
@@ -948,7 +948,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | string+</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline gridTemplateAreas (value: U2<string, GridTemplateAreas>) = "grid-template-areas" ==> value
+    static member inline gridTemplateAreas (value: U2<string, Globals>) = "grid-template-areas" ==> value
     /// <summary>
     /// The<b><c>grid-template-columns</c></b> CSS property defines the line names and track sizing functions of the grid columns.<br/><br/>
     ///<b>Syntax</b>: <c>none | track-list | auto-track-list | subgrid line-name-list?</c>
@@ -1102,13 +1102,13 @@ type Style =
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline lineHeightStep (value: U2<string, LineHeightStep>) = "line-height-step" ==> value
+    static member inline lineHeightStep (value: U2<string, Globals>) = "line-height-step" ==> value
     /// <summary>
     /// The<b><c>list-style-image</c></b> CSS property sets an image to be used as the list item marker.<br/><br/>
     ///<b>Syntax</b>: <c>image | none</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline listStyleImage (value: U2<string, ListStyleImage>) = "list-style-image" ==> value
+    static member inline listStyleImage (value: U2<string, Globals>) = "list-style-image" ==> value
     /// <summary>
     /// The<b><c>list-style-position</c></b> CSS property sets the position of the <c>::marker</c> relative to a list item.<br/><br/>
     ///<b>Syntax</b>: <c>inside | outside</c>
@@ -1120,7 +1120,7 @@ type Style =
     ///<b>Syntax</b>: <c>counter-style | string | none</c>
     /// <br/><b>Initial value</b>: <c>disc</c>
     /// </summary>
-    static member inline listStyleType (value: U2<string, ListStyleType>) = "list-style-type" ==> value
+    static member inline listStyleType (value: U2<string, Globals>) = "list-style-type" ==> value
     /// <summary>
     /// The<b><c>margin-block-end</c></b> CSS property defines the logical block end margin of an element, which maps to a physical margin depending on the element's writing mode, directionality, and text orientation.<br/><br/>
     ///<b>Syntax</b>: <c>'margin-left'</c>
@@ -1183,7 +1183,7 @@ type Style =
     ///<b>Syntax</b>: <c>[ length | number ]{1,4}</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline maskBorderOutset (value: U2<string, MaskBorderOutset>) = "mask-border-outset" ==> value
+    static member inline maskBorderOutset (value: U2<string, Globals>) = "mask-border-outset" ==> value
     /// <summary>
     /// The<b><c>mask-border-repeat</c></b> CSS property sets how the edge regions of a source image are adjusted to fit the dimensions of an element's mask border.<br/><br/>
     ///<b>Syntax</b>: <c>[ stretch | repeat | round | space ]{1,2}</c>
@@ -1195,13 +1195,13 @@ type Style =
     ///<b>Syntax</b>: <c>number-percentage{1,4} fill?</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline maskBorderSlice (value: U2<string, MaskBorderSlice>) = "mask-border-slice" ==> value
+    static member inline maskBorderSlice (value: U2<string, Globals>) = "mask-border-slice" ==> value
     /// <summary>
     /// The<b><c>mask-border-source</c></b> CSS property sets the source image used to create an element's mask border.<br/><br/>
     ///<b>Syntax</b>: <c>none | image</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline maskBorderSource (value: U2<string, MaskBorderSource>) = "mask-border-source" ==> value
+    static member inline maskBorderSource (value: U2<string, Globals>) = "mask-border-source" ==> value
     /// <summary>
     /// The<b><c>mask-border-width</c></b> CSS property sets the width of an element's mask border.<br/><br/>
     ///<b>Syntax</b>: <c>[ length-percentage | number | auto ]{1,4}</c>
@@ -1225,7 +1225,7 @@ type Style =
     ///<b>Syntax</b>: <c>mask-reference#</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline maskImage (value: U2<string, MaskImage>) = "mask-image" ==> value
+    static member inline maskImage (value: U2<string, Globals>) = "mask-image" ==> value
     /// <summary>
     /// The<b><c>mask-mode</c></b> CSS property sets whether the mask reference defined by <c>mask-image</c> is treated as a luminance or alpha mask.<br/><br/>
     ///<b>Syntax</b>: <c>masking-mode#</c>
@@ -1305,7 +1305,7 @@ type Style =
     /// </summary>
     static member inline maxInlineSize (value: U2<string, MaxInlineSize>) = "max-inline-size" ==> value
     /// </summary>
-    static member inline maxLines (value: U2<string, MaxLines>) = "max-lines" ==> value
+    static member inline maxLines (value: U2<string, Globals>) = "max-lines" ==> value
     /// <summary>
     /// The<b><c>max-width</c></b> CSS property sets the maximum width of an element. It prevents the used value of the <c>width</c> property from becoming larger than the value specified by <c>max-width</c>.<br/><br/>
     ///<b>Syntax</b>: <c>none | length-percentage | min-content | max-content | fit-content | fit-content(length-percentage)</c>
@@ -1347,13 +1347,13 @@ type Style =
     ///<b>Syntax</b>: <c>length-percentage</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline motionDistance (value: U2<string, OffsetDistance>) = "motion-distance" ==> value
+    static member inline motionDistance (value: U2<string, Globals>) = "motion-distance" ==> value
     /// <summary>
     /// The<b><c>offset-path</c></b> CSS property specifies a motion path for an element to follow and defines the element's positioning within the parent container or SVG coordinate system.<br/><br/>
     ///<b>Syntax</b>: <c>none | offset-path || coord-box</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline motionPath (value: U2<string, OffsetPath>) = "motion-path" ==> value
+    static member inline motionPath (value: U2<string, Globals>) = "motion-path" ==> value
     /// <summary>
     /// The<b><c>offset-rotate</c></b> CSS property defines the orientation/direction of the element as it is positioned along the <c>offset-path</c>.<br/><br/>
     ///<b>Syntax</b>: <c>[ auto | reverse ] || angle</c>
@@ -1382,13 +1382,13 @@ type Style =
     ///<b>Syntax</b>: <c>length-percentage</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline offsetDistance (value: U2<string, OffsetDistance>) = "offset-distance" ==> value
+    static member inline offsetDistance (value: U2<string, Globals>) = "offset-distance" ==> value
     /// <summary>
     /// The<b><c>offset-path</c></b> CSS property specifies a motion path for an element to follow and defines the element's positioning within the parent container or SVG coordinate system.<br/><br/>
     ///<b>Syntax</b>: <c>none | offset-path || coord-box</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline offsetPath (value: U2<string, OffsetPath>) = "offset-path" ==> value
+    static member inline offsetPath (value: U2<string, Globals>) = "offset-path" ==> value
     /// <summary>
     ///<b>Syntax</b>: <c>normal | auto | position</c>
     /// <br/><b>Initial value</b>: <c>auto</c>
@@ -1411,19 +1411,19 @@ type Style =
     ///<b>Syntax</b>: <c>alpha-value</c>
     /// <br/><b>Initial value</b>: <c>1</c>
     /// </summary>
-    static member inline opacity (value: U2<string, Opacity>) = "opacity" ==> value
+    static member inline opacity (value: U2<string, Globals>) = "opacity" ==> value
     /// <summary>
     /// The<b><c>order</c></b> CSS property sets the order to lay out an item in a flex or grid container. Items in a container are sorted by ascending <c>order</c> value and then by their source code order.<br/><br/>
     ///<b>Syntax</b>: <c>integer</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline order (value: U2<string, Order>) = "order" ==> value
+    static member inline order (value: U2<string, Globals>) = "order" ==> value
     /// <summary>
     /// The<b><c>orphans</c></b> CSS property sets the minimum number of lines in a block container that must be shown at the _bottom_ of a page, region, or column.<br/><br/>
     ///<b>Syntax</b>: <c>integer</c>
     /// <br/><b>Initial value</b>: <c>2</c>
     /// </summary>
-    static member inline orphans (value: U2<string, Orphans>) = "orphans" ==> value
+    static member inline orphans (value: U2<string, Globals>) = "orphans" ==> value
     /// <summary>
     /// The<b><c>outline-color</c></b> CSS property sets the color of an element's outline.<br/><br/>
     ///<b>Syntax</b>: <c>color | invert</c>
@@ -1435,7 +1435,7 @@ type Style =
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline outlineOffset (value: U2<string, OutlineOffset>) = "outline-offset" ==> value
+    static member inline outlineOffset (value: U2<string, Globals>) = "outline-offset" ==> value
     /// <summary>
     /// The<b><c>outline-style</c></b> CSS property sets the style of an element's outline. An outline is a line that is drawn around an element, outside the <c>border</c>.<br/><br/>
     ///<b>Syntax</b>: <c>auto | 'border-style'</c>
@@ -1524,49 +1524,49 @@ type Style =
     ///<b>Syntax</b>: <c>'padding-left'</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline paddingBlockEnd (value: U2<string, PaddingBlockEnd>) = "padding-block-end" ==> value
+    static member inline paddingBlockEnd (value: U2<string, Globals>) = "padding-block-end" ==> value
     /// <summary>
     /// The<b><c>padding-block-start</c></b> CSS property defines the logical block start padding of an element, which maps to a physical padding depending on the element's writing mode, directionality, and text orientation.<br/><br/>
     ///<b>Syntax</b>: <c>'padding-left'</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline paddingBlockStart (value: U2<string, PaddingBlockStart>) = "padding-block-start" ==> value
+    static member inline paddingBlockStart (value: U2<string, Globals>) = "padding-block-start" ==> value
     /// <summary>
     /// The<b><c>padding-bottom</c></b> CSS property sets the height of the padding area on the bottom of an element.<br/><br/>
     ///<b>Syntax</b>: <c>length | percentage</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline paddingBottom (value: U2<string, PaddingBottom>) = "padding-bottom" ==> value
+    static member inline paddingBottom (value: U2<string, Globals>) = "padding-bottom" ==> value
     /// <summary>
     /// The<b><c>padding-inline-end</c></b> CSS property defines the logical inline end padding of an element, which maps to a physical padding depending on the element's writing mode, directionality, and text orientation.<br/><br/>
     ///<b>Syntax</b>: <c>'padding-left'</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline paddingInlineEnd (value: U2<string, PaddingInlineEnd>) = "padding-inline-end" ==> value
+    static member inline paddingInlineEnd (value: U2<string, Globals>) = "padding-inline-end" ==> value
     /// <summary>
     /// The<b><c>padding-inline-start</c></b> CSS property defines the logical inline start padding of an element, which maps to a physical padding depending on the element's writing mode, directionality, and text orientation.<br/><br/>
     ///<b>Syntax</b>: <c>'padding-left'</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline paddingInlineStart (value: U2<string, PaddingInlineStart>) = "padding-inline-start" ==> value
+    static member inline paddingInlineStart (value: U2<string, Globals>) = "padding-inline-start" ==> value
     /// <summary>
     /// The<b><c>padding-left</c></b> CSS property sets the width of the padding area to the left of an element.<br/><br/>
     ///<b>Syntax</b>: <c>length | percentage</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline paddingLeft (value: U2<string, PaddingLeft>) = "padding-left" ==> value
+    static member inline paddingLeft (value: U2<string, Globals>) = "padding-left" ==> value
     /// <summary>
     /// The<b><c>padding-right</c></b> CSS property sets the width of the padding area on the right of an element.<br/><br/>
     ///<b>Syntax</b>: <c>length | percentage</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline paddingRight (value: U2<string, PaddingRight>) = "padding-right" ==> value
+    static member inline paddingRight (value: U2<string, Globals>) = "padding-right" ==> value
     /// <summary>
     /// The<b><c>padding-top</c></b> CSS property sets the height of the padding area on the top of an element.<br/><br/>
     ///<b>Syntax</b>: <c>length | percentage</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline paddingTop (value: U2<string, PaddingTop>) = "padding-top" ==> value
+    static member inline paddingTop (value: U2<string, Globals>) = "padding-top" ==> value
     /// <summary>
     /// The<b><c>page</c></b> CSS property is used to specify the named page, a specific type of page defined by the <c>@page</c> at-rule.<br/><br/>
     ///<b>Syntax</b>: <c>auto | custom-ident</c>
@@ -1602,7 +1602,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | length</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline perspective (value: U2<string, Perspective>) = "perspective" ==> value
+    static member inline perspective (value: U2<string, Globals>) = "perspective" ==> value
     /// <summary>
     /// The<b><c>perspective-origin</c></b> CSS property determines the position at which the viewer is looking. It is used as the _vanishing point_ by the <c>perspective</c> property.<br/><br/>
     ///<b>Syntax</b>: <c>position</c>
@@ -1650,7 +1650,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | angle | [ x | y | z | number{3} ] && angle</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline rotate (value: U2<string, Rotate>) = "rotate" ==> value
+    static member inline rotate (value: U2<string, Globals>) = "rotate" ==> value
     /// <summary>
     /// The<b><c>row-gap</c></b> CSS property sets the size of the gap (gutter) between an element's rows.<br/><br/>
     ///<b>Syntax</b>: <c>normal | length-percentage</c>
@@ -1676,7 +1676,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | number{1,3}</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline scale (value: U2<string, Scale>) = "scale" ==> value
+    static member inline scale (value: U2<string, Globals>) = "scale" ==> value
     /// <summary>
     /// The<b><c>scroll-behavior</c></b> CSS property sets the behavior for a scrolling box when scrolling is triggered by the navigation or CSSOM scrolling APIs.<br/><br/>
     ///<b>Syntax</b>: <c>auto | smooth</c>
@@ -1688,49 +1688,49 @@ type Style =
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollMarginBlockEnd (value: U2<string, ScrollMarginBlockEnd>) = "scroll-margin-block-end" ==> value
+    static member inline scrollMarginBlockEnd (value: U2<string, Globals>) = "scroll-margin-block-end" ==> value
     /// <summary>
     /// The <c>scroll-margin-block-start</c> property defines the margin of the scroll snap area at the start of the block dimension that is used for snapping this box to the snapport. The scroll snap area is determined by taking the transformed border box, finding its rectangular bounding box (axis-aligned in the scroll container's coordinate space), then adding the specified outsets.<br/><br/>
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollMarginBlockStart (value: U2<string, ScrollMarginBlockStart>) = "scroll-margin-block-start" ==> value
+    static member inline scrollMarginBlockStart (value: U2<string, Globals>) = "scroll-margin-block-start" ==> value
     /// <summary>
     /// The <c>scroll-margin-bottom</c> property defines the bottom margin of the scroll snap area that is used for snapping this box to the snapport. The scroll snap area is determined by taking the transformed border box, finding its rectangular bounding box (axis-aligned in the scroll container's coordinate space), then adding the specified outsets.<br/><br/>
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollMarginBottom (value: U2<string, ScrollMarginBottom>) = "scroll-margin-bottom" ==> value
+    static member inline scrollMarginBottom (value: U2<string, Globals>) = "scroll-margin-bottom" ==> value
     /// <summary>
     /// The <c>scroll-margin-inline-end</c> property defines the margin of the scroll snap area at the end of the inline dimension that is used for snapping this box to the snapport. The scroll snap area is determined by taking the transformed border box, finding its rectangular bounding box (axis-aligned in the scroll container's coordinate space), then adding the specified outsets.<br/><br/>
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollMarginInlineEnd (value: U2<string, ScrollMarginInlineEnd>) = "scroll-margin-inline-end" ==> value
+    static member inline scrollMarginInlineEnd (value: U2<string, Globals>) = "scroll-margin-inline-end" ==> value
     /// <summary>
     /// The <c>scroll-margin-inline-start</c> property defines the margin of the scroll snap area at the start of the inline dimension that is used for snapping this box to the snapport. The scroll snap area is determined by taking the transformed border box, finding its rectangular bounding box (axis-aligned in the scroll container's coordinate space), then adding the specified outsets.<br/><br/>
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollMarginInlineStart (value: U2<string, ScrollMarginInlineStart>) = "scroll-margin-inline-start" ==> value
+    static member inline scrollMarginInlineStart (value: U2<string, Globals>) = "scroll-margin-inline-start" ==> value
     /// <summary>
     /// The <c>scroll-margin-left</c> property defines the left margin of the scroll snap area that is used for snapping this box to the snapport. The scroll snap area is determined by taking the transformed border box, finding its rectangular bounding box (axis-aligned in the scroll container's coordinate space), then adding the specified outsets.<br/><br/>
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollMarginLeft (value: U2<string, ScrollMarginLeft>) = "scroll-margin-left" ==> value
+    static member inline scrollMarginLeft (value: U2<string, Globals>) = "scroll-margin-left" ==> value
     /// <summary>
     /// The <c>scroll-margin-right</c> property defines the right margin of the scroll snap area that is used for snapping this box to the snapport. The scroll snap area is determined by taking the transformed border box, finding its rectangular bounding box (axis-aligned in the scroll container's coordinate space), then adding the specified outsets.<br/><br/>
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollMarginRight (value: U2<string, ScrollMarginRight>) = "scroll-margin-right" ==> value
+    static member inline scrollMarginRight (value: U2<string, Globals>) = "scroll-margin-right" ==> value
     /// <summary>
     /// The <c>scroll-margin-top</c> property defines the top margin of the scroll snap area that is used for snapping this box to the snapport. The scroll snap area is determined by taking the transformed border box, finding its rectangular bounding box (axis-aligned in the scroll container's coordinate space), then adding the specified outsets.<br/><br/>
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollMarginTop (value: U2<string, ScrollMarginTop>) = "scroll-margin-top" ==> value
+    static member inline scrollMarginTop (value: U2<string, Globals>) = "scroll-margin-top" ==> value
     /// <summary>
     /// The <c>scroll-padding-block-end</c> property defines offsets for the end edge in the block dimension of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport.<br/><br/>
     ///<b>Syntax</b>: <c>auto | length-percentage</c>
@@ -1790,25 +1790,25 @@ type Style =
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollSnapMarginBottom (value: U2<string, ScrollMarginBottom>) = "scroll-snap-margin-bottom" ==> value
+    static member inline scrollSnapMarginBottom (value: U2<string, Globals>) = "scroll-snap-margin-bottom" ==> value
     /// <summary>
     /// The <c>scroll-margin-left</c> property defines the left margin of the scroll snap area that is used for snapping this box to the snapport. The scroll snap area is determined by taking the transformed border box, finding its rectangular bounding box (axis-aligned in the scroll container's coordinate space), then adding the specified outsets.<br/><br/>
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollSnapMarginLeft (value: U2<string, ScrollMarginLeft>) = "scroll-snap-margin-left" ==> value
+    static member inline scrollSnapMarginLeft (value: U2<string, Globals>) = "scroll-snap-margin-left" ==> value
     /// <summary>
     /// The <c>scroll-margin-right</c> property defines the right margin of the scroll snap area that is used for snapping this box to the snapport. The scroll snap area is determined by taking the transformed border box, finding its rectangular bounding box (axis-aligned in the scroll container's coordinate space), then adding the specified outsets.<br/><br/>
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollSnapMarginRight (value: U2<string, ScrollMarginRight>) = "scroll-snap-margin-right" ==> value
+    static member inline scrollSnapMarginRight (value: U2<string, Globals>) = "scroll-snap-margin-right" ==> value
     /// <summary>
     /// The <c>scroll-margin-top</c> property defines the top margin of the scroll snap area that is used for snapping this box to the snapport. The scroll snap area is determined by taking the transformed border box, finding its rectangular bounding box (axis-aligned in the scroll container's coordinate space), then adding the specified outsets.<br/><br/>
     ///<b>Syntax</b>: <c>length</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline scrollSnapMarginTop (value: U2<string, ScrollMarginTop>) = "scroll-snap-margin-top" ==> value
+    static member inline scrollSnapMarginTop (value: U2<string, Globals>) = "scroll-snap-margin-top" ==> value
     /// <summary>
     /// The<b><c>scroll-snap-stop</c></b> CSS property defines whether or not the scroll container is allowed to "pass over" possible snap positions.<br/><br/>
     ///<b>Syntax</b>: <c>normal | always</c>
@@ -1832,7 +1832,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | dashed-ident#</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline scrollTimelineName (value: U2<string, ScrollTimelineName>) = "scroll-timeline-name" ==> value
+    static member inline scrollTimelineName (value: U2<string, Globals>) = "scroll-timeline-name" ==> value
     /// <summary>
     /// The<b><c>scrollbar-color</c></b> CSS property sets the color of the scrollbar track and thumb.<br/><br/>
     ///<b>Syntax</b>: <c>auto | color{2}</c>
@@ -1856,13 +1856,13 @@ type Style =
     ///<b>Syntax</b>: <c>alpha-value</c>
     /// <br/><b>Initial value</b>: <c>0.0</c>
     /// </summary>
-    static member inline shapeImageThreshold (value: U2<string, ShapeImageThreshold>) = "shape-image-threshold" ==> value
+    static member inline shapeImageThreshold (value: U2<string, Globals>) = "shape-image-threshold" ==> value
     /// <summary>
     /// The<b><c>shape-margin</c></b> CSS property sets a margin for a CSS shape created using <c>shape-outside</c>.<br/><br/>
     ///<b>Syntax</b>: <c>length-percentage</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline shapeMargin (value: U2<string, ShapeMargin>) = "shape-margin" ==> value
+    static member inline shapeMargin (value: U2<string, Globals>) = "shape-margin" ==> value
     /// <summary>
     /// The<b><c>shape-outside</c></b> CSS property defines a shape—which may be non-rectangular—around which adjacent inline content should wrap. By default, inline content wraps around its margin box; <c>shape-outside</c> provides a way to customize this wrapping, making it possible to wrap text around complex objects rather than simple boxes.<br/><br/>
     ///<b>Syntax</b>: <c>none | [ shape-box || basic-shape ] | image</c>
@@ -1874,7 +1874,7 @@ type Style =
     ///<b>Syntax</b>: <c>integer | length</c>
     /// <br/><b>Initial value</b>: <c>8</c>
     /// </summary>
-    static member inline tabSize (value: U2<string, TabSize>) = "tab-size" ==> value
+    static member inline tabSize (value: U2<string, Globals>) = "tab-size" ==> value
     /// <summary>
     /// The<b><c>table-layout</c></b> CSS property sets the algorithm used to lay out <c>table</c> cells, rows, and columns.<br/><br/>
     ///<b>Syntax</b>: <c>auto | fixed</c>
@@ -1903,7 +1903,7 @@ type Style =
     ///<b>Syntax</b>: <c>color</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline textDecorationColor (value: U2<string, TextDecorationColor>) = "text-decoration-color" ==> value
+    static member inline textDecorationColor (value: U2<string, Color>) = "text-decoration-color" ==> value
     /// <summary>
     /// The<b><c>text-decoration-line</c></b> CSS property sets the kind of decoration that is used on text in an element, such as an underline or overline.<br/><br/>
     ///<b>Syntax</b>: <c>none | [ underline || overline || line-through || blink ] | spelling-error | grammar-error</c>
@@ -1939,13 +1939,13 @@ type Style =
     ///<b>Syntax</b>: <c>color</c>
     /// <br/><b>Initial value</b>: <c>currentcolor</c>
     /// </summary>
-    static member inline textEmphasisColor (value: U2<string, TextEmphasisColor>) = "text-emphasis-color" ==> value
+    static member inline textEmphasisColor (value: U2<string, Color>) = "text-emphasis-color" ==> value
     /// <summary>
     /// The<b><c>text-emphasis-position</c></b> CSS property sets where emphasis marks are drawn. Like ruby text, if there isn't enough room for emphasis marks, the line height is increased.<br/><br/>
     ///<b>Syntax</b>: <c>[ over | under ] && [ right | left ]</c>
     /// <br/><b>Initial value</b>: <c>over right</c>
     /// </summary>
-    static member inline textEmphasisPosition (value: U2<string, TextEmphasisPosition>) = "text-emphasis-position" ==> value
+    static member inline textEmphasisPosition (value: U2<string, Globals>) = "text-emphasis-position" ==> value
     /// <summary>
     /// The<b><c>text-emphasis-style</c></b> CSS property sets the appearance of emphasis marks. It can also be set, and reset, using the <c>text-emphasis</c> shorthand.<br/><br/>
     ///<b>Syntax</b>: <c>none | [ [ filled | open ] || [ dot | circle | double-circle | triangle | sesame ] ] | string</c>
@@ -1957,7 +1957,7 @@ type Style =
     ///<b>Syntax</b>: <c>length-percentage && hanging? && each-line?</c>
     /// <br/><b>Initial value</b>: <c>0</c>
     /// </summary>
-    static member inline textIndent (value: U2<string, TextIndent>) = "text-indent" ==> value
+    static member inline textIndent (value: U2<string, Globals>) = "text-indent" ==> value
     /// <summary>
     /// The<b><c>text-justify</c></b> CSS property sets what type of justification should be applied to text when <c>text-align</c><c>: justify;</c> is set on an element.<br/><br/>
     ///<b>Syntax</b>: <c>auto | inter-character | inter-word | none</c>
@@ -1987,7 +1987,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | shadow-t#</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline textShadow (value: U2<string, TextShadow>) = "text-shadow" ==> value
+    static member inline textShadow (value: U2<string, Globals>) = "text-shadow" ==> value
     /// <summary>
     /// The<b><c>text-size-adjust</c></b> CSS property controls the text inflation algorithm used on some smartphones and tablets. Other browsers will ignore this property.<br/><br/>
     ///<b>Syntax</b>: <c>none | auto | percentage</c>
@@ -2022,7 +2022,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | dashed-ident#</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline timelineScope (value: U2<string, TimelineScope>) = "timeline-scope" ==> value
+    static member inline timelineScope (value: U2<string, Globals>) = "timeline-scope" ==> value
     /// <summary>
     /// The<b><c>top</c></b> CSS property participates in specifying the vertical position of a positioned element. It has no effect on non-positioned elements.<br/><br/>
     ///<b>Syntax</b>: <c>length | percentage | auto</c>
@@ -2040,7 +2040,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | transform-list</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline transform (value: U2<string, Transform>) = "transform" ==> value
+    static member inline transform (value: U2<string, Globals>) = "transform" ==> value
     /// <summary>
     /// The<b><c>transform-box</c></b> CSS property defines the layout box to which the <c>transform</c>, individual transform properties <c>translate</c>,<c>scale</c>, and <c>rotate</c>, and <c>transform-origin</c> properties relate.<br/><br/>
     ///<b>Syntax</b>: <c>content-box | border-box | fill-box | stroke-box | view-box</c>
@@ -2070,13 +2070,13 @@ type Style =
     ///<b>Syntax</b>: <c>time#</c>
     /// <br/><b>Initial value</b>: <c>0s</c>
     /// </summary>
-    static member inline transitionDelay (value: U2<string, TransitionDelay>) = "transition-delay" ==> value
+    static member inline transitionDelay (value: U2<string, Globals>) = "transition-delay" ==> value
     /// <summary>
     /// The<b><c>transition-duration</c></b> CSS property sets the length of time a transition animation should take to complete. By default, the value is <c>0s</c>, meaning that no animation will occur.<br/><br/>
     ///<b>Syntax</b>: <c>time#</c>
     /// <br/><b>Initial value</b>: <c>0s</c>
     /// </summary>
-    static member inline transitionDuration (value: U2<string, TransitionDuration>) = "transition-duration" ==> value
+    static member inline transitionDuration (value: U2<string, Globals>) = "transition-duration" ==> value
     /// <summary>
     /// The<b><c>transition-property</c></b> CSS property sets the CSS properties to which a transition effect should be applied.<br/><br/>
     ///<b>Syntax</b>: <c>none | single-transition-property#</c>
@@ -2094,7 +2094,7 @@ type Style =
     ///<b>Syntax</b>: <c>none | length-percentage [ length-percentage length? ]?</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline translate (value: U2<string, Translate>) = "translate" ==> value
+    static member inline translate (value: U2<string, Globals>) = "translate" ==> value
     /// <summary>
     /// The<b><c>unicode-bidi</c></b> CSS property, together with the <c>direction</c> property, determines how bidirectional text in a document is handled. For example, if a block of content contains both left-to-right and right-to-left text, the user-agent uses a complex Unicode algorithm to decide how to display the text. The <c>unicode-bidi</c> property overrides this algorithm and allows the developer to control the text embedding.<br/><br/>
     ///<b>Syntax</b>: <c>normal | embed | isolate | bidi-override | isolate-override | plaintext</c>
@@ -2130,13 +2130,13 @@ type Style =
     ///<b>Syntax</b>: <c>none | dashed-ident#</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline viewTimelineName (value: U2<string, ViewTimelineName>) = "view-timeline-name" ==> value
+    static member inline viewTimelineName (value: U2<string, Globals>) = "view-timeline-name" ==> value
     /// <summary>
     /// The<b><c>view-transition-name</c></b> CSS property provides the selected element with a distinct identifying name (a <c>custom-ident</c>) and causes it to participate in a separate view transition from the root view transition — or no view transition if the <c>none</c> value is specified.<br/><br/>
     ///<b>Syntax</b>: <c>none | custom-ident</c>
     /// <br/><b>Initial value</b>: <c>none</c>
     /// </summary>
-    static member inline viewTransitionName (value: U2<string, ViewTransitionName>) = "view-transition-name" ==> value
+    static member inline viewTransitionName (value: U2<string, Globals>) = "view-transition-name" ==> value
     /// <summary>
     /// The<b><c>visibility</c></b> CSS property shows or hides an element without changing the layout of a document. The property can also hide rows or columns in a <c>table</c>.<br/><br/>
     ///<b>Syntax</b>: <c>visible | hidden | collapse</c>
@@ -2162,7 +2162,7 @@ type Style =
     ///<b>Syntax</b>: <c>integer</c>
     /// <br/><b>Initial value</b>: <c>2</c>
     /// </summary>
-    static member inline widows (value: U2<string, Widows>) = "widows" ==> value
+    static member inline widows (value: U2<string, Globals>) = "widows" ==> value
     /// <summary>
     /// The<b><c>width</c></b> CSS property sets an element's width. By default, it sets the width of the content area, but if <c>box-sizing</c> is set to <c>border-box</c>, it sets the width of the border area.<br/><br/>
     ///<b>Syntax</b>: <c>auto | length | percentage | min-content | max-content | fit-content | fit-content(length-percentage)</c>
@@ -2215,7 +2215,7 @@ type Style =
     /// The<b><c>all</c></b> shorthand CSS property resets all of an element's properties except <c>unicode-bidi</c>, <c>direction</c>, and CSS Custom Properties. It can set properties to their initial or inherited values, or to the values specified in another cascade layer or stylesheet origin.<br/><br/>
     ///<b>Syntax</b>: <c>initial | inherit | unset | revert | revert-layer</c>
     /// <br/><b>Initial value</b>: There is no practical initial value for it.<br/><br/> </summary>
-    static member inline all (value: U2<string, All>) = "all" ==> value
+    static member inline all (value: U2<string, Globals>) = "all" ==> value
     /// <summary>
     /// The<b><c>animation</c></b> shorthand CSS property applies an animation between styles. It is a shorthand for <c>animation-name</c>, <c>animation-duration</c>, <c>animation-timing-function</c>, <c>animation-delay</c>, <c>animation-iteration-count</c>, <c>animation-direction</c>, <c>animation-fill-mode</c>, and <c>animation-play-state</c>.<br/><br/>
     ///<b>Syntax</b>: <c>single-animation#</c>
@@ -2266,7 +2266,7 @@ type Style =
     /// The<b><c>border-color</c></b> shorthand CSS property sets the color of an element's border.<br/><br/>
     ///<b>Syntax</b>: <c>color{1,4}</c>
     /// </summary>
-    static member inline borderColor (value: U2<string, BorderColor>) = "border-color" ==> value
+    static member inline borderColor (value: U2<string, Color>) = "border-color" ==> value
     /// <summary>
     /// The<b><c>border-image</c></b> CSS property draws an image around a given element. It replaces the element's regular border.<br/><br/>
     ///<b>Syntax</b>: <c>'border-image-source' || 'border-image-slice' [ / 'border-image-width' | / 'border-image-width'? / 'border-image-outset' ]? || 'border-image-repeat'</c>
@@ -2296,7 +2296,7 @@ type Style =
     /// The<b><c>border-radius</c></b> CSS property rounds the corners of an element's outer border edge. You can set a single radius to make circular corners, or two radii to make elliptical corners.<br/><br/>
     ///<b>Syntax</b>: <c>length-percentage{1,4} [ / length-percentage{1,4} ]?</c>
     /// </summary>
-    static member inline borderRadius (value: U2<string, BorderRadius>) = "border-radius" ==> value
+    static member inline borderRadius (value: U2<string, Globals>) = "border-radius" ==> value
     /// <summary>
     /// The<b><c>border-right</c></b> shorthand CSS property sets all the properties of an element's right border.<br/><br/>
     ///<b>Syntax</b>: <c>line-width || line-style || color</c>
@@ -2331,12 +2331,12 @@ type Style =
     /// The<b><c>contain-intrinsic-size</c></b> CSS shorthand property sets the size of an element that a browser will use for layout when the element is subject to size containment.<br/><br/>
     ///<b>Syntax</b>: <c>[ auto? [ none | length ] ]{1,2}</c>
     /// </summary>
-    static member inline containIntrinsicSize (value: U2<string, ContainIntrinsicSize>) = "contain-intrinsic-size" ==> value
+    static member inline containIntrinsicSize (value: U2<string, Globals>) = "contain-intrinsic-size" ==> value
     /// <summary>
     /// The<b>container</b> shorthand CSS property establishes the element as a query container and specifies the name or name for the containment context used in a container query.<br/><br/>
     ///<b>Syntax</b>: <c>'container-name' [ / 'container-type' ]?</c>
     /// </summary>
-    static member inline container (value: U2<string, Container>) = "container" ==> value
+    static member inline container (value: U2<string, Globals>) = "container" ==> value
     /// <summary>
     /// The<b><c>flex</c></b> CSS shorthand property sets how a flex _item_ will grow or shrink to fit the space available in its flex container.<br/><br/>
     ///<b>Syntax</b>: <c>none | [ 'flex-grow' 'flex-shrink'? || 'flex-basis' ]</c>
@@ -2361,7 +2361,7 @@ type Style =
     /// The<b><c>grid</c></b> CSS property is a shorthand property that sets all of the explicit and implicit grid properties in a single declaration.<br/><br/>
     ///<b>Syntax</b>: <c>'grid-template' | 'grid-template-rows' / [ auto-flow && dense? ] 'grid-auto-columns'? | [ auto-flow && dense? ] 'grid-auto-rows'? / 'grid-template-columns'</c>
     /// </summary>
-    static member inline grid (value: U2<string, Grid>) = "grid" ==> value
+    static member inline grid (value: U2<string, Globals>) = "grid" ==> value
     /// <summary>
     /// The<b><c>grid-area</c></b> CSS shorthand property specifies a grid item's size and location within a grid by contributing a line, a span, or nothing (automatic) to its grid placement, thereby specifying the edges of its grid area.<br/><br/>
     ///<b>Syntax</b>: <c>grid-line [ / grid-line ]{0,3}</c>
@@ -2381,7 +2381,7 @@ type Style =
     /// The<b><c>grid-template</c></b> CSS property is a shorthand property for defining grid columns, grid rows, and grid areas.<br/><br/>
     ///<b>Syntax</b>: <c>none | [ 'grid-template-rows' / 'grid-template-columns' ] | [ line-names? string track-size? line-names? ]+ [ / explicit-track-list ]?</c>
     /// </summary>
-    static member inline gridTemplate (value: U2<string, GridTemplate>) = "grid-template" ==> value
+    static member inline gridTemplate (value: U2<string, Globals>) = "grid-template" ==> value
     /// <summary>
     /// The<b><c>inset</c></b> CSS property is a shorthand that corresponds to the <c>top</c>, <c>right</c>, <c>bottom</c>, and/or <c>left</c> properties. It has the same multi-value syntax of the <c>margin</c> shorthand.<br/><br/>
     ///<b>Syntax</b>: <c>'top'{1,4}</c>
@@ -2398,7 +2398,7 @@ type Style =
     /// </summary>
     static member inline insetInline (value: U2<string, InsetInline>) = "inset-inline" ==> value
     /// </summary>
-    static member inline lineClamp (value: U2<string, LineClamp>) = "line-clamp" ==> value
+    static member inline lineClamp (value: U2<string, Globals>) = "line-clamp" ==> value
     /// <summary>
     /// The<b><c>list-style</c></b> CSS shorthand property allows you to set all the list style properties at once.<br/><br/>
     ///<b>Syntax</b>: <c>'list-style-type' || 'list-style-position' || 'list-style-image'</c>
@@ -2460,17 +2460,17 @@ type Style =
     /// The<b><c>padding</c></b> CSS shorthand property sets the padding area on all four sides of an element at once.<br/><br/>
     ///<b>Syntax</b>: <c>[ length | percentage ]{1,4}</c>
     /// </summary>
-    static member inline padding (value: U2<string, Padding>) = "padding" ==> value
+    static member inline padding (value: U2<string, Globals>) = "padding" ==> value
     /// <summary>
     /// The<b><c>padding-block</c></b> CSS shorthand property defines the logical block start and end padding of an element, which maps to physical padding properties depending on the element's writing mode, directionality, and text orientation.<br/><br/>
     ///<b>Syntax</b>: <c>'padding-left'{1,2}</c>
     /// </summary>
-    static member inline paddingBlock (value: U2<string, PaddingBlock>) = "padding-block" ==> value
+    static member inline paddingBlock (value: U2<string, Globals>) = "padding-block" ==> value
     /// <summary>
     /// The<b><c>padding-inline</c></b> CSS shorthand property defines the logical inline start and end padding of an element, which maps to physical padding properties depending on the element's writing mode, directionality, and text orientation.<br/><br/>
     ///<b>Syntax</b>: <c>'padding-left'{1,2}</c>
     /// </summary>
-    static member inline paddingInline (value: U2<string, PaddingInline>) = "padding-inline" ==> value
+    static member inline paddingInline (value: U2<string, Globals>) = "padding-inline" ==> value
     /// <summary>
     /// The<b><c>place-content</c></b> CSS shorthand property allows you to align content along both the block and inline directions at once (i.e. the <c>align-content</c> and <c>justify-content</c> properties) in a relevant layout system such as Grid or Flexbox.<br/><br/>
     ///<b>Syntax</b>: <c>'align-content' 'justify-content'?</c>
@@ -2490,17 +2490,17 @@ type Style =
     /// The<b><c>scroll-margin</c></b> shorthand property sets all of the scroll margins of an element at once, assigning values much like the <c>margin</c> property does for margins of an element.<br/><br/>
     ///<b>Syntax</b>: <c>length{1,4}</c>
     /// </summary>
-    static member inline scrollMargin (value: U2<string, ScrollMargin>) = "scroll-margin" ==> value
+    static member inline scrollMargin (value: U2<string, Globals>) = "scroll-margin" ==> value
     /// <summary>
     /// The <c>scroll-margin-block</c> shorthand property sets the scroll margins of an element in the block dimension.<br/><br/>
     ///<b>Syntax</b>: <c>length{1,2}</c>
     /// </summary>
-    static member inline scrollMarginBlock (value: U2<string, ScrollMarginBlock>) = "scroll-margin-block" ==> value
+    static member inline scrollMarginBlock (value: U2<string, Globals>) = "scroll-margin-block" ==> value
     /// <summary>
     /// The <c>scroll-margin-inline</c> shorthand property sets the scroll margins of an element in the inline dimension.<br/><br/>
     ///<b>Syntax</b>: <c>length{1,2}</c>
     /// </summary>
-    static member inline scrollMarginInline (value: U2<string, ScrollMarginInline>) = "scroll-margin-inline" ==> value
+    static member inline scrollMarginInline (value: U2<string, Globals>) = "scroll-margin-inline" ==> value
     /// <summary>
     /// The<b><c>scroll-padding</c></b> shorthand property sets scroll padding on all sides of an element at once, much like the <c>padding</c> property does for padding on an element.<br/><br/>
     ///<b>Syntax</b>: <c>[ auto | length-percentage ]{1,4}</c>
@@ -2520,12 +2520,12 @@ type Style =
     /// The<b><c>scroll-margin</c></b> shorthand property sets all of the scroll margins of an element at once, assigning values much like the <c>margin</c> property does for margins of an element.<br/><br/>
     ///<b>Syntax</b>: <c>length{1,4}</c>
     /// </summary>
-    static member inline scrollSnapMargin (value: U2<string, ScrollMargin>) = "scroll-snap-margin" ==> value
+    static member inline scrollSnapMargin (value: U2<string, Globals>) = "scroll-snap-margin" ==> value
     /// <summary>
     /// The<b><c>scroll-timeline</c></b> CSS shorthand property defines a name that can be used to identify the source element of a scroll timeline, along with the scrollbar axis that should provide the timeline.<br/><br/>
     ///<b>Syntax</b>: <c>[ 'scroll-timeline-name' 'scroll-timeline-axis'? ]#</c>
     /// </summary>
-    static member inline scrollTimeline (value: U2<string, ScrollTimeline>) = "scroll-timeline" ==> value
+    static member inline scrollTimeline (value: U2<string, Globals>) = "scroll-timeline" ==> value
     /// <summary>
     /// The<b><c>text-decoration</c></b> shorthand CSS property sets the appearance of decorative lines on text. It is a shorthand for <c>text-decoration-line</c>, <c>text-decoration-color</c>, <c>text-decoration-style</c>, and the newer <c>text-decoration-thickness</c> property.<br/><br/>
     ///<b>Syntax</b>: <c>'text-decoration-line' || 'text-decoration-style' || 'text-decoration-color' || 'text-decoration-thickness'</c>
@@ -2545,7 +2545,7 @@ type Style =
     /// The<b><c>view-timeline</c></b> CSS shorthand property is used to define a _named view progress timeline_, which is progressed through based on the change in visibility of an element (known as the _subject_) inside a scrollable element (_scroller_). <c>view-timeline</c> is set on the subject.<br/><br/>
     ///<b>Syntax</b>: <c>[ 'view-timeline-name' 'view-timeline-axis'? ]#</c>
     /// </summary>
-    static member inline viewTimeline (value: U2<string, ViewTimeline>) = "view-timeline" ==> value
+    static member inline viewTimeline (value: U2<string, Globals>) = "view-timeline" ==> value
 
 type SvgStyle =
     static member inline alignmentBaseline (value: U2<string, AlignmentBaseline>) = "alignment-baseline" ==> value
@@ -2561,11 +2561,11 @@ type SvgStyle =
     static member inline display (value: U2<string, Display>) = "display" ==> value
     static member inline dominantBaseline (value: U2<string, DominantBaseline>) = "dominant-baseline" ==> value
     static member inline fill (value: U2<string, Fill>) = "fill" ==> value
-    static member inline fillOpacity (value: U4<string, int, float, FillOpacity>) = "fill-opacity" ==> value
+    static member inline fillOpacity (value: U4<string, int, float, Globals>) = "fill-opacity" ==> value
     static member inline fillRule (value: U2<string, FillRule>) = "fill-rule" ==> value
-    static member inline filter (value: U2<string, Filter>) = "filter" ==> value
-    static member inline floodColor (value: U2<string, FloodColor>) = "flood-color" ==> value
-    static member inline floodOpacity (value: U4<string, int, float, FloodOpacity>) = "flood-opacity" ==> value
+    static member inline filter (value: U2<string, Globals>) = "filter" ==> value
+    static member inline floodColor (value: U2<string, Color>) = "flood-color" ==> value
+    static member inline floodOpacity (value: U4<string, int, float, Globals>) = "flood-opacity" ==> value
     static member inline font (value: U2<string, Font>) = "font" ==> value
     static member inline fontFamily (value: U2<string, FontFamily>) = "font-family" ==> value
     static member inline fontSize (value: U3<string, int, FontSize>) = "font-size" ==> value
@@ -2577,28 +2577,28 @@ type SvgStyle =
     static member inline glyphOrientationVertical (value: U2<string, GlyphOrientationVertical>) = "glyph-orientation-vertical" ==> value
     static member inline imageRendering (value: U2<string, ImageRendering>) = "image-rendering" ==> value
     static member inline letterSpacing (value: U2<string, LetterSpacing>) = "letter-spacing" ==> value
-    static member inline lightingColor (value: U2<string, LightingColor>) = "lighting-color" ==> value
+    static member inline lightingColor (value: U2<string, Color>) = "lighting-color" ==> value
     static member inline lineHeight (value: U3<string, int, LineHeight>) = "line-height" ==> value
-    static member inline marker (value: U2<string, Marker>) = "marker" ==> value
-    static member inline markerEnd (value: U2<string, MarkerEnd>) = "marker-end" ==> value
-    static member inline markerMid (value: U2<string, MarkerMid>) = "marker-mid" ==> value
-    static member inline markerStart (value: U2<string, MarkerStart>) = "marker-start" ==> value
+    static member inline marker (value: U2<string, Globals>) = "marker" ==> value
+    static member inline markerEnd (value: U2<string, Globals>) = "marker-end" ==> value
+    static member inline markerMid (value: U2<string, Globals>) = "marker-mid" ==> value
+    static member inline markerStart (value: U2<string, Globals>) = "marker-start" ==> value
     static member inline mask (value: U2<string, Mask>) = "mask" ==> value
-    static member inline opacity (value: U4<string, int, float, Opacity>) = "opacity" ==> value
+    static member inline opacity (value: U4<string, int, float, Globals>) = "opacity" ==> value
     static member inline overflow (value: U2<string, Overflow>) = "overflow" ==> value
     static member inline paintOrder (value: U2<string, PaintOrder>) = "paint-order" ==> value
     static member inline pointerEvents (value: U2<string, PointerEvents>) = "pointer-events" ==> value
     static member inline shapeRendering (value: U2<string, ShapeRendering>) = "shape-rendering" ==> value
-    static member inline stopColor (value: U2<string, StopColor>) = "stop-color" ==> value
-    static member inline stopOpacity (value: U4<string, int,float, StopOpacity>) = "stop-opacity" ==> value
+    static member inline stopColor (value: U2<string, Color>) = "stop-color" ==> value
+    static member inline stopOpacity (value: U4<string, int,float, Globals>) = "stop-opacity" ==> value
     static member inline stroke (value: U2<string, Stroke>) = "stroke" ==> value
-    static member inline strokeDasharray (value: U2<string, StrokeDasharray>) = "stroke-dasharray" ==> value
-    static member inline strokeDashoffset (value: U2<string, StrokeDashoffset>) = "stroke-dashoffset" ==> value
+    static member inline strokeDasharray (value: U2<string, Globals>) = "stroke-dasharray" ==> value
+    static member inline strokeDashoffset (value: U2<string, Globals>) = "stroke-dashoffset" ==> value
     static member inline strokeLinecap (value: U2<string, StrokeLinecap>) = "stroke-linecap" ==> value
     static member inline strokeLinejoin (value: U2<string, StrokeLinejoin>) = "stroke-linejoin" ==> value
-    static member inline strokeMiterlimit (value: U2<string, StrokeMiterlimit>) = "stroke-miterlimit" ==> value
-    static member inline strokeOpacity (value: U4<string, int,float, StrokeOpacity>) = "stroke-opacity" ==> value
-    static member inline strokeWidth (value: U4<string, int,float, StrokeWidth>) = "stroke-width" ==> value
+    static member inline strokeMiterlimit (value: U2<string, Globals>) = "stroke-miterlimit" ==> value
+    static member inline strokeOpacity (value: U4<string, int,float, Globals>) = "stroke-opacity" ==> value
+    static member inline strokeWidth (value: U4<string, int,float, Globals>) = "stroke-width" ==> value
     static member inline textAnchor (value: U2<string, TextAnchor>) = "text-anchor" ==> value
     static member inline textDecoration (value: U2<string, TextDecoration>) = "text-decoration" ==> value
     static member inline textRendering (value: U2<string, TextRendering>) = "text-rendering" ==> value

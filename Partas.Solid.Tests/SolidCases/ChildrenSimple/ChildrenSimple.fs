@@ -4,14 +4,14 @@ open Partas.Solid
 open Fable.Core
 
 type [<Erase>] TypeDefTest() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         button() {
             "Button"
         }
 type [<Erase>] TypeDefTestWithProps() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         button(class' = "ButtonClass", draggable="indubitably") {
@@ -19,7 +19,7 @@ type [<Erase>] TypeDefTestWithProps() =
             span(class' = "sr-only") { "Span" }
         } 
 type [<Erase>] TypeDefTestWithExtensions() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         button(class' = "ButtonClass").attr("Key", "Value") {

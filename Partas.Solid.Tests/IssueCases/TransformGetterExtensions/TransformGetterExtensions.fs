@@ -6,7 +6,7 @@ open Fable.Core
 
 [<Erase>]
 type TransformGetterExtensions() =
-    inherit VoidNode()
+    interface VoidNode
     [<Erase>] member val data: int[] = unbox null with get,set
     [<SolidTypeComponentAttribute>]
     member props.constructor =

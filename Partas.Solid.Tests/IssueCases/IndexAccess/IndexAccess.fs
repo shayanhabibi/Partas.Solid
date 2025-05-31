@@ -8,7 +8,7 @@ type Container (value: Accessor<string>) = member val value: Accessor<string>
 
 [<Erase>]
 type TestStringAccess() =
-    inherit VoidNode()
+    interface VoidNode
     [<Erase>]
     member val index: int = jsNative with get,set
     [<SolidTypeComponent>]

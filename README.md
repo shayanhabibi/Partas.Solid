@@ -251,7 +251,7 @@ open Fable.Core
 
 [<Erase>]
 type MyComponent() =
-    inherit RegularNode()
+    interface RegularNode
     [<Erase>]
     member val customAttribute: int = unbox null with get,set
 ```
@@ -287,7 +287,7 @@ The name of the member has no influence on the output. The compiled name is dete
 ```fsharp
 [<Erase>]
 type MyComponent() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member private props.uncleIro = div()
 ```
@@ -305,7 +305,7 @@ Defining custom properties is simple:
 ```fsharp
 [<Erase>]
 type MyComponent() =
-    inherit RegularNode()
+    interface RegularNode
     
     [<Erase>] member val bordered: bool = unbox null with get,set
 ```
@@ -322,7 +322,7 @@ If you want to for example: define an alias to `class`, you can do this by defin
 ```fsharp
 [<Erase>]
 type MyComponent() =
-    inherit RegularNode()
+    interface RegularNode
     member this.className
         with inline set(value: string) = this.class' <- value
         and inline get(): string = this.class'
@@ -354,7 +354,7 @@ In combination with automatic property splitting, you can also assign properties
 ```fsharp
 // -- Program.fs
 type [<Erase>] CustomTag() =
-    inherit RegularNode()
+    interface RegularNode
     
     [<SolidTypeComponent>]
     member private props.typeDef =
@@ -391,7 +391,7 @@ For code clarity, you can even define the default in PROXIMITY to the usage, eve
 
 ```fsharp
 type [<Erase>] CustomTag() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member private props.typeDef =
         div(){
@@ -476,7 +476,7 @@ You can pass tags as values in jsx using `!@` prefix operator and then `%` in co
 ```fsharp
 [<Erase>]
 type CustomTag() =
-    inherit RegularNode()
+    interface RegularNode
     [<Erase>]
     member val icon: TagValue<_> = unbox null with get,set
     [<SolidTypeComponent>]
@@ -584,7 +584,7 @@ Now I define the specific context component, and interface with my Context inter
 type DatePickerApi = Glutinum.ZagJs.DatePickerApi
 [<Import("DatePicker.Context", datePicker)>]
 type Context() =
-    inherit RegularNode()
+    interface RegularNode
     interface ArkUIContext<DatePickerApi>
 ```
 

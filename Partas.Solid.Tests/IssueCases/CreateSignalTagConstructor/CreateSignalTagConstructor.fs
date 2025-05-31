@@ -17,7 +17,7 @@ type MenuItem(title: string, url: string, icon: RegularNode) =
 module App =
     [<Import("fakeTag", "fakeLibrary")>]
     type [<Erase>] MyItemizer() =
-        inherit RegularNode()
+        interface RegularNode
         member val items: MenuItem array = unbox null with get,set
         [<SolidTypeComponent>]
         member props.constructor =

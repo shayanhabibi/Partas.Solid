@@ -5,12 +5,12 @@ open Partas.Solid
 
 [<Import("SomeComponent", "FakeLibrary")>]
 type CustomComponent() =
-    inherit VoidNode()
+    interface VoidNode
     interface ChildLambdaProvider3<int, Accessor<string>, float>
     
 [<Import("OnlyTakesButtons", "FakeLibrary")>]
 type OnlyButtons() =
-    inherit VoidNode()
+    interface VoidNode
     interface ChildLambdaProviderStrict<int, button>
 
 [<SolidComponent>]

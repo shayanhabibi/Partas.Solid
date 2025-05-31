@@ -5,4 +5,4 @@ open Fable.Core
 
 [<Import("FakeImport", "FakeLibrary")>]
 type [<Erase>] Imported() =
-    inherit RegularNode()
+    interface RegularNode

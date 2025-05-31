@@ -2,7 +2,7 @@
 
 open Partas.Solid
 
-type MenuItem = { Title: string; Url: string; Icon: RegularNode }
+type MenuItem = { Title: string; Url: string; Icon: HtmlElement }
 module App =
     [<SolidComponent>]
     let App() =

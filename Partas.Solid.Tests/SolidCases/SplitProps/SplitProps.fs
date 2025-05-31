@@ -4,7 +4,7 @@ open Partas.Solid
 open Fable.Core
 
 type [<Erase>] SplitProps() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.SplitProps =
         div(class' = props.class') {
@@ -12,7 +12,7 @@ type [<Erase>] SplitProps() =
         }
 
 type [<Erase>] NestedSplitProps() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.SplitProps =
         div() {

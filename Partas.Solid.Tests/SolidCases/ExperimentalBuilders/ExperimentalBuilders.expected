@@ -1,6 +1,7 @@
-import { children, splitProps, createEffect, createSignal } from "solid-js";
+import { createSelector, batch, createMemo, onMount, onCleanup, children, splitProps, createEffect, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import { MatchFailureException } from "./fable_modules/fable-library-js.5.0.0-alpha.12/Types.js";
+import { printf, toConsole } from "./fable_modules/fable-library-js.5.0.0-alpha.12/String.js";
 
 export const patternInput$004013 = createSignal(10);
 
@@ -93,7 +94,26 @@ export function ComponentWrap() {
 export function TestComponent(props) {
     const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["children"]);
     const childs = children(() => PARTAS_LOCAL.children);
+    createEffect(() => {
+        toConsole(printf("effect"));
+    });
+    onCleanup(() => {
+        toConsole(printf("cleanup"));
+    });
+    onMount(() => {
+        toConsole(printf("mount"));
+    });
+    const x = createMemo(() => {
+        toConsole(printf("memo"));
+        return "memo";
+    });
+    const submission = batch(() => {
+        toConsole(printf(""));
+        return childs();
+    });
+    const isSelected = createSelector(() => false);
     return <div>
         {childs()}
     </div>;
 }
+

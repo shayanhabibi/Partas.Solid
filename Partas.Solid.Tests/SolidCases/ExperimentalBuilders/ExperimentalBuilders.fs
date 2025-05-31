@@ -60,9 +60,30 @@ let ComponentWrap () =
     
 [<Erase>]
 type TestComponent() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.__ =
         let childs = children { props.children }
+        effect {
+            printfn "effect"
+        }
+        cleanup {
+            printfn "cleanup"
+        }
+        mount {
+            printfn "mount"
+        }
+        let x = memo {
+            printfn "memo"
+            "memo"
+        }
+        let submission = batch {
+            printfn ""
+            childs()
+        }
+        let isSelected = selector {
+            false
+        }
+        
         div() { childs() }
     

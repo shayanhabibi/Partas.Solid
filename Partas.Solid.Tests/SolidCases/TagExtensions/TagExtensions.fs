@@ -4,25 +4,25 @@ open Partas.Solid
 open Fable.Core
 
 type [<Erase>] NoPropsOneExtension() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         div().attr("key", "value")
 
 type [<Erase>] PropsWithExtension() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         div(class' = "testClass").attr("key", "value")
         
 type [<Erase>] NoPropsExtensionChain() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         div().attr("key", "value").attr("key2", "value2")
 
 type [<Erase>] PropsWithExtensionChain() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         div(class' = "Tester", draggable = "drag").attr("key", "value").attr("key2", "value2").attr("key3", "value3").attr("key4", "value4")

@@ -102,6 +102,7 @@ module Bindings =
         member this.preload
             with set (value: RoutePreloadFunc) = ()
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Combine
             ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
@@ -109,15 +110,19 @@ module Bindings =
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND PARTAS_BUILDER
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun = PARTAS_DELAY()
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Zero() : HtmlContainerFun = ignore
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     [<Pojo>]
     type RootConfig (path: string, ``component``: HtmlElement) =
         member val path: string = jsNative with get, set
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member val ``component``: HtmlElement = jsNative with get, set
         /// <summary> Alias for <c>_.``component``</c></summary>
         member this.component'
@@ -145,6 +150,7 @@ module Bindings =
         member this.url
             with set (value: string) = ()
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Combine
             ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
@@ -152,12 +158,16 @@ module Bindings =
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND PARTAS_BUILDER
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun = PARTAS_DELAY()
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Zero() : HtmlContainerFun = ignore
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
         [<Erase>]
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: RootConfig[]) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     [<PartasImport("HashRouter", "@solidjs/router")>]
@@ -170,11 +180,13 @@ module Bindings =
 
     [<Erase>]
     type Extensions =
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: Router, PARTAS_RUN: HtmlContainerFun) =
             PARTAS_RUN Unchecked.defaultof<_>
             PARTAS_THIS
 
+        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: Route, PARTAS_RUN: HtmlContainerFun) =
             PARTAS_RUN Unchecked.defaultof<_>
@@ -182,7 +194,7 @@ module Bindings =
 
     [<Import("A", "@solidjs/router")>]
     type A() =
-        inherit RegularNode()
+        interface RegularNode
         [<Erase>]
         member this.href
             with set (value: string) = ()
@@ -207,7 +219,7 @@ module Bindings =
 
     [<Import("Navigate", "@solidjs/router")>]
     type Navigate() =
-        inherit RegularNode()
+        interface RegularNode
         [<Erase>]
         member this.href
             with set (value: string) = ()

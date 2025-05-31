@@ -4,7 +4,7 @@ open Partas.Solid
 open Fable.Core
 
 type [<Erase>] SimpleCombination() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.CombinedSpread =
         props.class' <- "ClassDefault"

@@ -8,7 +8,7 @@ open Fable.Core.JS
 
 [<Erase>]
 type PartasTable<'Data>() =
-    inherit RegularNode()
+    interface RegularNode
     [<Erase>]
     member val dataStack: DataStack<'Data> = undefined with get,set
     [<SolidTypeComponent(ComponentFlag.DebugMode)>]

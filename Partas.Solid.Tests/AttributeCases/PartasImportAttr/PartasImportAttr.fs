@@ -7,7 +7,7 @@ open Fable.Core
 // todo-replace with a better test
 [<Erase>]
 type PartasImportAttr() =
-    inherit VoidNode()
+    interface VoidNode
     [<SolidTypeComponentAttribute>]
     member props.constructor =
         Router() {

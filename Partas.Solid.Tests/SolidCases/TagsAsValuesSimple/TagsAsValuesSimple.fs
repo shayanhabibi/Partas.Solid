@@ -6,7 +6,7 @@ open Partas.Solid.Tests.SolidCases.TagsAsValuesSimpleTypes
 
 [<Erase>]
 type CustomTag() =
-    inherit RegularNode()
+    interface RegularNode
     [<Erase>]
     member val icon: TagValue = unbox null with get,set
     [<SolidTypeComponent>]

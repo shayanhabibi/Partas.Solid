@@ -4,14 +4,14 @@ open Partas.Solid
 open Fable.Core
 
 type [<Erase>] SimpleMerge() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.SimpleMerge =
         props.class' <- "DefaultClass"
         div()
         
 type [<Erase>] MultipleMerges() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.SimpleMerge =
         props.class' <- "DefaultClass"
@@ -20,14 +20,14 @@ type [<Erase>] MultipleMerges() =
         div()
 
 type [<Erase>] ComplexPropMerge() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.SimpleMerge =
         props.onKeyPress <- fun _ -> System.Console.WriteLine "Key pressed"
         div()
 
 type [<Erase>] SimpleNestedMerge() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.whatever =
         div() {
@@ -37,7 +37,7 @@ type [<Erase>] SimpleNestedMerge() =
         }
 
 type [<Erase>] NestedMerge() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.SimpleMerge =
         div() {
@@ -50,7 +50,7 @@ type [<Erase>] NestedMerge() =
         }
         
 type [<Erase>] NestedMergeWithChildren() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.SimpleMerge =
         div() {

@@ -7,7 +7,7 @@ open Fable.Core
     
 [<Erase>]
 type ModuleTag() =
-    inherit RegularNode()
+    interface RegularNode
     [<Erase>]
     member val other: TagValue = jsNative with get,set
     [<SolidTypeComponent>]
@@ -16,6 +16,6 @@ type ModuleTag() =
         
 [<Import("FakeImportedTag", "fakeLibrary")>]
 type Imported() =
-    inherit RegularNode()
+    interface RegularNode
     [<Erase>]
     member val other: TagValue = jsNative with get,set

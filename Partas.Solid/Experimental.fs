@@ -77,6 +77,7 @@ type CreateSelectorBuilder() =
 type CreateReactionBuilder() =
     inherit BaseLambdaBuilder()
     member inline _.Run(computation: unit -> unit): (unit -> unit) -> unit = createReaction(fun () -> computation())
+    member inline _.Zero(value: unit) = ignore value
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type ChildrenBuilder() =
@@ -128,7 +129,7 @@ module Builders =
     ///     configStore.Update Data.Config.data
     /// }
     /// </code></example>
-    let [<Erase>] cleanup = OnMountBuilder()
+    let [<Erase>] cleanup = OnCleanupBuilder()
     /// <summary>
     /// Wraps the computation in <c>createMemo(fun () -> ...)</c>
     /// </summary>
@@ -183,3 +184,16 @@ module Builders =
     /// if hasChildren() then resolvedChildren()
     /// </code></example>
     let [<Erase>] children = ChildrenBuilder()
+    /// <summary>
+    /// Wraps the computation in <c>createReaction(fun () -> ...)</c>
+    /// </summary>
+    /// <example><code>
+    /// let isOpen,setOpen = createSignal false
+    /// let onFirstOpen = reaction { 
+    ///   // ... do something on first time
+    ///   // ... isOpen changes
+    /// }
+    /// onFirstOpen (fun () -> isOpen()) 
+    /// // This will run the first time `isOpen` changes
+    /// </code></example>
+    let [<Erase>] reaction = CreateReactionBuilder()

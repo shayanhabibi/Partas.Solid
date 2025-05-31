@@ -4,19 +4,19 @@ open Partas.Solid
 open Fable.Core
 
 type [<Erase>] MyTag() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         div()
 
 type [<Erase>] TagWithProp() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         div(class' = "SomeClass")
 
 type [<Erase>] TagWithProps() =
-    inherit RegularNode()
+    interface RegularNode
     [<SolidTypeComponent>]
     member props.typeDef =
         div(class' = "SomeClass", draggable = "drag")
