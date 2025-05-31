@@ -2731,7 +2731,14 @@ module AttributeExtensions =
         member _.viewTarget
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
+
+[<Erase>]
 module Svg =
+    [<Erase>]
+    type animate() =
+        interface RegularNode
+        interface AnimateSVGAttributes
+    
     [<Erase>]
     type animateMotion() =
         interface RegularNode

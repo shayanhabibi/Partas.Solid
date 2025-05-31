@@ -301,7 +301,7 @@ module internal Expr =
             _ ) -> Some()
         | _ -> None
     let (|NativeImportedConstructor|_|) (ctx: PluginContext) = function
-        | Import({Kind = MemberImport(MemberRef({ FullName = Utils.StartsWith "Partas.Solid.Tags" ctx }, _))}, _, _)
+        | Import({Kind = MemberImport(MemberRef({ FullName = Utils.StartsWith "Partas.Solid.Tags" | Utils.StartsWith "Partas.Solid.Svg" }, _))}, _, _)
             & ImportedConstructor ctx ->
             Some()
         | _ -> None
