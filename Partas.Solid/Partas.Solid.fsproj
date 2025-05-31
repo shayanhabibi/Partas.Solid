@@ -16,9 +16,9 @@
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
-        <Version>1.0.0-alpha92</Version>
+        <Version>1.0.0-alpha96</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.0.0-alpha92</PackageVersion>
+        <PackageVersion>1.0.0-alpha96</PackageVersion>
 <!--        <PackageReleaseNotes></PackageReleaseNotes>-->
     </PropertyGroup>
 

@@ -540,16 +540,6 @@ type offsetAttributeInterfaceProvider =
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type CoreSVGAttributes =
-    interface end
-
-[<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type StylableSVGAttributes =
-    interface end
-
-[<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type TransformableSVGAttributes =
     interface end
 
@@ -586,7 +576,6 @@ type AnimationAttributeTargetSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type AnimationElementSVGAttributes =
-    inherit CoreSVGAttributes
     inherit ExternalResourceSVGAttributes
     inherit ConditionalProcessingSVGAttributes
 
@@ -594,7 +583,6 @@ type AnimationElementSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type PresentationSVGAttributes =
-    inherit CoreSVGAttributes
     inherit ExternalResourceSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit alignmentbaselineAttributeInterfaceProvider
@@ -660,7 +648,6 @@ type PresentationSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FilterPrimitiveElementSVGAttributes =
-    inherit CoreSVGAttributes
     inherit colorinterpolationfiltersAttributeInterfaceProvider
     inherit xAttributeInterfaceProvider
     inherit yAttributeInterfaceProvider
@@ -680,20 +667,18 @@ type DoubleInputFilterSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FitToViewBoxSVGAttributes =
-    interface end
+    inherit preserveAspectRatioAttributeInterfaceProvider
+    inherit viewBoxAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type GradientElementSVGAttributes =
-    inherit CoreSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit hrefAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type GraphicsElementSVGAttributes =
-    inherit CoreSVGAttributes
     inherit clipruleAttributeInterfaceProvider
     inherit colorinterpolationAttributeInterfaceProvider
     inherit colorrenderingAttributeInterfaceProvider
@@ -707,13 +692,11 @@ type GraphicsElementSVGAttributes =
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type LightSourceElementSVGAttributes =
-    inherit CoreSVGAttributes
+type LightSourceElementSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type NewViewportSVGAttributes =
-    inherit CoreSVGAttributes
     inherit clipAttributeInterfaceProvider
     inherit overflowAttributeInterfaceProvider
     inherit viewBoxAttributeInterfaceProvider
@@ -721,7 +704,6 @@ type NewViewportSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type ShapeElementSVGAttributes =
-    inherit CoreSVGAttributes
     inherit colorAttributeInterfaceProvider
     inherit fillAttributeInterfaceProvider
     inherit fillopacityAttributeInterfaceProvider
@@ -740,7 +722,6 @@ type ShapeElementSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type ContainerElementSVGAttributes =
-    inherit CoreSVGAttributes
     inherit ShapeElementSVGAttributes
     inherit clippathAttributeInterfaceProvider
     inherit colorinterpolationAttributeInterfaceProvider
@@ -754,7 +735,6 @@ type ContainerElementSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type TextContentElementSVGAttributes =
-    inherit CoreSVGAttributes
     inherit alignmentbaselineAttributeInterfaceProvider
     inherit baselineshiftAttributeInterfaceProvider
     inherit colorAttributeInterfaceProvider
@@ -826,7 +806,6 @@ type CircleSVGAttributes =
     inherit GraphicsElementSVGAttributes
     inherit ShapeElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit cxAttributeInterfaceProvider
     inherit cyAttributeInterfaceProvider
@@ -835,10 +814,8 @@ type CircleSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type ClipPathSVGAttributes =
-    inherit CoreSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit clippathAttributeInterfaceProvider
 
@@ -848,14 +825,11 @@ type DefsSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type DescSVGAttributes =
-    inherit CoreSVGAttributes
-    inherit StylableSVGAttributes
+type DescSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
@@ -864,7 +838,6 @@ type EllipseSVGAttributes =
     inherit ShapeElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit cxAttributeInterfaceProvider
     inherit cyAttributeInterfaceProvider
@@ -876,14 +849,12 @@ type EllipseSVGAttributes =
 type FeBlendSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit DoubleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FeColorMatrixSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
     inherit typeAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
@@ -891,14 +862,12 @@ type FeColorMatrixSVGAttributes =
 type FeComponentTransferSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FeCompositeSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit DoubleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
     inherit operatorAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
@@ -906,7 +875,6 @@ type FeCompositeSVGAttributes =
 type FeConvolveMatrixSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
     inherit kernelUnitLengthAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
@@ -914,7 +882,6 @@ type FeConvolveMatrixSVGAttributes =
 type FeDiffuseLightingSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
     inherit colorAttributeInterfaceProvider
     inherit kernelUnitLengthAttributeInterfaceProvider
     inherit surfaceScaleAttributeInterfaceProvider
@@ -925,7 +892,6 @@ type FeDiffuseLightingSVGAttributes =
 type FeDisplacementMapSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit DoubleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
@@ -935,9 +901,7 @@ type FeDistantLightSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FeDropShadowSVGAttributes =
-    inherit CoreSVGAttributes
     inherit FilterPrimitiveElementSVGAttributes
-    inherit StylableSVGAttributes
     inherit colorAttributeInterfaceProvider
     inherit floodcolorAttributeInterfaceProvider
     inherit floodOpacityAttributeInterfaceProvider
@@ -949,7 +913,6 @@ type FeDropShadowSVGAttributes =
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FeFloodSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
-    inherit StylableSVGAttributes
     inherit colorAttributeInterfaceProvider
     inherit floodcolorAttributeInterfaceProvider
     inherit floodOpacityAttributeInterfaceProvider
@@ -957,7 +920,6 @@ type FeFloodSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FeFuncSVGAttributes =
-    inherit CoreSVGAttributes
     inherit typeAttributeInterfaceProvider
     inherit offsetAttributeInterfaceProvider
 
@@ -966,7 +928,6 @@ type FeFuncSVGAttributes =
 type FeGaussianBlurSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
     inherit stdDeviationAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
@@ -974,7 +935,6 @@ type FeGaussianBlurSVGAttributes =
 type FeImageSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit hrefAttributeInterfaceProvider
     inherit preserveAspectRatioAttributeInterfaceProvider
 
@@ -982,12 +942,10 @@ type FeImageSVGAttributes =
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FeMergeSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
-    inherit StylableSVGAttributes
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FeMergeNodeSVGAttributes =
-    inherit CoreSVGAttributes
     inherit SingleInputFilterSVGAttributes
 
 [<AllowNullLiteral>]
@@ -995,7 +953,6 @@ type FeMergeNodeSVGAttributes =
 type FeMorphologySVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
     inherit operatorAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
@@ -1003,7 +960,6 @@ type FeMorphologySVGAttributes =
 type FeOffsetSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
     inherit dxAttributeInterfaceProvider
     inherit dyAttributeInterfaceProvider
 
@@ -1020,7 +976,6 @@ type FePointLightSVGAttributes =
 type FeSpecularLightingSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
     inherit colorAttributeInterfaceProvider
     inherit kernelUnitLengthAttributeInterfaceProvider
     inherit surfaceScaleAttributeInterfaceProvider
@@ -1041,21 +996,17 @@ type FeSpotLightSVGAttributes =
 type FeTileSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
-    inherit StylableSVGAttributes
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FeTurbulanceSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
-    inherit StylableSVGAttributes
     inherit typeAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type FilterSVGAttributes =
-    inherit CoreSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit xAttributeInterfaceProvider
     inherit yAttributeInterfaceProvider
     inherit widthAttributeInterfaceProvider
@@ -1067,7 +1018,6 @@ type ForeignObjectSVGAttributes =
     inherit NewViewportSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit displayAttributeInterfaceProvider
     inherit visibilityAttributeInterfaceProvider
@@ -1082,7 +1032,6 @@ type GSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit displayAttributeInterfaceProvider
     inherit visibilityAttributeInterfaceProvider
@@ -1093,7 +1042,6 @@ type ImageSVGAttributes =
     inherit NewViewportSVGAttributes
     inherit GraphicsElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit colorprofileAttributeInterfaceProvider
     inherit imageRenderingAttributeInterfaceProvider
@@ -1111,7 +1059,6 @@ type LineSVGAttributes =
     inherit ShapeElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit markerEndAttributeInterfaceProvider
     inherit markerMidAttributeInterfaceProvider
@@ -1135,7 +1082,6 @@ type LinearGradientSVGAttributes =
 type MarkerSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit FitToViewBoxSVGAttributes
     inherit clipAttributeInterfaceProvider
     inherit overflowAttributeInterfaceProvider
@@ -1152,7 +1098,6 @@ type MaskSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit xAttributeInterfaceProvider
     inherit yAttributeInterfaceProvider
     inherit widthAttributeInterfaceProvider
@@ -1162,13 +1107,11 @@ type MaskSVGAttributes =
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type MetadataSVGAttributes =
-    inherit CoreSVGAttributes
+type MetadataSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type MPathSVGAttributes =
-    inherit CoreSVGAttributes
+type MPathSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
@@ -1177,7 +1120,6 @@ type PathSVGAttributes =
     inherit ShapeElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit markerEndAttributeInterfaceProvider
     inherit markerMidAttributeInterfaceProvider
@@ -1191,7 +1133,6 @@ type PatternSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit FitToViewBoxSVGAttributes
     inherit clipAttributeInterfaceProvider
     inherit overflowAttributeInterfaceProvider
@@ -1211,7 +1152,6 @@ type PolygonSVGAttributes =
     inherit ShapeElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit markerEndAttributeInterfaceProvider
     inherit markerMidAttributeInterfaceProvider
@@ -1225,7 +1165,6 @@ type PolylineSVGAttributes =
     inherit ShapeElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit markerEndAttributeInterfaceProvider
     inherit markerMidAttributeInterfaceProvider
@@ -1247,7 +1186,6 @@ type RectSVGAttributes =
     inherit ShapeElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit xAttributeInterfaceProvider
     inherit yAttributeInterfaceProvider
@@ -1259,15 +1197,11 @@ type RectSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type SetSVGAttributes =
-    inherit CoreSVGAttributes
-    inherit StylableSVGAttributes
     inherit AnimationTimingSVGAttributes
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type StopSVGAttributes =
-    inherit CoreSVGAttributes
-    inherit StylableSVGAttributes
     inherit colorAttributeInterfaceProvider
     inherit stopColorAttributeInterfaceProvider
     inherit stopOpacityAttributeInterfaceProvider
@@ -1280,7 +1214,6 @@ type SvgSVGAttributes =
     inherit NewViewportSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit FitToViewBoxSVGAttributes
     inherit ZoomAndPanSVGAttributes
     inherit PresentationSVGAttributes
@@ -1300,7 +1233,6 @@ type SwitchSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit displayAttributeInterfaceProvider
     inherit visibilityAttributeInterfaceProvider
@@ -1311,7 +1243,6 @@ type SymbolSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit NewViewportSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit FitToViewBoxSVGAttributes
     inherit xAttributeInterfaceProvider
     inherit yAttributeInterfaceProvider
@@ -1329,7 +1260,6 @@ type TextSVGAttributes =
     inherit GraphicsElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit TransformableSVGAttributes
     inherit textRenderingAttributeInterfaceProvider
     inherit writingModeAttributeInterfaceProvider
@@ -1347,7 +1277,6 @@ type TextPathSVGAttributes =
     inherit TextContentElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit alignmentbaselineAttributeInterfaceProvider
     inherit baselineshiftAttributeInterfaceProvider
     inherit displayAttributeInterfaceProvider
@@ -1359,7 +1288,6 @@ type TSpanSVGAttributes =
     inherit TextContentElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
-    inherit StylableSVGAttributes
     inherit alignmentbaselineAttributeInterfaceProvider
     inherit baselineshiftAttributeInterfaceProvider
     inherit displayAttributeInterfaceProvider
@@ -1375,8 +1303,6 @@ type TSpanSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type UseSVGAttributes =
-    inherit CoreSVGAttributes
-    inherit StylableSVGAttributes
     inherit ConditionalProcessingSVGAttributes
     inherit GraphicsElementSVGAttributes
     inherit PresentationSVGAttributes
@@ -1391,7 +1317,6 @@ type UseSVGAttributes =
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type ViewSVGAttributes =
-    inherit CoreSVGAttributes
     inherit ExternalResourceSVGAttributes
     inherit FitToViewBoxSVGAttributes
     inherit ZoomAndPanSVGAttributes
@@ -2316,44 +2241,6 @@ module AttributeExtensions =
             with set (_: U2<float, string>) = ()
             and [<Erase>] get (): U2<float, string> = JS.undefined
 
-    type CoreSVGAttributes with
-        [<Erase>]
-        member _.id
-            with set (_: string) = ()
-            and [<Erase>] get (): string = JS.undefined
-
-        [<Erase>]
-        member _.lang
-            with set (_: string) = ()
-            and [<Erase>] get (): string = JS.undefined
-
-        [<Erase>]
-        member _.tabIndex
-            with set (_: U2<float, string>) = ()
-            and [<Erase>] get (): U2<float, string> = JS.undefined
-
-        [<Erase>]
-        member _.tabindex
-            with set (_: U2<float, string>) = ()
-            and [<Erase>] get (): U2<float, string> = JS.undefined
-
-    type StylableSVGAttributes with
-        [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-        member _.``class``
-            with set (_: string) = ()
-            and [<Erase>] get (): string = JS.undefined
-
-        [<Erase>]
-        member this.class'
-            with inline set(value: string) = this.``class`` <- value
-            and inline get(): string = this.``class``
-
-        [<Erase>]
-        member _.style
-            with set (_: string) = ()
-            and [<Erase>] get (): string = JS.undefined
-
     type TransformableSVGAttributes with
         [<Erase>]
         member _.transform
@@ -2523,17 +2410,6 @@ module AttributeExtensions =
 
         [<Erase>]
         member _.in2
-            with set (_: string) = ()
-            and [<Erase>] get (): string = JS.undefined
-
-    type FitToViewBoxSVGAttributes with
-        [<Erase>]
-        member _.viewBox
-            with set (_: string) = ()
-            and [<Erase>] get (): string = JS.undefined
-
-        [<Erase>]
-        member _.preserveAspectRatio
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
 
@@ -2837,7 +2713,7 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.method
-            with set(value: string) = ()
+            with set(_: string) = ()
             and get(): string = JS.undefined
 
         [<Erase>]
