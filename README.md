@@ -5,7 +5,7 @@
 
 <div align="center">
   <a href="https://github.com/shayanhabibi/Partas.Solid" target="_blank">
-  <img src="public/Partas_d00b_00a icon.png" height="42px"/>
+  <img src="https://github.com/shayanhabibi/Partas.Solid/blob/master/Public/Partas_d00b_00a%20icon.png" height="42px"/>
   </a>
 <h3 align="center">Partas.Solid</h3>
   <p align="center">
