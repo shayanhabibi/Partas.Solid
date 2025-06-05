@@ -20,3 +20,12 @@ export function NestedSplitProps(props) {
     </div>;
 }
 
+export function SplitValMutable(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["index"]);
+    return <div tabindex={PARTAS_LOCAL.index} />;
+}
+
+export function SplitInheritedValMutable(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["index"]);
+    return <div tabindex={PARTAS_LOCAL.index} />;
+}

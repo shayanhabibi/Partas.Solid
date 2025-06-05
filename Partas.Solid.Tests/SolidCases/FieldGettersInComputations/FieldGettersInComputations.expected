@@ -1,6 +1,6 @@
-import { Record } from "./fable_modules/fable-library-js.5.0.0-alpha.12/Types.js";
-import { record_type, class_type, string_type } from "./fable_modules/fable-library-js.5.0.0-alpha.12/Reflection.js";
-import { item, singleton } from "./fable_modules/fable-library-js.5.0.0-alpha.12/List.js";
+import { Record } from "./fable_modules/fable-library-js.5.0.0-alpha.13/Types.js";
+import { record_type, class_type, string_type } from "./fable_modules/fable-library-js.5.0.0-alpha.13/Reflection.js";
+import { item, singleton } from "./fable_modules/fable-library-js.5.0.0-alpha.13/List.js";
 
 export class MenuItem extends Record {
     constructor(Title, Url, Icon) {

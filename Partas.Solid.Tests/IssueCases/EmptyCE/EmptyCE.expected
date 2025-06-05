@@ -1,5 +1,5 @@
-import { fold } from "./fable_modules/fable-library-js.5.0.0-alpha.12/List.js";
-import { uncurry2 } from "./fable_modules/fable-library-js.5.0.0-alpha.12/Util.js";
+import { fold } from "./fable_modules/fable-library-js.5.0.0-alpha.13/List.js";
+import { uncurry2 } from "./fable_modules/fable-library-js.5.0.0-alpha.13/Util.js";
 import { For } from "solid-js";
 
 export function cn(listofclasses) {
@@ -8,7 +8,7 @@ export function cn(listofclasses) {
 
 export function Compponent(show) {
     return <div class={cn(["testcase", (show) ? ("showthis") : (null), "i\'m always here"])}>
-        {show ? "I show sometimes!" : undefined}
+        {show ? ("I show sometimes!") : (undefined)}
         I show always!
         <For each={[1, 2, 3, (show) ? (4) : (null), 5]}>
         </For>

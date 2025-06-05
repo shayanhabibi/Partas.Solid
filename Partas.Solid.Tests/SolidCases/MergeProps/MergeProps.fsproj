@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="MergePropsTypes.fs" />
         <Compile Include="MergeProps.fs" />
     </ItemGroup>
 

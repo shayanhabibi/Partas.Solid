@@ -25,9 +25,11 @@
         <None Include="SolidCases\ChildrenSimple\ChildrenSimple.fsproj" />
         <None Include="SolidCases\ChildrenSimple\ChildrenSimple.expected" />
         <Compile Include="SolidCases\ChildrenSimple\ChildrenSimple.fs" />
+        <Compile Include="SolidCases\MergeProps\MergePropsTypes.fs" />
         <Compile Include="SolidCases\MergeProps\MergeProps.fs" />
         <None Include="SolidCases\MergeProps\MergeProps.expected" />
         <None Include="SolidCases\MergeProps\MergeProps.fsproj" />
+        <Compile Include="SolidCases\SplitProps\SplitPropsTypes.fs" />
         <Compile Include="SolidCases\SplitProps\SplitProps.fs" />
         <None Include="SolidCases\SplitProps\SplitProps.expected" />
         <None Include="SolidCases\SplitProps\SplitProps.fsproj" />

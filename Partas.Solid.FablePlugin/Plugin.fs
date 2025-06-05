@@ -86,6 +86,20 @@ module internal rec AST =
                     Some(name, expr)
                 | _ ->
                     None
+            // This is a setter to a val mutable field.
+            | Set(
+                (
+                    // Defined locally
+                    IdentExpr(Ident.IdentIs ctx IdentType.Props)
+                    // inherited
+                  | TypeCast(IdentExpr(Ident.IdentIs ctx IdentType.Props), _)
+                )
+                ,FieldSet(name)
+                ,_
+                ,expr
+                ,_) ->
+                Some(name, expr)
+                
             | _ -> None
         /// <summary>
         /// Recognizes whether current expression is considered a prop setter by any
@@ -98,7 +112,12 @@ module internal rec AST =
         /// </remarks>
         let private (|PropertyGetter|_|) (ctx: PluginContext) = function
             | Get(
-                IdentExpr(Ident.IdentIs ctx IdentType.Props),
+                (
+                    // Defined locally
+                    IdentExpr(Ident.IdentIs ctx IdentType.Props)
+                    // Inherited
+                  | TypeCast(IdentExpr(Ident.IdentIs ctx IdentType.Props), _)
+                ),
                 FieldGet({ Name = prop }), _, _
                 )
             | Call(

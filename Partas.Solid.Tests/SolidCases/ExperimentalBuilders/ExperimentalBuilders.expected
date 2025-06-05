@@ -1,7 +1,7 @@
 import { createSelector, batch, createMemo, onMount, onCleanup, children, splitProps, createEffect, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import { MatchFailureException } from "./fable_modules/fable-library-js.5.0.0-alpha.12/Types.js";
-import { printf, toConsole } from "./fable_modules/fable-library-js.5.0.0-alpha.12/String.js";
+import { MatchFailureException } from "./fable_modules/fable-library-js.5.0.0-alpha.13/Types.js";
+import { printf, toConsole } from "./fable_modules/fable-library-js.5.0.0-alpha.13/String.js";
 
 export const patternInput$004013 = createSignal(10);
 

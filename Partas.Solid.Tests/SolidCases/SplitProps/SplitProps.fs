@@ -2,6 +2,7 @@
 
 open Partas.Solid
 open Fable.Core
+open Partas.Solid.Tests.SolidCases.SplitPropsTypes
 
 type [<Erase>] SplitProps() =
     interface RegularNode
@@ -23,4 +24,16 @@ type [<Erase>] NestedSplitProps() =
             "text"
         }
 
-    
+type [<Erase>] SplitValMutable() =
+    interface RegularNode
+    [<DefaultValue>]
+    val mutable index: int
+    [<SolidTypeComponent>]
+    member props.__ =
+        div(tabindex = props.index)
+
+type [<Erase>] SplitInheritedValMutable() =
+    inherit MyComponent()
+    [<SolidTypeComponent>]
+    member props.__ =
+        div(tabindex = props.index)

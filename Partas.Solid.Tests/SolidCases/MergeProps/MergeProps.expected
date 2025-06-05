@@ -66,3 +66,19 @@ export function NestedMergeWithChildren(props) {
     </div>;
 }
 
+export function ValMutableMerge(props) {
+    props = mergeProps({
+        index: 5,
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div />;
+}
+
+export function ValMutableMergeInherited(props) {
+    props = mergeProps({
+        index: 5,
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div />;
+}
+

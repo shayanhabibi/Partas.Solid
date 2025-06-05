@@ -2,6 +2,7 @@
 
 open Partas.Solid
 open Fable.Core
+open Partas.Solid.Tests.SolidCases.MergePropsTypes
 
 type [<Erase>] SimpleMerge() =
     interface RegularNode
@@ -63,4 +64,18 @@ type [<Erase>] NestedMergeWithChildren() =
             }
         }
         
+type [<Erase>] ValMutableMerge() =
+    interface RegularNode
+    [<DefaultValue>]
+    val mutable index: int
+    [<SolidTypeComponent>]
+    member props.__ =
+        props.index <- 5
+        div()
 
+type [<Erase>] ValMutableMergeInherited() =
+    inherit MyComponent()
+    [<SolidTypeComponent>]
+    member props.__ =
+        props.index <- 5
+        div()
