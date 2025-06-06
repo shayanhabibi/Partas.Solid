@@ -437,7 +437,7 @@ module HtmlAttributes =
             and get(): obj = unbox ()
         [<Erase; LanguageInjection("jsx", Prefix = "<div style='", Suffix = "' />")>]
         member this.style 
-            with inline set (value: string) = this.style'' <- JSX.jsx value
+            with inline set (value: string) = this.style'' <- value
             and inline [<Erase>] get(): string = !!this.style''
         [<Erase; LanguageInjection("jsx", Prefix = "<div tabindex='", Suffix = "' >")>]
         member _.tabindex 
