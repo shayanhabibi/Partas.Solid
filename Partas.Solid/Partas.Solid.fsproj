@@ -16,10 +16,10 @@
         <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
-        <Version>1.0.1</Version>
+        <Version>1.0.2</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.0.1</PackageVersion>
-        <PackageReleaseNotes>HOTFIX: style no longer routes through JSX.jsx</PackageReleaseNotes>
+        <PackageVersion>1.0.2</PackageVersion>
+        <PackageReleaseNotes>HOTFIX: Nuget collision with historical local version.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
