@@ -213,6 +213,7 @@ module internal rec AST =
                 | "spread", [ (TypeCast(IdentExpr({ Name = ident }), _) | IdentExpr({ Name = ident })) ]
                     when fable5 ->
                     Some("{..." + ident + "} bool:n$", Value(ValueKind.BoolConstant(false), None))
+                // handles tupled getters `div().spread(someEnumerable[0])`
                 | "spread", [ (TypeCast(
                         Get(
                             IdentExpr({ Name = ident }),
@@ -231,6 +232,25 @@ module internal rec AST =
                         )
                     ) ] ->
                     Some("{..." + ident + "[" + string indx + "]} bool:n$", Value(ValueKind.BoolConstant(false), None))
+                // handles field getters `div().spread(props.otherProps)`
+                | "spread", [ (TypeCast(
+                        Get(
+                            IdentExpr({ Name = ident }),
+                            FieldGet { Name = identSuffix },
+                            _,
+                            _
+                            )
+                        , _
+                        )
+                    ) | (
+                        Get(
+                            IdentExpr({ Name = ident }),
+                            FieldGet { Name = identSuffix },
+                            _,
+                            _
+                        )
+                    ) ] ->
+                    Some("{..." + ident + "." + identSuffix + "} bool:n$", Value(ValueKind.BoolConstant(false), None))
                 | "spread", [ expr ]
                     when fable4 ->
                     $"Spread does not support this as a value in Fable 4 or below:\n{expr}"
@@ -276,9 +296,7 @@ module internal rec AST =
                         Some(attrName, expr)
                     
                     
-                // -- FEATURE NOT PRESENT IN FABLE COMPILER YET -- //
-                // | "spread", [ identExpr ] when fable5 -> 
-                //     Some("__SPREAD_PROPERTY__", identExpr)
+
                 | _ ->
                     $"Unhandled extension: {extensionName}\nProvidedValues: {exprs}"
                     |> PluginContext.logError ctx
