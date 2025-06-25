@@ -5,3 +5,7 @@ riderModule.iml
 /_ReSharper.Caches/
 /Partas.Solid.sln
 /ScratchTests
+.fake
+*.fs.jsx
+*.fs.js
+.idea
