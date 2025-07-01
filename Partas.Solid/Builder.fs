@@ -36,6 +36,8 @@ module Builder =
     [<AllowNullLiteral; Interface>]
     type VoidNode =
         inherit HtmlTag
+    
+    let inline jsx value = JSX.jsx value |> unbox<HtmlElement>
         
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type IChildLambdaProvider = inherit HtmlElement
@@ -214,14 +216,7 @@ module Builder =
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_TEXT: int) : HtmlContainerFun = fun PARTAS_YIELD -> ignore PARTAS_TEXT
-        
-        // [<Erase>]
-        // member inline _.For(PARTAS_VALUES: #seq<'T>, [<InlineIfLambda>] PARTAS_BODY: 'T -> HtmlContainerFun): HtmlContainerFun =
-        //     fun PARTAS_BUILDER ->
-        //         for PARTAS_VALUE in PARTAS_VALUES do
-        //             PARTAS_BODY PARTAS_VALUE PARTAS_BUILDER
 
-    
     type IChildLambdaProvider with
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]

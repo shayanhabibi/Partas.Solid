@@ -109,6 +109,9 @@ module Bindings =
         static member inline getServerFunctionMeta =
             let inline fn(): unit -> {| id: string |} = (JsInterop.import "getServerFunctionMeta" Spec.path)
             (fn()()).id
+        [<ImportMember(Spec.path + "/config")>]
+        static member defineConfig(config: obj): obj = jsNative
+        static member inline defineConfig(objList: (string * obj) list) = defineConfig(JsInterop.createObj objList) 
         
     [<Import("StartServer", Spec.path + "/server")>]
     type StartServer() =
@@ -116,15 +119,23 @@ module Bindings =
         [<DefaultValue>]
         val mutable document: ({|children: HtmlElement; assets: link; scripts: script|} -> html)
     
+    [<Erase>]
+    module Client =
+        [<ImportMember(Spec.path + "/client")>]
+        let mount (fn: unit -> HtmlElement, el: obj) = jsNative
+        
     [<Import("StartClient", Spec.path + "/client")>]
     type StartClient() =
         interface HtmlElement
+        member inline this.mount(el: obj) = Client.mount((fun () -> this), el)
+    
+    type private T = HttpStatusCode
     
     [<Import("HttpStatusCode", Spec.path)>]
     type HttpStatusCode() =
         interface VoidNode
         [<DefaultValue>]
-        val mutable code: HttpStatusCode
+        val mutable code: T
     
     [<Import("HttpHeader", Spec.path)>]
     type HttpHeader() =
@@ -137,3 +148,9 @@ module Bindings =
     [<Import("FileRoutes", Spec.path + "/router")>]
     type FileRoutes() =
         interface HtmlElement
+        member inline this.ToRoute() = unbox<Router.Bindings.Route> this
+    
+    type Exports with
+        [<ImportMember(Spec.path)>]
+        static member clientOnly (importFunc: unit -> JS.Promise<HtmlElement>): TagValue = jsNative
+    
