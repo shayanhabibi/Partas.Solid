@@ -38,6 +38,7 @@ module Builder =
     type VoidNode =
         inherit HtmlTag
 
+    
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type IChildLambdaProvider =
         inherit HtmlElement
