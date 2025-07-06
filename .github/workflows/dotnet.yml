@@ -46,7 +46,7 @@ jobs:
         env:
           NITRO_PRESET: github_pages
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./.output/public
   deploy:
@@ -64,4 +64,4 @@ jobs:
     steps:
       - name: Deploy to Github Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
