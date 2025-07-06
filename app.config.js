@@ -25,7 +25,6 @@ export default defineConfig(withSolidBase(
                     ]
                 }
             },
-            base: "/Partas.Solid/"
         },
         // Vinxi/Nitro/SolidStart
         server: {
@@ -33,7 +32,7 @@ export default defineConfig(withSolidBase(
             prerender: {
                 crawlLinks: true
             },
-            preset: "github_pages",
+            preset: "vercel",
         }
     },
     // solidbase config
@@ -58,8 +57,8 @@ export default defineConfig(withSolidBase(
                 }
             ],
             sidebar: {
-                "/": [],
-                "/partas-solid" : {
+                "/Partas.Solid/": [],
+                "/Partas.Solid/partas-solid" : {
                     items: [
                         {
                             title: "About",
