@@ -2,9 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - docs
+#  push:
+#    branches:
+#      - docs
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
