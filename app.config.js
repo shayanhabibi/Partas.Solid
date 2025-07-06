@@ -24,7 +24,8 @@ export default defineConfig(withSolidBase(
                         "**/*.fsx"
                     ]
                 }
-            }
+            },
+            base: "/Partas.Solid/"
         },
         // Vinxi/Nitro/SolidStart
         server: {
@@ -33,7 +34,6 @@ export default defineConfig(withSolidBase(
                 crawlLinks: true
             },
             preset: "github_pages",
-            baseUrl: "/Partas.Solid/",
         }
     },
     // solidbase config
