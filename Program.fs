@@ -8,7 +8,7 @@ open Helpers
 initializeContext ()
 
 let basePath = __SOURCE_DIRECTORY__
-let clientPath = basePath + @"\Partas.Solid"
+let clientPath = basePath + @"/Partas.Solid"
 
 Target.create "Clean" (fun _ ->
     run fable [ "clean"
@@ -47,7 +47,7 @@ Target.create "QuickDev" (fun _ ->
     )
 
 Target.create "Build" (fun _ ->
-        run dotnet ["tool"; "run"; "fable"; "-e"; ".fs.jsx"; "--optimize"; "-c"; "Release"; "--typedArrays"; "false"] basePath
+        run dotnet ["tool"; "run"; "fable"; "-e"; ".fs.jsx"; "--optimize"; "-c"; "Release"; "--typedArrays"; "false"] clientPath
     )
 
 open Fake.Core.TargetOperators
