@@ -1,0 +1,86 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <FablePackageType>library</FablePackageType>
+        <TargetFramework>net9.0</TargetFramework>
+        <!--        <WarningsAsErrors>3239;0025</WarningsAsErrors>-->
+        <PackageId>Partas.Solid.Kobalte</PackageId>
+        <Title>Partas.Solid.Kobalte</Title>
+        <RootNamespace>Partas.Solid.Kobalte</RootNamespace>
+        <AssemblyName>Partas.Solid.Kobalte</AssemblyName>
+        <Company>F# Community</Company>
+        <Description>Bindings for Kobalte for Partas.Solid</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/shayanhabibi/Partas.Bindings</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;Bindings;Solid-Kobalte</PackageTags>
+        <Authors>Shayan Habibi</Authors>
+        <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
+        <Version>0.3.5</Version>
+                <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageVersion>0.3.5</PackageVersion>
+                <PackageReleaseNotes>Refactor to use true property definitions for Partas.Solid.Storybook compatibility</PackageReleaseNotes>
+        <NpmDependencies>
+            <NpmPackage Name="@kobalte/core" Version=">= 0.13.10" />
+        </NpmDependencies>
+    </PropertyGroup>
+
+    <ItemGroup>
+                <None Include="../README.md" Pack="true" PackagePath="\" />
+                <Compile Include="Spec.fs" />
+        <Compile Include="Program.fs" />
+        <Content Include="README.md" />
+        <Compile Include="Collapsible.fs" />
+        <Compile Include="Button.fs" />
+        <Compile Include="Link.fs" />
+        <Compile Include="Accordion.fs" />
+        <Compile Include="Alert.fs" />
+        <Compile Include="AlertDialog.fs" />
+        <Compile Include="Badge.fs" />
+        <Compile Include="Breadcrumbs.fs" />
+        <Compile Include="Checkbox.fs" />
+        <Compile Include="Combobox.fs" />
+        <Compile Include="ContextMenu.fs" />
+        <Compile Include="Dialog.fs" />
+        <Compile Include="DropdownMenu.fs" />
+        <Compile Include="FileField.fs" />
+        <Compile Include="HoverCard.fs" />
+        <Compile Include="Image.fs" />
+        <Compile Include="Menubar.fs" />
+        <Compile Include="Meter.fs" />
+        <Compile Include="NavigationMenu.fs" />
+        <Compile Include="NumberField.fs" />
+        <Compile Include="Pagination.fs" />
+        <Compile Include="Popover.fs" />
+        <Compile Include="Progress.fs" />
+        <Compile Include="RadioGroup.fs" />
+        <Compile Include="Select.fs" />
+        <Compile Include="SeparatorSkeleton.fs" />
+        <Compile Include="Slider.fs" />
+        <Compile Include="Switch.fs" />
+        <Compile Include="Tabs.fs" />
+        <Compile Include="TextField.fs" />
+        <Compile Include="ToggleButton.fs" />
+        <Compile Include="Tooltip.fs" />
+        <Compile Include="ToggleGroup.fs" />
+        <Compile Include="SegmentedControl.fs" />
+        <Compile Include="ColorArea.fs" />
+        <Compile Include="ColorChannelField.fs" />
+        <Compile Include="ColorField.fs" />
+        <Compile Include="ColorSlider.fs" />
+        <Compile Include="ColorSwatch.fs" />
+        <Compile Include="ColorMode.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Fable.Core" Version="4.5.0" />
+        <PackageReference Include="Fable.Package.SDK" Version="1.3.1">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Partas.Solid" Version="1.0.0" />
+        <PackageReference Include="Partas.Solid.FablePlugin" Version="1.0.0" />
+        <PackageReference Update="FSharp.Core" Version="9.0.300" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+<PropertyGroup>
+    <FablePackageType>library</FablePackageType>
+    <TargetFramework>net9.0</TargetFramework>
+    <WarningsAsErrors>3239;0025</WarningsAsErrors>
+    <PackageId>Partas.Solid.Motion</PackageId>
+    <Title>Partas.Solid.Motion</Title>
+    <RootNamespace>Partas.Solid.Motion</RootNamespace>
+    <AssemblyName>Partas.Solid.Motion</AssemblyName>
+    <Company>F# Community</Company>
+    <Description>Bindings for Solid-MotionOne in Oxpecker.Solid Style compatible with Partas.Solid</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/shayanhabibi/Partas.Bindings</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;Bindings;Solid-MotionOne</PackageTags>
+    <Authors>Shayan Habibi</Authors>
+    <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
+    <Version>0.2.1</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageVersion>0.2.1</PackageVersion>
+    <PackageReleaseNotes>Change MotionStyle to produce camelCased CSS properties; despite source claims, kebab cased is not working.</PackageReleaseNotes>
+    <NpmDependencies>
+        <NpmPackage Name="solid-motionone" Version=">= 1.0.0" />
+    </NpmDependencies>
+</PropertyGroup>
+
+<ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="\" />
+    <Compile Include="IdeTweaks.fs" />
+    <Compile Include="LibDom.fs" />
+    <Compile Include="Style.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="Program.fs" />
+    <Compile Include="Tags.fs" />
+    <Content Include="README.md" />
+    <Compile Include="Motion.fs" />
+</ItemGroup>
+
+<ItemGroup>
+    <PackageReference Include="Fable.Core" Version="4.5.0" />
+    <PackageReference Include="Fable.Package.SDK" Version="1.3.1">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Partas.Solid" Version="1.0.0-alpha98" />
+</ItemGroup>
+
+</Project>
