@@ -9,7 +9,7 @@ on:
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
-  DOTNET_VERSION: 9.0.101
+  DOTNET_VERSION: 9.0.303
 
 # Kill other jobs when we trigger this workflow by sending new commits
 # to the PR.

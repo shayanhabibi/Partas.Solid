@@ -27,7 +27,7 @@ Target.create "Dev" (fun _ ->
 )
 
 Target.create "Restore" (fun _ ->
-    [ "npm", npm [ "install" ] clientPath
+    [ "npm", npm [ "install" ] basePath
       "dotnet", dotnet [ "restore"; "Partas.Solid.sln" ] basePath ] |> runParallel
 )
 
