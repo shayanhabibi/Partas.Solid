@@ -57,8 +57,8 @@ export default defineConfig(withSolidBase(
                 }
             ],
             sidebar: {
-                "/Partas.Solid/": [],
-                "/Partas.Solid/partas-solid" : {
+                "/": [],
+                "/partas-solid" : {
                     items: [
                         {
                             title: "About",
