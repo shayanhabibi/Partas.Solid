@@ -1,14 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Build", "Build.fsproj", "{CB6D3854-1F14-4F1D-A025-F28CFF232972}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Partas.Solid.Docs", "Partas.Solid\Partas.Solid.Docs.fsproj", "{683F7DA4-9A9E-4159-AD86-91786E923ED5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolidStartConfig", "SolidStartConfig", "{27587754-387C-4E99-9D0C-F4DE452AC289}"
+	ProjectSection(SolutionItems) = preProject
+		package.json = package.json
+		app.config.js = app.config.js
+		jsconfig.json = jsconfig.json
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{107B9E6E-5EF2-4ECA-91F1-11D3A7940D4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{107B9E6E-5EF2-4ECA-91F1-11D3A7940D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{107B9E6E-5EF2-4ECA-91F1-11D3A7940D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{107B9E6E-5EF2-4ECA-91F1-11D3A7940D4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB6D3854-1F14-4F1D-A025-F28CFF232972}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB6D3854-1F14-4F1D-A025-F28CFF232972}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB6D3854-1F14-4F1D-A025-F28CFF232972}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB6D3854-1F14-4F1D-A025-F28CFF232972}.Release|Any CPU.Build.0 = Release|Any CPU
+		{683F7DA4-9A9E-4159-AD86-91786E923ED5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{683F7DA4-9A9E-4159-AD86-91786E923ED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{683F7DA4-9A9E-4159-AD86-91786E923ED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{683F7DA4-9A9E-4159-AD86-91786E923ED5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
