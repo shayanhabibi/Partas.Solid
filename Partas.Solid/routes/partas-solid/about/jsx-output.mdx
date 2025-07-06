@@ -1,0 +1,278 @@
+---
+title: JSX Output
+---
+
+# JSX Compiled Output
+
+:::tip[]
+clean-*ish*™
+:::
+
+```jsx tab title="JSX: Output"
+export function RootApp(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["children"]);
+    return <SidebarProvider mobileBreakpoint={1023}
+        style={{
+            "--navbar-size": `calc(var(--spacing)*${12}`,
+        }}>
+        <NavigationShell header={<NavigationBar />}
+            sidebar={<SidebarShell footer={GithubVisit()} />}>
+            <MainViewPort>
+                {PARTAS_LOCAL.children}
+            </MainViewPort>
+        </NavigationShell>
+    </SidebarProvider>;
+}
+```
+
+```fsharp tab title="F#: Source"
+[<Erase>]
+type RootApp() =
+    interface RegularNode
+    [<SolidTypeComponent>]
+    member props.__ =
+        SidebarProvider(
+            mobileBreakpoint = 1023
+            ).style'([
+            "--navbar-size" ==> $"calc(var(--spacing)*{12}"
+            ]) {
+            
+            NavigationShell(
+                header = NavigationBar(),
+                sidebar = SidebarShell(footer = GithubVisit())
+                ) {
+                MainViewPort() {
+                    props.children
+                }
+            }
+        }
+```
+
+Clean JSX output provides several benefits over compiling straight to JS:
+
+[[toc]]
+
+## Onboarding JavaScript Developers to F#
+
+By taking advantage of the `Oxpecker` CE style of DOM templating, we are already reducing the cognitive load of learning F# by having a DSL that is closer to what a JavaScript developer would be familiar with.
+
+Much like JSX, the constructors act as the opening tag with properties for attributes, and the following computation expression mimic the scope between the opening and closing tags.
+
+```fsharp tab title="F#"
+div(class' = "flex") {
+    button(onClick = fun _ -> console.log "Clicked!")
+}
+```
+
+```jsx tab title="JSX"
+<div class="flex">
+    <button onClick={(e_1) => { console.log("Clicked!") }}/>
+</div>
+```
+
+A JavaScript developer can also familiarise themselves with the nuances of F#/Fable by checking what their output looks like in a language more familiar to them.
+
+With the power of F#, it's not hard to show how we can drop dependencies by using superior language primitives and constructs.
+
+:::tip[]
+Convince a JS developer to drop a 22.1kb dependency on CVA with F# features
+:::
+
+```fsharp tab title="F#"
+[<Erase>]
+type Button() =
+    inherit Kobalte.Button()
+    static member variants (?variant: Button.Variant, ?size: Button.Size) : string =
+        let variant = defaultArg variant Button.Variant.Default
+        let size = defaultArg size Button.Size.Default
+        "cursor-pointer disabled:cursor-default inline-flex items-center justify-center
+        gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors
+        focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring
+        disabled:pointer-events-none disabled:opacity-50
+        [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 " +
+        match variant with
+        | Button.Variant.Default ->     "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+        | Button.Variant.Destructive -> "bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90"
+        | Button.Variant.Outline ->     "border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground"
+        | Button.Variant.Secondary ->   "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80"
+        | Button.Variant.Ghost ->       "hover:bg-accent hover:text-accent-foreground"
+        | Button.Variant.Link ->        "text-primary underline-offset-4 hover:underline"
+        + " " +
+        match size with
+        | Button.Size.Default ->        "h-9 px-4 py-2"
+        | Button.Size.Small ->          "h-8 rounded-md px-3 text-xs"
+        | Button.Size.Large ->          "h-10 rounded-md px-8"
+        | Button.Size.Icon ->           "h-9 w-9"
+```
+
+```jsx tab title="JSX"
+export function Button_variants_40457300(variant, size) {
+    const variant_1 = defaultArg(variant, "default");
+    const size_1 = defaultArg(size, "default");
+    return (("cursor-pointer disabled:cursor-default inline-flex items-center justify-center\r\n        gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors\r\n        focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring\r\n        disabled:pointer-events-none disabled:opacity-50\r\n        [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 " + ((variant_1 === "destructive") ? "bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90" : ((variant_1 === "outline") ? "border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground" : ((variant_1 === "secondary") ? "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80" : ((variant_1 === "ghost") ? "hover:bg-accent hover:text-accent-foreground" : ((variant_1 === "link") ? "text-primary underline-offset-4 hover:underline" : "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90")))))) + " ") + ((size_1 === "small") ? "h-8 rounded-md px-3 text-xs" : ((size_1 === "large") ? "h-10 rounded-md px-8" : ((size_1 === "icon") ? "h-9 w-9" : "h-9 px-4 py-2")));
+}
+```
+
+## Enabling and Supporting Enterprise Migrations to F#/Fable
+
+Components can quickly and easily be migrated to Fable, or new components can be written in Fable, while having an output that is recognisable and usable by the legacy team.
+
+In combination with storybook (with soon to come Data Contract-like abstractions), there is nothing holding you and your team back.
+
+## Usability and Distributability as a JavaScript package
+
+Within enterprise or open-source circles, having a readable source can be a deciding factor in whether your product is used or not. Having a source code that users can help maintain through pulls/issues etc is a massive boon.
+
+Since our DSL is so close to the native JSX, there is minimal cognitive load in translating any pull to the F# source.
+
+Hopefully, the advent of our over-hyped useless AI janitors will assist in this area.
+
+## Taking Advantage of Solid-JS Optimisations and Helpers
+
+With JSX being the new default method of writing the web, many libraries and frameworks are investing into performing their optimisations from parsed JSX. Similarly, there are utilities which are designed for use in JSX that may not be easily portable to Fable otherwise.
+
+## Less Surprises while Debugging
+
+When you're making your UI, it is not uncommon for something to go awry.
+
+By compiling to a clean JSX output, you have an exponentially greater chance of honing in on the fix.
+
+You're not limited to the size of the F# or Fable community. You now are capable of asking for help from the massive pool of front end developers with a reproducible example in hand.
+
+You also won't be surprised by a Fable, F# or Plugin bug, because you can easily determine whether your intention has been reflected in your output.
+
+```fsharp title="Should work tm"
+// ...
+and [<StringEnum(CaseRules.KebabCase)>] ControlType =
+    | Object
+    // ...
+    | [<CompiledValue(false)>] DoNotRender
+// ...
+ArgTypes.make "onClick" <| ArgType(control = !!ControlType.DoNotRender)
+```
+```jsx title="Well that wasn't what I expected"
+onClick: {
+    control: "do-not-render", // should be `false`
+},
+```
+:::note
+This is being fixed with Fable 5.0
+:::
+
+## Masquerading as a JavaScript Developer
+
+I mean... It's possible. But why?
+
+## Better Coexistence of F# and JavaScript Developers
+
+A moot point after previous sections; but it's worth mentioning again. 
+
+There will be far less pushback to adopting F# and Fable with all the safety and Domain Modeling advantages it brings if existing JavaScript developers can easily grok and use your output. 
+
+If you're working with a design team, its advantageous when the output is in a syntax they are familiar with.
+
+## OTHER MUSINGS
+
+Plenty of development tools out there can take advantage of source code in JSX. I've never had luck making any of them work with Feliz Javascript output. But that's very likely my own failings. That's the point though, I find it much easier to solve those problems when I have something readable to cross-reference against examples.
+
+Also plenty of tools might output to JSX. The gap between making a context for an LLM to parse JSX to Oxpecker syntax is far smaller than Feliz.
+
+# Comparing Output of Fable/Feliz to Oxpecker/Partas
+
+Example code from compiling similar designed sidebars using Feliz and Partas.Solid.
+
+:::note
+Recent efforts to make a Feliz version that uses the newer JSX helpers provided by Fable is underway which would make clean compiled code)
+:::
+
+```js tab title="Feliz"
+function AppSideBar() {
+    let el, el_2, el_4, el_6, children_1_4, children_1_2, children_1_1, children_1, children_1_3;
+    const items = ofArray([{
+        icon: (el = House, createElement(el, {})),
+        title: "Home",
+        url: "#",
+    }, {
+        icon: (el_2 = Inbox, createElement(el_2, {})),
+        title: "Inbox",
+        url: "#",
+    }, {
+        icon: (el_4 = Search, createElement(el_4, {})),
+        title: "Calendar",
+        url: "#",
+    }, {
+        icon: (el_6 = Settings, createElement(el_6, {})),
+        title: "Settings",
+        url: "#",
+    }]);
+    return createElement(Sidebar_1, {
+        collapsible: "icon",
+        children: (children_1_4 = ofArray([(children_1_2 = ofArray([createElement(SidebarGroupLabel_1, {
+            children: "Application",
+        }), (children_1_1 = singleton((children_1 = toList(delay(() => map((item) => {
+            let elems_1, elems;
+            return createElement(SidebarMenuItem_1, createObj(ofArray([["key", item.title], (elems_1 = [createElement(SidebarMenuButton_1, {
+                asChild: true,
+                tooltip: item.title,
+                children: createElement("a", createObj(ofArray([["href", item.url], (elems = [item.icon, createElement("span", {
+                    children: [item.title],
+                })], ["children", reactApi.Children.toArray(Array.from(elems))])]))),
+            })], ["children", reactApi_1.Children.toArray(Array.from(elems_1))])])));
+        }, items))), createElement(SidebarMenu_1, {
+            children: reactApi.Children.toArray(Array.from(children_1)),
+        }))), createElement(SidebarGroupContent_1, {
+            children: reactApi.Children.toArray(Array.from(children_1_1)),
+        }))]), createElement(SidebarGroup_1, {
+            children: reactApi.Children.toArray(Array.from(children_1_2)),
+        })), (children_1_3 = singleton(defaultOf()), createElement(SidebarRail, {
+            children: reactApi.Children.toArray(Array.from(children_1_3)),
+        }))]), createElement(SidebarContent_1, {
+            children: reactApi.Children.toArray(Array.from(children_1_4)),
+        })),
+    });
+}
+```
+
+```jsx tab title="Partas.Solid"
+export function NavSidebarContent(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    const ctx = SidebarModule_Context_useSidebar();
+    return <For each={Data_Navigation_data}>
+        {(group, index) => <SidebarGroup>
+            <SidebarGroupLabel>
+                {group.Title}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+                <SidebarMenu>
+                    <For each={group.Items}>
+                        {(item, itemIndex) => <SidebarMenuItem>
+                            <SidebarMenuButton tooltip={item.Title}
+                                class="group/mbutton disabled:cursor-default"
+                                onClick={(_arg) => {
+                                    if (Data_Window_isMobile() && ctx.openMobile()) {
+                                        ctx.setOpenMobile(false);
+                                    }
+                                }}
+                                as={(PARTAS_POLYPROPS) => <A {...PARTAS_POLYPROPS} on:n$={false}
+                                    href={item.Path} />}>
+                                {(item.Icon != null) ? <item.Icon /> : <Separator orientation="vertical"
+                                    class="group-hover/mbutton:bg-black/20 in-aria-[current=page]:bg-black transition-colors group-hover/mbutton:in-aria-[current=page]:bg-black" />}
+                                <span>
+                                    {item.Title}
+                                </span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>}
+                    </For>
+                </SidebarMenu>
+            </SidebarGroupContent>
+        </SidebarGroup>}
+    </For>;
+}
+```
+
+I know which I would prefer to debug if I was suspicious the transpiled code was at fault for a bug, and not my business logic.
+
+:::tip[Clarification]
+    The above example is not an admonishment of Feliz, its authors/contributors, nor users; it is simply
+    a demonstration of what Fable 5.0 and Partas have to offer.
+:::

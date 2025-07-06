@@ -1,0 +1,82 @@
+---
+title: Solid-Start
+---
+
+# Solid/Start
+
+Lite bindings to the SolidStart library.
+
+:::warning
+These bindings do not wrap all available components/functions
+:::
+
+:::note
+Should Fable eventually support conditional extension compilation, then
+these bindings will be completed, as it will mean we could have 0 reliance
+on having js config files
+:::
+
+:::important
+Ensure your dependencies include `@solidjs/start`.
+
+Ensure you open the `Partas.Solid.Start` namespace.
+:::
+
+## Functions
+
+### useServer
+
+Emits `"use server";` in the output.
+
+```fsharp tab title="F#"
+useServer()
+```
+
+```jsx tab title="JSX"
+"use server";
+```
+
+### getServerFunctionMeta
+
+Used within a server-side function to retrieve the server metadata.
+
+Returns the `id` value from the returned object directly.
+
+### defineConfig
+
+Either takes an object or a list of key,value pairs.
+
+Not much use since its used within a context that requires a specific name/extension.
+
+### mount
+
+Not much use since its used within a context where the `.fs.jsx` would be invalid.
+
+Used within the `entry-client.fsx` file:
+
+```fsharp
+Client.mount((fun () -> StartClient()), document.getElementById "app")
+```
+
+### clientOnly
+
+Use with a lambda that dynamically imports the component/element to ensure it
+is only rendered on the client side.
+
+```fsharp title="Signature"
+type Exports with
+    [<ImportMember(Spec.path)>]
+    static member clientOnly (importFunc: unit -> JS.Promise<HtmlElement>): TagValue = jsNative
+```
+
+## Components
+
+### StartServer
+
+### StartClient
+
+### HttpStatusCode
+
+### HttpHeader
+
+### FileRoutes

@@ -7,19 +7,71 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="app.css"/>
-        <Content Include="app.jsx"/>
-        <Content Include="entry-client.jsx"/>
-        <Content Include="entry-server.jsx"/>
-        <Content Include="global.d.js"/>
-        <Compile Include="Program.fs"/>
-        <Compile Include="routes\index.mdx"/>
-        <Compile Include="routes\about.mdx"/>
-        <Compile Include="routes\[...404].mdx"/>
+        <Compile Include="routes\partas-solid\index.mdx" />
+        <Compile Include="routes\partas-solid\about\index.mdx" />
+        <Content Include="app.css" />
+        <Content Include="app.jsx" />
+        <Content Include="entry-client.jsx" />
+        <Content Include="entry-server.jsx" />
+        <Compile Include="examples\overview.fs" />
+        <Compile Include="examples\kobalte.fs" />
+        <Compile Include="examples\apexcharts.fs" />
+        <Compile Include="examples\motion.fs" />
+        <Content Include="global.d.js" />
+        <Compile Include="Program.fs" />
+        <Content Include="routes\partas-solid\about\oxpecker-fork.mdx" />
+        <Content Include="routes\partas-solid\about\jsx-output.mdx" />
+        <Content Include="routes\partas-solid\installation.mdx" />
+        <Folder Include="routes\partas-solid\overview\" />
+        <Content Include="routes\partas-solid\overview.mdx" />
+        <Content Include="routes\partas-solid\oxpecker-dsl.mdx" />
+        <Content Include="routes\partas-solid\solid-component-attribute.mdx" />
+        <Content Include="routes\partas-solid\solid-type-attribute.mdx" />
+        <Content Include="routes\partas-solid\building-the-dom.mdx" />
+        <Content Include="routes\partas-solid\tag-interfaces.mdx" />
+        <Content Include="routes\partas-solid\extension-methods.mdx" />
+        <Content Include="routes\partas-solid\solid-js.mdx" />
+        <Content Include="routes\partas-solid\aria-attributes.mdx" />
+        <Content Include="routes\partas-solid\svg-elements.mdx" />
+        <Content Include="routes\partas-solid\solid-router.mdx" />
+        <Content Include="routes\partas-solid\solid-meta.mdx" />
+        <Content Include="routes\partas-solid\solid-start.mdx" />
+        <Content Include="routes\partas-solid\tag-values.mdx" />
+        <Content Include="routes\partas-solid\api-differences.mdx" />
+        <Content Include="routes\partas-solid\experimental.mdx" />
+        <Content Include="routes\partas-solid\attribute-flags.mdx" />
+        <Content Include="routes\partas-solid\common-issues.mdx" />
+        <Content Include="routes\partas-solid\submit-issues.mdx" />
+        <Content Include="routes\partas-solid\contributing.mdx" />
+        <Content Include="routes\partas-solid\dev\file-structure.mdx" />
+        <Content Include="routes\partas-solid\dev\types.mdx" />
+        <Content Include="routes\partas-solid\dev\utilities.mdx" />
+        <Content Include="routes\partas-solid\dev\spec.mdx" />
+        <Content Include="routes\partas-solid\dev\patterns.mdx" />
+        <Content Include="routes\partas-solid\dev\transformation.mdx" />
+        <Compile Include="routes\[...404].mdx" />
+        <Compile Include="routes\index.mdx" />
+        <Content Include="routes\ecosystem\index.mdx" />
+        <Content Include="routes\ecosystem\polymorphism.mdx" />
+        <Content Include="routes\ecosystem\bindings.mdx" />
+        <Folder Include="routes\ecosystem\primitives\" />
+        <Content Include="routes\ecosystem\partas-solid-ui.mdx" />
+        <Content Include="routes\ecosystem\kobalte.mdx" />
+        <Content Include="routes\ecosystem\motion.mdx" />
+        <Content Include="routes\ecosystem\apexcharts.mdx" />
+        <Content Include="routes\ecosystem\cmdk.mdx" />
+        <Content Include="routes\ecosystem\lucide.mdx" />
+        <Content Include="routes\ecosystem\modular-forms.mdx" />
+        <Content Include="routes\ecosystem\neodrag.mdx" />
+        <Content Include="routes\ecosystem\tan-stack-table.mdx" />
+        <Content Include="routes\ecosystem\storybook.mdx" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Partas.Solid" Version="1.1.4"/>
+        <PackageReference Include="Partas.Solid" Version="1.1.4" />
+        <PackageReference Include="Partas.Solid.ApexCharts" Version="0.2.2" />
+        <PackageReference Include="Partas.Solid.Kobalte" Version="0.3.5" />
+        <PackageReference Include="Partas.Solid.Motion" Version="0.2.1" />
     </ItemGroup>
 
 </Project>

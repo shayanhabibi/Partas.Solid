@@ -1,0 +1,111 @@
+---
+title: Extension Methods
+---
+
+# Solid-JS Bindings
+
+## On
+
+## Bool
+
+## Ref
+
+## Attr
+
+# Partas.Solid Extensions
+
+## Style
+
+## Spread
+
+```fsharp title="Spreading Objects"
+[<SolidComponent>]
+let MyComponent () =
+    let myObj = {| ``class`` = "bg-primary" |}
+    div().spread myObj { "Primary BG" }
+```
+
+[//]: # (<SpreadExampleZero></SpreadExampleZero>)
+
+Any identifier can be spread within a tag using the special extension method `.spread`.
+
+```fsharp title="Spreading Props"
+// ...
+    [<SolidTypeComponent>]
+    member props.constructor =
+        props.class' <- "bg-accent"
+        div().spread props { "Accent BG" } 
+```
+
+This is most commonly used in building complex components where the properties of a parent component are passed to a nested child component.
+
+```fsharp
+namespace Partas.Solid.MyCenteredButton
+open Fable.Core
+open Partas.Solid
+
+[<Erase>]
+type MyCenteredButton() =
+    interface RegularNode
+    [<SolidTypeComponent>]
+    member props.constructor =
+        div(class' = "flex justify-center w-full") {
+            button().spread props
+        }
+        
+// usage
+[<SolidComponent>]
+let SpreadExampleOne () =
+    MyCenteredButton(class' = "bg-primary hover:bg-background") { "Centered" }
+```
+
+[//]: # (<SpreadExampleOne></SpreadExampleOne>)
+
+---
+
+## Gotchas
+
+When used with `SolidTypeComponent`'s properties, one must remember that any reads from the `props` identifier before or after the spread will result in the plugin splitting that property from the identifier.
+
+```fsharp
+namespace Partas.Solid.MyCenteredButton
+open Fable.Core
+open Partas.Solid
+
+[<Erase>]
+type MyCenteredButtonTwo() =
+    interface RegularNode
+    [<SolidTypeComponent>]
+    member props.constructor =
+    div(class' = "flex justify-center w-full") {
+        div(class' = props.class') { "Div" }
+        button().spread props
+    }
+
+// usage
+[<SolidComponent>]
+let SpreadExampleTwo () =
+    MyCenteredButtonTwo(class' = "bg-primary hover:bg-background") { "Centered" }
+```
+
+[//]: # (<SpreadExampleTwo></SpreadExampleTwo>)
+
+In the above example, the div receives the classes that we pass to `MyCenteredButtonTwo`, but the button does not receive it because it was removed from the `props` identifier when it was read by the div.
+
+In cases like this, if you want to pass these split properties with the spread, you have to manually pass the properties to the child along with the spread:
+
+```fsharp
+[<Erase>]
+type MyCenteredButtonThree() =
+    interface RegularNode
+    [<SolidTypeComponent>]
+    member props.constructor =
+        div(class' = "flex w-full justify-center") {
+            div(class' = props.class') { "Div" }
+            button(class' = props.class').spread props
+        }
+```
+
+[//]: # (<SpreadExampleThree></SpreadExampleThree>)
+
+## Attr

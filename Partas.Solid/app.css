@@ -1,4 +1,6 @@
 :root {
     --sb-hero-name-background: linear-gradient(-20deg, hsl(200, 98%, 39%) 30%, hsl(199, 95%, 74%));
-    --sb-hero-background: linear-gradient(-45deg, hsl(200, 98%, 39%) 50%, hsl(199, 95%, 74%) 50%);
+    /*--sb-hero-name-background: linear-gradient(90deg, #ff6b47 0%, #ff4081 33%, #8b5cf6 66%, #06b6d4 100%);*/
+    --sb-hero-background: linear-gradient(0deg, #ff6b47 0%, #ff4081 33%, #8b5cf6 66%, #06b6d4 100%);
+    /*--sb-hero-background: linear-gradient(-45deg, hsl(200, 98%, 39%) 50%, hsl(199, 95%, 74%) 50%);*/
 }

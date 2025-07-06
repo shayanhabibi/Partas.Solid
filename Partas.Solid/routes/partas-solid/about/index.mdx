@@ -1,0 +1,48 @@
+---
+title: Partas.Solid
+---
+
+:::tip
+If you're not aware of [Fable](https://fable.io), and/or are [new to F#](https://fsharp.org/), then I suggest you visit their website
+to familiarise yourself with the technology.
+:::
+
+---
+
+# Introduction
+
+`Partas.Solid` is a plugin for the F# to JS transpiler `Fable`.
+
+
+Partas.Solid differs from other front end plugins in F# in its overarching goal:
+
+:::important[]
+To define a DSL that allows building HTML/JSX trees for native, imported, **and** user defined components
+:::
+
+## What this means
+
+* You can **_define_** a component and use it **_within the same DSL_**
+
+This means User defined components are ***indistinguishable*** from native or library imported components in their usage.
+Forming DOM trees is consistently uniform in syntax, making it easier to read, understand, refactor, and use.
+
+* When creating a UI element, you can inherit the ability to receive children or not, have classes, have event signatures,
+all by interfacing a single type. No need to overload. No need to define optional signatures. Just go.
+* Creating components with optional properties/attributes are as intuitive as the source material.
+
+These are unique goals for Partas.Solid.
+
+## [Getting Started](/partas-solid/installation)
+
+## [Benefits of JSX Output](/partas-solid/about/jsx-output)
+
+## [Learn More About Us](/partas-solid/about/oxpecker-fork)
+
+:::details[Isn't this Oxpecker.Solid?]
+Partas.Solid is an opinionated fork of Lanayx's [Oxpecker.Solid](https://github.com/lanayx/oxpecker), the plugin aggressively transforms
+the Fable AST to produce Solid-js compatible **JSX** with lots of syntactic sugar sprinkled in for a smooth developer experience.
+
+There are fundamental differences with the goals of each plugin, which is why the fork exists. Where possible, everything is done to
+simultaneously support and contribute to [Oxpecker.Solid](https://github.com/lanayx/oxpecker).
+:::

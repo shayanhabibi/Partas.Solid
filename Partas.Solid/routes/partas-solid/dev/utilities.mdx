@@ -1,0 +1,25 @@
+---
+title: Plugin Utilities
+---
+
+# Utilities
+
+Contains utilities that are frequently used to simplify pattern recognition such as:
+
+```fsharp
+let (|StartsWith|_|) (value: string) = function
+    | (s: string) when s.StartsWith(value) -> Some()
+    | _ -> None
+```
+
+These utilities should be based on primitives rather than structures defined in `Types.fs`.
+
+The only reason it is compiled after `Types.fs` is to allow us to utilise `PluginContext` (which is defined in `Types.fs`) if required.
+
+:::note
+The plugin is extensively documented in the source code to explain usage.
+:::
+
+:::warning
+Under construction.
+:::

@@ -1,0 +1,19 @@
+---
+title: Submitting Issues
+---
+
+# Debugging & Reporting Issues
+
+If something doesn't seem to be going right, please use the `DebugMode` flag in combination with the actual `jsx` output and report an issue so that it can be addressed.
+
+```fsharp title="Using the DebugFlag"
+[<SolidComponent(ComponentFlag.DebugMode)>]
+// ...
+
+[<SolidTypeComponent(ComponentFlag.DebugMode)>]
+// ...
+```
+
+### DebugMode
+
+The `DebugMode` flag will cause the AST of the component in question to be printed. This in combination with the input, and the actual `jsx` output will allow any issue to be addressed.

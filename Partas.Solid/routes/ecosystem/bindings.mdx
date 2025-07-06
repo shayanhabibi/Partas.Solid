@@ -1,0 +1,119 @@
+# Bindings
+
+See [Partas.Solid.Bindings](https://github.com/shayanhabibi/Partas.Solid.Bindings) for a suite of prebuilt bindings to
+popular Solid-js libraries.
+
+# Binding Specification
+
+This is for superbly crafted bindings. Naturally, we will tend for auto generation (because making bindings is dumb waste
+of time). But there are those *special* libraries that might want special attention.
+
+A good series of suggestions to follow to make the ecosystem of top notch bindings work well together.
+
+## Naming
+
+The convention of starting all namespaces with `Partas.Solid` is to prevent *over-zealous* transformation by the plugin.
+This might change in the future. However, this is only pertinent when it comes to using the rendering of DOM elements by
+the plugin.
+
+Feel free to ask that this be removed, I am not fussed, it is mostly an inherited historical trait.
+
+Have a primary access point through an obvious namespace such as `Partas.Solid.Kobalte` rather than `Partas.Solid.Fabalte`
+(unless it is not a binding).
+
+## Specs
+
+Recommended to create a `Spec` file which includes constant literals such as paths to the libraries. Place these in a
+module 'Spec'. Include a string literal of the version of the binding which is publicly accessible. Feel free to apply
+the erasure attribute.
+
+If the file is sparse, then you can include the Enums module in here.
+
+## Enums
+
+For bindings, best practice should be to consolidate them to the Spec or Enums file and under a shadow `Enums` module (ie auto-opened).
+This will aid in providing a consistent path to finding enums when there are libraries providing conflicting enumerations
+such as `Orientation`.
+
+DO NOT further compartmentalise them behind other modules to avoid extended names. DO name them in full, and THEN create
+sub modules with aliased types to the original.
+
+```fsharp
+namespace Partas.Solid.Kobalte
+
+
+[<Erase; AutoOpen>]
+module Enums =
+    [<StringEnum; RequireQualifiedAccess>]
+    type TextFieldInputOrientation =
+        | Ltr
+        | Rtl
+        
+    [<RequireQualifiedAccess; Erase>]
+    module TextFieldInput =
+        type Orientation = TextFieldInputOrientation
+    
+    [<StringEnum>]
+    type PopperOrientation =
+        | Start
+        | End
+        
+    [<RequireQualifiedAccess>]
+    module Popper =
+        type Orientation = PopperOrientation
+```
+
+#### Advantages
+
+It takes less cognitive effort to find an enum or ensure you're picking the right one if you just suffix the library
+you're using with `.Enums` to dot into all the accessible enumerations. If there are conflicting names, or you
+want to provide shorter syntaxes, then you should (with or without QualifiedAccess) put aliases in submodules.
+
+#### Disadvantages
+
+Verbose. Also making bindings sucks.
+
+---
+
+Follow PascalCasing, use `CompiledName` and `CompiledValue` where required.
+
+Use `RequireQualifiedAccess` as much as possible.
+
+You can place further aliases to an enum as static members in the type it is specific too.
+
+## Optional parameters/Objects
+
+Where a bound member has optional parameters taken as an object such as:
+
+```
+someMethod ( someparam, options: { someotherparam, someotherotherparam })
+```
+
+Try to provide a signature that uses this scheme:
+
+```fsharp
+[<ImportMember(path); ParamObject(1)>]
+static member someMethod(someparam: 'T, ?someotherparam: 'T, ?someotherotherparam: 'T): 'T = jsNative
+[<ImportMember(path)>]
+static member someMethod(someparam: 'T): 'T = jsNative
+```
+
+The `ParamObject` attribute will collect the options into a pojo. If no optional arguments are filled, then an empty pojo
+would be rendered. To prevent this, we provide a signature that doesnt have the optional arguments.
+
+In the case where there are optionals that take pojos (or the option has to be named argument) then you can use some indirection as follows:
+
+```fsharp
+[<JS.Pojo>]
+type SomeMethodOptions(?someotherparam: 'T, ?someotherotherparam: 'T) =
+    member val someotherparam = someotherparam with get,set
+    member val someotherotherparam = someotherotherparam with get,set
+// ...
+[<ImportMember(path)>]
+static member someMethod(someparam: 'T, ?options: obj): 'T = jsNative
+static member inline someMethod(someparam: 'T, ?someotherparam: 'T, ?someotherotherparam: 'T): 'T =
+    TYPE.someMethod(someparam, options = SomeMethodOptions(?someotherparam = someotherparam, ?someotherotherparam = someotherotherparam))
+```
+
+Essentially, it would be nice to flatten the optional arguments into the signature where possible - and/or appropriate -
+to prevent the user having to build the options object themselves.

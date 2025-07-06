@@ -1,0 +1,125 @@
+import { ColorAreaExample } from "~/examples/kobalte.fs.jsx";
+
+# Partas.Solid.Kobalte
+
+## Kobalte Bindings
+
+See [the docs]() for usage.
+
+## Differences
+
+The polymorphism of Kobalte via `as` is provided via the extension method `.as'`. This takes either a `TagValue`, or a constructed component tag.
+
+The advantage of the latter, is that you will get the type guarantees from setting properties in the constructor of the component tag rather than using `.attr` extension chains for attributes
+of the polymorphed type that are not provided in the Kobalte component.
+
+> Each component implements its `Root` as the component name, and then the sub-components via the component name qualified.
+> Eg: `Combobox()` & `Combobox.Input()`
+
+### Polymorphism Example
+
+```fsharp
+SidebarMenuButton(
+    tooltip = item.Title,
+    class' = "group/mbutton disabled:cursor-default",
+    ) //---- Polymorphism
+    .as' (
+        A(href = item.Path)
+    )
+```
+
+---
+
+Install via femto or manually with:
+
+```
+npm install @kobalte/core
+```
+
+## Example Component
+
+```fsharp title="Building a tooltip with Kobalte headless components"
+[<Erase>]
+type TooltipTrigger() =
+    inherit Tooltip.Trigger()
+    [<SolidTypeComponentAttribute>]
+    member props.constructor = Tooltip.Trigger().spread props
+
+[<Erase>]
+type Tooltip() =
+    inherit Kobalte.Tooltip()
+    [<SolidTypeComponentAttribute>]
+    member props.constructor = Kobalte.Tooltip(gutter = 4).spread props
+
+[<Erase>]
+type TooltipContent() =
+    inherit Tooltip.Content()
+    [<SolidTypeComponentAttribute>]
+    member props.constructor =
+        Tooltip.Portal() {
+            Tooltip.Content(
+                class' =
+                    Lib.cn [|
+                        "z-50 origin-[var(--kb-popover-content-transform-origin)]
+                        overflow-hidden rounded-md border bg-popover px-3 py-1.5
+                        text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95"
+                        props.class'
+                    |]
+                ).spread props
+        }
+```
+
+## Example Color Area
+
+```fsharp
+[<SolidComponent>]
+let ColorAreaExample() =
+    let color,setColor = createSignal<Color>(JS.undefined)
+    let colorLabel format =
+        if color() |> unbox then color().toString(format)
+        else $"{format}"
+    ColorArea(
+        class' = "relative flex flex-col
+                align-items-center w-[200px]"
+        ,value = color()
+        ,onChange = setColor
+        ) {
+        div(class' = "flex flex-col pb-2") {
+        ColorArea.Label() { colorLabel Color.ToString.Format.Hsl }
+        ColorArea.Label() { colorLabel Color.ToString.Format.Rgb }
+        ColorArea.Label() { colorLabel Color.ToString.Format.Hex }
+        ColorArea.Label() { colorLabel Color.ToString.Format.Hsb }
+        }
+        ColorArea.Background(
+            class' = "relative rounded-sm
+                    h-[150px] w-[150px]"
+            ) {
+            ColorArea.Thumb(
+                class' = "block w-[16px] h-[16px]
+                rounded-full border-1 border-border
+                bg-(--kb-color-current)"
+                ) {
+                ColorArea.HiddenInputX()
+                ColorArea.HiddenInputY()
+            }
+        }
+    }
+```
+
+[//]: # (<ColorAreaExample/>)
+
+---
+
+## Contexts
+
+While not mentioned in the Kobalte docs, most of the components have accessible Contexts exposed from their root components. This is useful in things like dialogs etc.
+
+At this current time, I've only implemented the Contexts for the components to which I would find it helpful.
+
+## ColorMode
+
+Another unmentioned utility in Kobalte is the `ColorModeProvider` (*which is poorly named in my opinion; more accurately a ThemeModeProvider*) which handles theme and local theme storage etc.
+
+It provides a reactive signal utility which does the connecting boiler plate for you, and other helpful options.
+
+See [the binding]() file for details.

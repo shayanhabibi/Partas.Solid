@@ -1,0 +1,49 @@
+# Partas.Solid.ModularForms
+
+## ModularForms Binding
+
+See [the docs](https://modularforms.dev/solid/api/createForm) to learn about the API and components.
+
+Other than a couple caveats to do with Fable.Remoting and some helpers for typing, it's been quite simple to use the library in its current state.
+
+## Differences
+
+You can use "name" to ascribe the mapping to a field for a form as per the docs, but I've added a useful method extension in these scenarios: `map`. Just as you expect,
+it takes a lambda function that maps to the field from the form and converts it under the hood with `Fable.Core.Experimental.namesofLambda` into a string path.
+
+So let's say you have a form of type:
+
+```fsharp
+type FormData = {
+    Item: string
+    Id: int
+    Value: float
+}
+```
+
+You would connect a field to this form via a `Field` component (as per the source), but instead of using `Field(name = "Value")`, you can use `map` to also provide the type parameters to the
+field props.
+
+```fsharp
+let form = createFormStore<FormData,obj>()
+let valueField = Field(of' = form).map(_.Value) { 
+        yield fun field (* FieldStore<FormData, float> *) fieldProps (* FieldElementProps *) ->
+            // ...
+    }
+```
+
+## Fable.Remoting - Considerations
+
+This library works great with Fable.Remoting, with a couple caveats to keep in mind.
+
+### Invalid Submissions
+
+If you are using records to structure your form data, then you must ensure that all fields of the record are initialised by passing an initialValue.
+
+ModularForms will not send null data (to save transmission size), while Fable.Remoting will not match an object to a record without all fields and types matching.
+
+This ALSO means that you will have to have a `Field` component set for each field of the record (although they do not have to be visible or active) so that the field is provided a value for each submission.
+
+## Reset/Prefill Form/Fields
+
+The best thing to do when trying to reset/set the form to a certain state, is to use `reset(form, initialValue = (* ... *))`. Even when resetting to a cleared state, the best idea is to pass an empty/default form value.

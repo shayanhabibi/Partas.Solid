@@ -1,0 +1,178 @@
+---
+title: Experimental Features
+---
+
+# Experimental Features
+
+> Beware, all ye who tread here.
+
+Please use these features cautiously. Some computation expressions are more tested than others in real world usage.
+
+## Computation Expressions
+
+Many methods in `Solid-js` use lambdas without parameters as arguments to maintain reactivity such as `createEffect`.
+
+For these, computation expressions are provided that abstract away the method call and empty function boiler plate. However, if you want to use the options or overloads available to one of the methods, then you'll need to call it directly instead of using a CE sugar.
+
+To access these expressions, you must open the `Partas.Solid.Experimental` namespace.
+
+### lambda
+
+Wraps the computation in `fun () -> ...`
+
+```fsharp
+let config = lambda { Data.config.data }
+// Same as
+let config = fun () -> Data.config.data
+
+console.log (config())
+```
+
+### effect
+
+Wraps the computation in `createEffect(fun () -> ...)`
+
+```fsharp
+effect {
+    console.log "I'm in an effect"
+}
+// Same as
+createEffect(fun () ->
+    console.log "I'm in an effect"
+)
+```
+
+### mount
+
+Wraps the computation in `onMount(fun () -> ...)`
+
+```fsharp
+mount {
+    Data.Config.resource.refetch()
+}
+// Same as
+onMount(fun () -> Data.Config.resource.refetch())
+```
+
+### cleanup
+
+Wraps the computation in `onCleanup(fun () -> ...)`
+
+```fsharp
+cleanup {
+    thishere.available <- false
+}
+// Same as
+onCleanup(fun () -> thishere.available <- false)
+```
+
+### memo
+
+Wraps the computation in `createMemo(fun() -> ...)`
+
+```fsharp
+memo {
+    // ...
+}
+// Same as
+createMemo(fun () -> ...)
+```
+
+### batch
+
+Wraps the computation in `batch(fun () -> ...)`
+
+```fsharp
+let submissionResult = batch {
+    // Some reactive tasks here
+}
+// Same as
+let submissionResult = batch(fun () ->
+    // Some reactive tasks here
+)
+```
+
+### lazyload
+
+Wraps the computation in `lazy'(fun () -> ...)`
+
+```fsharp
+let comp = lazyload { importComponent "./MyComponent.fs.jsx" }
+// Same as
+let comp = lazy'(fun () -> importComponent "./MyComponent.fs.jsx")
+```
+### selector
+
+Wraps the computation in `createSelect(fun () -> ...)`
+
+```fsharp
+let isSelected = selector {
+    // ...
+}
+// Same as
+let isSelected = createSelect(fun () ->
+    // ...
+)
+```
+
+### children
+
+Wraps the computation in `children(fun () -> ...)`
+
+```fsharp
+let childs = children {
+    props.children
+}
+// Same as
+let childs = children(fun () ->
+    props.children
+)
+```
+
+## Erased Union Implicit Casting
+
+When making bindings, it is common to have a function accept multiple different value types. Ordinarily, you would have to use the additional `!^` operator to cast into these
+bindings erased unions.
+
+Within the Experimental namespace, you can open the `U` module, which reimplements the erased unions of fable with implicit casting into the union.
+
+I find this most useful when creating bindings, because it's less noisy when using them.
+
+:::tip
+Make sure your access to `Partas.Solid.Experimental.U` comes AFTER `Fable.Core`.
+:::
+
+```fsharp
+open Fable.Core
+open Fable.Core.JsInterop
+open Partas.Solid.Experimental.U
+
+[<Import("somefunction","somelibrary")>]
+let numberOrString (value: U2<string, int>): obj = jsNative
+
+// previously you would have:
+numberOrString !^"Something"
+numberOrString "Something" // Will cause an error
+numberOrString !^3. // Will cause an error
+// With the experimental casting you can do:
+numberOrString "Something"
+numberOrString 2
+numberOrString 3. // Will cause an error
+// Depending on your configuration, you may get compiler warnings for op_Implicit usage. This can
+// then be resolved by explicitly using !^, but at least you won't be obstructed from using the function as expected
+```
+
+:::tip
+These implicit helpers do not work with arrays/lists without either explicitly typing the value as an accepted array/list type or
+by using the erase operator `!^`. In other words, the behaviour returns to normal for these cases, requiring explicit casting with !^.
+:::
+
+```fsharp
+let numberOrString (value: U2<int, int list>): obj = jsNative
+
+numberOrString 5 // works
+numberOrString [ 5; 6 ] // Error: Expected type U2<int, int list>, but got 'a list
+numberOrString ([5;6] : int list) // works
+numberOrString !^[ 5; 6 ] // works
+numberOrString !^[ "5"; "6" ] // error as expected
+```

@@ -1,0 +1,68 @@
+---
+title: Attribute Flags
+---
+
+# {frontmatter.title}
+
+Enums accessible by the `ComponentFlag` qualifier.
+
+Eg: `ComponentFlag.Default`
+
+Are usable in both `SolidComponentAttribute` and `SolidTypeComponentAttribute`.
+
+:::details[Default]
+Default transformations.
+:::
+
+:::details[DebugMode]
+Prints the AST tree before transformation.
+
+Use this when submitting issues.
+:::
+
+:::details[SkipPojoOptimisation]
+SolidComponents optimise Pojo constructors so that setter members which are not
+within the primary constructor are compiled into the object initialiser instead
+of being deferred.
+:::
+
+:::details[PrintDisposals]
+!NOISY!
+
+Prints any expressions that are disposed of in transformation.
+:::
+
+:::details[SkipCEOptimisation]
+SolidComponents optimise out computation expressions, particularly of lists
+etc.
+
+This will be handled primarily by the Fable transpiler in Fable 5.
+:::
+
+:::details[All Flags]
+```fsharp
+type ComponentFlag =
+    /// Default transformations.
+    | Default = 0b0000
+    /// Prints the AST tree before transformation. Please supply a minimal
+    /// example with this flag set when submitting issues.
+    | DebugMode = 0b0001
+    /// SolidComponents optimise Pojo constructors so that
+    /// setter members which are not in the primary constructor that
+    /// are used when building the pojo, are compiled into the object
+    /// initialiser in JS instead of being deferred
+    | SkipPojoOptimisation = 0b0010
+    /// Noisy. Prints any expressions that are disposed of in transformation.
+    | PrintDisposals = 0b0100
+    /// SolidComponents optimise out computation expressions, particularly of
+    /// lists etc. In Fable 5, this should be handled by the compiler.
+    | SkipCEOptimisation = 0b1000
+```
+:::
+
+```fsharp title="Using multiple flags"
+[<SolidTypeComponent(
+    ComponentFlag.DebugMode 
+    ||| ComponentFlag.SkipPojoOptimisation)>]
+let Binding () = // ...
+```

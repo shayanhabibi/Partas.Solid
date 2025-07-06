@@ -1,0 +1,61 @@
+# Partas.Solid.TanStack.Table
+
+# TanStack-Tables Bindings
+
+See [the docs](https://tanstack.com/table/latest/docs/introduction) for usage. Make sure to select the `Solid` framework when viewing the docs.
+
+## Differences
+
+This is a massive library, so there a few more caveats/discrepancies in usage to keep in mind:
+
+1. All options should be done using the provided Pojo Constructors
+
+```fsharp title="Example of TanStack.Table ColumnDefs with provided Pojo Constructors"
+[<SolidComponent>] // <-- We apply the attribute so we're in a plugin scope
+let idColumn = ColumnDef<Patient>(
+    id = "id"
+    ,accessorFn = fun patient _ -> patient.Id
+    ,enableSorting = false // v---- type is inferred by the compiler
+    ,cell = fun (props: CellRenderProps<Patient>) ->
+        span(class' = "text-xs text-muted-foreground justify-items-start") {
+            props.cell.getValue() |> unbox<string>
+        }
+    ,header = fun props ->
+        div(class' = "text-lg") { "Id" }
+)
+```
+
+2. Use method extensions to set `getter` object fields of options
+
+The `TableOptions` is a perfect example of an options which requires the use of extension methods to set fields which are required to be
+`getters` to be reactive in solid-js.
+
+The main fields that require this are:
+- data
+- columns
+- state accessors
+
+```fsharp
+TableOptions<'Data>(
+    getCoreRowModel = getCoreRowModel()
+    ,getFacetedRowModel = getFacetedRowModel() //v--- Signal
+    ,onRowSelectionChanged = unbox(snd rowSelection)
+)   .data(fun _ -> dataSource.data)
+    .columns(fun _ -> columnDefs)
+    .stateFn(fun (state: TableState) ->//v--- Signal
+        state.rowSelection(fst rowSelection)
+            .sorting(fst sorting)
+            .pagination(fst pagination)
+    )
+```
+
+> Use `.init()` helpers for State Signals
+
+```fsharp
+let rowSelection = RowSelectionState.init() |> createSignal
+```
+
+---
+
+There's actually not much else that's too different from the source guides/examples. There does have to be some work done on the typings, but a lot of the issues that existed binding
+this library in the first place have mostly been ironed out.

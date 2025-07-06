@@ -1,0 +1,168 @@
+import { KeyframeExample, WordRotateExample } from "~/examples/motion.fs.jsx";
+
+# Partas.Solid.Motion
+
+This binding as it currently stands, binds the `solid-motionone` library, and also binds the `animate` function from `motion`.
+
+---
+
+## Solid-MotionOne Binding
+
+See [the docs](https://github.com/solidjs-community/solid-motionone) for usage.
+
+
+_When using examples from `motion/react` you should be aware that `solid-motionone` uses different property/attribute names._
+
+_As an example, in the `transition` attribute, instead of `times` for keyframes, you use the `offset` property. See the keyframes example at the bottom of the page._
+
+### Differences
+
+The Motion component specific properties provide two signatures, the original name such as `initial` which takes a Feliz style list
+of props to provide type safety and completion for all CSS style props, or a `-JSX` suffixed name such as `initialJSX` which injects
+the JSX language so you can write the value in JSX directly.
+
+> Lanayx discovered these injections only work with project reference, not when packaged and used from NuGet; an issue was
+> submitted and he was informed that the next 2025 Rider version should have this patched.
+
+For the general css properties such as `animate` and `initial`, you use the `MotionStyle` qualifier to access the properties in Feliz style.
+
+For `transition`, you use the `MotionTransition` qualifier, which will provide type safety by enforcing values to use the `AnimationOptions` pojo (when you are assigning a value to a CSS property in the transition attribute)
+
+## Motion Binding
+
+See [the docs](https://motion.dev/docs/animate) for usage.
+
+> Only the `animate` function is bound at the moment.
+
+---
+
+## Example Usage
+
+```fsharp
+[<Erase>]
+type WordRotate() =
+    inherit div()
+    interface OptionKeys
+    [<Erase>] member val words: string[] = unbox null with get,set
+    [<Erase>] member val duration: int = unbox null with get,set
+    [<SolidTypeComponentAttribute>]
+    member props.constructor =
+        props.duration <- 2500 // set a default duration if none is set
+        let index,setIndex = createSignal(0)
+        createEffect(
+            fun () ->
+                let interval = setInterval (fun () -> setIndex.Invoke(fun prevIndex -> (prevIndex + 1) % (props.words.Length))) props.duration
+                onCleanup(fun () -> clearInterval(interval))
+        )
+        Presence(exitBeforeEnter = true) {
+            Show(when' = !!(index() + 1), keyed = true) {
+                Motion(
+                    initial = [
+                        MotionStyle.opacity 0
+                        MotionStyle.y -50
+                    ],
+                    animate = [
+                        MotionStyle.opacity 1
+                        MotionStyle.y 0
+                    ],
+                    exit = [
+                        MotionStyle.opacity 0
+                        MotionStyle.y 50
+                    ],
+                    transition = [
+                        MotionTransition.duration 0.25
+                        MotionTransition.easing Easing.EaseOut
+                    ]
+                ).spread props {
+                    props.words[index()]
+                }
+            }
+        }
+```
+
+```fsharp
+[<SolidComponent>]
+let WordRotateExample () =
+    div() {
+        WordRotate(style = "font-size: 4rem",
+                   words = [| "Word" ; "Rotate" |])
+    }
+```
+
+<WordRotateExample/>
+
+## Example of Keyframes
+
+```fsharp
+[<SolidComponent>]
+let KeyframeExample () =
+    let inline percent value = $"{value}%%"
+    Motion.div(
+        animate = [
+            MotionStyle.scale !^[|1;2;2;1;1|]
+            MotionStyle.rotate !^[|0;0;180;180;0|]
+            MotionStyle.borderRadius !^[|percent 0; percent 0; percent 50; percent 50; percent 0|]
+        ],
+        transition = [
+            MotionTransition.duration 2
+            MotionTransition.easing Easing.EaseInOut
+            MotionTransition.offset [|0.;0.2;0.5;0.8;1|]
+            MotionTransition.repeat JS.Infinity
+            MotionTransition.endDelay 1.
+        ],
+        style="width: 100px; height: 100px; background-color: green"
+        )
+```
+
+<div style={{padding: "64px"}}>
+    <KeyframeExample/>
+</div>
+
+---
+
+### Experimental Computation Expression helpers
+
+As a side note, remember that the `createEffect` and related functions which take void functions can use the Experimental
+computation expressions:
+
+```fsharp tab title="Normal"
+createEffect(
+    fun () ->
+        let interval = 
+            setInterval (fun () -> setIndex.Invoke(fun prevIndex -> (prevIndex + 1) % (props.words.Length))) props.duration
+        onCleanup(fun () -> clearInterval(interval))
+)
+```
+
+```fsharp tab title="open Partas.Solid.Experimental"
+effect {
+    let interval = setInterval (fun _ -> setIndex.Invoke(fun prevIndex -> (prevIndex + 1) % props.words.Length))) props.duration
+    cleanup { clearInterval(interval) }
+}
+```
+
+---
+
+### Language Injection
+
+If fixed, you could also use the JSX suffixed properties and have JSX language injection in IntelliJ IDEs when using the Motion components:
+
+```fsharp
+Presence(exitBeforeEnter = true) {
+    Show(when' = !!(index() + 1), keyed = true) {
+        Motion(
+            initialJSX = "{ opacity: 0, y: -50 }",
+            animateJSX = "{ opacity: 1, y: 0 }",
+            exitJSX = "{ opacity: 0, y: 50 }",
+            transitionJSX = "{ duration: 0.25, easing: 'ease-out' }"
+        ).spread props {
+            props.words[index()]
+        }
+    }
+}
+```
+
+You'll know if it's fixed because you'll receive injected IDE suggestions for most HTML properties that take string enums like `dir` on normal HTML Elements.
+
+
+

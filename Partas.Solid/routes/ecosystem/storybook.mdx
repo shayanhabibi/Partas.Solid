@@ -1,0 +1,92 @@
+# Partas.Solid.Storybook
+
+Weak bindings to [Storybook](https://storybook.js.org/) via [Kachurun's](https://github.com/kachurun/create-solid-storybook) (soon to be moved to the solidcommunity-projects organisation) [solid-storybook plugin](https://github.com/kachurun/create-solid-storybook).
+
+Everything is functional, but further work on the bindings will be weak, as there is intention to create a data contract like abstraction for making stories within the Partas.Solid plugin itself.
+
+## Installation
+
+*Unlike other binding packages, there are no associated femto helpers for this binding. Ensure you follow the process described below to have everything you need to start BEFORE adding this package.*
+
+### Create a solid-storybook project
+
+```
+npx create-solid-storybook [path/project]
+
+cd [path/project]
+
+npm install
+
+npm run storybook
+```
+
+If everything works, then setup your Fable project within this directory.
+
+## Running Fable & Storybook
+
+To run Fable and storybook, you want to ensure you compile **into** the `/stories/` directory to prevent issues with styling etc. Since only files with `.stories.jsx` extension are picked up by storybook, this shouldn't cause any issues.
+
+```
+fable watch -c Release -o stories -e .jsx --run storybook dev -p 6006
+```
+
+## [Making a Story](https://storybook.js.org/docs/api/csf)
+
+Create a source file in the `/stories/` directory with a `.stories` suffix.
+
+```
+Button.stories.fs
+```
+Define the component meta attributes, and **make this the default export**.
+
+> Ensure you make the access of the binding private, to prevent storybook assessing it as a Story also. Read more on how Storybook picks up stories to know more.
+
+```fsharp caption="SolidComponent is required to render !@ correctly"
+[<SolidComponent>]
+[<ExportDefault>]
+let private meta: Meta<Button> = Meta.make [
+    Meta.component' !@Button
+    Meta.args [
+        Args.make "children" "Button"
+        Args.make "variant" Button.Variant.Default
+        Args.make "size" Button.Size.Default
+    ]
+    Meta.parameters [
+        Parameters.layout StorybookLayout.Centered
+    ]
+    Meta.argTypes [
+        ArgTypes.make "variant" <| ArgType(
+            control = Control(
+                ``type`` = ControlType.Select,
+                labels = createObj [
+                    !!Button.Variant.Default ==> nameof Button.Variant.Default
+                    // ...
+                ]
+            ),
+            table = ArgType.Table(
+                category = "variants",
+                defaultValue = ArgType.Table.Value(summary = nameof Button.Variant.Default)
+            ),
+            options = [| Button.Variant.Default; Button.Variant.Secondary |]
+    ]   
+]
+
+// A trick to have auto complete for attribute/args
+[<Global>]
+let btn = Button()
+
+let Default = meta.make [
+    Story.args [
+        Args.make (nameof btn.variant) Button.Variant.Default 
+    ]
+    Story.render (fun props -> div() { Button().spread props })
+    // ^-- when using render, remember to spread the props into
+    // the tested component
+]
+```
+
+Once you have written at least one story, you should see the page come up in Storybook.
+
+## Example
+
+If you want to see an example of Partas.Solid and Storybook in action, then you can build the storybook in the [Partas.Solid.UI](https://github.com/shayanhabibi/Partas.Solid.UI) repo.

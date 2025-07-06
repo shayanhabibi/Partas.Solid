@@ -1,0 +1,100 @@
+---
+title: Polymorphism
+---
+
+# Polymorphism
+
+There are libraries such as Kobalte and ArkUI which allow polymorphism. This is where the properties of the parent are passed to the specified component or tag.
+
+In Kobalte, this is via the `as` attribute.
+
+```jsx
+<Button as={a} href={"/"} />
+```
+
+Partas.Solid provides plugin support for Polymorphism for Kobalte, and methodology for you to enable polymorphism in other libraries.
+
+## Plugin Support
+
+Any element which provides a polymorphic interface must interface with the specified type:
+
+```fsharp "Partas.Solid.Polymorphism" "interface Polymorph"
+namespace Partas.Solid.PolymorphicComponent
+open Partas.Solid
+open Fable.Core
+
+[<Erase>]
+type PolymorphicComponent() =
+    interface RegularNode
+    interface Polymorph // interface specified type
+    // ...
+```
+
+### Polymorphic attribute
+
+The polymorphic attribute `as` is supported by default in the plugin (to interop with Kobalte), so you can define this attribute without any special treatment.
+
+```fsharp title="Polymorphism by tag value"
+[<Erase>]
+type PolymorphicComponent() =
+    interface RegularNode
+    interface Polymorph // interface specified type
+    [<Erase>]
+    member val as': TagValue = JS.undefined with get,set
+    // ...
+```
+
+This attribute is treated special, and you lost a lot of the special plugin behaviour if you use polymorphism via values (in F# at least).
+
+The reason for this is that polymorphism will often result in you utilising the morphed components properties in usage. Since we cannot dynamically inherit properties in F#, we instead support polymorphism by passing the whole HtmlElement to the attribute.
+
+```fsharp title="Dual polymorphism support"
+[<Erase>]
+type PolymorphicComponent() =
+    interface RegularNode
+    interface Polymorph // interface specified type
+    [<Erase>]
+    member val as': TagValue = JS.undefined with get,set
+    // ...
+
+[<System.Extension; Erase>]
+module PolymorphicExtension =
+    type PolymorphicComponent with
+        [<Erase; Extension>]
+        member _.as'
+            [<Erase>]
+            with set(value: HtmlElement) = ()
+            [<Erase>]
+            and get(): HtmlElement = JS.undefined
+```
+
+The above implementation style allows us to use both a tag value, or a built element.
+
+The plugin will extract all the properties from the component passed to `as'` and insert them into the parent.
+
+## Custom Polymorphic Attributes
+
+In the case where you need an attribute to support the above type of *property raising*, you can make use of a special magic prefix.
+
+```fsharp title="Custom Polymorphic attributes" "__PARTAS_POLYMORPHIC__"
+[<Erase>]
+type PolymorphicComponent() =
+    interface RegularNode
+    interface Polymorph // interface specified type
+    [<Erase>]
+    member val ``__PARTAS_POLYMORPHIC__asChild``: HtmlElement = JS.undefined with get,set
+    member this.asChild
+        [<Erase>]
+        with inline set(value: HtmlElement) = this.``__PARTAS_POLYMORPHIC__asChild`` <- value
+        [<Erase>]
+        and inline get() = this.``__PARTAS_POLYMORPHIC__asChild``
+    // ...
+```
+
+The compiler plugin will cleave the prefix from the attribute name, convert the HtmlElement passed into a tag value, and raise all properties from the HtmlElement into the parent.
+
+---
+
+# Attr Extension
+
+Of course, you can skip all of the above and just pass a tagvalue to the libraries polymorphic attribute, and then chain `.attr`s for the attributes that the parent does not have. But this would miss all the compiler type safety features of F# and Fable that we are trying to take advantage of in the first place.

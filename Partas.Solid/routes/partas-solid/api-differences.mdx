@@ -1,0 +1,132 @@
+---
+title: Api Differences
+---
+
+<div class="text-muted-foreground px-8 pb-2 justify-items-center text-sm">
+
+    _The API and usage of Solid-JS is not discussed in this documentation. Please visit [the Solid-js website](https://www.solidjs.com/) for reference on Solid-JS._
+
+    _The following mentions where to expect substantial differences in the API_
+
+</div>
+
+# Solid-JS API Differences
+
+## Methods with Option Objects
+
+Where encountered, the standard `Partas.Solid` bindings embed _option objects_ into the method as optional parameters. These are then compiled into option objects by Fable using the `ParamObject` attribute.
+
+These are quite benign, and can be discerned quickly from the type signatures. As an example, you can compare the following signature to the [Solid-js signature](https://docs.solidjs.com/reference/secondary-primitives/create-deferred).
+
+```fsharp
+/// <summary>
+/// Creates a readonly that only notifies downstream changes when the browser is idle. <c>timeoutMs</c> is the
+/// maximum time to wait before forcing the update.
+/// </summary>
+[<ImportMember("solid-js"); ParamObject(1)>]
+static member createDeferred<'T>(source: unit -> 'T, ?timeoutMs: int, ?equals: 'T -> 'T -> bool, ?name: string): unit -> 'T = jsNative
+```
+
+## Special JSX Attributes
+_This section is [copied directly from Oxpecker.Solid](https://lanayx.github.io/Oxpecker/src/Oxpecker.Solid/#special-jsx-attributes), all credit goes to [Lanayx](https://github.com/Lanayx)_
+
+Note that `attr:`, `on:`, `bool:`, `ref` attributes are exposed as F# methods in the API: `elem.on(...)`, `elem.attr(...)` etc. Also, `style` and `class'` are attributes when accepting `string`, while `style'` and `classList` are methods when accepting object (to be used with createObj).
+
+Note: when using `ref(nativeElem)` make sure that nativeElem is mutable (e.g. `let mutable nativeElem = Unchecked.defaultof<HTMLDivElement>`).
+
+
+## Store
+
+_This section is [copied directly from Oxpecker.Solid](https://lanayx.github.io/Oxpecker/src/Oxpecker.Solid/#store), all credit goes to [Lanayx](https://github.com/Lanayx)_
+
+Similar to the original implementation in `Fable.Solid`, store has a special helper for updating its fields:
+
+```fsharp
+setStore // store setter
+    .Path // special property to access store fields
+    .Map(_.data) // choose which field to update
+    .Update(newData) // update field with a new value
+```
+
+## Resource
+
+_This section is [copied directly from Oxpecker.Solid](https://lanayx.github.io/Oxpecker/src/Oxpecker.Solid/#resource), all credit goes to [Lanayx](https://github.com/Lanayx)_
+
+Again, just as in the original implementation in `Fable.Solid`, resource is a special object, so instead of JS `resource()` call, you'll need to use `resource.current` in F#.
+
+## Router
+
+_This section is mostly [copied directly from Oxpecker.Solid](https://lanayx.github.io/Oxpecker/src/Oxpecker.Solid/#router), all credit goes to [Lanayx](https://github.com/Lanayx)_
+
+[Router](https://docs.solidjs.com/solid-router) namespace is `Partas.Solid.Router`. It contains router related components and functions. To render a router you still need to decorate router function with `SolidComponent` attribute:
+
+```fsharp
+open Partas.Solid.Router
+
+[<SolidComponent>]
+let MyRouter () =
+    Router() {
+        Route(path = "/", component'=!!Home)
+        Route(path="/about", component'=!!About)
+    }
+
+render (MyRouter, document.getElementById "root")
+```
+
+_You still need to add a separate reference to @solidjs/router in your package.json._
+
+## Lazy
+
+_This section is [copied directly from Oxpecker.Solid](https://lanayx.github.io/Oxpecker/src/Oxpecker.Solid/#lazy), all credit goes to [Lanayx](https://github.com/Lanayx)_
+
+For components lazy loading you’ll need to use lazy' function together with another importComponent function.
+
+```fsharp
+lazy'(fun () -> importComponent("./ComponentA"))
+```
+
+will be translated to
+
+```fsharp
+lazy(() => import("./ComponentA"))
+```
+
+## Signal Setters
+
+When creating a signal (getter/setter tuple), the F# type signature for the getter and setter are as follows:
+
+```fsharp
+type Accessor<'T> = unit -> 'T
+type Setter<'T> = 'T -> unit
+```
+
+Setters in Solid-JS can alternatively use their previous value as a reference when setting a new value. In Oxpecker and Partas, this is done by using the special `Invoke` methods:
+
+```fsharp
+let getter,setter = createSignal 0
+setter.Invoke(fun previous -> previous + 1)
+console.log (getter()) // 1
+```
+
+Setters in Solid-JS return the value they have been set to which is usually discarded in usage. If you require the value, you can use the special `InvokeAndGet` methods.
+
+## Context Providers
+
+> Context objects allow deeply nested children to access values without property passing
+
+Context providers work as expected. Create a context, and then use it as a tag. It will be rendered with the `.Provider` suffix.
+
+```fsharp tab title="F#"
+let context = createContext<int>() // define value type, can be anything!
+[<SolidComponent>]
+let ContextUsage () =
+    context(5) { ... } // Provide initial value to context provider
+```
+
+```jsx tab title="JSX"
+<context.Provider value={5}>
+    ...
+</context.Provider>
+```
+
+The `useContext` function does not differ in usage to Solid-JS.

@@ -1,0 +1,194 @@
+---
+hero:
+    text: Oxpecker
+    tagline: Full Stack F# Framework
+    actions:
+        - theme: alt
+          text: Support Oxpecker!
+          link: https://github.com/lanayx/Oxpecker
+    image:
+        src: https://github.com/Lanayx/Oxpecker/raw/develop/images/oxpecker.png
+---
+
+
+:::warning[Excuse the ramble.]
+I'm sure I'll *eventually* rewrite this.
+:::
+
+# Oxpecker
+
+Oxpecker is a full stack framework for F#. The front end DSL uses Computation Expressions
+to template the DOM. Oxpecker.Solid uses this DSL to compose native elements. I discovered Oxpecker.Solid
+when I came to a cross-roads with a private project I was working on.
+
+## Starting out with Feliz
+
+Building
+an app with the SAFE stack, which uses Elmish, React and Vite for the front end in Feliz
+style, I came to a point where I found it increasingly difficult to discern where things were happening in my DOM elements.
+The list approach meant I was either making components too small or diving into
+indent nesting-hell.
+
+```fsharp title="Some of my early days Fable/Feliz code"
+let Default () =
+    // ...
+    Html.div [
+        prop.className "flex flex-row gap-5 p-2"
+        prop.children [
+            for size,label in sizes do
+                UI.Button [
+                    size
+                    if label = "Icon" then
+                        props.children (Icon.Image []) 
+                    else props.text label
+                ]
+            UI.Button [
+                props.text "Disabled"
+                props.disabled true
+            ]
+           // ...
+        ]
+    ]
+```
+
+It was just a bit difficult for me to get a good view of at a glance. Combined with very obvious performance issues
+with fairly small SPAs (in regards to React), I was in for a bad ride -
+
+:::danger[]
+    Now before you go and grab your pitch forks, yes I am aware that there are many ways to optimise React apps. Yes it was probably
+    because I'm a rookie React and JS developer. But that is exactly the point. Because I'm NOT a JS developer, nor do I ever intend
+    to be.
+
+    Yes, I'm one of those people, and here I am, trying to preach to you about a plugin for a F# -> JS transpiler.
+:::
+
+## Discovering Oxpecker
+
+Around this point the wonderful [Amplifying F#](https://amplifyingfsharp.io/) group did a session with Vladimir Schur (the author of Oxpecker),
+which is where I found out about Oxpecker.Solid!
+
+This was the first time seeing an alternative DSL that was not list based and had (in my perspective) a more intuitive
+DSL. It was not the first time I had seen Solid-js. But it came at the right time where I was seriously frustrated with
+trying to understand how to prevent performance loss with massive re-renders.
+
+:::info[]
+    *"It was a match made in heaven!"*
+:::
+
+I absolutely loved working with the DSL. It so much more closely **resembled** the examples I was looking at on the internet
+for how to make some components etc.
+
+One thing I **loved** too, was the fact that the *compiled output was also ***readable****.
+
+:::warning[]
+    Probably a good time to mention I have historically NEVER wanted to touch web development, and preferred working closer
+    to the metal or making GUI executables with QT and Nim. But the project I had in mind demanded me to change my ways.
+
+    So why does the transpiled output matter?
+:::
+
+I was surprised it mattered to me. I didn't think I would/should/even could care. But since I am quite set on this
+highway-to-hell (vis-a-vis making a web app without touching JS) I am quite dependent on examples and guides that
+are written in JSX/TSX.
+
+Not only this, but a lot of bindings I was finding were quite antiquated. The demands for my project were particular,
+so it was not uncommon to try making or updating a binding.
+
+But **ANY** issue I would run into, would leave me scratching my head. It was pretty damn difficult to see if my code was
+even close to being correct on the output. Also, since there are such black magics required to make React renders performant,
+it was IMPOSSIBLE for ME to understand what the heck was going right and what was going wrong!
+
+:::warning[]
+    There are plenty of occasions where the compiled code has to be explored
+    as a sanity check.
+:::
+
+So what does the nice output do for me? Now when I hit a roadblock, I could search up issues and compare my code _or even contribute issues with examples_.
+
+I don't need to do a series of prints or abstract tests to see if the code has transpiled correctly. I can see it clearly.
+As a certified smooth brain, I can just look at all the examples online and copy pasta to make my spaghetti.
+
+# Fork
+
+Oxpecker was the essential step to me shaking away any requirement to need to know JS. Now I can write everything in F#.
+
+I don't need to learn JS or *JSX* (in a sense I did, but that's besides the point), I write my F#, and if there's a supposed
+issue in javascript land, I can use the abundant internet resources with some source-code in-hand that doesn't look like my attempt at cleaning
+the garage.
+
+Except for one thing. 
+
+:::info[]
+I wanted to make a **component** library.
+:::
+
+And there was no level of using functions, static parameters, or
+optional method parameters that would replace the following issue: it was impossible, just like in feliz, for me to write
+a component, and then use the Oxpecker DSL with those components. 
+
+The DSL was only designed for the native components.
+
+You could also use it for imported library types. But if I wanted to make a Shadcn-like component library with a headless
+component package? Not supported.
+
+Part of the issue of this for me goes back to 'resembling JSX' to make use of abundant JS front end resources. But it also
+has to do with one of those things that just makes someone 'tick'. This was __SO CLOSE__ to being absolutely __PERFECT__ in my
+view.
+
+## First Contributions
+
+So I started to make some contributions. This was the first time working with FSharp or Fable AST. It was not easy for me
+to wrap my head around.
+
+:::warning[]
+    I was having problem with indent hell of Feliz. Have you seen the kind of output you get when you print Fable AST
+    to console? Lord have mercy upon my soul.
+:::
+
+After a variety of bumbled attempts to make changes, I did come to a realisation that I COULD achieve my dreams above.
+
+I needed to find some way to make it so that, like an imported library tag, you would defined the properties, but then
+be able to write the component function while having access to the properties of the type, and have them somehow linked
+together.
+
+Obviously, this was a good case for a member method.
+
+On my fork, I made the changes to test if I could achieve the hallowed outcome I so desperately sought. I did manage to make
+some headway, and discussed this -and some other features I wanted- with Lanayx (author of Oxpecker.Solid). Lanayx liked
+the enthusiasm, but felt that the expanded API surface this was creating (and if you compare the two plugins, you can see
+this definitely expanded the plugin API/logic) was not the direction he wanted to go in. At least, not for the moment, not
+while he planned on keeping active maintenance and support for Oxpecker.Solid.
+
+He gave permission to proceed with a *harder* fork. I am always humbled
+to receive advice and get Lanayx/Vladimir's opinions, and he continues to graciously answer my sometimes absurd questions.
+I still continue to contribute to Oxpecker.Solid, and will continue doing so.
+
+In the end, while the Plugin logic/API has shifted drastically, the underlying *bindings* are still pretty much the same.
+There are very minor differences when it comes to bindings (the most significant being that I use property getters and setters
+for HtmlElements/Components while Oxpecker just uses setters), so they're basically always ready to be ported. Additionally, if I
+bind some additional features of the solid-js library that weren't there before, then I will contribute those changes to Oxpecker.
+
+## Continued support for Oxpecker
+
+I'm always happy to make Oxpecker versions of any binding that I have made, and I certainly do check with
+bindings I think Lanayx would be interested in. An example is the Oxpecker.Solid.MotionOne and Oxpecker.Solid.Primitives.
+Although the latter is yet to be ported.
+
+:::warning[]
+    While I am happy to iterate over alpha-ware bindings and make them available, I do not want to pull them under the
+    Oxpecker umbrella until they have had at least SOME real world testing and usage. I make changes very quickly, and
+    this will become more laborious if I'm trying to track changes and then test them for both plugins. Once I achieve a
+    stable binding API, I finalise the Oxpecker binding. For me, this is a matter of respecting Vladimir Schur, and not
+    providing crud.
+:::
+
+Essentially, I spend egregious amounts of time bashing out bindings, and running them through the ringer, and happily will
+contribute any of these bindings with improved public APIs while continuing to bash out other bindings or work on my own
+project.
+
+In saying all of this, I would be willing (as I discussed with Lanayx to begin with) at any time to come together and bring
+the plugin logic under Oxpecker and his ownership.
+
+At this current time though, I am really time constrained and trying to hammer out features to enable my own project quickly, so it's not the
+worst thing that the plugins are currently forked, as I can apply my CPU threads (which is how I like to think
+of my ADHD brain) to rapidly iterating over the plugin and growing the features without much ~~needed~~ oversight.

@@ -1,0 +1,170 @@
+---
+title: SolidTypeComponent
+---
+
+# SolidTypeComponentAttribute
+
+## Overview
+
+Apply this to the member of a class to make a tag constructor.
+
+```fsharp
+[<Erase>]
+type MyComponent() =
+    interface VoidNode
+    [<SolidTypeComponent>]
+    member props.__ =
+        let clicked,setClicked = createSignal false
+        let handler = fun _ ->
+            if clicked() |> not then
+                console.log("Clicked")
+                setClicked false
+                
+        div(class' = props.class') {
+            button(onClick = handler) { "Click me!" }
+        }
+```
+
+There are **significant** magics that are performed in the transformation of members with this attribute. The most significant are:
+
+1. Default Property Setting
+2. Automated Property Splitting
+
+These are discussed further below.
+
+## Requirements
+
+#### Public Access
+
+The transformed constructor function inherits the accessibility of the member.
+
+#### `props` self identifier
+
+This enforces component idioms by referencing to the collection of attributes as props. It also simplifies the transformation sequence. You will receive errors or warnings when attempting to compile a member with this attribute that does not have the props self identifier.
+
+#### No parameters
+
+You will receive errors or warnings when attempting to compile a member with this attribute if it is a method binding.
+
+:::info
+This is enforced since JSX compiles all the attributes into a single object parameter
+:::
+
+#### Same File as Type Declaration
+
+The usages of the component will import from the type declaration rather than the location of the constructor.
+
+:::details[Explanation]
+Let look at an example where your type is declared in `MyComponent.fs`, but you define the constructor in `Extensions.fs`.
+
+Partas.Solid would compile the component function in `Extensions.fs.jsx`, but any usage of the type constructor would instead
+refer to `MyComponent.fs.jsx` which would have no function of the same name declared.
+
+You will therefore receive a runtime error.
+:::
+
+## Defining Component Properties
+
+```fsharp tab title="Style 1"
+[<DefaultValue>]
+val mutable myAttribute: int
+```
+
+```fsharp tab title="Style 2"
+[<Erase>]                     // v--- value doesn't matter
+member val myAttribute: int = JS.undefined with get,set
+```
+
+```fsharp tab title="Style 3"
+member _.myAttribute
+    [<Erase>]
+    with get(): int = JS.undefined
+    [<Erase>]
+    and set(value: int) = ()
+```
+
+Use Style 3 with `inline` when making aliases.
+
+```fsharp title="Aliasing properties"
+[<Erase>]
+member val ``type``: string = JS.undefined with get,set
+member this.type'
+    with inline get(): string = this.``type``
+    and inline set(value: string) = this.``type`` <-- value
+```
+
+## Using Component Properties
+
+To maintain reactivity in Solid-JS, you must use explicit utilities to merge and split `props`. This is a major difference to React.
+
+The Plugin automates this for the most common use cases, which is setting defaults, and splitting properties that are directly referenced before spreading the rest of the `props` object into a child element.
+
+### Setting Defaults
+
+Whenever you assign a property a value, the relevant AST is excised from the output, and lifted into a `mergeProps` call at the beginning of the component constructor.
+
+```fsharp
+[<SolidTypeComponent>]
+member props.__ =
+    props.class' <- "defaultClass"
+    props.children <- "Button"
+```
+
+You will receive an error/warning when compiling if you have attempted to assign a property more than once.
+
+The location where you set the property is irrelevant, and will be lifted to the beginning of the constructor either way.
+
+### Automated Splitting
+
+Whenever you reference a property (whether to directly access its value or as part of an access path) the property name is cached in the transformation sequence.
+
+After transforming the AST of the constructor, the plugin compiles all the cached property accesses into a `splitProps` call at beginning of, or after a `mergeProps`, of the constructor.
+
+> In this example, the class property will be cached by the plugin when traversing the AST
+
+```fsharp tab title="F#"
+let finalisedClass =  props.class' + " bg-primary" 
+```
+```jsx tab title="JSX"
+const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["class"]);
+const finalisedClass = PARTAS_LOCAL.class + " bg-primary";
+```
+
+Essentially, you can imagine that in the case where you are applying a `.spread` to the `props` object, the spread object has already had all directly referenced properties excised from the object for you.
+
+```fsharp tab title="F#"
+div().spread props
+```
+```jsx tab title="JSX"
+<div {...PARTAS_OTHERS} />
+```
+
+There are few situations where you intend to also pass a directly referenced property to a child element via object spreading, and in these situations you will have to account for this and directly pass the property to the child.
+
+```fsharp
+[<SolidTypeComponent>]
+member props.__ = // v--- direct reference of class prop
+    div(class' = props.class') {
+        button().spread props // <-- inherits all but class prop
+    }
+```
+
+:::danger
+To prevent name collisions, the compiled names for property access and spreading are `PARTAS_LOCAL` and `PARTAS_OTHERS`. 
+
+If you use these identifiers in your code and cause a name collision, I would question your sanity.
+:::
+
+## Passing Components as Values
+
+See [Tag Values](/partas-solid/tag-values)
+
+## Signatures
+
+```fsharp
+type SolidTypeComponentAttribute(flag: int)
+new()
+new(compileOptions: ComponentFlag)
+```
+
+See [Attribute Flags](/partas-solid/attribute-flags) for the available `ComponentFlag`s

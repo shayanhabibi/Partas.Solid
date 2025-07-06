@@ -1,0 +1,18 @@
+---
+title: Common Issues
+---
+
+# Common Issues
+
+The most frequent issues that I run into are:
+1. Forgetting to use a namespace that starts with Partas.Solid
+ - The original motivation for this was to prevent over zealous transformations
+2. Forgetting to `yield` an anonymous function in a computation
+
+```fsharp "yield"
+For(each = [| "1"; "2" |]) {
+    yield fun item index -> // ...
+}
+```
+
+3. Forgetting to turn off typedArrays

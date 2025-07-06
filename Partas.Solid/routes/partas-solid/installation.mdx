@@ -1,0 +1,253 @@
+---
+title: Partas.Solid
+---
+
+[//]: # (hero:)
+
+[//]: # (    text: Getting Started)
+
+[//]: # (    tagline: Install via)
+
+[//]: # (    actions:)
+
+[//]: # (        - text: Templates)
+
+[//]: # (          link: /installation#template-quick-start)
+
+[//]: # (        - theme: alt)
+
+[//]: # (          text: Manual)
+
+[//]: # (          link: /installation#manual)
+
+
+
+# Installation
+
+You can either [manually install and setup](#manual) or [use the dotnet templates](#partassolidstart).
+<br/>
+
+:::tip
+If you quickly just want to get started and give the framework a try, then we recommend using the
+[Partas.SolidStart Templates](#partassolidstart).
+:::
+
+---
+
+# Partas.SolidStart
+
+Templates using [solid-start](https://docs.solidjs.com/solid-start/) can be used to quickly spin up a preconfigured
+environment[^1].
+
+<br/>
+
+:::warning
+The SolidStart templates use the Solid-JS meta framework of the same name.
+
+It is a preconfigured ***full-stack*** framework.
+
+We are able to plugin a dotnet backend to make the best of both worlds, but that is outside the scope of these docs.
+:::
+
+<br/>
+
+## 1. Template Quick Start
+
+
+```ansi title="Install the templates"
+[38;5;81mdotnet new install Partas.Solid.Start.Templates
+```
+
+This will provide you quick access to several templates:
+
+```ansi tab title="Bare"
+[38;5;81mdotnet new [38;5;2mbare-devtools
+```
+
+```ansi tab title="Tailwind"
+[38;5;81mdotnet new [38;5;2mtailwind-devtools
+```
+
+```ansi tab title="SolidBase"
+[38;5;81mdotnet new [38;5;2msolidbase-devtools
+```
+
+```ansi tab title="Mdx"
+[38;5;81mdotnet new [38;5;2mmdx-devtools
+```
+
+| Template Name      | Included libraries          | Description                                         |
+|--------------------|-----------------------------|-----------------------------------------------------|
+| bare-devtools      | solid-devtools              | Barebones template with devtools pre-setup          |
+| tailwind-devtools  | tailwind v4; solid-devtools | Barebones template with tailwindcss v4 and devtools |
+| solidbase-devtools | solidbase; solid-devtools   | SolidBase static website framework with devtools    |
+| mdx-devtools       | solid-mdx; solid-devtools   | MDX based site template with devtools               |
+
+###  Build Scripts
+
+Due to the nature of the SolidStart meta framework, using `Fable` with a run command would cause `vinxi` to start up a production
+server which wouldn't work.
+
+To remediate this, we use the SAFE-Stack build project based on `FAKE` to run `Fable` and `vinxi` in parallel.
+
+### Available Commands:
+
+```ansi tab title="Setup"
+[38;5;81mdotnet run setup
+```
+
+```ansi tab title="Dev"
+[38;5;81mdotnet run dev
+```
+
+```ansi tab title="Restore"
+[38;5;81mdotnet run restore
+```
+
+## 2. Setup
+
+After creating your template, navigate to the root of the solution and run:
+
+```ansi
+[38;5;81mdotnet run setup
+```
+
+This will:
+
+1. Install `Fable`[^2]
+2. Install all NPM & Dotnet dependencies
+3. Start the Development Server
+
+:::warning
+The NPM dependency installation can take up to 5 minutes (varies) on the first run.
+
+Be patient!
+:::
+
+#### Dev Server
+
+To startup the dev server, just run:
+
+```ansi
+[38;5;81mdotnet run dev
+```
+
+#### Custom Scripts
+
+See `Program.fs` in the `Build.fsproj` to see how the scripts work.
+
+:::info
+Since the templates rely on `.js` and `.jsx` config files, the build system
+compiles to `.fs.jsx` by default.
+
+When running `dev` mode, all `.fs.jsx` files are cleaned out.
+:::
+
+---
+
+
+# Manual
+
+## 1. Fable 5
+
+Ensure you have Fable 5.0+ installed[^3].
+
+```ansi
+// Create your dotnet tool manifest in a new solution
+[38;5;81mdotnet new tool-manifest
+
+[0m// Install fable to solution
+[38;5;81mdotnet tool install Fable
+```
+
+## 2. Partas.Solid
+
+```ansi tab title="Dotnet"
+[38;5;81mdotnet add package Partas.Solid
+```
+
+```ansi tab title="Paket"
+[38;5;81mpaket install Partas.Solid
+```
+
+## 3. NPM
+
+This gives you everything you need to start (ie you can compile with fable and see the output JSX).
+
+But to actually run the output, you'll need to setup your JavaScript runtime using Vite or whatever bundler/process
+you choose. You'll then need to fulfill the JS dependencies such as `solid-js` to start.
+
+```ansi
+[38;5;2mnpm install solid-js
+```
+
+### Bindings
+
+#### Femto
+
+When installing or using the bindings I've crafted, you can use femto to also manage the NPM dependencies. However, for some libraries this might not be possible (as they may have components packaged in versioned libraries themselves).
+
+---
+
+## 4. Compiling/Usage
+
+Compile with the following flags passed to fable:
+
+```ansi caption="typedArrays optional, see below"
+[38;5;81m-e .fs.jsx -c Release [0m[--typedArrays false]
+```
+
+---
+
+### JSX
+
+This plugin compiles to JSX. You will need to therefore tell Fable to compile your JS files with the `.jsx` extension.
+
+```ansi
+[38;5;81m-e .fs.jsx
+```
+
+---
+
+### Release vs Debug AST
+
+F# & Fable give different AST trees between Release and Debug mode. The plugin was developed with Release mode in mind.
+This is a non-issue until you try to compile with `fable watch`.
+
+> When compiling with <c>fable watch</c> or in debug mode, use the release flag
+
+```ansi
+[38;5;81m-c Release
+```
+
+---
+
+### Typed arrays
+
+Fable uses the most optimised/performant primitives when compiling to `js` (ie not `ts`). This means integer arrays are
+compiled into the Int32Array primitives in `js`.
+
+This becomes an issue when you're passing arrays of integers to libraries like `ApexCharts`.
+
+There are two solutions to the problem, you can either disable typed arrays using a fable flag:
+
+```ansi
+[38;5;81m--typedArrays false
+```
+
+Or, you can `cast` the integers into a different type:
+
+```fsharp
+
+// VALID:
+let data = [|
+    box 4
+    box 18
+    box 43
+|]
+
+```
+
+[^1]: These docs are made using the `solidbase-devtools` Partas.SolidStart template!
+[^2]: This will install `fable` using the `--prerelease` flag, since this plugin relies on Fable 5.0
+[^3]: At the time of writing, Fable 5 is still in *alpha* (although it is absolutely usable, it is understandable if this is a dealbreaker until a stable release), to install it, you might need to pass the `--prerelease` flag.

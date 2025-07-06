@@ -1,0 +1,176 @@
+import { ButtonExample, MyComponentExample } from "~/examples/overview.fs.jsx";
+
+
+:::info
+_The API and usage of Solid-JS is not discussed in this documentation. Please visit [the Solid-js website](https://www.solidjs.com/) for reference on Solid-JS._
+:::
+
+<br/>
+
+# Overview
+
+Solid-js operates under the modus operandi of *everything is a function*.
+
+Partas.Solid provides two methods to create functions which are compiled into HtmlElements.
+
+1. [SolidComponentAttribute](/overview#solidcomponent)
+2. [SolidTypeComponentAttribute](/overview#solidtypecomponent)
+
+## SolidComponent
+
+The first is applicable to any `let` binding:
+
+```fsharp tab title="F#: SolidComponent"
+open Partas.Solid
+open Fable.Core
+
+[<Erase>]
+type ButtonVariant =
+    | Primary
+    | Ghost
+
+[<SolidComponent>]
+let Button (title: string) (variant: ButtonVariant) =
+    button(style = match variant with
+                    | Primary -> "background-color: var(--sb-important-background-color)"
+                    | Ghost -> "") { title }
+
+[<SolidComponent>]
+let ButtonExample () =
+    let variant, setVariant = createSignal(Ghost)
+    div() {
+        Button "Primary" Primary
+        Button "Ghost" Ghost
+        Button "Responsive" (variant())
+        button(onClick = fun _ ->
+            if variant() = Primary
+            then Ghost
+            else Primary
+            |> setVariant) { "Click me" }
+    }
+```
+
+```jsx tab title="JSX: Compiled output"
+import { createSignal } from "solid-js";
+import { equals } from "../fable_modules/fable-library-js.5.0.0-alpha.13/Util.js";
+
+export function Button(title, variant) {
+    return <button style={(variant === "ghost") ? "" : "background-color: var(--sb-important-background-color)"}>
+        {title}
+    </button>;
+}
+
+export function ButtonExample() {
+    const patternInput = createSignal("ghost");
+    const variant = patternInput[0];
+    return <div>
+        {Button("Primary", "primary")}
+        {Button("Ghost", "ghost")}
+        {Button("Responsive", variant())}
+        <button onClick={(_arg) => {
+                patternInput[1](equals(variant(), "primary") ? "ghost" : "primary");
+            }}>
+            Click me
+        </button>
+    </div>;
+}
+```
+
+```mdx tab title="MDX: Usage"
+import { ButtonExample } from "~/examples/overview.fs.jsx";
+//...
+<ButtonExample></ButtonExample>
+```
+
+<ButtonExample></ButtonExample>
+
+## SolidTypeComponent
+
+The second is applied to custom tags.
+
+In Partas.Solid, you can define a custom tag which interfaces with RegularNode (if the element accepts children), or VoidNode (if the element does not accept children).
+
+To be valid, the tags must be defined within a namespace that begins with `Partas.Solid`.
+
+```fsharp title="SolidTypeComponent"
+module Partas.Solid.MyComponent
+
+open Fable.Core
+open Partas.Solid
+
+[<Erase>]
+type MyComponent() =
+    interface RegularNode
+    [<Erase>] member val myAttribute: bool = false with get,set
+```
+
+These can then be used like the predefined tags:
+
+```fsharp
+MyComponent(myAttribute = true, class' = "MyClass") { "text" }
+```
+
+This allows you to interop with other JS libraries using Fables ImportAttribute.
+
+`SolidTypeComponent` allows you to compile a function that shares the type name, allowing you to define the attributes of a component and its implementation in the same type definition. This allows you to define a component usable in the Oxpecker DSL.
+
+```fsharp tab title="F#: SolidTypeComponent"
+namespace Partas.Solid.MyComponent
+open Partas.Solid
+open Fable.Core
+
+[<Erase>]
+type MyComponent() =
+    interface RegularNode
+    [<DefaultValue>]
+    val mutable myAttribute: bool
+    [<SolidTypeComponent>]
+    member props.__ =
+        let buttonText () =
+            if props.myAttribute then
+                "MyComponent"
+            else "Button"
+        button() { buttonText() }
+
+[<SolidComponent>]
+let MyComponentExample() =
+    let sign,setSign = createSignal false
+    div() {
+        button(onClick = (fun _ -> sign() |> not |> setSign)) { "Click me!" }
+        MyComponent(myAttribute = sign())
+    }
+```
+
+```jsx tab title="JSX: Compiled Output"
+import { splitProps, createSignal } from "solid-js";
+
+export function MyComponent(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["myAttribute"]);
+    return <button>
+        {PARTAS_LOCAL.myAttribute ? ("MyComponent") : ("Button")}
+    </button>;
+}
+
+export function MyComponentExample() {
+    const patternInput = createSignal(false);
+    const sign = patternInput[0];
+    return <div>
+        <button onClick={(_arg) => {
+                patternInput[1](!sign());
+            }}>
+            Click me!
+        </button>
+        <MyComponent myAttribute={sign()} />
+    </div>;
+}
+```
+
+```mdx tab title="MDX: Usage"
+import { MyComponentExample} from "~/examples/overview.fs.jsx";
+// ...
+<MyComponentExample/>
+```
+
+<MyComponentExample/>
+
+There are plenty of things Partas.Solid does under the hood to help you out, such as providing an easy abstraction over merging props, and automated prop splitting.

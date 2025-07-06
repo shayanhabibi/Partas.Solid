@@ -37,12 +37,28 @@ Target.create "Tool" (fun _ ->
 
 Target.create "Setup" (fun _ -> ())
 
+Target.create "QuickDev" (fun _ ->
+    [ "vinxi", npm [ "run";"dev" ] basePath
+      "fable", dotnet [ "tool";"run";"fable";"watch"; "-e";".fs.jsx";"--optimize"
+                        // Compatibility with Partas.Solid.FablePlugin
+                        "-c";"Release"
+                        // Interop compatibility with most JS libraries
+                        "--typedArrays";"false" ] clientPath ] |> runParallel
+    )
+
+Target.create "Build" (fun _ ->
+        run dotnet ["tool"; "run"; "fable"; "-e"; ".fs.jsx"; "--optimize"; "-c"; "Release"; "--typedArrays"; "false"] clientPath
+    )
+
 open Fake.Core.TargetOperators
 
 let dependencies =
     [ "Clean" ==> "Dev"
       "Restore"
-      "Tool" ==> "Restore" ==> "Dev" ==> "Setup" ]
+      "Tool" ==> "Restore" ==> "Dev" ==> "Setup"
+      "QuickDev"
+      "Tool" ==> "Restore" ==> "Build"
+      ]
 
 [<EntryPoint>]
 let main args = runOrDefault args
