@@ -32,7 +32,8 @@ export default defineConfig(withSolidBase(
             prerender: {
                 crawlLinks: true
             },
-            preset: "github_pages"
+            preset: "github_pages",
+            baseUrl: "/Partas.Solid/",
         }
     },
     // solidbase config
