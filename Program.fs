@@ -47,7 +47,7 @@ Target.create "QuickDev" (fun _ ->
     )
 
 Target.create "Build" (fun _ ->
-        run dotnet ["tool"; "run"; "fable"; "-e"; ".fs.jsx"; "--optimize"; "-c"; "Release"; "--typedArrays"; "false"] clientPath
+        run dotnet ["tool"; "run"; "fable"; "-e"; ".fs.jsx"; "--optimize"; "-c"; "Release"; "--typedArrays"; "false"] basePath
     )
 
 open Fake.Core.TargetOperators
