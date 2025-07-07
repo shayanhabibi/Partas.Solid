@@ -122,8 +122,7 @@ export default defineConfig(withSolidBase(
                                 },
                                 {
                                     title: "Extension Methods",
-                                    link: "/extension-methods",
-                                    status: "next"
+                                    link: "/extension-methods"
                                 },
                                 {
                                     title: "Solid-JS",

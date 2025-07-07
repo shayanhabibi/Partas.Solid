@@ -2,19 +2,92 @@
 title: Extension Methods
 ---
 
-# Solid-JS Bindings
+# Extension Methods
+
+These methods are provided as method calls to an element constructor.
+
+They either provide native functionality through directives provided by
+solid-js such as with `bool:` or `on:`, or javascript functionality such
+as object spreading through the extension method `.spread`.
 
 ## On
 
+`.on(eventName: string, eventHandler: Event -> unit)`
+
+Uses the solid-js `on:` directive to handle events for the given name.
+
+```fsharp
+div().on("click", fun event -> JS.console.log "Clicked!)
+```
+
 ## Bool
+
+`.bool(name: string, value: bool)`
+
+Adds or removes the given attribute using the solid-js `bool:` directive.
+
+```fsharp
+div().bool("keyed", true)
+```
 
 ## Ref
 
+`.ref(el: #Element)` | `.ref(el: #Element -> unit)`
+
+Reference a native HTML element type before connecting to the DOM
+by passing a reactive signal setter, or by passing a mutable value.
+
+```fsharp tab title="Mutable Value"
+let mutable containerRef: HTMLElement = null
+div().ref(containerRef)
+```
+
+```fsharp tab title="Reactive Signal"
+let containerRef, setContainerRef = createSignal<HTMLElement>(null)
+div().ref(setContainerRef)
+```
+
 ## Attr
 
-# Partas.Solid Extensions
+`.attr(name: string, value: obj)`
+
+Adds an attribute to the element.
+
+```fsharp
+div().attr("someAttribute", 100)
+```
+
+## ClassList
+
+`.classList(classListObj: obj)`
+
+Conditional classes, like `clsx` and related libraries, through the respective
+solid-js directive.
+
+```fsharp
+div().classList(createObj [ "absolute" ==> true; "disabled" ==> false ])
+```
+
+## Data
+
+`.data(name: string, value: string)`
+
+Adds a `data-[name]` attribute.
+
+```fsharp
+div().data("visible", "false")
+```
 
 ## Style
+
+`.style'(value: obj)` | `.style'(value: (string * obj) list)`
+
+Passes the value to the `style` attribute as an object, or creates the object
+in place if provided a key,value list.
+
+```fsharp
+div().style'([ "--primary-color" ==> "#FFFFFF" ])
+```
 
 ## Spread
 
@@ -107,5 +180,3 @@ type MyCenteredButtonThree() =
 ```
 
 [//]: # (<SpreadExampleThree></SpreadExampleThree>)
-
-## Attr

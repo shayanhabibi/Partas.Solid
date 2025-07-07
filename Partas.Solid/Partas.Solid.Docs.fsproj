@@ -55,7 +55,11 @@
         <Content Include="routes\ecosystem\index.mdx" />
         <Content Include="routes\ecosystem\polymorphism.mdx" />
         <Content Include="routes\ecosystem\bindings.mdx" />
-        <Folder Include="routes\ecosystem\primitives\" />
+        <Content Include="routes\ecosystem\primitives\index.mdx" />
+        <Content Include="routes\ecosystem\primitives\active-element.mdx" />
+        <Content Include="routes\ecosystem\primitives\mouse.mdx" />
+        <Content Include="routes\ecosystem\primitives\autofocus.mdx" />
+        <Content Include="routes\ecosystem\primitives\bounds.mdx" />
         <Content Include="routes\ecosystem\partas-solid-ui.mdx" />
         <Content Include="routes\ecosystem\kobalte.mdx" />
         <Content Include="routes\ecosystem\motion.mdx" />

@@ -1,0 +1,29 @@
+﻿---
+title: Solid Primitives
+---
+
+# Autofocus
+
+```fsharp
+/// <summary>
+/// Reactively autofocuses an element passid in as a signal
+/// </summary>
+/// <example><code>
+/// import { createAutofocus } from "@solid-primitives/autofocus";
+/// // Using ref
+/// let ref!: HTMLButtonElement;
+/// createAutofocus(() => ref);
+/// 
+/// /button ref={ref}>Autofocused /button>;
+/// 
+/// // Using ref signal
+/// const [ref, setRef] = createSignal /HTMLButtonElement>();
+/// createAutofocus(ref);
+/// 
+/// /button ref={setRef}>Autofocused /button>;
+/// </code></example>
+[<ImportMember(path)>]
+static member createAutofocus (ref: unit -> #HtmlElement): unit = jsNative
+```
+
+No further notes.

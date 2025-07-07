@@ -1,0 +1,33 @@
+﻿---
+title: Solid Primitives
+---
+
+# Solid Primitives
+
+The following bindings are for the community provided `@solid-primitives`.
+
+Signatures will be provided for the bound functions/methods.
+
+Usage is best discerned from the source material.
+
+## Femto
+
+All primitives are compatible with Femto to install.
+
+```ansi
+femto install Partas.Solid.Primitives.Mouse
+```
+
+## Use, Make and Create
+
+As per the solid-primitives naming scheme, primitives that are labeled with
+the `make` prefix are non-reactive, but will clean-up their resources on disposal.
+
+Primitives marked with the `use` prefix, are typically *rootless* primitives.
+
+> This means that there would typically be only one of that primitive, which is shared
+> between all consumers.
+
+Primitives marked with `create` prefix, are *reactive* and will clean-up resources
+on disposal.
+
