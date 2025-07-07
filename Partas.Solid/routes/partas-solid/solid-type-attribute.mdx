@@ -122,20 +122,20 @@ After transforming the AST of the constructor, the plugin compiles all the cache
 
 > In this example, the class property will be cached by the plugin when traversing the AST
 
-```fsharp tab title="F#"
+```fsharp tab="Key1" title="F#"
 let finalisedClass =  props.class' + " bg-primary" 
 ```
-```jsx tab title="JSX"
+```jsx tab="Key1" title="JSX"
 const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["class"]);
 const finalisedClass = PARTAS_LOCAL.class + " bg-primary";
 ```
 
 Essentially, you can imagine that in the case where you are applying a `.spread` to the `props` object, the spread object has already had all directly referenced properties excised from the object for you.
 
-```fsharp tab title="F#"
+```fsharp tab="Key1" title="F#"
 div().spread props
 ```
-```jsx tab title="JSX"
+```jsx tab="Key1" title="JSX"
 <div {...PARTAS_OTHERS} />
 ```
 

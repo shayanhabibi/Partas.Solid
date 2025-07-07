@@ -7,7 +7,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolidStartConfig", "SolidStartConfig", "{27587754-387C-4E99-9D0C-F4DE452AC289}"
 	ProjectSection(SolutionItems) = preProject
 		package.json = package.json
-		app.config.js = app.config.js
+		app.config.jsx = app.config.jsx
 		jsconfig.json = jsconfig.json
 		.gitignore = .gitignore
 	EndProjectSection

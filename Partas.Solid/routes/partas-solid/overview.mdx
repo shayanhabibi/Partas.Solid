@@ -20,7 +20,7 @@ Partas.Solid provides two methods to create functions which are compiled into Ht
 
 The first is applicable to any `let` binding:
 
-```fsharp tab title="F#: SolidComponent"
+```fsharp tab title="F#: SolidComponent" "[<SolidComponent>]"
 open Partas.Solid
 open Fable.Core
 
@@ -114,7 +114,7 @@ This allows you to interop with other JS libraries using Fables ImportAttribute.
 
 `SolidTypeComponent` allows you to compile a function that shares the type name, allowing you to define the attributes of a component and its implementation in the same type definition. This allows you to define a component usable in the Oxpecker DSL.
 
-```fsharp tab title="F#: SolidTypeComponent"
+```fsharp tab title="F#: SolidTypeComponent" "[<SolidTypeComponent>]"
 namespace Partas.Solid.MyComponent
 open Partas.Solid
 open Fable.Core

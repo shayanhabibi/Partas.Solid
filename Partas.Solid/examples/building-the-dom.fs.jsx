@@ -15,7 +15,7 @@ export function UnreactiveComponent(props) {
     </button>;
 }
 
-export function MyComponentExample() {
+export function MyReactiveComponentExample() {
     const patternInput = createSignal(false);
     const sign = patternInput[0];
     return <div>
@@ -25,6 +25,18 @@ export function MyComponentExample() {
             Click me!
         </button>
         <ReactiveComponent myAttribute={sign()} />
+    </div>;
+}
+
+export function MyUnreactiveComponentExample() {
+    const patternInput = createSignal(false);
+    const sign = patternInput[0];
+    return <div>
+        <button onClick={(_arg) => {
+                patternInput[1](!sign());
+            }}>
+            Click me!
+        </button>
         <UnreactiveComponent myAttribute={sign()} />
     </div>;
 }

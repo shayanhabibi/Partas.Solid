@@ -2,42 +2,23 @@
 title: Partas.Solid
 ---
 
-[//]: # (hero:)
-
-[//]: # (    text: Getting Started)
-
-[//]: # (    tagline: Install via)
-
-[//]: # (    actions:)
-
-[//]: # (        - text: Templates)
-
-[//]: # (          link: /installation#template-quick-start)
-
-[//]: # (        - theme: alt)
-
-[//]: # (          text: Manual)
-
-[//]: # (          link: /installation#manual)
-
-
-
 # Installation
 
 You can either [manually install and setup](#manual) or [use the dotnet templates](#partassolidstart).
 <br/>
 
-:::tip
-If you quickly just want to get started and give the framework a try, then we recommend using the
-[Partas.SolidStart Templates](#partassolidstart).
-:::
 
 ---
 
 # Partas.SolidStart
 
+:::tip
+If you quickly just want to get started and give the framework a try, then we recommend using the
+[Partas.SolidStart Templates](#partassolidstart).
+
 Templates using [solid-start](https://docs.solidjs.com/solid-start/) can be used to quickly spin up a preconfigured
 environment[^1].
+:::
 
 <br/>
 
@@ -78,10 +59,10 @@ This will provide you quick access to several templates:
 
 | Template Name      | Included libraries          | Description                                         |
 |--------------------|-----------------------------|-----------------------------------------------------|
-| bare-devtools      | solid-devtools              | Barebones template with devtools pre-setup          |
-| tailwind-devtools  | tailwind v4; solid-devtools | Barebones template with tailwindcss v4 and devtools |
-| solidbase-devtools | solidbase; solid-devtools   | SolidBase static website framework with devtools    |
-| mdx-devtools       | solid-mdx; solid-devtools   | MDX based site template with devtools               |
+| `bare-devtools`      | solid-devtools              | Barebones template with devtools pre-setup          |
+| `tailwind-devtools`  | tailwind v4; solid-devtools | Barebones template with tailwindcss v4 and devtools |
+| `solidbase-devtools` | solidbase; solid-devtools   | SolidBase static website framework with devtools    |
+| `mdx-devtools`       | solid-mdx; solid-devtools   | MDX based site template with devtools               |
 
 ###  Build Scripts
 
@@ -199,54 +180,46 @@ Compile with the following flags passed to fable:
 
 ---
 
-### JSX
+::::tab-group[compKey]
+:::tab[Jsx]
 
+**JSX**<br/><br/>
 This plugin compiles to JSX. You will need to therefore tell Fable to compile your JS files with the `.jsx` extension.
 
-```ansi
+:::
+
+:::tab[Release]
+
+**Release vs Debug AST**<br/><br/>
+F# & Fable give different AST trees between Release and Debug mode. The plugin was developed with Release mode in mind.
+This is a non-issue until you try to compile with `fable watch`.<br/><br/>
+When compiling with <c>fable watch</c> or in debug mode, use the release flag
+
+:::
+
+:::tab[typedArrays]
+
+**Typed arrays**<br/><br/>
+Fable uses the most optimised/performant primitives when compiling to `js` (ie not `ts`). This means integer arrays are
+compiled into the Int32Array primitives in `js`.<br/><br/>
+This becomes an issue when you're passing arrays of integers to libraries like `ApexCharts`.<br/><br/>
+There are two solutions to the problem, you can either disable typed arrays using a fable flag, or you can `cast` the integers into a different type `box 5`.
+
+:::
+::::
+
+```ansi tab="compKey" title="Jsx"
 [38;5;81m-e .fs.jsx
 ```
 
----
-
-### Release vs Debug AST
-
-F# & Fable give different AST trees between Release and Debug mode. The plugin was developed with Release mode in mind.
-This is a non-issue until you try to compile with `fable watch`.
-
-> When compiling with <c>fable watch</c> or in debug mode, use the release flag
-
-```ansi
+```ansi tab="compKey" title="Release"
 [38;5;81m-c Release
 ```
 
----
-
-### Typed arrays
-
-Fable uses the most optimised/performant primitives when compiling to `js` (ie not `ts`). This means integer arrays are
-compiled into the Int32Array primitives in `js`.
-
-This becomes an issue when you're passing arrays of integers to libraries like `ApexCharts`.
-
-There are two solutions to the problem, you can either disable typed arrays using a fable flag:
-
-```ansi
+```ansi tab="compKey" title="typedArrays"
 [38;5;81m--typedArrays false
 ```
 
-Or, you can `cast` the integers into a different type:
-
-```fsharp
-
-// VALID:
-let data = [|
-    box 4
-    box 18
-    box 43
-|]
-
-```
 
 [^1]: These docs are made using the `solidbase-devtools` Partas.SolidStart template!
 [^2]: This will install `fable` using the `--prerelease` flag, since this plugin relies on Fable 5.0

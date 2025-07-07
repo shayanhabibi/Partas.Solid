@@ -78,7 +78,7 @@ With the power of F#, it's not hard to show how we can drop dependencies by usin
 Convince a JS developer to drop a 22.1kb dependency on CVA with F# features
 :::
 
-```fsharp tab title="F#"
+```fsharp tab title="F#" collapse={8-10,14-17,22-24} wrap
 [<Erase>]
 type Button() =
     inherit Kobalte.Button()
@@ -185,7 +185,7 @@ Example code from compiling similar designed sidebars using Feliz and Partas.Sol
 Recent efforts to make a Feliz version that uses the newer JSX helpers provided by Fable is underway which would make clean compiled code)
 :::
 
-```js tab title="Feliz"
+```js tab title="Feliz" collapse={2-45}
 function AppSideBar() {
     let el, el_2, el_4, el_6, children_1_4, children_1_2, children_1_1, children_1, children_1_3;
     const items = ofArray([{
@@ -233,7 +233,7 @@ function AppSideBar() {
 }
 ```
 
-```jsx tab title="Partas.Solid"
+```jsx tab title="Partas.Solid" collapse={2-34}
 export function NavSidebarContent(props) {
     const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
     const ctx = SidebarModule_Context_useSidebar();

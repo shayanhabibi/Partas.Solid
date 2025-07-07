@@ -2,7 +2,7 @@
 title: Building the DOM
 ---
 
-import { Conditional, MyComponentExample } from "~/examples/building-the-dom.fs.jsx";
+import { Conditional, MyReactiveComponentExample, MyUnreactiveComponentExample } from "~/examples/building-the-dom.fs.jsx";
 
 # {frontmatter.title}
 
@@ -38,7 +38,7 @@ Happy to answer any specific questions on the community discord if you are
 running into issues.
 
 
-```fsharp tab title="F#: Unreactive"
+```fsharp tab="rKey" title="Unreactive" del={8-12} collapse={3-5,13-20}
 [<Erase>]
 type UnreactiveComponent() =
     interface RegularNode
@@ -51,9 +51,17 @@ type UnreactiveComponent() =
                 "MyComponent"
             else "Button"
         button() { buttonText }
+        
+[<SolidComponent>]
+let MyUnreactiveComponentExample() =
+    let sign,setSign = createSignal false
+    div() {
+        button(onClick = (fun _ -> sign() |> not |> setSign)) { "Click me!" }
+        UnreactiveComponent(myAttribute = sign())
+    }
 ```
 
-```fsharp {8} tab title="F#: Reactive"
+```fsharp {8} tab="rKey" title="Reactive" ins={8-12} collapse={3-5,13-20}
 [<Erase>]
 type ReactiveComponent() =
     interface RegularNode
@@ -66,9 +74,29 @@ type ReactiveComponent() =
                 "MyComponent"
             else "Button"
         button() { buttonText() }
+        
+[<SolidComponent>]
+let MyReactiveComponentExample() =
+    let sign,setSign = createSignal false
+    div() {
+        button(onClick = (fun _ -> sign() |> not |> setSign)) { "Click me!" }
+        ReactiveComponent(myAttribute = sign())
+    }
 ```
 
-```jsx tab title="JSX: Unreactive"
+::::tab-group[rKey]
+:::tab[Unreactive]
+<MyUnreactiveComponentExample/>
+:::
+
+:::tab[Reactive]
+<MyReactiveComponentExample/>
+:::
+::::
+
+
+:::details[Compiled Output]
+```jsx tab="rKey" title="Unreactive"
 export function UnreactiveComponent(props) {
     const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["myAttribute"]);
     const buttonText = PARTAS_LOCAL.myAttribute ? "MyComponent" : "Button";
@@ -77,10 +105,23 @@ export function UnreactiveComponent(props) {
     </button>;
 }
 
+export function MyUnreactiveComponentExample() {
+    const patternInput = createSignal(false);
+    const sign = patternInput[0];
+    return <div>
+        <button onClick={(_arg) => {
+                patternInput[1](!sign());
+            }}>
+            Click me!
+        </button>
+        <UnreactiveComponent myAttribute={sign()} />
+    </div>;
+}
+
 ```
 
 
-```jsx tab title="JSX: Reactive"
+```jsx tab="rKey" title="Reactive"
 export function ReactiveComponent(props) {
     const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["myAttribute"]);
     return <button>
@@ -88,23 +129,7 @@ export function ReactiveComponent(props) {
     </button>;
 }
 
-```
-
-
-```fsharp tab title="F#: Example"
-[<SolidComponent>]
-let MyComponentExample() =
-    let sign,setSign = createSignal false
-    div() {
-        button(onClick = (fun _ -> sign() |> not |> setSign)) { "Click me!" }
-        ReactiveComponent(myAttribute = sign())
-        UnreactiveComponent(myAttribute = sign())
-    }
-```
-
-
-```jsx tab title="JSX: Example"
-export function MyComponentExample() {
+export function MyReactiveComponentExample() {
     const patternInput = createSignal(false);
     const sign = patternInput[0];
     return <div>
@@ -114,20 +139,18 @@ export function MyComponentExample() {
             Click me!
         </button>
         <ReactiveComponent myAttribute={sign()} />
-        <UnreactiveComponent myAttribute={sign()} />
     </div>;
 }
-
 ```
+:::
 
-<MyComponentExample/>
 
 ## Conditional Rendering
 
 The `Show` component is an explicit version of a conditional ternary, with some additional
 benefit in how it is handled by some libraries in the ecosystem.
 
-```fsharp title="F#"
+```fsharp tab title="F#"
 [<SolidComponent>]
 let Conditional () =
     let truthy,setTruthy = createSignal false
@@ -141,7 +164,7 @@ let Conditional () =
     }
 ```
 
-```jsx title="JSX"
+```jsx tab title="JSX"
 export function Conditional() {
     const patternInput = createSignal(false);
     const truthy = patternInput[0];

@@ -40,9 +40,8 @@ Ensure your component has a unit parameter/argument if you want to use it as a c
 This attribute recursively transforms the body of a member/function.
 It recursively searches the AST for tags, collects these tags into Elements, and compiles them as a Fable.Core call to JSX.create.
 
-<div class="px-8 text-muted-foreground text-sm">
-    There are a few other optimisations and tricks that the plugin does with the AST, such as removing CE calls in lists etc to prevent obscuring Solid-JSs reactivity system. This was before Fable included these optimisations internally.
-</div>
+
+> There are a few other optimisations and tricks that the plugin does with the AST, such as removing CE calls in lists etc to prevent obscuring Solid-JSs reactivity system. This was before Fable included these optimisations internally.
 
 ## When else to use it
 
@@ -52,7 +51,8 @@ Without being in a scope accessible by the plugin (a binding or member with a So
 
 However, if your icon/tag/element was a function binding (as opposed to a TypeComponent binding) then this wouldn't be an issue, and you can refer to the icon/tag/element directly.
 
-```fsharp
+```fsharp collapse={5-8}
+// Define a SolidTypeComponent for example
 [<Erase>]
 type LucideActivity() =
     inherit Lucide.Activity()
@@ -60,12 +60,14 @@ type LucideActivity() =
     member props.__ =
         Lucide.Activity()
 
+// Define a SolidComponent for example
 [<SolidComponent>]
 let MyIcon () =
     Lucide.Activity()
 ```
 
-```fsharp {5} tab title="Invalid"
+
+```fsharp tab title="Invalid" del={5}
 // Notice this is not in a Plugin scope
 for item in titles do
     match item with
@@ -73,7 +75,7 @@ for item in titles do
         item, Some !@LucideActivity
 ```
 
-```fsharp tab title="Valid"
+```fsharp tab title="Valid" ins={5}
 // Notice this is not in a Plugin scope
 for item in titles do
     match item with
@@ -81,7 +83,7 @@ for item in titles do
         item, Some MyIcon
 ```
 
-```fsharp {1,6} tab title="Alt Valid"
+```fsharp tab title="Alt Valid" ins={1,6}
 [<SolidComponent>] // <-- Plugin Scope
 let makeItems =
     for item in titles do
@@ -89,6 +91,7 @@ let makeItems =
         | "Sports" -> // v--- Works
             item, Some !@LucideActivity
 ```
+
 
 ## Signatures
 

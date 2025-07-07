@@ -32,11 +32,17 @@ type UnreactiveComponent() =
         button() { buttonText }
 
 [<SolidComponent>]
-let MyComponentExample() =
+let MyReactiveComponentExample() =
     let sign,setSign = createSignal false
     div() {
         button(onClick = (fun _ -> sign() |> not |> setSign)) { "Click me!" }
         ReactiveComponent(myAttribute = sign())
+    }
+[<SolidComponent>]
+let MyUnreactiveComponentExample() =
+    let sign,setSign = createSignal false
+    div() {
+        button(onClick = (fun _ -> sign() |> not |> setSign)) { "Click me!" }
         UnreactiveComponent(myAttribute = sign())
     }
 
