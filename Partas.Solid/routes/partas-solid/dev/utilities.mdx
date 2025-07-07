@@ -2,6 +2,12 @@
 title: Plugin Utilities
 ---
 
+:::note
+The plugin is extensively documented in the source code to explain usage.
+
+For this reason, only sparse notes are included here.
+:::
+
 # Utilities
 
 Contains utilities that are frequently used to simplify pattern recognition such as:
@@ -15,11 +21,3 @@ let (|StartsWith|_|) (value: string) = function
 These utilities should be based on primitives rather than structures defined in `Types.fs`.
 
 The only reason it is compiled after `Types.fs` is to allow us to utilise `PluginContext` (which is defined in `Types.fs`) if required.
-
-:::note
-The plugin is extensively documented in the source code to explain usage.
-:::
-
-:::warning
-Under construction.
-:::

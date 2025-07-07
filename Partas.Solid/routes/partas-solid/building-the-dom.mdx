@@ -53,19 +53,6 @@ type UnreactiveComponent() =
         button() { buttonText }
 ```
 
-
-```jsx tab title="JSX: Unreactive"
-export function UnreactiveComponent(props) {
-    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["myAttribute"]);
-    const buttonText = PARTAS_LOCAL.myAttribute ? "MyComponent" : "Button";
-    return <button>
-        {buttonText}
-    </button>;
-}
-
-```
-
-
 ```fsharp {8} tab title="F#: Reactive"
 [<Erase>]
 type ReactiveComponent() =
@@ -81,6 +68,17 @@ type ReactiveComponent() =
         button() { buttonText() }
 ```
 
+```jsx tab title="JSX: Unreactive"
+export function UnreactiveComponent(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["myAttribute"]);
+    const buttonText = PARTAS_LOCAL.myAttribute ? "MyComponent" : "Button";
+    return <button>
+        {buttonText}
+    </button>;
+}
+
+```
+
 
 ```jsx tab title="JSX: Reactive"
 export function ReactiveComponent(props) {
@@ -91,7 +89,6 @@ export function ReactiveComponent(props) {
 }
 
 ```
-
 
 
 ```fsharp tab title="F#: Example"

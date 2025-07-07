@@ -8,8 +8,36 @@ Contains DUs, types, and functions relating to those types.
 
 :::note
 The plugin is extensively documented in the source code to explain usage.
+
+For this reason, only sparse notes are included here.
 :::
 
-:::warning
-Under construction.
-:::
+Many patterns relate to abstracting away recursive drilling of a node
+which may be a wrapper such as a typecast, to elucidate a type or identity
+within.
+
+Unions are used as the result of these patterns, such that the consumption
+for higher order patterns is simplified.
+
+Examples of these are the union types `MemberRefType` and `IdentType`. The
+primary purpose of the latter, is to remove the purposely derranged identifiers
+that we match against from consuming patterns, such as `PARTAS_YIELD`.
+
+## `ElementBuilder`
+
+This record is the end objective for tag transformations.
+
+Collecting and constructing this record, can then be processed uniformly into
+a `JSX.create` call.
+
+## `PluginContext`
+
+This record is threaded all transformations.
+
+It provides the cache arrays for collecting getters and setters, and exposes
+the component flags to transformations to conditionally alter behaviour.
+
+It also exposes the plugin helper to all transformations, allowing warnings and
+errors to be passed to the Fable compiler.
+
+It will be commonly seen as the first argument to many patterns and functions.

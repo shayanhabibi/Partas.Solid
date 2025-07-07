@@ -4,6 +4,79 @@ title: Tag Interfaces
 
 # {frontmatter.title}
 
-:::warning
-Under construction
-:::
+The following interfaces are exposed by the Partas.Solid library to provide
+inheritance for common component structures and properties.
+
+Beyond this, feel free to inherit from any of the concrete classes such as `div`.
+
+## Foundation Interfaces
+
+### `HtmlElement`
+
+Base type for all elements.
+
+To allow a class/type to be accepted as a child node in the computation expressions,
+the type must derive from `HtmlElement`, or one of it's subsequent derivatives.
+
+### `HtmlTag`
+
+Implementation of `HtmlElement` with common/global solid-js attributes.
+
+Interface provides the [support for extension methods](/partas-solid/extension-methods).
+
+### `HtmlContainer`
+
+Interface enables the computation expression to construct child elements.
+
+## Derivative Interfaces
+
+### `RegularNode`
+
+An interface which provides common/global solid-js attributes, extension methods,
+and accepts children nodes.
+
+> This is essentially just a convenient interface to both HtmlContainer and HtmlTag
+
+### `VoidNode`
+
+An interface which provides common/global solid-js attributes, extension methods,
+but does not accept any children nodes.
+
+> This is essentially just an alias to HtmlTag.
+>
+> Historically, the Derivative Interfaces were concrete classes. The change
+> to interfaces make this more-or-less redundant.
+
+### `FragmentNode`
+
+Special interface which renders `<> </>` in the plugin.
+
+At face value, it is just a derivative of `HtmlContainer`. It is implemented
+by the concrete class `Fragment()`.
+
+## Special Interfaces
+
+### `ChildLambdaProvider`
+
+Provides interfaces which implement the lambda constructor functionality that is
+already existing in components such as `For` and `Index`.
+
+A numeric suffix to the interface name provides more explicit type parameter
+numbers.
+
+The plugin uncurries the lambda function that is passed as a child to the element.
+
+### `ChildLambdaProviderStrict`
+
+An implementation of the `ChildLambdaProvider` family of interfaces, with the
+addendum that you can specify the exact type that the child must be.
+
+An example use is for elements like the solidjs/router `Router`, which can only
+accept children of type `Route`.
+
+### `Polymorph`
+
+Library support for polymorphic elements from `Kobalte` and `ArkUI`.
+
+Usage is best described in the [Partas.Solid.Kobalte](/ecosystem/kobalte) binding
+library documentation.

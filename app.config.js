@@ -119,7 +119,6 @@ export default defineConfig(withSolidBase(
                                 {
                                     title: "Tag Interfaces",
                                     link: "/tag-interfaces",
-                                    status: "next"
                                 },
                                 {
                                     title: "Extension Methods",
@@ -194,18 +193,15 @@ export default defineConfig(withSolidBase(
                                 {
                                     title: "Types",
                                     link: "/dev/types",
-                                    status: "next"
                                 },
                                 {
                                     title: "Utilities",
                                     link: "/dev/utilities",
-                                    status: "next"
                                     
                                 },
                                 {
                                     title: "Spec",
                                     link: "/dev/spec",
-                                    status: "next"
                                 },
                                 {
                                     title: "Patterns",
