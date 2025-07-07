@@ -103,7 +103,6 @@ export default defineConfig(withSolidBase(
                                 {
                                     title: "Oxpecker DSL",
                                     link: "/oxpecker-dsl",
-                                    status: "next"
                                 },
                                 {
                                     title: "SolidComponent",
@@ -116,7 +115,6 @@ export default defineConfig(withSolidBase(
                                 {
                                     title: "Building the DOM",
                                     link: "/building-the-dom",
-                                    status: "next"
                                 },
                                 {
                                     title: "Tag Interfaces",

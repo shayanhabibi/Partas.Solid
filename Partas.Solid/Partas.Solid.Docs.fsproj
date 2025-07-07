@@ -17,6 +17,7 @@
         <Compile Include="examples\kobalte.fs" />
         <Compile Include="examples\apexcharts.fs" />
         <Compile Include="examples\motion.fs" />
+        <Compile Include="examples\building-the-dom.fs" />
         <Content Include="global.d.js" />
         <Compile Include="Program.fs" />
         <Content Include="routes\partas-solid\about\oxpecker-fork.mdx" />

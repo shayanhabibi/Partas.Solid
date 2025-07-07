@@ -2,8 +2,180 @@
 title: Building the DOM
 ---
 
+import { Conditional, MyComponentExample } from "~/examples/building-the-dom.fs.jsx";
+
 # {frontmatter.title}
 
-:::warning
-Under construction
+With the ability to compose the DOM using either functions or type constructors,
+you can mix and match them to suit your needs.
+
+> If building and distributing *components* or *elements*, then it is recommended
+> to use the `SolidTypeComponent` - type constructor - syntax.
+> 
+> For F# users, this means consumption uses the same DSL for a uniform experience.
+> You also retain the flexibility of optional properties.
+> 
+> For JS consumers, this means consumption as a an XML tag will not miss any
+> arguments (since attributes are packed into the first parameter of a function).
+
+## Large vs Small Components
+
+Unlike React, there is negligible consideration as to whether compose smaller
+components into large components to avoid re-rendering due to the fine-grained
+reactive system.
+
+## Reactivity
+
+Solid-JS reactive system is amazing to work with, but is disjointing if you
+come from having used React extensively.
+
+Unfortunately, there is no amount of documentation that I could provide which
+would exceed the work already done on the solid-js website.
+
+I would suggest having a look through their documentation on reactivity.
+
+Happy to answer any specific questions on the community discord if you are
+running into issues.
+
+
+```fsharp tab title="F#: Unreactive"
+[<Erase>]
+type UnreactiveComponent() =
+    interface RegularNode
+    [<DefaultValue>]
+    val mutable myAttribute: bool
+    [<SolidTypeComponent>]
+    member props.__ =
+        let buttonText =
+            if props.myAttribute then
+                "MyComponent"
+            else "Button"
+        button() { buttonText }
+```
+
+
+```jsx tab title="JSX: Unreactive"
+export function UnreactiveComponent(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["myAttribute"]);
+    const buttonText = PARTAS_LOCAL.myAttribute ? "MyComponent" : "Button";
+    return <button>
+        {buttonText}
+    </button>;
+}
+
+```
+
+
+```fsharp {8} tab title="F#: Reactive"
+[<Erase>]
+type ReactiveComponent() =
+    interface RegularNode
+    [<DefaultValue>]
+    val mutable myAttribute: bool
+    [<SolidTypeComponent>]
+    member props.__ =
+        let buttonText () =
+            if props.myAttribute then
+                "MyComponent"
+            else "Button"
+        button() { buttonText() }
+```
+
+
+```jsx tab title="JSX: Reactive"
+export function ReactiveComponent(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["myAttribute"]);
+    return <button>
+        {PARTAS_LOCAL.myAttribute ? ("MyComponent") : ("Button")}
+    </button>;
+}
+
+```
+
+
+
+```fsharp tab title="F#: Example"
+[<SolidComponent>]
+let MyComponentExample() =
+    let sign,setSign = createSignal false
+    div() {
+        button(onClick = (fun _ -> sign() |> not |> setSign)) { "Click me!" }
+        ReactiveComponent(myAttribute = sign())
+        UnreactiveComponent(myAttribute = sign())
+    }
+```
+
+
+```jsx tab title="JSX: Example"
+export function MyComponentExample() {
+    const patternInput = createSignal(false);
+    const sign = patternInput[0];
+    return <div>
+        <button onClick={(_arg) => {
+                patternInput[1](!sign());
+            }}>
+            Click me!
+        </button>
+        <ReactiveComponent myAttribute={sign()} />
+        <UnreactiveComponent myAttribute={sign()} />
+    </div>;
+}
+
+```
+
+<MyComponentExample/>
+
+## Conditional Rendering
+
+The `Show` component is an explicit version of a conditional ternary, with some additional
+benefit in how it is handled by some libraries in the ecosystem.
+
+```fsharp title="F#"
+[<SolidComponent>]
+let Conditional () =
+    let truthy,setTruthy = createSignal false
+    div() {
+        button(onClick = fun _ -> setTruthy(truthy() |> not)) { "Click me!" }
+        if truthy() then
+            "Boo!"
+        Show(when'=not (truthy())) {
+            "Do you hear that?"
+        }
+    }
+```
+
+```jsx title="JSX"
+export function Conditional() {
+    const patternInput = createSignal(false);
+    const truthy = patternInput[0];
+    return <div>
+        <button onClick={(_arg) => {
+                patternInput[1](!truthy());
+            }}>
+            Click me!
+        </button>
+        {truthy() ? ("Boo!") : (undefined)}
+        <Show when={!truthy()}>
+            Do you hear that?
+        </Show>
+    </div>;
+}
+```
+
+<Conditional/>
+
+There is a similar `Switch` and `Match` component for case based rendering.
+
+:::note
+There is consideration to abstract `Switch` and `Match` injection when using
+pattern matches in CEs.
+
+There is similar consideration to abstract `Show`, and `Index`/`For`.
 :::
+
+## Handling Streams and Errors
+
+The `ErrorBoundary` and `Suspense` components are used in handling async
+and errors within the DOM. The relevant sections in the solid-js documentation are
+suggested reading.
+

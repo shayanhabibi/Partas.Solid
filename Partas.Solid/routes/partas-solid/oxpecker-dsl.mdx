@@ -4,6 +4,124 @@ title: Oxpecker DSL
 
 # {frontmatter.title}
 
-:::info
-Under Construction
+Partas.Solid, as a derivative of Oxpecker.Solid, has the same foundational DSL.
+
+:::note[Advantage]
+The advantage of this DSL is the ease with which you can distinguish attributes
+from children, and the similarity to XML with opening and closing identifiers.
 :::
+
+:::warning[Disadvantage]
+It has been argued that the disadvantage is the obstruction to programmatically
+building attributes with lists.
+:::
+
+**HOWEVER**, this is not an issue in Partas.Solid, as you can spread any object into the attributes
+using the [spread extension method](/partas-solid/extension-methods).
+
+This gives you freedom to construct attributes however you wish, and pass them
+to native elements.
+
+## Element DSL
+
+The Oxpecker view DSL uses class constructors with optional parameters
+to build elements.
+
+```fsharp
+[<SolidComponent>]
+let Example() =
+    button(onClick = fun _ -> console.log "Clicked!")
+```
+
+Reserved names such for attributes such as `class` are apostraphised:
+
+```fsharp
+button(class' = "btn btn-primary")
+```
+
+Computation Expressions (CE) are used to construct the children of the element.
+
+You can pass multiple integers, strings, other elements into the CE.
+
+```fsharp tab title="Strings"
+button() {
+    "Button!"
+ }
+```
+
+```fsharp tab title="Ints"
+button() {
+    "ButtonNum:"
+    5
+}
+```
+
+```fsharp tab title="Elements"
+div() {
+    "Button Label"
+    button() {
+        "Button"
+    }
+    span() { "Button Caption" }
+}
+```
+
+## Embedded JSX
+
+You can also pass embedded JSX using a helper converter:
+
+```fsharp
+let inline toHtmlElement (func: string -> JSX.Element) (value: string): HtmlElement =
+    unbox(func value)
+```
+
+```fsharp
+div() {
+    toHtmlElement JSX.jsx "<button>Button</button>"
+}
+```
+
+:::note
+The F# Compiler seems to consider `JSX.Element` as a non-concrete type that collides with
+`HtmlElement`, and prevents us having both `#HtmlElement` and `JSX.Element` as overloads
+for the computation expression.
+
+When this is resolved, `JSX.Element` types will be inherently accepted
+:::
+
+## Lambda Elements
+
+Library components, and native solid-js components, have components which require
+a function as a child.
+
+An example of this is the `For` component, which is used for building components iteratively
+while maintaining reactivity.
+
+:::important
+To pass a lambda function as a child of an element, you must ensure you
+`yield` the function.
+
+If your IDE is not able to type the function parameters, it is likely you have
+not done this.
+:::
+
+```fsharp {2}
+For(each = [| 1;2;3 |]) {
+    yield fun item idx ->
+        button() {
+            $"Button Number {item}"
+        }
+}
+```
+
+:::tip[Binding Libraries with Lambda Constructors]
+If you are binding a library that requires a lambda constructor such as the one above,
+you can use specialised interfaces to automatically enable this behavior.
+
+See [tag interfaces](/partas-solid/tag-interfaces) `ChildLambdaProvider` for more.
+:::
+
+## [Extension Methods](/partas-solid/extension-methods)
+
+Auxiliary methods that supplement the API with the ability to spread objects
+in the tag constructor, or to add custom attributes.
