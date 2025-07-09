@@ -1,0 +1,39 @@
+﻿---
+title: Render the Table
+---
+
+# {frontmatter.title}
+
+Let's put it all together and render our first basic table before adding more elements.
+
+```fsharp title="TableTest.fs"
+module Partas.Solid.Example.TableTest
+
+open Partas.Solid
+open Partas.Solid.Example.TestColumnDefs
+open Partas.Solid.TanStack.Table
+open Fable.Core
+
+let userData = [|
+        { Name = "Name"; Color = "Color"; Code = "Code" }
+        { Name = "Name1"; Color = "Color1"; Code = "Code1" }
+        { Name = "Name2"; Color = "Color2"; Code = "Code2" }
+    |]
+
+[<SolidComponent>]
+let Test () =
+    let table = createTable(
+            TableOptions<User>(
+                getCoreRowModel = getCoreRowModel()
+            )   .data(fun _ -> userData)
+                .columns(fun _ -> columnDefs)
+        )
+    DataTable(table = table)
+```
+
+:::details[Why are data & columns methods?]
+TanStack requires the `data` and `columns` to be `get` properties of
+the `TableOptions` object passed to `createTable`.
+
+The `.data` and `.columns` method take care of this for you.
+:::

@@ -1,0 +1,78 @@
+﻿---
+title: Column Definitions
+---
+
+# {frontmatter.title}
+
+Now we get to the ~~fun~~ annoying part. Defining the columns/table structure.
+
+Lets start by defining the type that we want to populate a table with.
+
+```fsharp title="Model.fs"
+module Partas.Solid.Example.TestColumnDefs
+
+open Fable.Core
+open Partas.Solid.TanStack.Table
+open Partas.Solid
+
+type User = {
+    Code: string
+    Name: string
+    Color: string
+}
+```
+
+Now we define the column definitions. There are different ways to organise this, but
+I find it easier to define each column individually, and then assemble them
+into an array after.
+
+The `ColumnDef<'T>` type from `Partas.Solid.TanStack.Table` is essentially a replica
+of the source material. In `Fable`, the most favourable primitive for this type is
+a `Pojo` class constructor with optional parameters.
+
+First, let's define the column for `Code` of `User`. We'll want to declare the
+definition to access that member of `User`.
+
+```fsharp title="Model.fs" ins={3} del={2}
+let codeColumn = ColumnDef<User>(
+    accessor = "Code"
+    accessorFn = fun user _ -> user.Code
+)
+```
+
+In TypeScript, it would be common to just reference the object field by name.
+
+Thankfully, a better option is provided natively in `@tanstack/table`, which is
+`accessorFn`. This would let us have type safety. The second parameter in the
+`accessorFn` lambda is the `index` position of the row.
+
+We can then decide to render the cell however we wish, and add other elements such
+as a header etc.
+
+```fsharp title="Model.fs"
+[<SolidComponent>]
+let codeColumn = ColumnDef<User>(
+    accessorFn = fun user _ -> user.Code
+    ,header = "Code"
+    ,cell = fun props ->
+        div(class' = "w-14 hover:scale-102 flex justify-center bg-black text-white") {
+                props.getValue() :?> string
+            }
+)
+```
+
+:::warning
+Now that we are rendering tags in the `let`, we have to apply `[<SolidComponent]` so
+that it falls under the plugin scope and is transformed.
+:::
+
+Do the same for the other columns, styled however you wish, and then assemble them into
+an array:
+
+```fsharp title="Model.fs"
+let columnDef = [|
+    codeColumn
+    nameColumn
+    colorColumn
+|]
+```

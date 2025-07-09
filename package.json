@@ -15,10 +15,16 @@
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.3",
     "@solidjs/start": "^1.1.0",
+    "@tailwindcss/vite": "^4.1.11",
+    "@tanstack/solid-table": "^8.21.3",
+    "clsx": "^2.1.1",
     "solid-apexcharts": "^0.4.0",
     "solid-devtools": "^0.34.3",
     "solid-js": "^1.9.5",
     "solid-motionone": "^1.0.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.11",
+    "tw-animate-css": "^1.3.5",
     "vinxi": "^0.5.7"
   },
   "engines": {

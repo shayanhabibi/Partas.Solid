@@ -127,7 +127,6 @@ export default defineConfig(withSolidBase(
                                 {
                                     title: "Solid-JS",
                                     link: "/solid-js",
-                                    status: "next"
                                 },
                                 {
                                     title: "Aria Attributes",
@@ -160,6 +159,41 @@ export default defineConfig(withSolidBase(
                                 {
                                     title: "Experimental",
                                     link: "/experimental"
+                                }
+                            ]
+                        },
+                        {
+                            title: "Examples",
+                            collapsed: true,
+                            items: [
+                                {
+                                    title: "Data Tables",
+                                    items: [
+                                        {
+                                            title: "Getting Started",
+                                            link: "/examples/data-table"
+                                        },
+                                        {
+                                            title: "Utilities",
+                                            link: "/examples/data-table/utils"
+                                        },
+                                        {
+                                            title: "Table Component",
+                                            link: "/examples/data-table/table-component"
+                                        },
+                                        {
+                                            title: "DataTable Component",
+                                            link: "/examples/data-table/datatable-component"
+                                        },
+                                        {
+                                            title: "Column Definitions",
+                                            link: "/examples/data-table/column-defs"
+                                        },
+                                        {
+                                            title: "Render the Table",
+                                            link: "/examples/data-table/table-render"
+                                        },
+                                    ]
                                 }
                             ]
                         },
@@ -217,7 +251,7 @@ export default defineConfig(withSolidBase(
                         {
                             title: "Contributing",
                             link: "/contributing"
-                        }
+                        },
                     ],
                 },
                 "/ecosystem" : {

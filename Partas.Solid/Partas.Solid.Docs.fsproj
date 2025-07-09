@@ -7,8 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="routes\partas-solid\index.mdx" />
-        <Compile Include="routes\partas-solid\about\index.mdx" />
         <Content Include="app.css" />
         <Content Include="app.jsx" />
         <Content Include="entry-client.jsx" />
@@ -20,9 +18,17 @@
         <Compile Include="examples\building-the-dom.fs" />
         <Content Include="global.d.js" />
         <Compile Include="Program.fs" />
+        <Compile Include="routes\partas-solid\index.mdx" />
+        <Compile Include="routes\partas-solid\about\index.mdx" />
         <Content Include="routes\partas-solid\about\oxpecker-fork.mdx" />
         <Content Include="routes\partas-solid\about\jsx-output.mdx" />
         <Content Include="routes\partas-solid\installation.mdx" />
+        <Content Include="routes\partas-solid\examples\data-table\index.mdx" />
+        <Content Include="routes\partas-solid\examples\data-table\utils.mdx" />
+        <Content Include="routes\partas-solid\examples\data-table\table-component.mdx" />
+        <Content Include="routes\partas-solid\examples\data-table\datatable-component.mdx" />
+        <Content Include="routes\partas-solid\examples\data-table\column-defs.mdx" />
+        <Content Include="routes\partas-solid\examples\data-table\table-render.mdx" />
         <Folder Include="routes\partas-solid\overview\" />
         <Content Include="routes\partas-solid\overview.mdx" />
         <Content Include="routes\partas-solid\oxpecker-dsl.mdx" />

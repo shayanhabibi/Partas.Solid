@@ -1,0 +1,101 @@
+﻿---
+title: DataTable Component
+---
+
+# {frontmatter.title}
+
+Now that we have our styled bases, we're going to build the basic `DataTable`
+component which will receive the `@tanstack/solid-table` object and render it.
+
+```fsharp title="DataTable.fs"
+namespace Partas.Solid.Example
+
+open Partas.Solid
+open Partas.Solid.TanStack.Table
+open Fable.Core
+open Fable.Core.JsInterop
+
+[<Erase>]
+type DataTable<'T>() =
+    interface VoidNode
+```
+
+:::details[Why are we using VoidNode?]
+The `VoidNode` interface is used because we don't accept any child elements for the
+`DataTable` component. Any attempt to do so will raise a compiler error.
+:::
+
+The `DataTable` must have a property to receive the `table` object from tanstack.
+The type signature for this type in `Partas.Solid.TanStack.Table` is `Table<'T>`.
+
+There are different ways to define an optional constructor parameter in F#, but my
+favourite is to use `DefaultValue` with `val mutable` to create a get/set property.
+
+This is because any value we assign to it from the beginning means nothing in the end
+compiled output, so we only really care about the type of the property.
+
+```fsharp title="DataTable.fs"
+    [<DefaultValue>]
+    val mutable table: Table<'T>
+```
+
+The following would require some reading on `@tanstack/table` to understand.
+
+If you plan on using the library, you'll have to do this at some point anyway.
+
+```fsharp title="DataTable.fs"
+[<Erase>]
+type DataTable<'T>() =
+    inherit VoidNode()
+    [<DefaultValue>] val mutable table: Table<'T>
+    [<SolidTypeComponent>]
+    member props.__ =
+        let table = props.table
+        Table() {
+            TableHeader() {
+                For(each = table.getHeaderGroups()) {
+                    yield fun headerGroup _ ->
+                        TableRow() {
+                            For(each = headerGroup.headers) {
+                                yield fun header _ ->
+                                    TableHead(colspan = header.colSpan) {
+                                        Show(when' = not header.isPlaceholder) {
+                                            flexRender(header.column.columnDef.header, header.getContext())
+                                        }
+                                    }
+                            }
+                        }
+                }
+            }
+            TableBody() {
+                Show(
+                    when' = unbox (table.getRowModel().rows.Length)
+                    ,fallback = (TableRow() { TableCell(colspan = (8), class' = "h-24 text-center") { "No Results." } })
+                    ) {
+                    For(each = table.getRowModel().rows) {
+                        yield fun row _ ->
+                            TableRow().data("state", !!(row.getIsSelected() && !!"selected")) {
+                                For(each = row.getVisibleCells()) {
+                                    yield fun cell _ ->
+                                        TableCell() {
+                                            flexRender(cell.column.columnDef.cell, cell.getContext())
+                                        }
+                                }
+                            }
+                    }
+                }
+            }
+        }
+```
+
+:::details[Why are we using SolidTypeComponent instead of SolidComponent?]
+In this case, **with our current implementation** there's actually no reason to use `SolidTypeComponent`.
+Except for letting usage of the component be consistent with the rest of the DSL.
+
+We aren't spreading any of the optional properties that `DataTable` might receive such as
+class etc.
+
+We can spread `props` into the `Table` component that is the top level component to
+make use of the value provided by `SolidTypeComponent`.
+:::
+

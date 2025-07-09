@@ -2,9 +2,970 @@
 title: Solid-JS
 ---
 
-:::warning
-Under construction
-:::
+# {frontmatter.title}
 
 The intention here will be to provide an overview of all bound functions and types
 from solid-js.
+
+> Depending on the level of motivation when I write this, and until I complete
+> my `SolidBase.DocGen`, the level of detail varies. Best resource is to visit
+> the `solid-js` docs.
+>
+> In cases where we have 'unique' calls/signatures, that will be documented here
+> and/or in the ['API Differences'](/partas-solid/api-differences) section.
+
+When drawing up a type signature, if referencing a component that takes children,
+the type will `interface HtmlContainer`. Otherwise `interface HtmlElement`.
+
+Optional constructor properties/parameters are `val` declarations. An interface object
+uses `member` declarations.
+
+Components which only take a specific signature or type of children will declare
+a `val children`.
+
+Methods will use `let` to provide syntax highlighting. To provide overloads, they
+are actually `static member`s on a type marked with `[<AutoOpen>]`.
+
+:::tip[Help!]
+See something missing?
+
+Please submit an issue and we will update the bindings within a day or two.
+:::
+
+---
+
+## Signal
+
+```fsharp
+type Signal<'T> = Accessor<'T> * Setter<'T>
+```
+
+[See `createSignal`](#createsignal)
+
+### Accessor
+
+```fsharp
+type Accessor<'T> = unit -> 'T
+```
+
+### Setter
+
+Calling the `setter` updates the `signal`, triggering dependents to rerun (if the value actually changed).
+
+```fsharp
+type Setter<'T> = 'T -> unit
+```
+
+You can optionally `.Invoke` a setter to pass it a handler, which will be expected
+to provide the new value from the previous value.
+
+> There is an overload which resembles the normal behaviour too.
+
+```fsharp
+[<Extension; Erase>]
+static member inline Invoke(setter: Setter<'T>, handler: 'T -> 'T): unit
+[<Extension; Erase>]
+static member inline Invoke(setter: Setter<'T>, value: 'T): unit
+```
+
+To access the new value that is set, you can use `.InvokeAndGet`.
+
+```fsharp
+[<Extension; Erase>]
+static member inline InvokeAndGet(setter: Setter<'T>, handler: 'T -> 'T): 'T
+[<Extension; Erase>]
+static member inline InvokeAndGet(setter: Setter<'T>, value: 'T): 'T
+```
+
+---
+
+## Context
+
+```fsharp
+type Context<'T> = 'T -> ContextProvider
+type ContextProvider = inherit HtmlContainer
+```
+
+Created by passing a `JS.Pojo` (recommended) to a `createContext` call as a type arg or value.
+
+The default is set by calling the given `Context` function with the value.
+
+> The plugin transpiles the `'T -> ContextProvider` function call with the identifier
+> suffixed by `.Provider` as per the solid-js spec
+
+[//]: # (TODO EXAMPLE)
+
+---
+
+## For
+
+```fsharp
+type For<'T>() = interface HtmlElement
+```
+
+```fsharp
+val each: 'T[]
+```
+
+The array of items that are accessible within the child function.
+
+
+```fsharp
+val children: (item: 'T) -> (index: Accessor<int>) -> #HtmlElement
+```
+
+Similar to passing an array to an `Array.mapi` call. The array passed to
+`each` has each member acted on by the given function.
+
+The parameters of the lambda are the item of the array, and a reactive getter for
+the`index` of that item.
+
+> Use `Index` for the item to be a reactive getter instead.
+
+## Index
+
+```fsharp
+type Index<'T>() = interface HtmlElement
+```
+
+```fsharp
+val each: 'T[]
+```
+
+```fsharp
+val children: (item: Accessor<'T>) -> (index: int) -> #HtmlElement
+```
+
+---
+
+## Show
+
+```fsharp
+type Show() = interface HtmlContainer
+```
+
+```fsharp
+val when': bool
+```
+
+```fsharp
+val fallback: HtmlElement
+```
+
+```fsharp
+val keyed: bool
+```
+
+---
+
+## Match
+
+```fsharp
+type Match() = interface HtmlContainer
+```
+
+```fsharp
+val when': bool
+```
+
+## Switch
+
+```fsharp
+type Switch() = interface HtmlElement
+```
+
+```fsharp
+val children: Match
+```
+
+---
+
+## Suspense
+
+```fsharp
+type Suspense() = interface HtmlContainer
+```
+
+```fsharp
+val fallback: HtmlElement
+```
+
+## SuspenseList
+
+```fsharp
+type SuspenseList() = interface HtmlContainer
+```
+
+```fsharp
+val revealOrder: string
+```
+
+```fsharp
+val tail: string
+```
+
+```fsharp
+val fallback: HtmlElement
+```
+
+---
+
+## Portal
+
+```fsharp
+type Portal() = interface HtmlContainer
+```
+
+```fsharp
+val mount: Element
+```
+
+```fsharp
+val useShadow: bool
+```
+
+---
+
+## ErrorBoundary
+
+```fsharp
+type ErrorBoundary() = interface HtmlContainer
+```
+
+```fsharp
+val fallback: (err: obj) -> (reset: (unit -> unit)) -> HtmlElement
+```
+
+---
+
+# Functions
+
+## children
+
+```fsharp
+let children(value: unit -> #HtmlElement): Accessor<#HtmlElement>
+```
+
+---
+
+## mergeProps
+
+```fsharp
+let mergeProps([<ParamList>] values: 'T[]): 'T
+```
+
+:::important
+Typical usage of this [is abstracted away for](/partas-solid/solid-type-attribute#setting-defaults) you when making components
+using the `[<SolidTypeComponent>]` attribute.
+:::
+
+---
+
+## splitProps
+
+```fsharp
+let splitProps(
+    o: 'T,
+    properties: string[],
+    ?otherProperties: string[]
+    ): 'T * 'T
+```
+
+:::important
+Typical usage of this [is abstracted away for](/partas-solid/solid-type-attribute#automated-splitting) you when making components
+using the `[<SolidTypeComponent>]` attribute.
+:::
+
+---
+
+## render
+
+```fsharp
+let render(
+    code: unit -> #HtmlElement,
+    element: #Element
+    ): unit
+```
+
+---
+
+## renderToString
+
+```fsharp
+let renderToString(fn: unit -> #HtmlElement): string
+```
+
+---
+
+## createSignal
+
+```fsharp
+let createSignal(
+    value: 'T,
+    ?equals: oldVal: 'T -> newVal: 'T -> bool,
+    ?name: string,
+    ?``internal``: bool
+    ): Signal<'T>
+```
+
+[See `Signal<'T>`](#signal)
+
+---
+
+## createMemo
+
+```fsharp
+let createMemo(value: unit -> 'T): Accessor<'T>
+```
+
+:::details[Experimental CE]
+```fsharp
+open Partas.Solid.Experimental
+memo { ... }
+```
+:::
+
+---
+
+## createEffect
+
+```fsharp
+let createEffect(effect: unit -> unit): unit
+```
+:::details[Experimental CE]
+```fsharp
+open Partas.Solid.Experimental
+effect { ... }
+```
+:::
+
+```fsharp
+let createEffect(
+    effect: 'T -> 'T,
+    initialValue: 'T
+    ): unit
+```
+
+---
+
+## createContext
+
+```fsharp
+let createContext<'T>(?value: 'T): Context<'T>
+```
+
+[See `Context<'T>`](#context)
+
+---
+
+## useContext
+
+```fsharp
+let useContext(context: Context<'T>): 'T
+```
+
+[See `Context<'T>`](#context)
+
+---
+
+## createResource
+
+```fsharp tab title="Signature 1"
+let createResource(
+    fetcher: unit -> JS.Promise<'T>,
+    ?initialValue: 'T
+    // Using Async<'T> will have Async.StartAsPromise injected
+    ) = SolidResource<'T> * SolidResourceManager<'T>
+```
+
+```fsharp tab title="Signature 2"
+// Fetcher only called when 'U is Some
+let createResource(
+    source: unit -> 'U option,
+    fetcher: 'U -> JS.Promise<'T>,
+    ?initialValue: 'T
+    // Using Async<'T> will have Async.StartAsPromise injected
+    ) = SolidResource<'T> * SolidResourceManager<'T>
+```
+
+
+```fsharp tab collapse={2} title="Signature 3"
+let createResource(
+    ?source: unit -> 'U option,
+    fetcher: ResourceFetcher<'U option, 'T>,
+    ?initialValue: 'T,
+    ?name: string,
+    ?deferStream: bool,
+    ?onHydrated: (unit -> unit),
+    ?ssrLoadFrom: string,
+    ?storage: Signal<'T>
+    ): SolidResource<'T> * SolidResourceManager<'T>
+```
+
+### SolidResource
+
+```fsharp
+type SolidResource<'T> = interface
+```
+
+```fsharp
+member current: 'T
+```
+
+```fsharp
+member state: SolidResourceState
+```
+
+[See `SolidResourceState`](#solidresourcestate)
+
+```fsharp
+member loading: bool
+```
+
+```fsharp
+member error: exn option
+```
+
+```fsharp
+member latest: 'T
+```
+
+Unlike `current`, it keeps the latest value while re-loading.
+
+> Will be undefined until first value has been loaded.
+
+### SolidResourceManager
+
+```fsharp
+type SolidResourceManager<'T> = interface
+```
+
+```fsharp
+member mutate: 'T -> 'T
+```
+
+```fsharp
+member refetch: unit -> JS.Promise<'T>
+```
+
+Can alternatively pass an argument to `refetch` which can be accessed by the
+handler if using the `ResourceFetcher` overload. See below.
+
+```fsharp
+[<Extension; Erase>]
+static member refetchWith<'U, 'T>(this: SolidResourceManager<'T>, input: 'U): JS.Promise<'T> 
+```
+
+### SolidResourceState
+
+```fsharp
+type SolidResourceState
+```
+
+`StringEnum` with values:
+
+```fsharp
+| Unresolved
+```
+
+Hasn't started loading, no value yet.
+
+```fsharp
+| Pending
+```
+
+It's loading, no value yet.
+
+```fsharp
+| Ready
+```
+
+Finished loading, has value.
+
+```fsharp
+| Refreshing
+```
+
+It's reloading, `latest` has value.
+
+```fsharp
+| Errored
+```
+
+Finished loading with an error, no value.
+
+### ResourceFetcher
+
+```fsharp
+type ResourceFetcher<'U, 'T> = 'U -> ResourceFetcherInfo<'T> -> JS.Promise<'T>
+```
+
+Arguments that are available to consume within the handler. The first is the
+source signal (if any was provided, else null), and the second is an object
+with two properties: the previous value via `_.value`, and whether the fetcher
+was initiated by a `refetch` via `_.refetching`.
+
+### ResourceFetcherInfo
+
+```fsharp
+type ResourceFetcherInfo<'T> = interface
+```
+
+Used in the handler parameter of the `createResource` function if using the
+`ResourceFetcher<'U, 'T>` overload.
+
+```fsharp
+member value: 'T
+```
+
+Previous value.
+
+```fsharp
+member refetching: bool
+```
+
+Is true when `fetcher` was triggered using the `refetch` function.
+
+If `refetch` is called with an argument, that argument is supplied instead of
+the boolean value.
+
+Use `_.refetchingWith` helper if you are expecting this.
+
+```fsharp
+[<Extension; Erase>]
+static member refetchingWith<'T>(this: ResourceFetcherInfo<_>): U2<'T, bool>
+```
+
+[//]: # (TODO - EXAMPLE USING RESOURCE)
+
+---
+
+## createRoot
+
+```fsharp
+let createRoot(
+    // dispose fn
+    fn: Action -> 'T
+    ): 'T
+```
+
+[//]: # (TODO - doc Action)
+
+---
+
+## createUniqueId
+
+```fsharp
+let createUniqueId(): string
+```
+
+---
+
+## createStore
+
+```fsharp
+let createStore(store: 'T): 'T * SolidStoreSetter<'T>
+```
+
+### SolidStoreSetter
+
+```fsharp
+type SolidStoreSetter<'T> = interface
+```
+
+```fsharp
+member Update: newValue 'T -> unit
+```
+
+Replace old store value with new value.
+
+```fsharp
+member Update: updater: ('T -> 'T) -> unit
+```
+
+Update store mapping the old value to a new value.
+
+```fsharp
+member UpdatePath: pathArgs: obj[] -> unit
+```
+
+Update store using native solid path syntax.
+
+```fsharp
+member Path: SolidStorePath<'T, 'T>
+```
+
+Access more convenient method of updating store items.
+
+### SolidStorePath
+
+```fsharp
+type SolidStorePath<'T, 'Value> = interface
+```
+
+```fsharp
+member Setter: SolidStoreSetter<'T>
+```
+
+```fsharp
+member Path: obj[]
+```
+
+```fsharp
+member Map(map: 'Value -> 'Value2)
+```
+
+Chooses the store item that should be updated.
+
+```fsharp
+member Update(value: 'Value): unit
+```
+
+Update store item using new value
+
+```fsharp
+member Update(value: 'Value -> 'Value): unit
+```
+
+Update store item mapping old value to new value.
+
+
+```fsharp
+[<Extension; Erase>]
+static member inline Item(
+    this: SolidStorePath<'T, 'Value array>,
+    index: int
+    ): 'Value
+```
+
+Select store item by index
+
+```fsharp
+[<Extension; Erase>]
+static member inline Find(
+    this: SolidStorePath<'T, 'Value array>,
+    predicate: 'Value -> bool
+    ): 'Value
+```
+
+Select store item by predicate
+
+:::details[Example]
+```fsharp
+type StoreValue = {
+        MyValue: int
+    }
+
+let store,storeSetter = createStore<StoreValue>({ MyValue = 5 })
+JS.console.log store // { MyValue: 5 }
+storeSetter.Path.Map( _.MyValue ).Update(10)
+JS.console.log store // { MyValue: 10 }
+```
+:::
+
+---
+
+## reconcile
+
+```fsharp
+let reconcile<'T, 'U>(value: 'T): ('U -> 'T)
+```
+
+---
+
+## produce
+
+```fsharp
+let produce<'T>(fn: 'T -> unit)
+```
+
+---
+
+## unwrap
+
+```fsharp
+let unwrap<'T>(item: 'T): 'T
+```
+
+---
+
+## batch
+
+```fsharp
+let batch<'T>(fn: unit -> 'T): 'T
+```
+
+:::details[Experimental CE]
+```fsharp
+open Partas.Solid.Experimental
+batch { ... }
+```
+:::
+
+---
+
+## catchError
+
+```fsharp
+let catchError<'T>(
+    tryFn: unit -> 'T,
+    onError: obj -> unit
+    ): 'T
+```
+
+---
+
+## onCleanup
+
+```fsharp
+let onCleanup(fn: unit -> unit): unit
+```
+
+:::details[Experimental CE]
+```fsharp
+open Partas.Solid.Experimental
+cleanup { ... }
+```
+:::
+
+---
+
+## onMount
+
+```fsharp
+let onMount(fn: unit -> unit): unit
+```
+
+:::details[Experimental CE]
+```fsharp
+open Partas.Solid.Experimental
+mount { ... }
+```
+:::
+
+---
+
+## useTransition
+
+```fsharp
+let useTransition(): (pending: unit -> bool) * (start: (unit -> unit) -> JS.Promise<unit>)
+```
+
+---
+
+## startTransition
+
+```fsharp
+let startTransition(): (start: (unit -> unit) -> JS.Promise<unit>)
+```
+
+---
+
+## untrack
+
+```fsharp
+let untrack<'T>(fn: Accessor<'T>): 'T
+```
+
+---
+
+## importComponent
+
+```fsharp
+let importComponent(path: string): JS.Promise<HtmlElement>
+```
+
+Use to dynamically import a component (in combination with `lazy`), where `path` is the relative path to the
+component declaring file.
+
+The component must therefor be the default export of the file.
+
+---
+
+## lazy
+
+```fsharp
+let lazy'(import: unit -> JS.Promise<HtmlElement>): HtmlElement
+```
+
+Component lazy loading. Use in combination with `importComponent`
+
+---
+
+## createComputed
+
+```fsharp
+let createComputed<'T>(
+    fn: 'T -> 'T,
+    ?value: 'T
+    ): unit
+```
+
+|Param|Description|
+|---|---|
+|`fn`|The function to run in a tracking scope.|
+|`value`|The initial value to pass to the function.|
+
+`createComputed` creates a new computation that immediately runs the given function
+in a tracking scope, thus automatically tracking its dependencies, and automatically
+reruns the function whenever the dependencies changes.
+
+The function gets called with an argument equal to the value returned from the functions
+last execution, or on the first call, equal to the optional second argument.
+
+> The return value of the function is not otherwise exposed; in particular, `createComputed`
+> has no return value.
+
+:::tip
+Before using `createComputed` consider using `createMemo` or `createRenderEffect`.
+:::
+
+`createComputed` is the most immediate form of reactivity in `solid-js`, and is most useful
+for building other reactive primitives.
+
+For example, some other `solid-js` primitives are built from `createComputed`.
+
+:::warning
+`createComputed` should be used with care, as it can easily cause more unnecessary
+updates than other reactive primitives.
+:::
+
+---
+
+## createDeferred
+
+```fsharp
+let createDeferred<'T>(
+    source: unit -> 'T,
+    ?timeoutMs: int,
+    ?equals: (prev: 'T) -> (next: 'T) -> bool,
+    ?name: string
+    ): Accessor<'T>
+```
+
+|Param|Desc|
+|---|---|
+|`source`||
+|`timeoutMs`|Maximum time to wait for the browser to go idle before forcing update|
+|`?equals`|Custom function comparison predicate|
+|`?name`|Name to use for debugging|
+
+Creates a `readonly` that only notifies downstream changes when the browser is **idle**.
+
+---
+
+## createReaction
+
+```fsharp
+let createReaction(
+    onInvalidate: unit -> unit
+    ): (unit -> unit) -> unit
+```
+
+Sometimes it is useful to separate tracking from re-execution. This primitive
+registers a side-effect that is run **the first time** the expression wrapped
+by the returned tracking is notified of a change.
+
+---
+
+## createRenderEffect
+
+```fsharp
+let createRenderEffect<'T>(
+    fn: 'T -> 'T,
+    ?value: 'T
+    ): unit
+```
+
+A render effect is a computation similar to a regular effect, but differs in when `solid-js`
+schedules the first execution of the effect function.
+
+While `createEffect` waits for the current rendering phase to be complete, `createRenderEffect`
+immediately calls the function. Thus the effect runs ***as*** DOM elements are being created
+and updated, but possibly *before* specific elements of interest have been created,
+and probably before those elements have been mounted.
+
+In particular, refs will not be set before the initial effect call.
+
+:::note
+`solid-js` uses `createRenderEffect` to implement the rendering phase of itself,
+including the setting of `refs`
+:::
+
+---
+
+## createSelector
+
+```fsharp
+let createSelector<'T, 'U>(
+    source: unit -> 'T,
+    ?fn: 'U -> 'T -> bool
+    ): 'U -> bool
+```
+
+|Param|Desc|
+|--|--|
+|`source`|The source signal to get the value from and compare with keys.|
+|`fn`|A function to compare the key and the value, returning whether they should be treated as equal. Default: `=`|
+
+Creates a parameterised derived boolean signal `selector(key)` that indicates whether
+`key` is equal to the current value of the `source` signal.
+
+These signals are optimised to notify each subscriber ***only*** when their `key` starts
+or stops matching the reactive `source` value (instead of every time `key` changes).
+
+If you have `n` different subscribers with different keys, and the `source` value changes
+from `a` to `b`, then instead of all `n` subscribers updating, at most two subscribers
+will update:
+
+> The signal with `key` `a` will change to `false`.
+
+> The signal with `key` `b` will change to `true`.
+
+Thus it reduces from `n` updates to 2 updates.
+
+Useful for defining the selection state of several selectable elements.
+
+---
+
+## mapArray
+
+```fsharp
+let mapArray<'T, 'U>(
+    source: Accessor<'T[]>,
+    fn: 'T -> Accessor<int> -> 'U
+    ): Accessor<'U[]>
+```
+
+Reactive map helpers that caches each item by reference to avoid unnecessary
+recomputations. It only runs the mapping function once per value, and then
+moves or removes it as needed.
+
+The index argument is a signal. The map function itself **is not tracking**.
+
+:::note
+This is the underlying helper for the `For` component, which is used to render
+lists of items.
+:::
+
+---
+
+## indexArray
+
+```fsharp
+let indexArray<'T, 'U>(
+    source: Accessor<'T[]>,
+    fn: Accessor<'T> -> int -> 'U
+    ): Accessor<'U[]>
+```
+
+Reactive helper that maps by index, similar to `mapArray`, but uses the index
+of the item in the array as the key for the mapping function.
+
+This is useful when you want to map over an array and use the index as a key
+for each item, such as when rendering a list of items with unique keys.
+
+:::note
+This is the underlying helper for the `Index` component, which is used to render lists
+of items.
+:::

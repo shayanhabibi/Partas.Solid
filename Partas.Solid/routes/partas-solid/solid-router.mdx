@@ -13,3 +13,446 @@ Ensure you open the `Partas.Solid.Router` namespace.
 :::important[See the Solid-js docs]
 https://docs.solidjs.com/solid-router/
 :::
+
+## Route
+
+```fsharp
+type Route() = interface HtmlElement
+```
+
+```fsharp
+val path: string
+```
+
+```fsharp
+val component': TagValue
+```
+
+```fsharp
+val matchFilters: obj
+```
+
+```fsharp
+val preload: RoutePreloadFunc
+```
+
+### RoutePreloadFunc
+
+```fsharp
+type RoutePreloadFunc = RoutePreloadFuncArgs -> unit
+```
+
+#### RoutePreloadFuncArgs
+
+```fsharp
+type RoutePreloadFuncArgs = interface
+```
+
+```fsharp
+member ``params``: obj
+```
+
+```fsharp
+member location: Location
+```
+
+```fsharp
+member intent: Intent
+```
+
+### Intent
+
+```fsharp
+type Intent
+```
+
+`StringEnum` with values:
+
+```fsharp
+| Initial
+```
+
+```fsharp
+| Native
+```
+
+```fsharp
+| Navigate
+```
+
+```fsharp
+| Preload
+```
+
+### Location
+
+```fsharp
+type Location = inherit Path
+```
+
+```fsharp
+member query: obj
+```
+
+```fsharp
+member state: obj option
+```
+
+```fsharp
+member key: string
+```
+
+### Path
+
+```fsharp
+type Path = interface
+```
+
+```fsharp
+member pathname: string
+```
+
+```fsharp
+member search: string
+```
+
+```fsharp
+member hash: string
+```
+
+---
+
+## Router
+
+```fsharp
+type Router() = interface HtmlElement
+```
+
+```fsharp
+val root: TagValue
+```
+
+```fsharp
+val base': string
+```
+
+```fsharp
+val actionBase: string
+```
+
+```fsharp
+val preload: bool
+```
+
+```fsharp
+val explicitLinks: bool
+```
+
+```fsharp
+val url: string
+```
+
+```fsharp
+val children: Route
+val children: RootConfig[]
+```
+
+[See `Route`](#route) and also [see `RootConfig`](#rootconfig)
+
+### RootConfig
+
+```fsharp
+[<Pojo>]
+type RootConfig (
+    path: string,
+    ``component``: HtmlElement
+    )
+```
+
+---
+
+## HashRouter
+
+```fsharp
+type HashRouter = Router
+```
+
+[See `Router`](#router)
+
+---
+
+## PreloadData
+
+```fsharp
+[<Pojo>]
+type PreloadData (preloadData: bool)
+```
+
+---
+
+## A
+
+```fsharp
+type A() = interface RegularNode
+```
+
+```fsharp
+val href: string
+```
+
+```fsharp
+val noScroll: bool
+```
+
+```fsharp
+val replace: bool
+```
+
+```fsharp
+val state: obj
+```
+
+```fsharp
+val activeClass: string
+```
+
+```fsharp
+val inactiveClass: string
+```
+
+```fsharp
+val end': bool
+```
+
+---
+
+## Navigate
+
+```fsharp
+type Navigate() = interface RegularNode
+```
+
+```fsharp
+val href: string
+```
+
+```fsharp
+val state: obj
+```
+
+---
+
+## useNavigate
+
+```fsharp
+let useNavigate(): Navigator
+```
+
+[See `Navigator`](#navigator)
+
+### Navigator
+
+```fsharp
+type Navigator = interface
+```
+
+```fsharp
+member Invoke: (``to``: string) * (?options: NavigateOptions) -> unit
+```
+
+See the `InvokeOptions` signature below to see the construction parameters for the
+`NavigateOptions` Pojo.
+
+```fsharp
+member InvokeOptions: 
+    ``to``: string *
+    ?resolve: bool *
+    ?replace: bool *
+    ?scroll: bool *
+    ?state: obj
+    -> unit
+```
+
+:::warning
+This will replace `Invoke` in an upcoming update, as it is a superior user experience
+to consume.
+:::
+
+```fsharp
+member Invoke: delta: float -> unit
+```
+
+---
+
+## useLocation
+
+```fsharp
+let useLocation(): Location
+```
+
+[See `Location`](#location)
+
+---
+
+## useIsRouting
+
+```fsharp
+let useIsRouting(): unit -> bool
+```
+
+---
+
+## useMatch
+
+```fsharp
+let useMatch(
+    fn: unit -> string,
+    ?matchFilters: obj
+    ): unit -> bool
+```
+
+---
+
+## useParams
+
+```fsharp
+let useParams(): obj
+```
+
+---
+
+## useBeforeLeave
+
+```fsharp
+let useBeforeLeave(listener: BeforeLeaveEventArgs -> unit): unit
+```
+
+[See `BeforeLeaveEventArgs`](#beforeleaveeventargs)
+
+### BeforeLeaveEventArgs
+
+```fsharp
+type BeforeLeaveEventArgs = interface
+```
+
+```fsharp
+member from: Location
+```
+
+[See `Location`](#location)
+
+```fsharp
+member ``to``: U2<string, float>
+```
+
+```fsharp
+member options: NavigateOptions option
+```
+
+[See `Navigator`](#navigator)
+
+```fsharp
+member defaultPrevented: bool
+```
+
+```fsharp
+member preventDefault: unit -> unit
+```
+
+```fsharp
+member retry: ?force: bool -> unit
+```
+
+---
+
+## useCurrentMatches
+
+```fsharp
+let useCurrentMatches(): unit -> RouteMatch[]
+```
+
+[See `RouteMatch`](#routematch)
+
+### RouteMatch
+
+```fsharp
+type RouteMatch = inherit PathMatch
+```
+
+```fsharp
+member route: RouteDescription
+```
+
+[See `RouteDescription`](#routedescription)
+
+#### PathMatch
+
+```fsharp
+type PathMatch = interface
+```
+
+```fsharp
+member ``params``: obj
+```
+
+```fsharp
+member path: string
+```
+
+#### RouteDescription
+
+```fsharp
+type RouteDescription = interface
+```
+
+```fsharp
+member key: obj
+```
+
+```fsharp
+member originalPath: string
+```
+
+```fsharp
+member pattern: string
+```
+
+```fsharp
+member preload: RoutePreloadFunc option
+```
+
+[See `RoutePreloadFunc`](#routepreloadfunc)
+
+```fsharp
+member matcher: string -> PathMatch option
+```
+
+[See `PathMatch`](#pathmatch)
+
+```fsharp
+member matchFilters: obj option
+```
+
+```fsharp
+member info: obj option
+```
+
+---
+
+## usePreloadRoute
+
+```fsharp
+let usePreloadRoute(): (string -> PreloadData) -> unit
+```
+
+[See `PreloadData`](#preloaddata)
+
+---
+
+## useSearchParams
+
+```fsharp
+let useSearchParams(): Signal<obj>
+```
+
+[See `Signal<'T>`](/partas-solid/solid-js#signal)

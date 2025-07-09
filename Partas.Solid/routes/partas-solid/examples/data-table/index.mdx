@@ -1,0 +1,192 @@
+﻿---
+title: DataTables with Partas.Solid
+---
+
+# Data Tables
+
+With this example/guide, we're going to build a data table with `@tanstack/solid-table`
+using `Partas.Solid.TanStack.Table`, `tailwindcss`, and some other small utilities.
+
+This example is sourced from the `solid-ui` implementation of `shadcn-ui` `DataTables`.
+
+## Getting Started
+
+Either spin up an environment with [Vite](#vite) or [Partas.SolidStart](#partassolidstart)
+
+
+## Partas.SolidStart
+
+See ['Getting Started'](/partas-solid/installation); spin-up a tailwind template.
+
+Install the following dependencies:
+
+```ansi
+npm install @kobalte/core @tanstack/solid-table clsx tailwind-merge lucide-solid
+```
+
+And:
+
+```ansi
+dotnet add package Partas.Solid.TanStack.Table
+dotnet add package Partas.Solid.Lucide
+dotnet add package Partas.Solid.Kobalte
+```
+
+Spin-up the dev server and make sure everything is working as expected:
+
+```ansi
+dotnet run dev
+```
+
+---
+
+## Vite
+
+Create a console `.fsproj` and setup a vite environment within the project.
+
+You can do this manually by creating a `vite.config.mts`, `index.html`, and `index.css` file with following settings:
+
+> Don't worry, we'll download the dependencies shortly
+
+```ts tab title="vite.config.mts"
+import { defineConfig } from 'vite'
+import solidPlugin from 'vite-plugin-solid';
+import tailwindcss from "@tailwindcss/vite";
+
+// https://vitejs.dev/config/
+export default defineConfig({
+    server: {
+        watch: {
+            ignored: [
+                "**/*.md" , // Don't watch markdown files
+                "**/*.fs" , // Don't watch F# files
+                "**/*.fsx"  // Don't watch F# script files
+            ]
+        }
+    },
+    plugins: [
+        solidPlugin(),
+        tailwindcss(),
+    ],
+})
+```
+
+```html tab title="index.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Partas.Solid Playground</title>
+    <script type="module" src="/Program.fs.jsx"></script> 
+<!--Adjust the src as required to point to your compiled entry file-->
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>
+```
+
+```css tab title="index.css"
+@import 'tailwindcss';
+
+/* set default border color due to tailwindcss v4 */
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+```
+
+Here's a `package.json` file to match:
+
+```json title="package.json"
+{
+  "private": "true",
+  "scripts": {
+    "start": "dotnet tool run fable watch -c Release --optimize --typedArrays false -e .fs.jsx --run vite",
+  },
+  "dependencies": {
+    "@kobalte/core": "^0.13.8",
+    "@tailwindcss/vite": "^4.0.1",
+    "@tanstack/solid-table": "^8.21.2",
+    "clsx": "^2.1.1",
+    "lucide-solid": "^0.474.0",
+    "solid-js": "^1.9.2",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss": "^4.0.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.9",
+    "vite-plugin-solid": "^2.10.2"
+  }
+}
+```
+
+Make sure to install dependencies while you sort out `dotnet` dependencies.
+
+```ansi
+npm install
+```
+
+Install the following packages (and also install Fable 5.0+):
+
+```ansi tab title="dotnet"
+dotnet add package Partas.Solid
+dotnet add package Partas.Solid.TanStack.Table
+dotnet add package Partas.Solid.Kobalte
+dotnet add package Partas.Solid.Lucide
+```
+
+```ansi tab title="paket"
+paket install Partas.Solid
+paket install Partas.Solid.TanStack.Table
+paket install Partas.Solid.Kobalte
+paket install Partas.Solid.Lucide
+```
+
+This will give us some headless components, and icons to work with.
+
+Now create a file that compiles before `Program.fs` called `Root.fs`.
+
+Add the following:
+
+```fsharp title="Root.fs"
+// Remember your namespaces must start with Partas.Solid
+module Partas.Solid.Example.Root
+open Partas.Solid
+open Fable.Core
+
+[<SolidComponent>]
+let Root () =
+    div() {
+        "Hello World!"
+    }
+```
+
+Now add the following to your `Program.fs`
+
+```fsharp title="Program.fs"
+module Partas.Solid.Example.Program
+
+open Partas.Solid.Example.Root
+open Partas.Solid
+open Fable.Core
+open Fable.Core.JsInterop
+
+importSideEffects "./index.css"
+
+render(Root, Browser.Dom.document.getElementById "root")
+```
+
+This should prevent any jankyness with the HMR. Now run `npm` script and see if you
+can load the browser with "Hello World!"
+
+```ansi
+npm run start
+```

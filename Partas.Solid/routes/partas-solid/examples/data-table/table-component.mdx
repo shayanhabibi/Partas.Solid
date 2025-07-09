@@ -1,0 +1,136 @@
+﻿---
+title: Table Component
+---
+
+# {frontmatter.title}
+
+Next up, we'll want to create our style base table components.
+
+Create a `Table.fs` file to store these components in the `Partas.Solid.Example` namespace.
+
+These components are just going to be opinionated, styled, but extensible bases for
+our data tables.
+
+```fsharp title="Table.fs"
+namespace Partas.Solid.Example
+
+open Partas.Solid
+open Fable.Core
+```
+
+We'll want to create styled versions of `table`, `thead`, `tbody`, `tfoot`, `tr`, `th`, `td` and `caption`.
+
+You can change the styles, or make your own versions.
+
+First we'll make the `TableCaption` as an example.
+
+```fsharp title="Table.fs"
+[<Erase>]
+type TableCaption() =
+    inherit caption()
+    [<SolidTypeComponent>]
+    member props.__ =
+        caption(class' = Lib.cn [|
+                "mt-4 text-sm text-muted-foreground"
+                props.class'
+            |]).spread props
+```
+
+First, we are inheriting all attributes of the native `caption` element, and we use
+that as the returned element.
+
+We're using the utility we made before `Lib.cn` to merge and overwrite any of our
+preset classes with any classes that are passed to the component.
+
+We then spread any other attributes into the object.
+
+> Try your hand at the next component on your own
+
+The next component we'll make is the `Table` component, which will inherit from `table`.
+
+The `Table` component will be a `div` with the classes `"relative w-full overflow-auto"`
+wrapping a `table` component that will have the classes `"w-full caption-bottom text-sm"`
+along with any classes that are passed to the `Table` component. The `table` component
+should also receive all other attributes that might have been passed to `Table`.
+
+:::details[Table Component]
+```fsharp title="Table.fs"
+[<Erase>]
+type Table() =
+    inherit table()
+    [<SolidTypeComponent>]
+    member props.__ =
+        div(class' = "relative w-full overflow-auto") {
+            table(class' = Lib.cn [|
+                    "w-full caption-bottom text-sm"
+                    props.class'
+                |]).spread props
+        }
+```
+:::
+
+We then complete the component set with the following:
+
+```fsharp title="Table.fs"
+[<Erase>]
+type TableHeader() =
+    inherit thead()
+    [<SolidTypeComponent>]
+    member props.constructor =
+        thead(class' = Lib.cn [| "[&_tr]:border-b"
+                                 props.class' |])
+            .spread props
+
+[<Erase>]
+type TableBody() =
+    inherit tbody()
+    [<SolidTypeComponent>]
+    member props.constructor =
+        tbody(class' = Lib.cn [|
+            "[&_tr:last-child]:border-0"
+            props.class'
+        |]).spread props
+
+[<Erase>]
+type TableFooter() =
+    inherit tfoot()
+    [<SolidTypeComponent>]
+    member props.constructor =
+        tfoot(class' = Lib.cn [|
+            "bg-primary font-medium text-primary-foreground"
+            props.class'
+        |]).spread props
+
+[<Erase>]
+type TableRow() =
+    inherit tr()
+    [<SolidTypeComponent>]
+    member props.constructor =
+        tr(
+            class' = Lib.cn [|
+                "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                props.class'
+            |]
+        ).spread props
+
+[<Erase>]
+type TableHead() =
+    inherit th()
+    [<SolidTypeComponent>]
+    member props.constructor =
+        th(
+            class' = Lib.cn [|
+                "h-10 px-2 text-left align-middle font-medium
+                text-muted-foreground [&:has([role=checkbox])]:pr-0"
+                props.class'
+            |]
+        ).spread props
+
+[<Erase>]
+type TableCell() =
+    inherit td()
+    [<SolidTypeComponentAttribute>]
+    member props.constructor =
+        td(class' = Lib.cn [| "p-2 align-middle [&:has([role=checkbox])]:pr-0"; props.class' |]).spread props
+```
+

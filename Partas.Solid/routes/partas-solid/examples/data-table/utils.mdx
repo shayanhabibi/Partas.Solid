@@ -1,0 +1,21 @@
+﻿---
+title: Utilities
+---
+
+# {frontmatter.title}
+
+We'll want to create a file that handles some utilities for us down the line.
+
+```fsharp title="Utils.fs"
+namespace Partas.Solid.Example
+
+open Partas.Solid
+open Fable.Core
+
+type [<Erase>] Lib =
+    [<Import("twMerge", "tailwind-merge")>]
+    static member twMerge (classes: string) : string = jsNative
+    [<Import("clsx", "clsx")>]
+    static member clsx(classes: obj): string = jsNative
+    static member cn (classes: string array): string = classes |> Lib.clsx |> Lib.twMerge
+```
