@@ -16,6 +16,7 @@
         <Compile Include="examples\apexcharts.fs" />
         <Compile Include="examples\motion.fs" />
         <Compile Include="examples\building-the-dom.fs" />
+        <Compile Include="examples\datatable.fs" />
         <Content Include="global.d.js" />
         <Compile Include="Program.fs" />
         <Compile Include="routes\partas-solid\index.mdx" />
@@ -83,6 +84,7 @@
         <PackageReference Include="Partas.Solid.ApexCharts" Version="0.2.2" />
         <PackageReference Include="Partas.Solid.Kobalte" Version="0.3.5" />
         <PackageReference Include="Partas.Solid.Motion" Version="0.2.1" />
+        <PackageReference Include="Partas.Solid.TanStack.Table" Version="0.2.0" />
     </ItemGroup>
 
 </Project>

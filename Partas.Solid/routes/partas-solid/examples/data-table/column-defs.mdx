@@ -53,7 +53,7 @@ as a header etc.
 [<SolidComponent>]
 let codeColumn = ColumnDef<User>(
     accessorFn = fun user _ -> user.Code
-    ,header = "Code"
+    ,header = !!"Code"
     ,cell = fun props ->
         div(class' = "w-14 hover:scale-102 flex justify-center bg-black text-white") {
                 props.getValue() :?> string
@@ -70,7 +70,7 @@ Do the same for the other columns, styled however you wish, and then assemble th
 an array:
 
 ```fsharp title="Model.fs"
-let columnDef = [|
+let columnDefs = [|
     codeColumn
     nameColumn
     colorColumn

@@ -2,6 +2,8 @@
 title: Render the Table
 ---
 
+import { Test } from "~/examples/datatable.fs.jsx";
+
 # {frontmatter.title}
 
 Let's put it all together and render our first basic table before adding more elements.
@@ -36,4 +38,19 @@ TanStack requires the `data` and `columns` to be `get` properties of
 the `TableOptions` object passed to `createTable`.
 
 The `.data` and `.columns` method take care of this for you.
+:::
+
+<Test/>
+
+:::note
+I think my tailwind is broken, but I'm too tired and I'm going to bed. You get the idea.
+:::
+
+:::details[All example code]
+
+```fsharp file="~/examples/datatable.fs" tab
+```
+
+```jsx file="~/examples/datatable.fs.jsx" tab
+```
 :::

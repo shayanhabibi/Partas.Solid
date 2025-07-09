@@ -46,7 +46,7 @@ If you plan on using the library, you'll have to do this at some point anyway.
 ```fsharp title="DataTable.fs"
 [<Erase>]
 type DataTable<'T>() =
-    inherit VoidNode()
+    interface VoidNode
     [<DefaultValue>] val mutable table: Table<'T>
     [<SolidTypeComponent>]
     member props.__ =
