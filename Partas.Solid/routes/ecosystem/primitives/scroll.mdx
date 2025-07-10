@@ -1,0 +1,50 @@
+﻿---
+title: Solid Primitives
+---
+
+# Scroll
+
+## ScrollPosition
+
+```fsharp
+type ScrollPosition = interface
+```
+
+```fsharp
+member x: int
+```
+
+```fsharp
+member y: int
+```
+
+:::warning
+This will likely change to `float` in a future binding version.
+:::
+
+## createScrollPosition
+
+```fsharp
+let createScrollPosition(
+    ?element: #HtmlElement | Accessor<#HtmlElement>
+    ): Accessor<ScrollPosition>
+```
+
+Default target: `window`.
+
+## useWindowScrollPosition
+
+```fsharp
+let useWindowScrollPosition(): ScrollPosition
+```
+
+Returns a reactive object with current window scroll position; signals and event-listeners are shared between
+dependents making it more optimised to use in multiple places at once.
+
+## getScrollPosition
+
+```fsharp
+let getScrollPosition(): ScrollPosition
+```
+
+Get a `ScrollPosition`.

@@ -1,0 +1,74 @@
+﻿---
+title: Solid Primitives
+---
+
+# Tween
+
+## Easing
+
+```fsharp
+type Easing = float -> float
+```
+
+## createTween
+
+```fsharp
+let createTween(
+    target: Accessor<'T>,
+    ?duration: int,
+    ?easing: Easing
+    ): Accessor<'T>
+```
+
+Creates an efficient tweening derived signal that smoothly transitions a given signal from its previous value to its
+next value whenever it changes.
+
+The target can be any reactive value (signal, memo, or function that calls such). For example, to use a component
+prop, specify `fun () -> props.value`.
+
+|Param|Desc|
+|---|---|
+|`target`||
+|`duration`|Number of milliseconds to perform the transition from the previous value to the next. Defaults to 100.|
+|`easing`|Easing is a function that maps a number between `1.` and `0.` to speed up or slow down different parts of
+the transition. The default easing function is `linear`.|
+
+Under the hood, `createTween` uses `requestAnimationFrame` to smoothly update the tweened value at the display refresh
+rate.
+
+After the tweened value reaches the underlying signal, it will stop updating via `requestAnimationFrame` for efficiency.
+
+# Easings
+
+A group of easings have been premade with 0 dependency (ie written in Fable/F#).
+
+## easeInSine
+## easeOutSine
+## easeInOutSine
+## easeInQuad
+## easeOutQuad
+## easeInOutQuad
+## easeInCubic
+## easeOutCubic
+## easeInOutCubic
+## easeInQuart
+## easeOutQuart
+## easeInOutQuart
+## easeInQuint
+## easeOutQuint
+## easeInOutQuint
+## easeInExpo
+## easeOutExpo
+## easeInOutExpo
+## easeInCirc
+## easeOutCirc
+## easeInOutCirc
+## easeInBack
+## easeOutBack
+## easeInOutBack
+## easeInElastic
+## easeOutElastic
+## easeInOutElastic
+## easeInBounce
+## easeOutBounce
+## easeInOutBounce

@@ -31,3 +31,7 @@ Primitives marked with the `use` prefix, are typically *rootless* primitives.
 Primitives marked with `create` prefix, are *reactive* and will clean-up resources
 on disposal.
 
+## Disposal Callbacks
+
+Some primitives will provide a `DisposeCallback` which is a void function `unit -> unit` used to cleanup
+the resource.

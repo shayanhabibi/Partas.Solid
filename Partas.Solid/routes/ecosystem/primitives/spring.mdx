@@ -1,0 +1,62 @@
+﻿---
+title: Solid Primitives
+---
+
+# Spring
+
+Also provides an extension for `float` setters.
+
+```fsharp
+open Partas.Solid.Primitives.Spring.SetterExtensions
+```
+
+```fsharp
+[<Extension>]
+static member inline Invoke(
+    setter: Setter<float>,
+    newValue: float,
+    options: StringSetterOptions
+    ): ???
+```
+
+:::warning
+The above binding seems janky and needs to be reviewed
+:::
+
+## createSpring
+
+```fsharp
+let createSpring(
+    inialValue: 'T when 'T :> (float | float seq | Accessor<float>),
+    ?stiffness: float,
+    ?damping: float
+    ): Signal<'T>
+```
+
+|Param|Desc|
+|---|---|
+|`initialValue`|The initial value of the signal.|
+|`stiffness`|Options to configure the physics of the spring.|
+|`damping`|Options to configure the physics of the spring.|
+
+Creates a `Signal<float>` that uses spring physics when interpolating from one value to another.
+
+This means when the value changes, instead of transitioning at a steady rate, it *'bounces'* like a spring would,
+depending on the physics parameters provided. This adds a level of realism to the transitions and can enhance
+the user experience.
+
+Works best for basic data types that can be interpolated, such as `number` types, `Date`, and `Array`s.
+
+## createDerivedSpring
+
+```fsharp
+let createDerivedSpring(
+    target: Accessor<'T when 'T :> (float | float seq)>,
+    ?stiffness: float,
+    ?damping: float
+    ): Accessor<'T>
+```
+
+Creates a spring that interpolates based on changes to the passed signal.
+
+Works similar to [`@solid-primitives/tween`](/ecosystem/primitives/tween).

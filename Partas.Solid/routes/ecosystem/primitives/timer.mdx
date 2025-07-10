@@ -1,0 +1,66 @@
+﻿---
+title: Solid Primitives
+---
+
+# Timer
+
+## IntervalOrTimeout
+
+```fsharp
+type IntervalOrTimeout = (unit -> unit) -> int -> int
+```
+
+## makeTimer
+
+```fsharp
+let makeTimer(
+    callback: unit -> unit,
+    timespan: int,
+    policy: IntervalOrTimeout
+    ): DisposeCallback
+```
+
+Makes an automatically cleaned up timer. Takes a callback, the timespan, and then either the
+function `setInterval` or `setTimeout` as its base.
+
+## createTimer
+
+```fsharp
+let createTimer(
+    callback: unit -> unit,
+    timespan: int | Accessor<U2<bool, int>> | Accessor<bool> | Accessor<int>,
+    policy: IntervalOrTimeout
+    ): unit
+```
+
+`makeTimer` but with a fully reactive delay. The delay can also be set to `false` in which case the timer is disabled.
+
+## createTimeoutLoop
+
+```fsharp
+let createTimeoutLoop(
+    callback: unit -> unit,
+    timespan: int | Accessor<int>
+    ): unit
+```
+
+Similar to an interval created with `createTimer`, but the delay does not update ***until*** the callback is executed.
+
+## createPolled
+
+```fsharp
+let createPolled(
+    callback: unit -> 'T,
+    timespan: int | Accessor<int>
+    ): Accessor<'T>
+```
+
+Periodically polls a function, returning an accessor to its last return value.
+
+## createIntervalCounter
+
+```fsharp
+let createIntervalCounter(timespan: int | Accessor<int>): Accessor<int>
+```
+
+A counter which incremements periodically on a delay.

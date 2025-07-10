@@ -1,0 +1,51 @@
+﻿---
+title: Solid Primitives
+---
+
+# Keyboard
+
+## useKeyDownEvent
+
+```fsharp
+let useKeyDownEvent(): Accessor<KeyboardEvent>
+```
+
+## useKeyDownList
+
+```fsharp
+let useKeyDownList(): Accessor<string[]>
+```
+
+## useCurrentlyHeldKey
+
+```fsharp
+let useCurrentlyHeldKey(): Accessor<string | null>
+```
+
+## useKeyDownSequence
+
+```fsharp
+let useKeyDownSequence(): Accessor<string[][]>
+```
+
+## createKeyHold
+
+```fsharp
+let createKeyHold(
+    key: string,
+    ?preventDefault: bool
+    ): Accessor<bool>
+```
+
+## createShortcut
+
+```fsharp
+let createShortcut(
+    keys: string[],
+    handler: unit -> unit,
+    ?preventDefault: bool,
+    ?requireReset: bool
+    ): unit
+```
+
+The key order is strictly ordered.

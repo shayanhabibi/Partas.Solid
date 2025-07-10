@@ -1,0 +1,80 @@
+﻿---
+title: Solid Primitives
+---
+
+# Scheduled
+
+## Schedule
+
+```fsharp
+type Schedule<'T> = interface
+```
+
+```fsharp
+member exec: 'T -> unit
+```
+
+Mimics `schedule(_)` at runtime.
+
+```fsharp
+member clear: unit -> unit
+```
+
+## debounce
+
+```fsharp
+let debounce(
+    callback: 'T -> unit,
+    timespan: int
+    ): Schedule<'T>
+```
+
+## throttle
+
+```fsharp
+let throttle(
+    callback: 'T -> unit,
+    timespan: int
+    ): Schedule<'T>
+```
+
+## scheduleIdle
+
+```fsharp
+let scheduleIdle(
+    callback: 'T -> unit,
+    timespan: int
+    ): Schedule<'T>
+```
+
+## DebounceOrThrottle
+
+```fsharp
+type DebounceOrThrottle<'T> = ('T -> unit) * int -> Schedule<'T>
+```
+
+## leading
+
+```fsharp
+let leading(
+    debOrThrot: DebounceOrThrottle<'T>,
+    callback: 'T -> unit,
+    timespan: unit
+    ): Schedule<'T>
+```
+
+## leadingAndTrailing
+
+```fsharp
+let leadingAndTrailing(
+    debOrThrot: DebounceOrThrottle<'T>,
+    callback: 'T -> unit,
+    timespan: int
+    ): Schedule<'T>
+```
+
+## createScheduled
+
+:::warning
+unbound
+:::

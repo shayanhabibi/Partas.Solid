@@ -1,6 +1,7 @@
 import { defineConfig } from "@solidjs/start/config";
 import devtools from "solid-devtools/vite";
 import { withSolidBase } from "@kobalte/solidbase/config";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig(withSolidBase(
     {
@@ -15,7 +16,8 @@ export default defineConfig(withSolidBase(
             plugins:[
                 devtools({
                     autoname: true
-                })
+                }),
+                tailwindcss()
             ],
             server: {
                 watch: {
@@ -193,6 +195,10 @@ export default defineConfig(withSolidBase(
                                             title: "Render the Table",
                                             link: "/examples/data-table/table-render"
                                         },
+                                        {
+                                            title: "Extending - Selectable Rows",
+                                            link: "/examples/data-table/selectable-rows"
+                                        },
                                     ]
                                 }
                             ]
@@ -358,7 +364,7 @@ export default defineConfig(withSolidBase(
                                     },
                                     {
                                         title: "WebSocket",
-                                        link: "/primitives/web-socket"
+                                        link: "/primitives/websocket"
                                     }
                                 ]
                             },

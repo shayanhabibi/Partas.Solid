@@ -1,0 +1,80 @@
+﻿---
+title: Solid Primitives
+---
+
+# Media
+
+## makeMediaQueryListener
+
+```fsharp
+let makeMediaQueryListener
+    (query: string)
+    (handler: MediaQueryEvent -> unit)
+    : DisposeCallback
+```
+
+### MediaQueryEvent
+
+```fsharp
+type MediaQueryEvent = interface
+```
+
+```fsharp
+member matches: bool
+```
+
+```fsharp
+member media: string
+```
+
+## createMediaQuery
+
+```fsharp
+let createMediaQuery(
+    query: string,
+    ?serverFallback: bool
+    ): MediaQuery
+```
+
+### MediaQuery
+
+```fsharp
+type MediaQuery = unit -> bool
+```
+
+## createBreakpoints
+
+```fsharp
+let createBreakpoints(queryMonitor: 'T): BreakpointMonitor<'T>
+```
+
+### BreakpointMonitor
+
+:::warning
+TODO
+This type and binding needs to be fixed as the code looks fishy.
+:::
+
+```fsharp
+type BreakpointMonitor<'T>
+```
+
+## sortBreakpoints
+
+```fsharp
+let sortBreakpoints(breakpoints: 'T): 'T
+```
+
+## createPrefersDark
+
+```fsharp
+let createPrefersDark(?fallback: bool): MediaQuery
+```
+
+## usePrefersDark
+
+```fsharp
+let usePrefersDark(): MediaQuery
+```
+
+Uses a rootless primitive that is shared between all calls.

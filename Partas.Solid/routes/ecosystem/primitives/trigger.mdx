@@ -1,0 +1,70 @@
+﻿---
+title: Solid Primitives
+---
+
+# Trigger
+
+***Alias Types:***
+
+```fsharp
+type [<Erase>] Track<'T> = 'T -> unit
+type [<Erase>] Dirty<'T> = 'T -> unit
+type [<Erase>] DirtyAll = unit -> unit
+type [<Erase>] TriggerSignal<'T> = Track<'T> * Dirty<'T>
+type [<Erase>] TriggerCacheSignal<'T> = Track<'T> * Dirty<'T> * DirtyAll
+```
+
+## createTrigger
+
+```fsharp
+let createTrigger(): TriggerSignal<unit>
+```
+
+Set listeners in reactive computations and then trigger them when you want.
+
+:::details[Example]
+```fsharp
+let track,dirty = createTrigger()
+createEffect(fun () ->
+    track() // The trigger is now a dependency
+    JS.console.log "Triggered!"
+    )
+// ...
+dirty() // "Triggered!"
+```
+:::
+
+## createTriggerCache
+
+```fsharp
+let createTriggerCache<'T>(): TriggerCacheSignal<'T>
+```
+
+Creates a cache of triggers that can be used to mark dirty only specific keys.
+
+> Cache is a `Map` or `WeakMap` depending on the mapConstructor argument (default: `Map`).
+
+> If mapConstructor is `WeakMap` then the cache will be weak and the keys will be garbage collected when they are
+> no longer referenced.
+
+Trigger signals added to the cache only when tracked under a computation, and get deleted from the cache
+when they are no longer tracked.
+
+```fsharp
+[<Extension>]
+static member track (triggerCache: TriggerCacheSignal<'T>, key: 'T): unit
+[<Extension>]
+static member dirty (triggerCache: TriggerCacheSignal<'T>, key: 'T): unit
+```
+
+:::details[Example]
+```fsharp
+let map = createTriggerCache<int>()
+createEffect(fun () ->
+    map.track(1) // adds to dependencies 
+    JS.console.log "Triggered!"
+    )
+// ...
+map.dirty(1) // "Triggered!"
+```
+:::

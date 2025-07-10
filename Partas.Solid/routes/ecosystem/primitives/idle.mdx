@@ -1,0 +1,64 @@
+﻿---
+title: Solid Primitives
+---
+
+# Idle
+
+## createIdleTimer
+
+```fsharp
+let createIdleTimer(
+    ?idleTimeout: int,
+    ?promptTimeout: int,
+    ?onIdle: Event -> unit,
+    ?onPrompt: Event -> unit,
+    ?onActive: Event -> unit,
+    ?startManually: bool,
+    ?events: Event[],
+    ?element: HtmlElement
+    ): IdleTimer
+```
+
+Provides different accessors and methods to observe the user's idle status and react to its changing.
+
+## IdleTimer
+
+```fsharp
+type IdleTimer = interface
+```
+
+```fsharp
+member isIdle: Accessor<bool>
+```
+
+Report user status.
+
+```fsharp
+member isPrompted: Accessor<bool>
+```
+
+Report user status.
+
+```fsharp
+member start: unit -> unit
+```
+
+Start the timer.
+
+```fsharp
+member stop: unit -> unit
+```
+
+Stop the timer.
+
+```fsharp
+let reset: unit -> unit
+```
+
+Reset the timer.
+
+```fsharp
+let triggerIdle: unit -> unit
+```
+
+Manually sets `isIdle` to true and triggers `onIdle` callback (with custom manualidle event).

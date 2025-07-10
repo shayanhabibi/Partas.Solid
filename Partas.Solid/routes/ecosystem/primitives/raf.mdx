@@ -1,0 +1,98 @@
+﻿---
+title: Solid Primitives
+---
+
+# RAF
+
+## FrameRequestCallback
+
+```fsharp
+type FrameRequestCallback = float -> unit
+```
+
+## createRAF
+
+```fsharp
+let createRAF(
+    callback: FrameRequestCallback
+    ): running: Accessor<bool> * start: VoidFunction * stop: VoidFunction
+```
+
+|Param|Desc|
+|---|---|
+|`callback`|The callback to run each frame|
+
+|Returns|Desc|
+|---|---|
+|`running`|Signal for if currently running|
+|`start`|Starts the sequence|
+|`stop`|Stops the sequence|
+
+A primitive for creating reactive `window.requestAnimationFrame` that is automatically disposed `onCleanup`.
+
+## targetFPS
+
+```fsharp
+let targetFPS(
+    callback: FrameRequestCallback,
+    fps: float | Accessor<float>
+    ): FrameRequestCallback
+```
+
+A primitive for wrapping a `window.requestAnimationFrame` callback function to limit the execution of the callback
+to the specified number of frames per second.
+
+Keep in mind that limiting FPS is achieved by not executing a callback if the frames are above the defined limit.
+This can lead to inconsistent frame durations.
+
+## createMs
+
+```fsharp
+let createMs(
+    fps: float | Accessor<float>,
+    ?limit: float | Accessor<float>
+    ): MsCounter
+```
+
+A primitive that creates a signal counting up milliseconds with a given frame rate to base your animations on.
+
+:::important
+Contrary to the original implementation, the binding accesses the current value of the returned counter using
+[`counter.current` instead of `counter()`](#mscounter).
+:::
+
+### MsCounter
+
+```fsharp
+type MsCounter = interface
+```
+
+```fsharp
+member current: int
+```
+
+This calls the `MsCounter` in the runtime: `msCounter()`.
+
+```fsharp
+member reset(): unit
+```
+
+Manually reset the counter.
+
+```fsharp
+member running(): bool
+```
+
+Returns if the counter is currently running.
+
+```fsharp
+member start(): unit
+```
+
+Restarts the counter if stopped.
+
+```fsharp
+member stop(): unit
+```
+
+Stops the counter if running.

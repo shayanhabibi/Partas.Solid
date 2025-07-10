@@ -1,0 +1,148 @@
+﻿---
+title: Solid Primitives
+---
+
+# Event Bus
+
+## createEventBus
+
+```fsharp
+let createEventBus<'T>(): EventBus<'T>
+```
+
+[See `EventBus`](#eventbus)
+
+## createEmitter
+
+```fsharp
+let createEmitter<'T>(): Emitter<'T>
+```
+
+[See `Emitter`](#emitter)
+
+## createMappedEmitter
+
+```fsharp
+let createMappedEmitter<'MessageSchema>(): MappedEmitter<'MessageSchema>
+```
+
+[See `MappedEmitter` which is a F# friendly binding.](#mappedemitter)
+
+## createEventHub
+
+```fsharp
+let createEventHub<'T> (?channels: 'T): EventHub<'T>
+```
+
+[See `EventHub`](#eventhub)
+
+## EventBus
+
+[See `createEventBus`](#createeventbus).
+
+```fsharp
+type EventBus<'T> = interface
+```
+
+Provides all base functions of an event-emitter, plus additional functions for managing listeners.
+
+Its behavior could be customized with a config object. Good for advanced usage.
+
+```fsharp
+member listen: ('T -> unit) -> DisposeCallback
+```
+
+The disposal will be called automatically on cleanup. Use the callback to cleanup the resource earlier if required.
+
+```fsharp
+member emit: 'T -> unit
+```
+
+```fsharp
+member clear: unit -> unit
+```
+
+## Emitter
+
+[See `createEmitter`](#createemitter) and [see `createMappedEmitter`](#createmappedemitter) with the [F# friendly
+version `MappedEmitter`](#mappedemitter)
+
+```fsharp
+type Emitter<'MessageTyper> = interface
+```
+
+An emitter which you can listen to and emit various events.
+
+```fsharp
+member on: (string * (obj -> unit)) -> DisposeCallback
+```
+
+The sub is cleaned up automatically on dismount, but you can cleanup the resource earlier if required.
+
+```fsharp
+member emit: (string * obj) -> unit
+```
+
+```fsharp
+member clear: unit -> unit
+```
+
+## MappedEmitter
+
+[See `createMappedEmitter`](#createmappedemitter)
+
+```fsharp
+type MappedEmitter<'MessageMapper> = interface
+```
+
+This is a typesafe version of the `Emitter` made for F#/Fable.
+
+It uses the path from the type to its member as the key of the emission. Because we provide a typed path,
+we get the benefit of having the member being typed as the message type.
+
+```fsharp
+member on
+    (mapping: 'MessageMapper -> 'MessageType)
+    (callback: 'MessageType -> unit)
+    : DisposeCallback
+```
+
+```fsharp
+member emit
+    (mapping: 'MessageMapper -> 'MessageType)
+    (message: 'MessageType)
+    : unit
+```
+
+```fsharp
+member clear: unit -> unit
+```
+
+## GlobalEmitter
+
+```fsharp
+type GlobalEmitter<'T> = inherit Emitter<'T>
+```
+
+A wrapper around `createEmitter`. Creates an emitter with which you can listen to and emit various events.
+With this emitter you can also listen to all events.
+
+```fsharp
+member listen (obj -> unit): DisposeCallback
+```
+
+## EventHub
+
+[See `createEventHub`](#createventhub)
+
+```fsharp
+type EventHub<'T> = inherit GlobalEmitter<'T.
+```
+
+Provides helpers for using a group of event buses. Can be used with `createEventBus`, `createEventStack` or any emitter
+with the same api.
+
+:::warning
+Not much more has been bound for this type. I think I was intending to build a type provider for this. Which is a lot
+of effort for not much worth (to me right now).
+:::

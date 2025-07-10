@@ -1,0 +1,255 @@
+﻿---
+title: Making Selectable Rows
+---
+
+import { Root, Input, Control, Indicator } from "@kobalte/core/checkbox";
+import { Checkbox } from "~/examples/checkbox.fs.jsx";
+
+# Adding Selectable Rows
+
+As an example, let's make the rows selectable, and provide a 'select-all' button too.
+
+The first thing we'll want is to make the button to select the rows. Let's make it a checkbox.
+
+For the sake of this example (and because I can just rip off what I've already written before), we're going
+to use an accessible headless ui library `@kobalte/core`. We'll also use `lucide` icons. This will show how
+the headless UI library is used (as it is the main one that is bound in Partas.Solid).
+
+## Checkbox
+
+Here's the checkbox unstyled, with some width/height and colour added so its visible:
+
+<Root class={"size-8 bg-muted"}>
+    <Input />
+    <Control class={"size-8"}>
+        <Indicator/>
+    </Control>
+</Root>
+
+:::tip
+If you inspect the element and click it, you'll see the `checked` data attribute appear.
+:::
+
+For the `Checkbox` component, we're going to inherit and implement the `Kobalte.Checkbox` component:
+
+```fsharp
+open Partas.Solid.Kobalte
+
+[<Erase>]
+type Checkbox() =
+    inherit Kobalte.Checkbox()
+```
+
+Let's add our implementation.
+
+```fsharp
+[<SolidTypeComponent>]
+member props.__ =
+    Kobalte.Checkbox(
+        class' = Lib.cn [|
+                "items-top group relative flex space-x-2"
+                props.class'
+            |]
+        ).spread(props)
+```
+
+There's a few accessibility related components to put in the `Checkbox`, such as an
+`Input`, `Control` and `Indicator`. But if we try to add them, we might run into a type
+problem. The current implementation seems to have an issue with the ChildLambdaProviders
+where we have no choice but to use the lambda child provider.
+
+:::tip
+If we look at the tooltip for `Kobalte.Checkbox` we see:
+
+```fsharp
+type Checkbox =
+  interface ChildLambdaProvider<CheckboxRenderProp>
+  interface Polymorph
+  interface HtmlTag
+```
+
+This means the lambda takes one parameter which is `CheckboxRenderProp`.
+:::
+
+```fsharp ins={1, 6, 21}
+open Partas.Solid.Lucide
+
+[<SolidTypeComponent>]
+member props.checkbox =
+    Kobalte.Checkbox(
+        indeterminate = props.indeterminate,
+        class' = Lib.cn [| "items-top group relative flex space-x-2"; props.class' |]
+        ).spread(props) { yield fun _ -> Fragment() {
+        
+        Checkbox.Input(class'="peer")
+        Checkbox.Control(
+            class' = "size-4 shrink-0 rounded-sm border border-primary
+            ring-offset-background disabled:cursor-not-allowed disabled:opacity-50
+            peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring
+            peer-focus-visible:ring-offset-2 data-[checked]:border-none
+            data-[indeterminate]:border-none data-[checked]:bg-primary
+            data-[indeterminate]:bg-primary data-[checked]:text-primary-foreground
+            data-[indeterminate]:text-primary-foreground"
+            ) {
+            Checkbox.Indicator() {
+                if props.indeterminate then
+                    Minus(class' = "size-4", strokeWidth = 2)
+                else
+                    Check(class' = "size-4", strokeWidth = 2)
+            }
+        }
+    }
+    }
+```
+ 
+:::note
+Because we want the `indeterminate` property to be passed to the root component,
+but also use it to conditionally render something, we have to ensure we also
+pass it by name to the root component, since it is automatically split from the
+`props` object.
+
+:::details[Using the CheckboxRenderProps instead]
+
+The `ChildLambdaProvider` for the `Checkbox` passes it's state to its children.
+
+We can instead access the `indeterminate` status from this, and thereby not worry
+about the property being split off our `props`.
+
+```fsharp del={4} ins={6,19}
+[<SolidTypeComponent>]
+member props.checkbox =
+    Kobalte.Checkbox(
+        indeterminate = props.indeterminate,
+        class' = Lib.cn [| "items-top group relative flex space-x-2"; props.class' |]
+        ).spread(props) { yield fun rprops -> Fragment() {
+        
+        Checkbox.Input(class'="peer")
+        Checkbox.Control(
+            class' = "size-4 shrink-0 rounded-sm border border-primary
+            ring-offset-background disabled:cursor-not-allowed disabled:opacity-50
+            peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring
+            peer-focus-visible:ring-offset-2 data-[checked]:border-none
+            data-[indeterminate]:border-none data-[checked]:bg-primary
+            data-[indeterminate]:bg-primary data-[checked]:text-primary-foreground
+            data-[indeterminate]:text-primary-foreground"
+            ) {
+            Checkbox.Indicator() {
+                if rprops.indeterminate then
+                    Minus(class' = "size-4", strokeWidth = 2)
+                else
+                    Check(class' = "size-4", strokeWidth = 2)
+            }
+        }
+    }
+    }
+```
+:::
+
+
+Let's give that a spin:
+
+:::tip[Checkbox]
+<Checkbox/>
+:::
+
+# Column Definition
+
+We add a column definition for the *'selection column'* where we'll put our checkbox
+to indicate it has been selected.
+
+In this case, we use the proper signatures for the header and cell properties of
+`ColumnDef`, which feed the relevant parameters of the row into the definition.
+
+```fsharp
+open Partas.Solid.Aria
+
+[<SolidComponent>]
+let selectColumn =
+    ColumnDef<User>(
+        id = "select"
+        ,enableHiding = false
+        ,cell = fun props ->
+            Checkbox(
+                checked' = props.row.getIsSelected(),
+                onChange = fun value -> props.row.toggleSelected(!!value)
+                ,ariaLabel = "Select row",
+                class' = "translate-y-[2px]"
+                )
+        ,header = fun props ->
+            Checkbox(
+                checked' = (props.table.getIsAllPageRowsSelected()),
+                indeterminate = (props.table.getIsSomePageRowsSelected()),
+                onChange = fun value -> props.table.toggleAllPageRowsSelected(!!value)
+                ,ariaLabel = "Select all"
+                ,class' = "translate-y-[2px]"
+                )
+    )
+    
+let columnDefs = [|
+    selectColumn
+    codeColumn
+    nameColumn
+    colorColumn
+|]
+```
+
+:::note
+To identify the column when the header is not a simple string, we pass
+a unique id
+:::
+
+# Adding Selection to Table
+
+Adjust the table options in our `DataTable` component to include a selection state.
+
+First we create a reactive signal of the selection state:
+
+```fsharp ins={4}
+[<SolidComponent>]
+let TestSelectableTable () =
+    let selection,setSelection =
+        createSignal <| RowSelectionState.init()
+    let table = createTable(
+            TableOptions<User>(
+                getCoreRowModel = getCoreRowModel()
+            )   .data(fun _ -> userData)
+                .columns(fun _ -> columnDefs)
+        )
+    DataTable(table = table)
+```
+
+And now we plug that into the `createTable` `TableOptions`.
+
+```fsharp ins={8,9,12-14}
+[<SolidComponent>]
+let TestSelectableTable () =
+    let selection,setSelection =
+        createSignal <| RowSelectionState.init()
+    let table = createTable(
+            TableOptions<User>(
+                getCoreRowModel = getCoreRowModel(),
+                enableRowSelection = !!true,
+                onRowSelectionChange = !!setSelection
+            )   .data(fun _ -> userData)
+                .columns(fun _ -> columnDefs)
+                .stateFn(fun state ->
+                    state.rowSelection(selection)
+                    )
+        )
+    DataTable(table = table)
+```
+
+:::details[What is `.stateFn`?]
+Just like `data` and `columns`, to make the row selections reactive, we need
+them to be `getter` object properties.
+
+The `.stateFn` passes and object which makes this easy for us to do in Fable.
+:::
+
+Now lets render our table and see what we get:
+
+import { TestSelectableTable } from "~/examples/checkbox.fs.jsx";
+
+:::tip[]
+<TestSelectableTable />
+:::

@@ -16,11 +16,12 @@
         <Compile Include="examples\apexcharts.fs" />
         <Compile Include="examples\motion.fs" />
         <Compile Include="examples\building-the-dom.fs" />
+        <Compile Include="examples\checkbox.fs" />
         <Compile Include="examples\datatable.fs" />
         <Content Include="global.d.js" />
         <Compile Include="Program.fs" />
-        <Compile Include="routes\partas-solid\index.mdx" />
-        <Compile Include="routes\partas-solid\about\index.mdx" />
+        <Content Include="routes\partas-solid\index.mdx" />
+        <Content Include="routes\partas-solid\about\index.mdx" />
         <Content Include="routes\partas-solid\about\oxpecker-fork.mdx" />
         <Content Include="routes\partas-solid\about\jsx-output.mdx" />
         <Content Include="routes\partas-solid\installation.mdx" />
@@ -30,6 +31,7 @@
         <Content Include="routes\partas-solid\examples\data-table\datatable-component.mdx" />
         <Content Include="routes\partas-solid\examples\data-table\column-defs.mdx" />
         <Content Include="routes\partas-solid\examples\data-table\table-render.mdx" />
+        <Content Include="routes\partas-solid\examples\data-table\selectable-rows.mdx" />
         <Folder Include="routes\partas-solid\overview\" />
         <Content Include="routes\partas-solid\overview.mdx" />
         <Content Include="routes\partas-solid\oxpecker-dsl.mdx" />
@@ -57,8 +59,8 @@
         <Content Include="routes\partas-solid\dev\spec.mdx" />
         <Content Include="routes\partas-solid\dev\patterns.mdx" />
         <Content Include="routes\partas-solid\dev\transformation.mdx" />
-        <Compile Include="routes\[...404].mdx" />
-        <Compile Include="routes\index.mdx" />
+        <Content Include="routes\[...404].mdx" />
+        <Content Include="routes\index.mdx" />
         <Content Include="routes\ecosystem\index.mdx" />
         <Content Include="routes\ecosystem\polymorphism.mdx" />
         <Content Include="routes\ecosystem\bindings.mdx" />
@@ -67,6 +69,20 @@
         <Content Include="routes\ecosystem\primitives\mouse.mdx" />
         <Content Include="routes\ecosystem\primitives\autofocus.mdx" />
         <Content Include="routes\ecosystem\primitives\bounds.mdx" />
+        <Content Include="routes\ecosystem\primitives\broadcast-channel.mdx" />
+        <Content Include="routes\ecosystem\primitives\clipboard.mdx" />
+        <Content Include="routes\ecosystem\primitives\event-bus.mdx" />
+        <Content Include="routes\ecosystem\primitives\idle.mdx" />
+        <Content Include="routes\ecosystem\primitives\keyboard.mdx" />
+        <Content Include="routes\ecosystem\primitives\media.mdx" />
+        <Content Include="routes\ecosystem\primitives\raf.mdx" />
+        <Content Include="routes\ecosystem\primitives\scheduled.mdx" />
+        <Content Include="routes\ecosystem\primitives\scroll.mdx" />
+        <Content Include="routes\ecosystem\primitives\spring.mdx" />
+        <Content Include="routes\ecosystem\primitives\timer.mdx" />
+        <Content Include="routes\ecosystem\primitives\trigger.mdx" />
+        <Content Include="routes\ecosystem\primitives\tween.mdx" />
+        <Content Include="routes\ecosystem\primitives\websocket.mdx" />
         <Content Include="routes\ecosystem\partas-solid-ui.mdx" />
         <Content Include="routes\ecosystem\kobalte.mdx" />
         <Content Include="routes\ecosystem\motion.mdx" />
@@ -83,6 +99,7 @@
         <PackageReference Include="Partas.Solid" Version="1.1.4" />
         <PackageReference Include="Partas.Solid.ApexCharts" Version="0.2.2" />
         <PackageReference Include="Partas.Solid.Kobalte" Version="0.3.5" />
+        <PackageReference Include="Partas.Solid.Lucide" Version="0.513.0" />
         <PackageReference Include="Partas.Solid.Motion" Version="0.2.1" />
         <PackageReference Include="Partas.Solid.TanStack.Table" Version="0.2.0" />
     </ItemGroup>
