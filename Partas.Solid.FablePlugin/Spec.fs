@@ -347,6 +347,11 @@ module internal Expr =
             _
             ) -> Some compiledName
         | _ -> None
+    
+    /// Elucidates the first expr that is not a type cast.
+    let rec (|TypeCastDrill|) (ctx: PluginContext): Expr -> Expr = function
+        | TypeCast(TypeCastDrill ctx expr,_)
+        | expr -> expr
 module internal Type =
     let rec private (|GetDeclaredType|_|) (ctx: PluginContext): Type -> Type option = function
         | Type.DeclaredType(_) as typ -> Some typ

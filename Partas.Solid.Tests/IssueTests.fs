@@ -46,3 +46,7 @@ let ``#27 list CE 'empty' rendered out`` () =
 [<Fact>]
 let ``#28 ThisArg is transformed`` () =
     runIssueCase "ThisArgTransforms"
+    
+[<Fact>]
+let ``#29 val mutable overloads render 2`` () =
+    runIssueCase "InheritedProperty"

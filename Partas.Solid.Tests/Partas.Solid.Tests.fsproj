@@ -109,6 +109,9 @@
         <Compile Include="IssueCases\ThisArgTransforms\ThisArgTransformsTypes.fs" />
         <Compile Include="IssueCases\ThisArgTransforms\ThisArgTransforms.fs" />
         <Content Include="IssueCases\ThisArgTransforms\ThisArgTransforms.expected" />
+        <Compile Include="IssueCases\InheritedProperty\InheritedProperty.fs" />
+        <None Include="IssueCases\InheritedProperty\InheritedProperty.fsproj" />
+        <Content Include="IssueCases\InheritedProperty\InheritedProperty.expected" />
         <Compile Include="Common.fs" />
         <Compile Include="IssueTests.fs" />
         <Compile Include="SolidTests.fs" />
