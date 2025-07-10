@@ -164,7 +164,10 @@ module internal rec AST =
                     |> Some
                 | _, _ -> None
             // member val set/get
-            | Set(IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal), FieldSet(prop), _, expr, _) ->
+            | Set( // With inheritance within the same module etc, there may be a TypeCast on the IdentExpr.
+                Expr.TypeCastDrill ctx (IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal)), // TypeCast drill to first expr
+                FieldSet(prop),
+                _, expr, _) ->
                 (prop, transform ctx expr)
                 |> Some
             // Inlined named overloads to `[<DefaultValue>] val mutable` properties/attributes

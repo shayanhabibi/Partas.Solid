@@ -37,8 +37,6 @@ module Builder =
     type VoidNode =
         inherit HtmlTag
     
-    let inline jsx value = JSX.jsx value |> unbox<HtmlElement>
-        
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type IChildLambdaProvider = inherit HtmlElement
     /// <summary>
