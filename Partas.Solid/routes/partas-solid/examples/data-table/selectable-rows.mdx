@@ -239,7 +239,7 @@ let TestSelectableTable () =
     DataTable(table = table)
 ```
 
-:::details[What is `.stateFn`?]
+:::details[What is stateFn?]
 Just like `data` and `columns`, to make the row selections reactive, we need
 them to be `getter` object properties.
 
@@ -253,3 +253,24 @@ import { TestSelectableTable } from "~/examples/checkbox.fs.jsx";
 :::tip[]
 <TestSelectableTable />
 :::
+
+
+:::details[Example Code]
+```fsharp tab file="~/examples/checkbox.fs"
+```
+
+```jsx tab file="~/examples/checkbox.fs.jsx"
+```
+:::
+
+---
+
+# Conclusion
+
+That's it for this little exercise; the idea was to dip toes into
+using some of the binding libraries available and familiarising ourselves
+with `Partas.Solid`.
+
+When it comes to DataTables, undoubtedly `@tanstack/table` is one of the
+most well known. It is worth exploring and learning the API for this
+mammoth binding.

@@ -200,7 +200,7 @@ let colorColumn = ColumnDef<User>(
                 props.getValue() :?> string
             }
 )
-[<SolidComponent(ComponentFlag.DebugMode)>]
+[<SolidComponent>]
 let selectColumn =
     ColumnDef<User>(
         id = "select"
@@ -208,7 +208,7 @@ let selectColumn =
         ,cell = fun cellProps ->
             Checkbox(
                 checked' = cellProps.row.getIsSelected(),
-                onChange = fun value -> cellProps.row.toggleSelected(value)
+                onChange = fun value -> cellProps.row.toggleSelected(!!value)
                 ,ariaLabel = "Select row",
                 class' = "translate-y-[2px]"
                 )
@@ -216,7 +216,7 @@ let selectColumn =
             Checkbox(
                 checked' = (headerProps.table.getIsAllPageRowsSelected()),
                 indeterminate = (headerProps.table.getIsSomePageRowsSelected()),
-                onChange = fun value -> headerProps.table.toggleAllPageRowsSelected(value)
+                onChange = fun value -> headerProps.table.toggleAllPageRowsSelected(!!value)
                 ,ariaLabel = "Select all"
                 ,class' = "translate-y-[2px]"
                 )
@@ -243,24 +243,6 @@ let TestSelectableTable () =
                 getCoreRowModel = getCoreRowModel(),
                 enableRowSelection = !!true,
                 onRowSelectionChange = !!setSelection
-            )   .data(fun _ -> userData)
-                .columns(fun _ -> columnDefs)
-                .stateFn(fun state ->
-                    state.rowSelection(selection)
-                    )
-        )
-    DataTable(table = table)
-
-[<SolidComponent>]
-let TestSelectableTable2 () =
-    let selection,setSelection =
-        createSignal <| RowSelectionState.init()
-    let table = createTable(
-            TableOptions<User>(
-                getCoreRowModel = getCoreRowModel(),
-                enableRowSelection = !!true,
-                onRowSelectionChange = !!setSelection,
-                getRowId = (fun (row: User, _, _) -> if !!row then "Name" else "")
             )   .data(fun _ -> userData)
                 .columns(fun _ -> columnDefs)
                 .stateFn(fun state ->

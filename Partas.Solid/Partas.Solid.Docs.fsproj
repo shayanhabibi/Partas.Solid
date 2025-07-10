@@ -96,7 +96,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Partas.Solid" Version="1.1.4" />
+        <PackageReference Include="Partas.Solid" Version="1.1.5" />
         <PackageReference Include="Partas.Solid.ApexCharts" Version="0.2.2" />
         <PackageReference Include="Partas.Solid.Kobalte" Version="0.3.5" />
         <PackageReference Include="Partas.Solid.Lucide" Version="0.513.0" />
