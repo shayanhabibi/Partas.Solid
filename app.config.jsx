@@ -11,22 +11,48 @@ export default defineConfig(withSolidBase(
         // Recommended to use .fs.jsx extension so that fable clean will not
         // wipe out solid-start files
         extensions: [ 'js', 'jsx' , 'ts', 'tsx', 'fs.jsx', 'mdx', 'md' ],
-        // Vite config
-        vite: {
-            plugins:[
-                devtools({
-                    autoname: true
-                }),
-                tailwindcss()
-            ],
-            server: {
-                watch: {
-                    ignore: [
-                        "**/*.fs",
-                        "**/*.fsx"
+        vite({ router }) {
+            if (router === "server") {
+                return {
+                    server: {
+                        watch: {
+                            ignore: ["**/*.fs", "**/*.fsx"]
+                        }
+                    },
+                    plugins: [
+                        devtools({autoname: true})
                     ]
                 }
-            },
+            } else if (router === "client") {
+                return {
+                    server: {
+                        watch: {
+                            ignore: [
+                                "**/*.fs",
+                                "**/*.fsx"
+                            ]
+                        }
+                    },
+                    plugins:[
+                        devtools({
+                            autoname: true
+                        }),
+                        tailwindcss()
+                    ]
+                }
+            } else if (router === "server-function") {
+                return {
+                    server: {
+                        watch: {
+                            ignore: ["**/*.fs", "**/*.fsx"]
+                        }
+                    },
+                    plugins: [
+                        devtools({autoname: true})
+                    ]
+                }
+            }
+            return { plugins: [] };
         },
         // Vinxi/Nitro/SolidStart
         server: {
