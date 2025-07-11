@@ -8,6 +8,7 @@
     "version": "vinxi version"
   },
   "dependencies": {
+    "@docsearch/css": "^3.9.0",
     "@iconify-json/ri": "^1.2.5",
     "@kobalte/core": "^0.13.10",
     "@kobalte/solidbase": "^0.2.11",
