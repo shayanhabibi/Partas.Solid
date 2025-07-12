@@ -36,8 +36,7 @@ export default defineConfig(withSolidBase(
                     plugins:[
                         devtools({
                             autoname: true
-                        }),
-                        tailwindcss()
+                        })
                     ]
                 }
             } else if (router === "server-function") {
