@@ -6,7 +6,9 @@ title: Tags as Values
 
 ## Passing Components as Values
 
-A `SolidTypeComponent` can be passed as a value by wrapping it in the TagValue object. They can then be rendered into a tag by calling render.
+A `SolidTypeComponent` or `SolidComponent`[^1] can be passed as a value by wrapping it in the TagValue object. They can then be rendered into a tag by calling render.
+
+[^1]: As of version `1.2.0`
 
 ```fsharp
 let Comp = TagValue(MyComponent)
