@@ -13,6 +13,7 @@
         <Content Include="entry-server.jsx" />
         <Compile Include="examples\overview.fs" />
         <Compile Include="examples\kobalte.fs" />
+        <Compile Include="examples\apexcharts-import.fs" />
         <Compile Include="examples\apexcharts.fs" />
         <Compile Include="examples\motion.fs" />
         <Compile Include="examples\building-the-dom.fs" />

@@ -3,7 +3,7 @@ import { toArray } from "../fable_modules/fable-library-js.5.0.0-alpha.13/Seq.js
 import { rangeDouble } from "../fable_modules/fable-library-js.5.0.0-alpha.13/Range.js";
 import { SolidApexCharts } from "solid-apexcharts";
 
-export function ApexChartExample() {
+function ApexChartExample() {
     const options = createSignal({
         theme: {
             monochrome: {
@@ -34,4 +34,6 @@ export function ApexChartExample() {
             series={series()} />
     </div>;
 }
+
+export default ApexChartExample;
 

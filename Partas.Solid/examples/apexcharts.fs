@@ -5,8 +5,8 @@ open Fable.Core
 open Fable.Core.JsInterop
 open Partas.Solid.ApexCharts
 
-[<SolidComponent>]
-let ApexChartExample () =
+[<SolidComponent; ExportDefault>]
+let private ApexChartExample () =
     let options,_ = createSignal(Options(
         theme = Theme(
             monochrome = Theme.Monochrome(
