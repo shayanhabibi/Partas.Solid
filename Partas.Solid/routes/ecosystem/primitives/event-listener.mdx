@@ -1,0 +1,63 @@
+---
+title: Solid Primitives
+---
+
+# EventListener
+
+The methods taking Options have a signature which:
+- Flattens the option properties into the method signature and uses `ParamObject` when compiling to JS to turn them into an object
+- Takes an object of that Options type
+
+## makeEventListener
+
+```fsharp
+let makeEventListener(
+    target: #Element,
+    ``type``: string,
+    handler: Event -> unit,
+    options: AddEventListenerOptions
+    ): DisposeCallback
+```
+
+```fsharp
+let makeEventListener(
+    target: #Element,
+    ``type``: string,
+    handler: Event -> unit,
+    ?capture: bool,
+    ?once: bool,
+    ?passive: bool
+    ): DisposeCallback
+```
+
+## createEventListener
+
+```fsharp
+let createEventListener(
+    target: #Element | #Element[] | Accessor<#Element> | Accessor<#Element[]>,
+    ``type``: U4<string, string[], Accessor<string>, Accessor<string[]>>,
+    handler: Event -> unit,
+    options: AddEventListenerOptions
+    ): unit
+```
+
+```fsharp
+let createEventListener(
+    target: #Element | #Element[] | Accessor<#Element> | Accessor<#Element[]>,
+    ``type``: U4<string, string[], Accessor<string>, Accessor<string[]>>,
+    handler: Event -> unit,
+    ?capture: bool,
+    ?once: bool,
+    ?passive: bool
+    ): unit
+```
+
+## createEventSignal
+
+:::warning
+Not implemented.
+:::
+
+```fsharp
+let createEventSignal([<ParamArray>] args: obj[]): obj
+```

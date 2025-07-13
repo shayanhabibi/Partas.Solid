@@ -4,16 +4,69 @@ title: Solid Primitives
 
 # Clipboard
 
-:::warning
-This binding only appears to have `writeClipboard` actually typed properly; probably because
-I had bound this just for that method.
-:::
+Designed to make reading and writing to the MDN `clipboard` API easy.
+
+## ClipboardItem
+
+```fsharp
+type ClipboardItem = interface
+```
+
+A interface to the MDN `clipboard` API `ClipboardItem` interface.
+
+[See `newClipboardItem` for creating a new `ClipboardItem`.](#newclipboarditem)
+
+```fsharp
+member presentationStyle: PresentationStyle with get
+```
+
+[See `PresentationStyle`.](#presentationstyle)
+
+```fsharp
+member types: string[] with get
+```
+
+```fsharp
+member getType(``type``: string): JS.Promise<obj>
+```
+
+The `getType` method retrieves the data of a specific MIME type from the `ClipboardItem`. It returns a promise that resolves to the data object.
+Errors if the MIME type is not found.
+
+### PresentationStyle
+
+```fsharp
+type PresentationStyle = StringEnum
+```
+
+```fsharp
+| Attachment
+```
+
+```fsharp
+| Inline
+```
+
+```fsharp
+| Unspecified
+```
+
+## newClipboardItem
+
+```fsharp
+let newClipboardItem(``type``: string, data: obj): ClipboardItem
+```
+
+`newClipboardItem` is a wrapper method around creating new `ClipboardItem` objects. It takes a MIME type and data object, 
+[returning a new `ClipboardItem`.](#clipboarditem)
 
 ## readClipboard
 
 ```fsharp
-let readClipboard(): obj
+let readClipboard(): JS.Promise<ClipboardItem[]>
 ```
+
+Async read from the clipboard, returning a promise that resolves to an [array of `ClipboardItem`.](#clipboarditem)
 
 ## writeClipboard
 
@@ -21,20 +74,74 @@ let readClipboard(): obj
 let writeClipboard(input: string): unit
 ```
 
+```fsharp
+let writeClipboard(input: ClipboardItem[]): unit
+```
+
+Writes to the clipboard.
+
+[See newClipboardItem for creating a new `ClipboardItem`.](#newclipboarditem)
+
+:::note
+The writing method is asynchronous, use the apostraphised version of the method to interact with the returned `Promise`.
+:::
+
+```fsharp
+let writeClipboard'(input: string): JS.Promise<unit>
+```
+
+```fsharp
+let writeClipboard'(input: ClipboardItem[]): JS.Promise<unit>
+```
+
+Writes to the clipboard asynchronously.
+
 ## createClipboard
 
+The result of the `createClipboard` function can either be destructured with F# features using the apostraphe version
+or used with named access via [the `ClipboardResult` interface.](#clipboardresult)
+
 ```fsharp
-let createClipboard (): obj
+let createClipboard(
+    ?data: Accessor<string | ClipboardItem[]>,
+    ?deferInitial: bool
+    ): ClipboardResult
 ```
 
-## copyToClipboard
+:::note[Apostraphised Version]
+```fsharp
+let createClipboard'(
+    ?data: Accessor<string | ClipboardItem[]>,
+    ?deferInitial: bool
+    ): 
+    SolidResource<CliboardItem[]> * 
+    (unit -> unit) * 
+    (string -> JS.Promise<unit>)
+```
+:::
+
+Provides full facilities for reading and writing to the clipboard.
+
+Can write to the clipboard using either the returned `write` method of the `ClipboardResult`, or
+through the input signal. It wraps the `clipboard` async API with a Solid resource to make pulling
+from the clipboard easy. 
+
+### ClipboardResult
 
 ```fsharp
-let copyToClipboard(): obj
+type ClipboardResult = interface
 ```
 
-## newItem
+A [result type for the `createClipboard` function](#createclipboard), which provides named access to the returned array values.
 
 ```fsharp
-let newItem(): obj
+member resourceItems: SolidResource<ClipboardItem[]>
+```
+
+```fsharp
+member refetch: (unit -> unit)
+```
+
+```fsharp
+member write: (string -> JS.Promise<unit>)
 ```

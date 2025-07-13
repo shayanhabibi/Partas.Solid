@@ -11,47 +11,22 @@ export default defineConfig(withSolidBase(
         // Recommended to use .fs.jsx extension so that fable clean will not
         // wipe out solid-start files
         extensions: [ 'js', 'jsx' , 'ts', 'tsx', 'fs.jsx', 'mdx', 'md' ],
-        vite({ router }) {
-            if (router === "server") {
-                return {
-                    server: {
-                        watch: {
-                            ignore: ["**/*.fs", "**/*.fsx"]
-                        }
-                    },
-                    plugins: [
-                        devtools({autoname: true})
+        // Vite config
+        vite: {
+            plugins:[
+                devtools({
+                    autoname: true
+                }),
+                // tailwindcss()
+            ],
+            server: {
+                watch: {
+                    ignore: [
+                        "**/*.fs",
+                        "**/*.fsx"
                     ]
                 }
-            } else if (router === "client") {
-                return {
-                    server: {
-                        watch: {
-                            ignore: [
-                                "**/*.fs",
-                                "**/*.fsx"
-                            ]
-                        }
-                    },
-                    plugins:[
-                        devtools({
-                            autoname: true
-                        })
-                    ]
-                }
-            } else if (router === "server-function") {
-                return {
-                    server: {
-                        watch: {
-                            ignore: ["**/*.fs", "**/*.fsx"]
-                        }
-                    },
-                    plugins: [
-                        devtools({autoname: true})
-                    ]
-                }
-            }
-            return { plugins: [] };
+            },
         },
         // Vinxi/Nitro/SolidStart
         server: {
@@ -341,7 +316,18 @@ export default defineConfig(withSolidBase(
                                     },
                                     {
                                         title: "Clipboard",
-                                        link: "/primitives/clipboard"
+                                        link: "/primitives/clipboard",
+                                        status: "updated"
+                                    },
+                                    {
+                                        title: "Devices",
+                                        link: "/primitives/devices",
+                                        status: "new"
+                                    },
+                                    {
+                                        title: "Event Listener",
+                                        link: "/primitives/event-listener",
+                                        status: "new"
                                     },
                                     {
                                         title: "EventBus",
@@ -387,10 +373,10 @@ export default defineConfig(withSolidBase(
                                         title: "Tween",
                                         link: "/primitives/tween"
                                     },
-                                    {
-                                        title: "WebSocket",
-                                        link: "/primitives/websocket"
-                                    }
+                                    // {
+                                    //     title: "WebSocket",
+                                    //     link: "/primitives/websocket"
+                                    // }
                                 ]
                             },
                             {

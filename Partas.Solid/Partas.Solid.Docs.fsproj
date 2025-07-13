@@ -71,6 +71,8 @@
         <Content Include="routes\ecosystem\primitives\bounds.mdx" />
         <Content Include="routes\ecosystem\primitives\broadcast-channel.mdx" />
         <Content Include="routes\ecosystem\primitives\clipboard.mdx" />
+        <Content Include="routes\ecosystem\primitives\devices.mdx" />
+        <Content Include="routes\ecosystem\primitives\event-listener.mdx" />
         <Content Include="routes\ecosystem\primitives\event-bus.mdx" />
         <Content Include="routes\ecosystem\primitives\idle.mdx" />
         <Content Include="routes\ecosystem\primitives\keyboard.mdx" />

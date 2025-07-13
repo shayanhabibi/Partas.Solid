@@ -10,6 +10,23 @@ Signatures will be provided for the bound functions/methods.
 
 Usage is best discerned from the source material.
 
+## Package Organisation
+
+The packages are published under their respective names, such as `Partas.Solid.Primitives.Mouse`.
+In usage, all packages are accessed through the namespace `Partas.Solid.Primitives`.
+
+:::note[]
+The package `Partas.Solid.Primitives` will implicitly install all latest versions of the primitives.
+
+This should not be used when publishing libraries.
+:::
+
+All packages share a dependency to `Partas.Solid.Primitives.Common`.
+
+> Versions of the primitives prior to `0.2.0` had the primitives accessed through their own individual namespaces, with
+> all depending on a shared package `Partas.Solid.Primitives`.
+
+
 ## Femto
 
 All primitives are compatible with Femto to install.

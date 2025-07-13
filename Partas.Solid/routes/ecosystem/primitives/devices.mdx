@@ -1,0 +1,85 @@
+---
+title: Solid Primitives
+---
+
+# Devices
+
+Creates a primitive to get a list of media devices, with filtered versions for convenience.
+
+## createDevices
+
+```fsharp
+let createDevices(): Accessor<MediaDeviceInfo[]>
+```
+
+Creates a list of all media devices.
+
+## createMicrophones
+
+```fsharp
+let createMicrophones(): Accessor<MediaDeviceInfo[]>
+```
+
+Creates a list of all media devices that are microphones.
+
+## createSpeakers
+
+```fsharp
+let createSpeakers(): Accessor<MediaDeviceInfo[]>
+```
+
+Creates a list of all media devices that are speakers.
+
+## createCameras
+
+```fsharp
+let createCameras(): Accessor<MediaDeviceInfo[]>
+```
+
+Creates a list of all media devices that are cameras.
+
+## createAccelerometer
+
+```fsharp
+let createAccelerometer(
+    ?includeGravity: bool,
+    ?interval: float
+    ): Accessor<DeviceAcceleration option>
+```
+
+|Param|Desc|
+|---|---|
+|`?includeGravity`|`bool`, default is `false`|
+|`?interval`|Numer as ms, default value is `100`|
+
+Creates a reactive wrapper to get device acceleration.
+
+## createGyroscope
+
+```fsharp
+let createGyroscope(
+    ?interval: float
+    ): Accessor<GyroscopeValue>
+```
+
+|Param|Desc|
+|---|---|
+|`?interval`|Number as ms. Default value is `100`|
+
+### GyroscopeValue
+
+```fsharp
+type GyroscopeValue = interface
+```
+
+```fsharp
+member alpha: float
+```
+
+```fsharp
+member beta: float
+```
+
+```fsharp
+member gamma: float
+```
