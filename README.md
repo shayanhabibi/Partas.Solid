@@ -27,7 +27,9 @@
 
 ## Getting Started
 
-[See the docs to get started!](http://shayanhabibi.github.io/partas-solid-docs/)
+[See the docs to get started!](partas-solid.vercel.app/partas-solid)
+
+~~[Legacy Docs](http://shayanhabibi.github.io/partas-solid-docs/)~~
 
 # Related Repositories
 
@@ -46,7 +48,9 @@ Bindings for different libraries [Partas.Solid.Bindings](https://github.com/shay
 
 ### Differences
 
-[See the docs](http://shayanhabibi.github.io/partas-solid-docs/)
+[See the docs](partas-solid.vercel.app/partas-solid)
+
+~~[Legacy Docs](http://shayanhabibi.github.io/partas-solid-docs/)~~
 
 
 <details>
