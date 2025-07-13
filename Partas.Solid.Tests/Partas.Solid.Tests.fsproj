@@ -61,6 +61,10 @@
         <Compile Include="SolidCases\ChildLambdaProvider\ChildLambdaProvider.fs" />
         <Content Include="SolidCases\ChildLambdaProvider\ChildLambdaProvider.expected" />
         <None Include="SolidCases\ChildLambdaProvider\ChildLambdaProvider.fsproj" />
+        <Compile Include="SolidCases\SolidComponentAsTagValues\SolidComponentAsTagValuesTypes.fs" />
+        <Compile Include="SolidCases\SolidComponentAsTagValues\SolidComponentAsTagValues.fs" />
+        <Content Include="SolidCases\SolidComponentAsTagValues\SolidComponentAsTagValues.fsproj" />
+        <Content Include="SolidCases\SolidComponentAsTagValues\SolidComponentAsTagValues.expected" />
         <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructorTypes.fs" />
         <Compile Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.fs" />
         <Content Include="IssueCases\CreateSignalTagConstructor\CreateSignalTagConstructor.expected" />

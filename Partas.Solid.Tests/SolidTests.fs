@@ -52,6 +52,10 @@ let ``Tags can be used as values`` () =
     runSolidCase "TagsAsValuesSimple"
 
 [<Fact>]
+let ``SolidComponents can be used as TagValues`` () =
+    runSolidCase "SolidComponentAsTagValues"
+
+[<Fact>]
 let ``FieldGets like props.words.Length are transformed`` () =
     runSolidCase "FieldGetExpressionsTransformed"
 
