@@ -901,7 +901,7 @@ module internal rec AST =
             | Call(
                 Import({ Selector = "op_BangAt"; Kind = MemberImport(MemberRef({ FullName = "Partas.Solid.Builder" }, _)) }, _, _),
                 {
-                    Args = Lambda(_, Call(callee, _, _, _), _) :: _
+                    Args = Lambda(_, Call(callee, callInfo, _, _), _) :: _
                 },
                 _,
                 range
@@ -909,7 +909,15 @@ module internal rec AST =
                 match callee with
                 // Some ident
                 | IdentExpr({ Type = Type.PartasName ctx typeName } as identee) ->
-                    IdentExpr({ identee with Name = typeName |> Utils.trimReservedIdentifiers }) |> Some
+                    match callInfo with
+                    // In the case where the referenced tag is a constructor, then it is a SolidTypeComponent, and we
+                    // actually intend to reference the name of the type.
+                    | CallInfo.Constructor ctx ->
+                        IdentExpr({ identee with Name = typeName |> Utils.trimReservedIdentifiers }) |> Some
+                    // Where the above is not true, the referenced tag is a let binding, and therefore a SolidComponent,
+                    // so we intent to reference the name of the binding.
+                    | _ ->
+                        callee |> Some
                 // prevent import of native tags
                 | Expr.NativeImportedConstructor ctx
                     & Import(
@@ -923,9 +931,18 @@ module internal rec AST =
                 | Import(
                     importInfo,
                     typ & Type.PartasName ctx typeName,
-                    range) ->
-                    Import({ importInfo with Selector = typeName }, typ, range)
-                    |> Some
+                    range) as expr->
+                    // We determine if the imported tag was a constructor. If it was, then it is a SolidTypeComponent,
+                    // and the name of the component will be the name of the type.
+                    match callInfo with
+                    | CallInfo.Constructor ctx ->
+                        Import({ importInfo with Selector = typeName }, typ, range)
+                        |> Some
+                    // If the above is not true, then the tag is a SolidComponent let binding, and the name of the
+                    // component will be the name of the binding.
+                    | _ ->
+                        expr
+                        |> Some
                 | Import({ Kind = UserImport false }, _, _) ->
                     Some callee
                 | _ -> None
