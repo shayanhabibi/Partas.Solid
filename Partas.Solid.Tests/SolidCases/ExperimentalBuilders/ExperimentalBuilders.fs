@@ -24,6 +24,7 @@ let getGetter = lambda {
     match getter() with
     | 10 -> check <- 5
     | 5 -> check <- 10
+    | _ -> ()
     check
 }
 
@@ -46,6 +47,7 @@ let ComponentWrap () =
         match getter() with
         | 10 -> check <- 5
         | 5 -> check <- 10
+        | _ -> ()
         check
     }
 
