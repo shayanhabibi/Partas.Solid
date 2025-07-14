@@ -1,6 +1,5 @@
 import { createSelector, batch, createMemo, onMount, onCleanup, children, splitProps, createEffect, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import { MatchFailureException } from "./fable_modules/fable-library-js.5.0.0-alpha.13/Types.js";
 import { printf, toConsole } from "./fable_modules/fable-library-js.5.0.0-alpha.13/String.js";
 
 export const patternInput$004013 = createSignal(10);
@@ -26,9 +25,8 @@ export const getGetter = () => {
     let check = 10;
     (matchValue = (getter() | 0), (matchValue === 5) ? ((check = 10, (value_1) => {
     })) : ((matchValue === 10) ? ((check = 5, (value) => {
-    })) : (() => {
-        throw new MatchFailureException("C:/Users/shaya/RiderProjects/Partas.Solid/Partas.Solid.Tests/SolidCases/ExperimentalBuilders/ExperimentalBuilders.fs", 24, 10);
-    })()));
+    })) : ((value_2) => {
+    })));
     return check | 0;
 };
 
@@ -66,8 +64,8 @@ export function ComponentWrap() {
                     check = 5;
                     break;
                 }
-                default:
-                    throw new MatchFailureException("C:/Users/shaya/RiderProjects/Partas.Solid/Partas.Solid.Tests/SolidCases/ExperimentalBuilders/ExperimentalBuilders.fs", 46, 14);
+                default: {
+                }
             }
             return check | 0;
         };
