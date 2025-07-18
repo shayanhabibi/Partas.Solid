@@ -60,8 +60,10 @@ jobs:
       - name: Compile the main solution
         run: dotnet build Partas.Solid.sln --no-restore
 
-      - name: Test the main solution
-        run: dotnet test Partas.Solid.sln --no-restore --no-build
+      - name: Run the transpiler output tests
+        run: dotnet run --project Partas.Solid.Tests.Plugin --no-restore -- --colours 256 --summary
+#      - name: Test the main solution
+#        run: dotnet test Partas.Solid.sln --no-restore --no-build
 
       - name: Restore Solid nuget dependencies
         run: dotnet restore Partas.Solid.sln
