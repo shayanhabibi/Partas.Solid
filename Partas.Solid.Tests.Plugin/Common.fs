@@ -7,7 +7,8 @@ open FsUnitTyped
 
 let platformShell =
     match Environment.OSVersion.Platform with
-    | PlatformID.Unix | PlatformID.MacOSX -> ZSH
+    | PlatformID.Unix -> BASH
+    | PlatformID.MacOSX -> ZSH
     | _ -> CMD
 
 let buildCases () =
