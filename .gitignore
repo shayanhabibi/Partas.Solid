@@ -7,3 +7,4 @@ riderModule.iml
 *.fs.jsx
 *.fs.js
 .idea
+/ScratchTests/
