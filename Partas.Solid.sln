@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".environment", ".environmen
 								LICENSE.txt = LICENSE.txt
 								README.md = README.md
 					.editorconfig = .editorconfig
+					.config/dotnet-tools.json = .config/dotnet-tools.json
 				EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Partas.Solid.Tests.Core", "Partas.Solid.Tests.Core\Partas.Solid.Tests.Core.fsproj", "{B3D8EF27-8A7F-46A9-9E71-3AD47B666C60}"

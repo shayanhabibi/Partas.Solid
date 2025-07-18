@@ -54,6 +54,9 @@ jobs:
       - name: Restore nuget dependencies
         run: dotnet restore Partas.Solid.sln
 
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+
       - name: Compile the main solution
         run: dotnet build Partas.Solid.sln --no-restore
 
