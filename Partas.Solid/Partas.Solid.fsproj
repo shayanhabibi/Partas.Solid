@@ -9,7 +9,6 @@
         <RootNamespace>Partas.Solid</RootNamespace>
         <AssemblyName>Partas.Solid</AssemblyName>
         <Company>F# Community</Company>
-        <Description>Private fork of Oxpecker.Solid; a F# web framework built on top of Solid.js</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/shayanhabibi/Partas.Solid</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
@@ -24,6 +23,9 @@
 
     <ItemGroup>
       <None Include="../README.md" Pack="true" PackagePath="\" />
+        <Compile Include="../Common/AssemblyInfo.fs">
+            <Link>AssemblyInfo.fs</Link>
+        </Compile>
       <Compile Include="PluginSupport.fs" />
       <Compile Include="U.fs" />
       <Compile Include="IdeTweaks.fs" />
