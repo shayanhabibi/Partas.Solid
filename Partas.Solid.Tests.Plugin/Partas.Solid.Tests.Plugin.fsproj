@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <Content Include="Compiled\Partas.Solid.Tests.Plugin.Compiled.fsproj" />
-    <Compile Include="Compiled\Spec\Components.fs" />
+    <Content Include="Compiled\Spec\Components.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 </Project>
