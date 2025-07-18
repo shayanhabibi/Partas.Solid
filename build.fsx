@@ -7,7 +7,7 @@
 #r "nuget: Fake.DotNet.AssemblyInfoFile"
 #r "nuget: Fake.Tools.Git"
 #r "nuget: Fake.Api.GitHub"
-#r "nuget: Fake.DotNet.Testing.Coverlet"
+#r "nuget: Fake.DotNet.Testing.Expecto"
 
 System.Environment.GetCommandLineArgs()
 |> Array.skip 2
@@ -81,16 +81,14 @@ Target.create Ops.Build (fun _ -> dotnet "build" [
 ])
 
 Target.create Ops.Test (fun _ ->
-    "Partas.Solid.Tests"
-    |> DotNet.test (fun opts ->
-
-        Coverlet.withDotNetTestOptions
-            (id)
-            { opts with
-                NoBuild = true
-                NoRestore = true }
-        )
-    // |> DotNet.test id
+    !! "**/bin/**/*.Tests.Plugin.dll"
+    |> Testing.Expecto.run (fun p -> {
+        p with
+            Summary = true
+            CustomArgs = [
+                "--colours 256"
+            ] @ p.CustomArgs
+    })
     )
 
 
