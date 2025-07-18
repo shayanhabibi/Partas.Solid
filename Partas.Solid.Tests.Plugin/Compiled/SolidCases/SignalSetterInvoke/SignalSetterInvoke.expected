@@ -1,0 +1,16 @@
+import { onCleanup, createEffect, createSignal, splitProps } from "solid-js";
+
+export function WordRotate(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["words", "duration"]);
+    const patternInput = createSignal(0);
+    createEffect(() => {
+        const interval = setInterval(() => {
+            patternInput[1]((prevIndex) => (((prevIndex + 1) % PARTAS_LOCAL.words.length) | 0));
+        }, PARTAS_LOCAL.duration) | 0;
+        onCleanup(() => {
+            clearInterval(interval);
+        });
+    });
+    return <div />;
+}
+

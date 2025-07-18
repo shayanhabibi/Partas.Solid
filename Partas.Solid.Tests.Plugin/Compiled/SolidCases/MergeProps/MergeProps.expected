@@ -1,0 +1,84 @@
+import { splitProps, mergeProps } from "solid-js";
+
+export function SimpleMerge(props) {
+    props = mergeProps({
+        class: "DefaultClass",
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div />;
+}
+
+export function MultipleMerges(props) {
+    props = mergeProps({
+        class: "DefaultClass",
+        draggable: "stub",
+        dir: "ltr",
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div />;
+}
+
+export function ComplexPropMerge(props) {
+    props = mergeProps({
+        onKeyPress: (_arg) => {
+            console.log("Key pressed");
+        },
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div />;
+}
+
+export function SimpleNestedMerge(props) {
+    props = mergeProps({
+        class: "defaultClass",
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div>
+        <button />
+    </div>;
+}
+
+export function NestedMerge(props) {
+    props = mergeProps({
+        draggable: "stub",
+        class: "DefaultClass",
+        dir: "ltr",
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div>
+        <div />
+        <button />
+    </div>;
+}
+
+export function NestedMergeWithChildren(props) {
+    props = mergeProps({
+        draggable: "stub",
+        class: "DefaultClass",
+        dir: "ltr",
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div>
+        <div />
+        <button>
+            Button
+        </button>
+    </div>;
+}
+
+export function ValMutableMerge(props) {
+    props = mergeProps({
+        index: 5,
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div />;
+}
+
+export function ValMutableMergeInherited(props) {
+    props = mergeProps({
+        index: 5,
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div />;
+}
+

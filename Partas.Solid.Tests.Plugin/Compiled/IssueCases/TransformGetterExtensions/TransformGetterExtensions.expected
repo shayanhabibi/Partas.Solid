@@ -1,0 +1,24 @@
+import { For, Show, splitProps } from "solid-js";
+import { flexRender, createSolidTable } from "@tanstack/solid-table";
+
+export function TransformGetterExtensions(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["data"]);
+    const table = createSolidTable({
+        data: PARTAS_LOCAL.data,
+    });
+    return <div>
+        <Show when={table.getRowModel().rows.length}
+            fallback={<div />}>
+            <For each={table.getRowModel().rows}>
+                {(row, index) => <div data-state={row.getIsSelected() && "selected"}>
+                    <For each={row.getVisibleCells()}>
+                        {(cell, index_1) => <div>
+                            {flexRender(...[cell.column.columnDef.cell, cell.getContext])}
+                        </div>}
+                    </For>
+                </div>}
+            </For>
+        </Show>
+    </div>;
+}
+

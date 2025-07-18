@@ -1,0 +1,90 @@
+import { Match, Switch, splitProps, mergeProps, onCleanup, createEffect, createSignal, useContext, createContext } from "solid-js";
+import { twMerge } from "tailwind-merge";
+import { clsx } from "clsx";
+
+export const sidebar_mobileBreakpoint = 768;
+
+export const sidebar_sidebarCookieName = "sidebar:state";
+
+export const sidebar_sidebarCookieMaxAge = ((60 * 60) * 24) * 7;
+
+export const sidebar_sidebarWidth = "16rem";
+
+export const sidebar_sidebarWidthMobile = "18rem";
+
+export const sidebar_sidebarWidthIcon = "3rem";
+
+export const sidebar_sidebarKeyboardShortcut = "b";
+
+export const Context_SidebarContext = createContext();
+
+export function Context_useSidebar() {
+    const context = useContext(Context_SidebarContext);
+    if (!context) {
+        throw new Error("useSidebar can only be used within a Sidebar");
+    }
+    return context;
+}
+
+export function Context_useIsMobile(fallback) {
+    const patternInput = createSignal(fallback);
+    createEffect(() => {
+        const mql = window.matchMedia(`(max-width:${sidebar_mobileBreakpoint - 1}px)`);
+        const onChange = (e) => {
+            patternInput[1](e.matches);
+        };
+        mql.addEventListener("change", onChange);
+        onChange(mql);
+        onCleanup(() => {
+            mql.removeEventListener("change", onChange);
+        });
+    });
+    return patternInput[0];
+}
+
+export function Sidebar(props) {
+    props = mergeProps({
+        side: "left",
+        variant: "sidebar",
+        collapsible: "offcanvas",
+    }, props);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["collapsible", "class", "children", "side", "variant"]);
+    const ctx = Context_useSidebar();
+    const isMobile = ctx.isMobile;
+    return <Switch>
+        <Match when={PARTAS_LOCAL.collapsible === "none"}>
+            <div class={twMerge(clsx(["test flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground", PARTAS_LOCAL.class]))}
+                {...PARTAS_OTHERS} bool:n$={false}>
+                {PARTAS_LOCAL.children}
+            </div>
+        </Match>
+        <Match when={isMobile()}>
+            <Sheet open={ctx.openMobile()}
+                onOpenChange={ctx.openMobile}
+                {...PARTAS_OTHERS} bool:n$={false}>
+                <SheetContent class="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+                    position={PARTAS_LOCAL.side}
+                    data-sidebar="sidebar"
+                    data-mobile="true"
+                    style={{
+                        "--sidebar-width": sidebar_sidebarWidthMobile,
+                    }}>
+                    <div class="flex size-full flex-col">
+                        {PARTAS_LOCAL.children}
+                    </div>
+                </SheetContent>
+            </Sheet>
+        </Match>
+        <Match when={!isMobile()}>
+            <div class={twMerge(clsx(["a1", "a2", "a3", ((PARTAS_LOCAL.variant === "floating") ? (true) : (PARTAS_LOCAL.variant === "inset")) ? ("?a1") : ("?a2")]))} />
+            <div class={twMerge(clsx(["b1", (PARTAS_LOCAL.side === "left") ? ("?b1") : ("?b2"), ((PARTAS_LOCAL.variant === "floating") ? (true) : (PARTAS_LOCAL.variant === "inset")) ? ("?b3") : ("?b4"), PARTAS_LOCAL.class]))}
+                {...PARTAS_OTHERS} bool:n$={false}>
+                <div class="classend"
+                    data-sidebar="sidebar">
+                    {PARTAS_LOCAL.children}
+                </div>
+            </div>
+        </Match>
+    </Switch>;
+}
+

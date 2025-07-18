@@ -1,0 +1,9 @@
+import { createSignal, splitProps } from "solid-js";
+
+export function WordRotate(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["words"]);
+    const patternInput = createSignal(0);
+    const chog = PARTAS_LOCAL.words.length | 0;
+    return <div />;
+}
+
