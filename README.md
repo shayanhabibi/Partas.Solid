@@ -17,9 +17,16 @@
 
 <div align="center">
 
+![NuGet Version](https://img.shields.io/nuget/v/Partas.Solid?style=flat)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/shayanhabibi/Partas.Solid/dotnet.yml)
+
+</div>
+<div align="center">
+
 [![Scc Count Badge](https://sloc.xyz/github/shayanhabibi/Partas.Solid/?category=code&badge-bg-color=9100FF)](https://github.com/shayanhabibi/Partas.Solid/)
 [![Scc Count Badge](https://sloc.xyz/github/shayanhabibi/Partas.Solid/?category=comments&badge-bg-color=5E00B5)](https://github.com/shayanhabibi/Partas.Solid/)
 [![Scc Count Badge](https://sloc.xyz/github/shayanhabibi/Partas.Solid/?category=cocomo&badge-bg-color=3B0086)](https://github.com/shayanhabibi/Partas.Solid/)
+
 
 </div>
 
@@ -29,9 +36,12 @@
 
 [See the docs to get started!](https://partas-solid.vercel.app/partas-solid)
 
-~~[Legacy Docs](http://shayanhabibi.github.io/partas-solid-docs/)~~
+[//]: # (~~[Legacy Docs]&#40;http://shayanhabibi.github.io/partas-solid-docs/&#41;~~)
 
 # Related Repositories
+
+> [!NOTE]
+> Documentation for related repositories are located in the docs on this repo.
 
 Solid-ui (Shadcn port) [Partas.Solid.UI](https://github.com/shayanhabibi/Partas.Solid.UI)
 
@@ -42,7 +52,7 @@ Bindings for different libraries [Partas.Solid.Bindings](https://github.com/shay
 > This is an opinionated fork of [Oxpecker.Solid](https://github.com/lanayx/Oxpecker) that
 > keeps the original DSL style, but more aggressively
 > transforms F# input to produce correct JSX.
-> 
+>
 > Please support the original release.
 
 
@@ -50,7 +60,7 @@ Bindings for different libraries [Partas.Solid.Bindings](https://github.com/shay
 
 [See the docs](https://partas-solid.vercel.app/partas-solid)
 
-~~[Legacy Docs](http://shayanhabibi.github.io/partas-solid-docs/)~~
+[//]: # (~~[Legacy Docs]&#40;http://shayanhabibi.github.io/partas-solid-docs/&#41;~~)
 
 
 <details>
@@ -167,16 +177,16 @@ type Sidebar() =
         let (isMobile, state, openMobile, setOpenMobile) = (ctx.isMobile, ctx.state, ctx.openMobile, ctx.openMobile)
         Switch() {
             Match(when' = (props.collapsible = sidebar.None)) {
-                
+
                 div(class' = Lib.cn [|
                     "test flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground"
                     props.class'
                 |]).spread props
                     { props.children }
-                
+
             }
             Match(when' = isMobile()) {
-                
+
                 Sheet( open' = openMobile(), onOpenChange = !!setOpenMobile )
                     .spread props {
                         SheetContent(
@@ -187,7 +197,7 @@ type Sidebar() =
                             .style'(createObj [ "--sidebar-width" ==> sidebarWidthMobile ])
                             { div(class' = "flex size-full flex-col") { props.children } }
                     }
-                
+
             }
             Match(when' = (isMobile() |> not)) {
                 // gap handler on desktop
@@ -201,7 +211,7 @@ type Sidebar() =
                     else "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
                 |]
                 )
-                
+
                 div(
                 class' = Lib.cn [|
                     "fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex"
@@ -212,7 +222,7 @@ type Sidebar() =
                     if props.variant = sidebar.Floating || props.variant = sidebar.Inset then
                         "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
                     else "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l"
-                    props.class' 
+                    props.class'
                 |]
                     ).spread props
                     {
@@ -222,7 +232,7 @@ type Sidebar() =
                             { props.children }
                     }
             }
-            
+
         }
 ```
 
@@ -285,6 +295,20 @@ To develop the plugin, ensure you exclude the plugin on compilation:
 
 `fable --exclude Partas.Solid.FablePlugin --noCache -o output -e .fs.jsx --run dotnet restore`
 
+## FAKE Scripts
+
 There are a suite of tests to run to help inform if any changes have broken something else.
+
+You can run them from your IDE or using the FAKE script:
+
+`dotnet fsi build.fsx`
+
+Format with fantomas:
+
+`dotnet fsi build.fsx target format`
+
+> [!NOTE]
+> The FablePlugin `Plugin.fs` is excluded from formatting as the heavily nested
+> active patterns do not *jive* well with it.
 
 I've done my best to heavily document the plugin and the method of transformations.
