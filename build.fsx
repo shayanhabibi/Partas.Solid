@@ -190,7 +190,8 @@ Target.create Ops.Publish (fun _ ->
     |> Seq.iter (
         DotNet.nugetPush (fun p ->
             { p with
-                DotNet.NuGetPushOptions.PushParams.ApiKey = apiKey })
+                DotNet.NuGetPushOptions.PushParams.ApiKey = apiKey
+                DotNet.NuGetPushOptions.PushParams.Source = Some "https://api.nuget.org/v3/index.json" })
     ))
 
 Target.create Ops.PublishLocal (fun _ ->

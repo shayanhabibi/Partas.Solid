@@ -5,29 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<h2>[Unreleased]</h2>
+## [1.1.6] - 2025-07-19
 
-<h3><!-- 1 -->Added</h3>
-- Add git-cliff changelog
-- ADD: RELEASE_NOTES.md
-- New Expecto test structure
-- ADD: build script
-
-<h3><!-- 2 -->Removed</h3>
-- Remove scratchtest
-
-<h3><!-- 3 -->Changed</h3>
-- Nicer CI output
-- Add tool restore to CI
-
-<h3><!-- 5 -->Fixed</h3>
-- Do not compile from Compiled folder
-
-<h3><!-- 9 -->Other</h3>
-- Bash on unix
-- Ignore scratchtests
-- Old test structure
-- Merge branch 'master' into develop
+<h3><!-- 0 -->Features</h3>
+- CI and Expecto Tests by @shayanhabibi in [#35](https://github.com/shayanhabibi/Partas.Solid/pull/35)
 
 
 ## [1.1.5] - 2025-07-14
@@ -49,7 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <h3><!-- 5 -->Fixed</h3>
 - Fix #29: TypeCastDrill on Set expressions for Attributes. Fix FileRoutes to use emit macro to prevent fail on runtime. by @shayanhabibi in [#30](https://github.com/shayanhabibi/Partas.Solid/pull/30)
-- SolidStart FileRoutes binding to use emit macro to prevent compiling an invalid function call on runtime
 - Fix icon link by @shayanhabibi
 
 <h3><!-- 9 -->Other</h3>
@@ -349,7 +329,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <h2>New Contributors</h2>
 * @shayanhabibi made their first contribution
 
-[unreleased]: https://github.com/shayanhabibi/Partas.Solid/compare/v1.1.5..HEAD
+[1.1.6]: https://github.com/shayanhabibi/Partas.Solid/compare/v1.1.5..v1.1.6
 [1.1.5]: https://github.com/shayanhabibi/Partas.Solid/compare/1.1.5..v1.1.5
 [1.1.5]: https://github.com/shayanhabibi/Partas.Solid/compare/1.0.0..1.1.5
 [1.0.0]: https://github.com/shayanhabibi/Partas.Solid/compare/1.0.0-alpha4..1.0.0
