@@ -68,6 +68,7 @@ let description =
 
 let gitOwner = "shayanhabibi"
 let gitName = "Partas.Solid"
+let release = lazy ReleaseNotes.load "docs/RELEASE_NOTES.md"
 
 let apiKey =
     Target.getArguments ()
@@ -128,14 +129,13 @@ Target.create Ops.GitCliff (fun _ ->
 // Generate assembly info file with versioning and up-to-date info
 Target.create Ops.AssemblyInfo (fun _ ->
     let fileName = "Common/AssemblyInfo.fs"
-    let release = ReleaseNotes.load "docs/RELEASE_NOTES.md"
 
     AssemblyInfoFile.createFSharp
         fileName
         [ AssemblyInfo.Title gitName
           AssemblyInfo.Product gitName
-          AssemblyInfo.Version release.AssemblyVersion
-          AssemblyInfo.FileVersion release.AssemblyVersion ])
+          AssemblyInfo.Version release.Value.AssemblyVersion
+          AssemblyInfo.FileVersion release.Value.AssemblyVersion ])
 
 Target.create Ops.Clean (fun _ ->
     !!"**/**/bin"
@@ -155,7 +155,10 @@ Target.create Ops.Build (fun _ ->
     |> DotNet.build (fun p ->
         { p with
             Configuration = DotNet.BuildConfiguration.Release
-            DotNet.BuildOptions.MSBuildParams.DisableInternalBinLog = true }))
+            DotNet.BuildOptions.MSBuildParams.DisableInternalBinLog = true
+            DotNet.BuildOptions.MSBuildParams.Properties =
+                [ "PackageVersion", release.Value.AssemblyVersion
+                  "Version", release.Value.AssemblyVersion ] }))
 
 Target.create Ops.Test (fun _ ->
     !!"**/bin/**/*.Tests.Plugin.dll"
@@ -182,7 +185,10 @@ Target.create Ops.Nuget (fun _ ->
             { p with
                 NoRestore = true
                 OutputPath = Some "bin"
-                DotNet.PackOptions.MSBuildParams.DisableInternalBinLog = true })
+                DotNet.PackOptions.MSBuildParams.DisableInternalBinLog = true
+                DotNet.PackOptions.MSBuildParams.Properties =
+                    [ "PackageVersion", release.Value.AssemblyVersion
+                      "Version", release.Value.AssemblyVersion ] })
     ))
 
 Target.create Ops.Publish (fun _ ->
@@ -191,7 +197,8 @@ Target.create Ops.Publish (fun _ ->
         DotNet.nugetPush (fun p ->
             { p with
                 DotNet.NuGetPushOptions.PushParams.ApiKey = apiKey
-                DotNet.NuGetPushOptions.PushParams.Source = Some "https://api.nuget.org/v3/index.json" })
+                DotNet.NuGetPushOptions.PushParams.Source = Some "https://api.nuget.org/v3/index.json"
+                DotNet.NuGetPushOptions.Common.CustomParams = Some "--skip-duplicate" })
     ))
 
 Target.create Ops.PublishLocal (fun _ ->

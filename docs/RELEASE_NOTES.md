@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <h3><!-- 0 -->Features</h3>
 - CI and Expecto Tests by @shayanhabibi in [#35](https://github.com/shayanhabibi/Partas.Solid/pull/35)
 
+<h3><!-- 5 -->Fixed</h3>
+- Build.fsx packaging declares source explicitly by @shayanhabibi
+
 
 ## [1.1.5] - 2025-07-14
 
@@ -329,7 +332,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <h2>New Contributors</h2>
 * @shayanhabibi made their first contribution
 
-[1.1.6]: https://github.com/shayanhabibi/Partas.Solid/compare/v1.1.5..v1.1.6
+[1.1.6]: https://github.com/shayanhabibi/Partas.Solid/compare/v1.1.5..1.1.6
 [1.1.5]: https://github.com/shayanhabibi/Partas.Solid/compare/1.1.5..v1.1.5
 [1.1.5]: https://github.com/shayanhabibi/Partas.Solid/compare/1.0.0..1.1.5
 [1.0.0]: https://github.com/shayanhabibi/Partas.Solid/compare/1.0.0-alpha4..1.0.0

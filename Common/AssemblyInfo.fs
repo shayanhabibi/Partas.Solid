@@ -4,12 +4,12 @@ open System.Reflection
 
 [<assembly: AssemblyTitleAttribute("Partas.Solid")>]
 [<assembly: AssemblyProductAttribute("Partas.Solid")>]
-[<assembly: AssemblyVersionAttribute("1.1.5")>]
-[<assembly: AssemblyFileVersionAttribute("1.1.5")>]
+[<assembly: AssemblyVersionAttribute("1.1.6")>]
+[<assembly: AssemblyFileVersionAttribute("1.1.6")>]
 do ()
 
 module internal AssemblyVersionInformation =
     let [<Literal>] AssemblyTitle = "Partas.Solid"
     let [<Literal>] AssemblyProduct = "Partas.Solid"
-    let [<Literal>] AssemblyVersion = "1.1.5"
-    let [<Literal>] AssemblyFileVersion = "1.1.5"
+    let [<Literal>] AssemblyVersion = "1.1.6"
+    let [<Literal>] AssemblyFileVersion = "1.1.6"
