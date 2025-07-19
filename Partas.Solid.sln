@@ -18,6 +18,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6B45F8BE-1215-4F84-A7F6-50227F03A938}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		.github\workflows\package.yml = .github\workflows\package.yml
 		.github\ISSUE_TEMPLATE\bug-report---plugin-compilation.md = .github\ISSUE_TEMPLATE\bug-report---plugin-compilation.md
 	EndProjectSection
 EndProject
