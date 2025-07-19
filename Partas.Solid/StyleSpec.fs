@@ -1,4 +1,5 @@
 ﻿namespace Partas.Solid.Style
+
 open Fable.Core
 open Fable.Core.JS
 open Fable.Core.JsInterop
@@ -28,7 +29,7 @@ module Types =
         | [<CompiledName("@starting-style")>] StartingStyle
         | [<CompiledName("@supports")>] Supports
         | [<CompiledName("@viewport")>] Viewport
-    
+
     [<RequireQualifiedAccess>]
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
     [<StringEnum(CaseRules.KebabCase)>]
@@ -39,7 +40,7 @@ module Types =
         | Revert
         | RevertLayer
         | Unset
-    
+
     [<RequireQualifiedAccess>]
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
     [<StringEnum(CaseRules.KebabCase)>]
@@ -2034,7 +2035,7 @@ module Types =
         | WindowFrame
         | WindowText
         | Currentcolor
-        
+
     [<RequireQualifiedAccess>]
     [<StringEnum(CaseRules.KebabCase)>]
     type BorderBottomStyle =
@@ -5527,7 +5528,7 @@ module Types =
         | RevertLayer
         | Unset
         | Auto
-        
+
     [<RequireQualifiedAccess>]
     [<StringEnum(CaseRules.KebabCase)>]
     type GridTemplateColumns =
@@ -8914,7 +8915,7 @@ module Types =
         | Unset
         | Normal
         | Reset
-    
+
     [<RequireQualifiedAccess>]
     [<StringEnum(CaseRules.KebabCase)>]
     type MsAccelerator =
@@ -10322,7 +10323,7 @@ module Types =
         | Unset
         | NonScalingStroke
         | None
-    
+
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
     module AtRule =
         [<RequireQualifiedAccess>]
@@ -10333,7 +10334,7 @@ module Types =
             | Numbers
             | SpellOut
             | Words
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type System =
@@ -10343,7 +10344,7 @@ module Types =
             | Fixed
             | Numeric
             | Symbolic
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type FontDisplay =
@@ -10352,7 +10353,7 @@ module Types =
             | Fallback
             | Optional
             | Swap
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type FontStretch =
@@ -10365,14 +10366,14 @@ module Types =
             | SemiExpanded
             | UltraCondensed
             | UltraExpanded
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type FontStyle =
             | Italic
             | Normal
             | Oblique
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type FontVariant =
@@ -10416,33 +10417,32 @@ module Types =
         type FontWeight =
             | Bold
             | Normal
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
-        type LineGapOverride =
-            | Normal
-    
+        type LineGapOverride = | Normal
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type BasePalette =
             | Dark
             | Light
-    
-    
+
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type Marks =
             | Crop
             | Cross
             | None
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type PageOrientation =
             | RotateLeft
             | RotateRight
             | Upright
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type Size =
@@ -10459,11 +10459,11 @@ module Types =
             | Auto
             | Landscape
             | Portrait
-    
-    
+
+
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
     module DataType =
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type AbsoluteSize =
@@ -10475,20 +10475,20 @@ module Types =
             | XxLarge
             | XxSmall
             | XxxLarge
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type AnimateableFeature =
             | Contents
             | ScrollPosition
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type Attachment =
             | Fixed
             | Local
             | Scroll
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type BgPosition =
@@ -10497,14 +10497,14 @@ module Types =
             | Left
             | Right
             | Top
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type BgSize =
             | Auto
             | Contain
             | Cover
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type BlendMode =
@@ -10524,14 +10524,14 @@ module Types =
             | Saturation
             | Screen
             | SoftLight
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type Box =
             | BorderBox
             | ContentBox
             | PaddingBox
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type Color =
@@ -10713,7 +10713,7 @@ module Types =
             | WindowFrame
             | WindowText
             | Currentcolor
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type CompatAuto =
@@ -10729,7 +10729,7 @@ module Types =
             | SliderHorizontal
             | SquareButton
             | Textarea
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type CompositeStyle =
@@ -10744,7 +10744,7 @@ module Types =
             | SourceOut
             | SourceOver
             | Xor
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type CompositingOperator =
@@ -10752,7 +10752,7 @@ module Types =
             | Exclude
             | Intersect
             | Subtract
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type ContentDistribution =
@@ -10760,7 +10760,7 @@ module Types =
             | SpaceBetween
             | SpaceEvenly
             | Stretch
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type ContentList =
@@ -10769,7 +10769,7 @@ module Types =
             | NoOpenQuote
             | OpenQuote
             | Contents
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type ContentPosition =
@@ -10778,7 +10778,7 @@ module Types =
             | FlexEnd
             | FlexStart
             | Start
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type CubicBezierTimingFunction =
@@ -10786,10 +10786,9 @@ module Types =
             | EaseIn
             | EaseInOut
             | EaseOut
-    
-        type Dasharray<'TLength> =
-            U2<'TLength, obj>
-    
+
+        type Dasharray<'TLength> = U2<'TLength, obj>
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type DeprecatedSystemColor =
@@ -10821,7 +10820,7 @@ module Types =
             | Window
             | WindowFrame
             | WindowText
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type DisplayInside =
@@ -10834,7 +10833,7 @@ module Types =
             | Grid
             | Ruby
             | Table
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type DisplayInternal =
@@ -10850,7 +10849,7 @@ module Types =
             | TableHeaderGroup
             | TableRow
             | TableRowGroup
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type DisplayLegacy =
@@ -10862,14 +10861,14 @@ module Types =
             | InlineGrid
             | InlineListItem
             | InlineTable
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type DisplayOutside =
             | Block
             | Inline
             | RunIn
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type EasingFunction =
@@ -10880,7 +10879,7 @@ module Types =
             | StepEnd
             | StepStart
             | Linear
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type EastAsianVariantValues =
@@ -10890,7 +10889,7 @@ module Types =
             | Jis90
             | Simplified
             | Traditional
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type FinalBgLayer =
@@ -11090,7 +11089,7 @@ module Types =
             | ContentBox
             | PaddingBox
             | None
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type FontStretchAbsolute =
@@ -11103,13 +11102,13 @@ module Types =
             | SemiExpanded
             | UltraCondensed
             | UltraExpanded
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type FontWeightAbsolute =
             | Bold
             | Normal
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type GenericFamily =
@@ -11118,7 +11117,7 @@ module Types =
             | Monospace
             | SansSerif
             | Serif
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type GeometryBox =
@@ -11129,12 +11128,11 @@ module Types =
             | MarginBox
             | StrokeBox
             | ViewBox
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
-        type GridLine =
-            | Auto
-    
+        type GridLine = | Auto
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type LineStyle =
@@ -11148,14 +11146,14 @@ module Types =
             | Outset
             | Ridge
             | Solid
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type LineWidth =
             | Medium
             | Thick
             | Thin
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type MaskLayer =
@@ -11186,14 +11184,14 @@ module Types =
             | MatchSource
             | NoClip
             | None
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type MaskingMode =
             | Alpha
             | Luminance
             | MatchSource
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type NamedColor =
@@ -11346,7 +11344,7 @@ module Types =
             | Whitesmoke
             | Yellow
             | Yellowgreen
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type PageSize =
@@ -11360,7 +11358,7 @@ module Types =
             | Ledger
             | Legal
             | Letter
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type Paint =
@@ -11546,7 +11544,7 @@ module Types =
             | ContextFill
             | ContextStroke
             | None
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type Position =
@@ -11555,7 +11553,7 @@ module Types =
             | Left
             | Right
             | Top
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type Quote =
@@ -11563,7 +11561,7 @@ module Types =
             | NoCloseQuote
             | NoOpenQuote
             | OpenQuote
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type RepeatStyle =
@@ -11573,7 +11571,7 @@ module Types =
             | RepeatY
             | Round
             | Space
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type SelfPosition =
@@ -11584,7 +11582,7 @@ module Types =
             | SelfEnd
             | SelfStart
             | Start
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type SingleAnimation =
@@ -11607,14 +11605,14 @@ module Types =
             | Infinite
             | Paused
             | Running
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type SingleAnimationComposition =
             | Accumulate
             | Add
             | Replace
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type SingleAnimationDirection =
@@ -11622,7 +11620,7 @@ module Types =
             | AlternateReverse
             | Normal
             | Reverse
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type SingleAnimationFillMode =
@@ -11630,13 +11628,13 @@ module Types =
             | Both
             | Forwards
             | None
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type SingleAnimationTimeline =
             | Auto
             | None
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type SingleTransition =
@@ -11651,13 +11649,13 @@ module Types =
             | AllowDiscrete
             | None
             | Normal
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type StepTimingFunction =
             | StepEnd
             | StepStart
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type TimelineRangeName =
@@ -11667,19 +11665,18 @@ module Types =
             | EntryCrossing
             | Exit
             | ExitCrossing
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type TrackBreadth =
             | Auto
             | MaxContent
             | MinContent
-    
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
-        type ViewportLength =
-            | Auto
-    
+        type ViewportLength = | Auto
+
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
         type VisualBox =

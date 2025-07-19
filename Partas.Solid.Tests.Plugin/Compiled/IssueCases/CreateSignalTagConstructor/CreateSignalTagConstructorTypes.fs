@@ -4,5 +4,6 @@ open Partas.Solid
 open Fable.Core
 
 [<Import("FakeImport", "FakeLibrary")>]
-type [<Erase>] Imported() =
+[<Erase>]
+type Imported() =
     interface RegularNode

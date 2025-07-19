@@ -6,5 +6,6 @@ open Fable.Core
 [<Erase>]
 type MyComponent() =
     interface RegularNode
+
     [<DefaultValue>]
     val mutable index: int

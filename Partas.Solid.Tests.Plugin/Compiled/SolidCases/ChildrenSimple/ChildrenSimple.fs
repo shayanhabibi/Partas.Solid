@@ -3,29 +3,33 @@
 open Partas.Solid
 open Fable.Core
 
-type [<Erase>] TypeDefTest() =
+[<Erase>]
+type TypeDefTest() =
     interface RegularNode
+
+    [<SolidTypeComponent>]
+    member props.typeDef = button () { "Button" }
+
+[<Erase>]
+type TypeDefTestWithProps() =
+    interface RegularNode
+
     [<SolidTypeComponent>]
     member props.typeDef =
-        button() {
+        button (class' = "ButtonClass", draggable = "indubitably") {
             "Button"
+            span (class' = "sr-only") { "Span" }
         }
-type [<Erase>] TypeDefTestWithProps() =
+
+[<Erase>]
+type TypeDefTestWithExtensions() =
     interface RegularNode
+
     [<SolidTypeComponent>]
     member props.typeDef =
-        button(class' = "ButtonClass", draggable="indubitably") {
+        button(class' = "ButtonClass").attr ("Key", "Value") {
             "Button"
-            span(class' = "sr-only") { "Span" }
-        } 
-type [<Erase>] TypeDefTestWithExtensions() =
-    interface RegularNode
-    [<SolidTypeComponent>]
-    member props.typeDef =
-        button(class' = "ButtonClass").attr("Key", "Value") {
-            "Button"
-            span(class' = "sr-only") { "Span" }
-            div(class' = "DivBelow").attr("key", "value")
+            span (class' = "sr-only") { "Span" }
+            div(class' = "DivBelow").attr ("key", "value")
             "TextBelow"
-        } 
-        
+        }

@@ -7,7 +7,7 @@ open Partas.Solid
 type CustomComponent() =
     interface VoidNode
     interface ChildLambdaProvider3<int, Accessor<string>, float>
-    
+
 [<Import("OnlyTakesButtons", "FakeLibrary")>]
 type OnlyButtons() =
     interface VoidNode
@@ -15,13 +15,11 @@ type OnlyButtons() =
 
 [<SolidComponent>]
 let TestProvider () =
-    CustomComponent() {
-        yield fun i s f ->
-            Fragment() {
-                div(tabindex = i) { s() }
-                OnlyButtons() {
-                    yield fun b ->
-                        button(tabindex = b)
+    CustomComponent () {
+        yield
+            fun i s f ->
+                Fragment () {
+                    div (tabindex = i) { s () }
+                    OnlyButtons () { yield fun b -> button (tabindex = b) }
                 }
-            }
     }

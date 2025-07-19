@@ -7,6 +7,6 @@ open Fable.Core.JsInterop
 [<AutoOpen; Erase>]
 module uu =
     type Table<'Data> with
-        member _.getGlobalFacetedRowModel with get(): (unit -> RowModel<'Data>) = unbox null
-        member _.getGlobalFacetedUniqueValues with get(): (unit -> Map<obj, int>) = unbox null
-        member _.getGlobalFacetedMinMaxValues with get(): (unit -> int * int) = unbox null
+        member _.getGlobalFacetedRowModel: (unit -> RowModel<'Data>) = unbox null
+        member _.getGlobalFacetedUniqueValues: (unit -> Map<obj, int>) = unbox null
+        member _.getGlobalFacetedMinMaxValues: (unit -> int * int) = unbox null

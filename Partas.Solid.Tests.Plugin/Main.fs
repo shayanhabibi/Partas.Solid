@@ -1,4 +1,5 @@
 ﻿module Partas.Solid.Tests.Plugin.Main
+
 open Expecto
 
 [<EntryPoint>]

@@ -7,30 +7,33 @@ open Browser.Dom
 module Section1 =
     /// Let bindings compile to functions
     [<SolidComponent>]
-    let Component () =
-        div()
+    let Component () = div ()
+
     /// SolidComponent functions can be implemented within
-    /// normal functions. 
+    /// normal functions.
     let WrappingComponent () =
-        Component()
+        Component ()
+
     /// However native tags or SolidTypeComponents will not
     let FailsToWrap () =
-        div() { Component() }
+        div () { Component () }
 
     /// Reactivity would not work outside a function
     [<SolidComponent>]
-    let NotAFunction =
-        Component()
+    let NotAFunction = Component ()
+
     [<SolidComponent>]
     let WrapNotAFunction () =
         NotAFunction
+
     /// Parameters can be passed
     [<SolidComponent>]
     let ParameterComponent someInt someString someHandler =
         let thisInt = someInt
         let thisString = someString
         let thisHandler = someHandler
-        div()
+        div ()
+
     /// And since they are functions without special JSX compilation,
     /// can be used outside a SolidComponent or SolidTypeComponent
     let WrapParameterComponent () =
@@ -39,23 +42,19 @@ module Section1 =
     /// Native components use constructor parameters for attributes
     [<SolidComponent>]
     let NativeComponentAttributes () =
-        div(id = "MyDiv", tabindex = 5, onClick = fun _ -> console.log "Clicked")
+        div (id = "MyDiv", tabindex = 5, onClick = (fun _ -> console.log "Clicked"))
 
     /// Reserved keywords are apostrophised, but compile correctly
     [<SolidComponent>]
     let ApostrophisedAttribute () =
-        div(class' = "myclass")
+        div (class' = "myclass")
 
     /// Native components use computation expression syntax to receive children
     [<SolidComponent>]
     let NativeComponentChildren () =
-        div(class' = "group") {
-            button(class' = "bg_black text-white") {
-                "Button"
-            }
-            div() {
-                select()
-            }
+        div (class' = "group") {
+            button (class' = "bg_black text-white") { "Button" }
+            div () { select () }
         }
 
     /// New components can be typed and used to interop with libraries
@@ -64,24 +63,22 @@ module Section1 =
     [<Import("LibraryImport", "@some/library")>]
     type FakeImport() =
         interface RegularNode
+
         [<Erase>]
-        member val myAttribute: string = "" with get,set
+        member val myAttribute: string = "" with get, set
 
     /// New components can be typed and used to interop with libraries
     /// And they will compile correctly in a solid component
     [<SolidComponent>]
     let ComponentTypeWrap () =
-        div() {
-        FakeImport(myAttribute = "Something")
-        }
+        div () { FakeImport (myAttribute = "Something") }
 
     /// But not outside of a solid component
     let FailComponentTypeWrap () =
-        div() {
-            FakeImport(myAttribute = "something")
-        }
+        div () { FakeImport (myAttribute = "something") }
 
 namespace Banana
+
 open Partas.Solid
 open Fable.Core
 
@@ -90,12 +87,17 @@ open Fable.Core
 [<Import("LibraryImport", "@some/library")>]
 type FakeImport() =
     interface RegularNode
+
     [<Erase>]
-    member val myAttribute: string = "" with get,set
+    member val myAttribute: string = "" with get, set
+
 module Section2 =
     /// However, the components will not compile correctly
     /// if defined outside of a namespace starting with Partas.Solid
-    let Component () = FakeImport(myAttribute = "something")
+    let Component () =
+        FakeImport (myAttribute = "something")
+
     /// Regardless of with/without the SolidComponent attribute
     [<SolidComponent>]
-    let SolidCmp () = FakeImport(myAttribute = "seomthing")
+    let SolidCmp () =
+        FakeImport (myAttribute = "seomthing")

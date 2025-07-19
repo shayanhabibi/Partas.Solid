@@ -5,23 +5,34 @@ open Partas.Solid.Aria
 open Fable.Core
 open Fable.Core.JsInterop
 
-type [<Erase>] Lib =
+[<Erase>]
+type Lib =
     [<Import("twMerge", "tailwind-merge")>]
-    static member twMerge (classes: string) : string = jsNative
+    static member twMerge(classes: string) : string = jsNative
+
     [<Import("clsx", "clsx")>]
-    static member clsx(classes: obj): string = jsNative
-    static member cn (classes: string array): string = classes |> Lib.clsx |> Lib.twMerge
+    static member clsx(classes: obj) : string = jsNative
+
+    static member cn(classes: string array) : string =
+        classes
+        |> Lib.clsx
+        |> Lib.twMerge
+
 open Partas.Solid
 open Fable.Core
 open Browser.Types
+
 module Spec =
-    let [<Literal>] checkbox = "@kobalte/core/checkbox"
+    [<Literal>]
+    let checkbox = "@kobalte/core/checkbox"
+
 module Kobalte =
 
     [<Erase>]
     type CheckboxRenderProp =
         abstract checked': Accessor<bool> //v0.13.9
         abstract indeterminate: Accessor<bool> //v0.13.9
+
     /// <summary>
     ///
     /// </summary>
@@ -37,16 +48,36 @@ module Kobalte =
         interface HtmlTag
         interface Polymorph
         interface ChildLambdaProvider<CheckboxRenderProp>
-        [<DefaultValue>] val mutable checked' : bool  //v0.13.9
-        [<DefaultValue>] val mutable defaultChecked : bool  //v0.13.9
-        [<DefaultValue>] val mutable onChange : bool -> unit  //v0.13.9
-        [<DefaultValue>] val mutable indeterminate : bool //v0.13.9
-        [<DefaultValue>] val mutable name : string  //v0.13.9
-        [<DefaultValue>] val mutable value : string  //v0.13.9
-        [<DefaultValue>] val mutable required : bool  //v0.13.9
-        [<DefaultValue>] val mutable disabled : bool  //v0.13.9
-        [<DefaultValue>] val mutable readOnly : bool  //v0.13.9
-        [<DefaultValue>] val mutable children : CheckboxRenderProp -> HtmlElement   //v0.13.9
+
+        [<DefaultValue>]
+        val mutable checked': bool //v0.13.9
+
+        [<DefaultValue>]
+        val mutable defaultChecked: bool //v0.13.9
+
+        [<DefaultValue>]
+        val mutable onChange: bool -> unit //v0.13.9
+
+        [<DefaultValue>]
+        val mutable indeterminate: bool //v0.13.9
+
+        [<DefaultValue>]
+        val mutable name: string //v0.13.9
+
+        [<DefaultValue>]
+        val mutable value: string //v0.13.9
+
+        [<DefaultValue>]
+        val mutable required: bool //v0.13.9
+
+        [<DefaultValue>]
+        val mutable disabled: bool //v0.13.9
+
+        [<DefaultValue>]
+        val mutable readOnly: bool //v0.13.9
+
+        [<DefaultValue>]
+        val mutable children: CheckboxRenderProp -> HtmlElement //v0.13.9
 
     [<Erase; RequireQualifiedAccess>]
     module Checkbox = //v0.13.9
@@ -64,7 +95,10 @@ module Kobalte =
         type Indicator() = //v0.13.9
             inherit div()
             interface Polymorph
-            [<DefaultValue>] val mutable forceMount : bool  //v0.13.9
+
+            [<DefaultValue>]
+            val mutable forceMount: bool //v0.13.9
+
         /// <summary>
         ///
         /// </summary>
@@ -79,7 +113,10 @@ module Kobalte =
         type ErrorMessage() = //v0.13.9
             inherit div()
             interface Polymorph
-            [<DefaultValue>] val mutable forceMount : bool  //v0.13.9
+
+            [<DefaultValue>]
+            val mutable forceMount: bool //v0.13.9
+
         /// <summary>
         ///
         /// </summary>
@@ -94,6 +131,7 @@ module Kobalte =
         type Label() = //v0.13.9
             inherit label()
             interface Polymorph
+
         /// <summary>
         ///
         /// </summary>
@@ -108,6 +146,7 @@ module Kobalte =
         type Description() =
             inherit div() //v0.13.9
             interface Polymorph
+
         /// <summary>
         ///
         /// </summary>
@@ -122,6 +161,7 @@ module Kobalte =
         type Control() = //v0.13.9
             inherit div()
             interface Polymorph
+
         /// <summary>
         ///
         /// </summary>
@@ -142,7 +182,13 @@ module Kobalte =
         [<AllowNullLiteral; Interface>]
         type CheckboxContext =
             abstract member value: Accessor<string> with get
-            abstract member dataset: Accessor<{|``data-checked``:string option; ``data-indeterminate``: string option|}> with get
+
+            abstract member dataset:
+                Accessor<
+                    {| ``data-checked``: string option
+                       ``data-indeterminate``: string option |}
+                 > with get
+
             abstract member ``checked``: Accessor<bool> with get
             abstract member indeterminate: Accessor<bool> with get
             abstract member inputRef: Accessor<HTMLInputElement option> with get
@@ -151,54 +197,52 @@ module Kobalte =
             abstract member setIsChecked: (bool -> unit) with get
             abstract member setIsFocused: (bool -> unit) with get
             abstract member setInputRef: (HTMLInputElement -> unit) with get
+
         [<Import("useCheckboxContext", Spec.checkbox)>]
-        let useCheckboxContext (): CheckboxContext = jsNative
+        let useCheckboxContext () : CheckboxContext = jsNative
 
 
 
 [<Erase>]
 type Checkbox() =
     inherit Kobalte.Checkbox()
+
     [<SolidTypeComponent>]
     member props.checkbox =
-        Kobalte.Checkbox(
-            indeterminate = props.indeterminate,
-            class' = Lib.cn [| "items-top group relative flex space-x-2"; props.class' |]
-            ).spread(props) { yield fun _ -> Fragment() {
+        Kobalte
+            .Checkbox(indeterminate = props.indeterminate, class' = Lib.cn [| "items-top group relative flex space-x-2"; props.class' |])
+            .spread (props) {
+            yield
+                fun _ ->
+                    Fragment () {
 
-            Kobalte.Checkbox.Input(class'="peer")
-            Kobalte.Checkbox.Control(
-                class' = "size-4 shrink-0 rounded-sm border border-primary
+                        Kobalte.Checkbox.Input (class' = "peer")
+
+                        Kobalte.Checkbox.Control (
+                            class' =
+                                "size-4 shrink-0 rounded-sm border border-primary
                 ring-offset-background disabled:cursor-not-allowed disabled:opacity-50
                 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring
                 peer-focus-visible:ring-offset-2 data-[checked]:border-none
                 data-[indeterminate]:border-none data-[checked]:bg-primary
                 data-[indeterminate]:bg-primary data-[checked]:text-primary-foreground
                 data-[indeterminate]:text-primary-foreground"
-                ) {
-                Kobalte.Checkbox.Indicator() {
-                    if props.indeterminate then
-                        "😐"
-                        // Minus(class' = "size-4", strokeWidth = 2)
-                    else
-                        "😀"
-                        // Check(class' = "size-4", strokeWidth = 2)
-                }
-            }
-        }
+                        ) {
+                            Kobalte.Checkbox.Indicator () {
+                                if props.indeterminate then
+                                    "😐"
+                                // Minus(class' = "size-4", strokeWidth = 2)
+                                else
+                                    "😀"
+                            // Check(class' = "size-4", strokeWidth = 2)
+                            }
+                        }
+                    }
         }
 
 [<SolidComponent>]
-let selectColumn: obj =
-    Checkbox(checked' = true)
+let selectColumn: obj = Checkbox (checked' = true)
 
 [<SolidComponent>]
 let selectColumn2: obj =
-    {|
-        header = fun headerProps ->
-            Checkbox(
-                checked' = true,
-                indeterminate = true
-                )
-    |}
-
+    {| header = fun headerProps -> Checkbox (checked' = true, indeterminate = true) |}

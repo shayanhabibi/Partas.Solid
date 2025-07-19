@@ -1,6 +1,61 @@
 # git-cliff ~ configuration file
 # https://git-cliff.org/docs/configuration
 
+[git]
+# Exclude commits that are not matched by any commit parser.
+filter_commits = false
+# Order releases topologically instead of chronologically.
+topo_order = false
+# Order of commits in each group/release within the changelog.
+# Allowed values: newest, oldest
+sort_commits = "newest"
+
+# Parse commits according to the conventional commits specification. https://www.conventionalcommits.org
+conventional_commits = true
+filter_unconventional = false
+
+# An array of regex based parsers to modify commit messages prior to further processing.
+commit_preprocessors = [
+  # Remove issue numbers.
+  { pattern = '\((\w+\s)?#([0-9]+)\)', replace = "" },
+]
+
+# An array of regex based parsers for extracting data from the commit message.
+# Assigns commits to groups.
+# Optionally sets the commit's scope and can decide to exclude commits from further processing.
+commit_parsers = [
+    # Ignore commit if has 'changelog: ignore' in footer
+    { footer = "^changelog: ?ignore", skip = true },
+    { message = "^==", skip = true},
+    # GROUP FEATURES
+    { message = "^feat", group = "<!-- 0 -->Features" },
+    # GROUP ADDED
+    { message = "^[a|A][dd|DD]", group = "<!-- 1 -->Added" },
+    { message = "^[s|S]upport", group = "<!-- 1 -->Added" },
+    { message = "^.*: support", group = "<!-- 1 -->Added" },
+    { message = "^.*: add", group = "<!-- 1 -->Added" },
+    # GROUP REMOVED
+    { message = "^[r|R]emove", group = "<!-- 2 -->Removed" },
+    { message = "^.*: remove", group = "<!-- 2 -->Removed" },
+    { message = "^.*: delete", group = "<!-- 2 -->Removed" },
+    # GROUP CHANGED
+    { message = "^[r|R]efactor", group = "<!-- 3 -->Changed" },
+    { message = "^[u|U]pdate", group = "<!-- 3 -->Changed" },
+    { message = "^[c|C]", group = "<!-- 3 -->Changed" },
+    # GROUP DEPRECATED
+    { message = "^depr", group = "<!-- 4 -->Deprecated" },
+    { message = "^deprecate", group = "<!-- 4 -->Deprecated" },
+    # GROUP FIXED
+    { message = "^[t|T][est|EST]", group = "<!-- 5 -->Fixed" },
+    { message = "^[f|F][ix|IX]", group = "<!-- 5 -->Fixed" },
+    { message = "^.*: fix", group = "<!-- 5 -->Fixed" },
+    # GROUP DOCUMENTATION
+    { message = "^doc", group = "<!-- 6 -->Documentation" },
+    # OTHERS
+    { message = "^.*", group = "<!-- 9 -->Other", default_scope = "other" },
+]
+
+
 [changelog]
 # A Tera template to be rendered as the changelog's header.
 # See https://keats.github.io/tera/docs/#introduction
@@ -13,6 +68,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 """
 # A Tera template to be rendered for each release in the changelog.
 # See https://keats.github.io/tera/docs/#introduction
+# Tags are used instead of MarkDown to prevent Fake.Core.ReleaseNotes from incorrectly parsing
+# the assembly version
 body = """
 {%- macro remote_url() -%}
   https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}
@@ -21,11 +78,11 @@ body = """
 {% if version -%}
     ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
 {% else -%}
-    ## [Unreleased]
+    <h2>[Unreleased]</h2>
 {% endif -%}
 
 {% for group, commits in commits | group_by(attribute="group") %}
-    ### {{ group | upper_first }}
+    <h3>{{ group | upper_first }}</h3>
     {%- for commit in commits %}
         - {{ commit.message | split(pat="\n") | first | upper_first | trim }}\
             {% if commit.remote.username %} by @{{ commit.remote.username }}{%- endif -%}
@@ -36,7 +93,7 @@ body = """
 {% endfor %}
 
 {%- if github.contributors | filter(attribute="is_first_time", value=true) | length != 0 %}
-  ## New Contributors
+  <h2>New Contributors</h2>
 {%- endif -%}
 
 {% for contributor in github.contributors | filter(attribute="is_first_time", value=true) %}
@@ -45,6 +102,7 @@ body = """
       [#{{ contributor.pr_number }}]({{ self::remote_url() }}/pull/{{ contributor.pr_number }}) \
     {%- endif %}
 {%- endfor %}\n
+
 """
 # A Tera template to be rendered as the changelog's footer.
 # See https://keats.github.io/tera/docs/#introduction
@@ -68,38 +126,3 @@ footer = """
 # Remove leading and trailing whitespaces from the changelog's body.
 trim = true
 output = "./docs/RELEASE_NOTES.md"
-
-[git]
-# Parse commits according to the conventional commits specification.
-# See https://www.conventionalcommits.org
-conventional_commits = true
-# Exclude commits that do not match the conventional commits specification.
-filter_unconventional = false
-# An array of regex based parsers to modify commit messages prior to further processing.
-commit_preprocessors = [
-  # Remove issue numbers.
-  { pattern = '\((\w+\s)?#([0-9]+)\)', replace = "" },
-]
-# An array of regex based parsers for extracting data from the commit message.
-# Assigns commits to groups.
-# Optionally sets the commit's scope and can decide to exclude commits from further processing.
-commit_parsers = [
-  { message = "^[a|A]dd", group = "Added" },
-  { message = "^[s|S]upport", group = "Added" },
-  { message = "^[r|R]emove", group = "Removed" },
-  { message = "^.*: add", group = "Added" },
-  { message = "^.*: support", group = "Added" },
-  { message = "^.*: remove", group = "Removed" },
-  { message = "^.*: delete", group = "Removed" },
-  { message = "^test", group = "Fixed" },
-  { message = "^fix", group = "Fixed" },
-  { message = "^.*: fix", group = "Fixed" },
-  { message = "^.*", group = "Changed" },
-]
-# Exclude commits that are not matched by any commit parser.
-filter_commits = false
-# Order releases topologically instead of chronologically.
-topo_order = false
-# Order of commits in each group/release within the changelog.
-# Allowed values: newest, oldest
-sort_commits = "newest"

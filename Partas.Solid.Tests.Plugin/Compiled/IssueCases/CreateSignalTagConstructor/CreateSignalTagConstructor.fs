@@ -14,24 +14,25 @@ type MenuItem(title: string, url: string, icon: RegularNode) =
     member val title = title
     member val url = url
     member val icon = icon
+
 module App =
     [<Import("fakeTag", "fakeLibrary")>]
-    type [<Erase>] MyItemizer() =
+    [<Erase>]
+    type MyItemizer() =
         interface RegularNode
-        member val items: MenuItem array = unbox null with get,set
+        member val items: MenuItem array = unbox null with get, set
+
         [<SolidTypeComponent>]
-        member props.constructor =
-            div()
-    
+        member props.constructor = div ()
+
     [<SolidComponent>]
-    let App() =
-        let initialItems = [|
-            MenuItem("Home", "#", div())
-        |]
-        let (items, setItems) = createSignal(initialItems)
-        let (item, addItem) = createSignal<MenuItem>(Unchecked.defaultof<_>)
-        div() {
-            MyItemizer(items = items())
-            Imported()
-            Match()
+    let App () =
+        let initialItems = [| MenuItem ("Home", "#", div ()) |]
+        let (items, setItems) = createSignal (initialItems)
+        let (item, addItem) = createSignal<MenuItem> (Unchecked.defaultof<_>)
+
+        div () {
+            MyItemizer (items = items ())
+            Imported ()
+            Match ()
         }

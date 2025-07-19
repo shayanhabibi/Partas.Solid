@@ -9,7 +9,7 @@ open Partas.Solid.Experimental.U
 
 [<SolidComponent>]
 let CssPropStyleTest () =
-    div().style' [
-        Style.backgroundColor Color.Slategray
-        "--custom-var" ==> "Chocolate"
-    ]
+    div().style'
+        [ Style.backgroundColor Color.Slategray
+          "--custom-var"
+          ==> "Chocolate" ]

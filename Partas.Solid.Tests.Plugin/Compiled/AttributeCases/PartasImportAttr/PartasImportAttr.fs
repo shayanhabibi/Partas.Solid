@@ -8,8 +8,6 @@ open Fable.Core
 [<Erase>]
 type PartasImportAttr() =
     interface VoidNode
+
     [<SolidTypeComponentAttribute>]
-    member props.constructor =
-        Router() {
-            Route()
-        }
+    member props.constructor = Router () { Route () }

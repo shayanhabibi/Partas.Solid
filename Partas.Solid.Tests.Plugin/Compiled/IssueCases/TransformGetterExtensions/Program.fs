@@ -15,7 +15,7 @@ module rec Types =
 
     [<AllowNullLiteral; Interface>]
     type TableRenderProp<'Data> = interface end
-        
+
     [<AllowNullLiteral; Interface>]
     type ColumnRenderProp<'Data> = interface end
 
@@ -39,14 +39,14 @@ module rec Types =
         inherit ColumnRenderProp<'Data>
 
     [<AllowNullLiteral; Interface>]
-    type CellRenderProps<'Data> = 
+    type CellRenderProps<'Data> =
         inherit TableRenderProp<'Data>
         inherit RowRenderProp<'Data>
         inherit ColumnRenderProp<'Data>
         inherit CellRenderProp<'Data>
         abstract member getValue: ((unit -> obj)) with get
         abstract member renderValue: ((unit -> obj)) with get
-        
+
     [<AllowNullLiteral; JS.Pojo>]
     type ColumnDef<'Data>
         (
@@ -67,13 +67,13 @@ module rec Types =
         /// An accessor column is created with an object key accessor<br/>
         /// The column header is defined as a string<br/>
         /// </summary>
-        member val id: string = id.Value with get,set
+        member val id: string = id.Value with get, set
         /// The key of the row object to use when extracting the value for the column.
-        member val accessorKey: string = accessorKey.Value with get,set
+        member val accessorKey: string = accessorKey.Value with get, set
         /// The accessor function to use when extracting the value for the column from each row.
-        member val accessorFn: ('Data * int -> obj) = accessorFn.Value with get,set
+        member val accessorFn: ('Data * int -> obj) = accessorFn.Value with get, set
         /// The child column defs to include in a group column.
-        member val columns: 'Data[] = columns.Value with get,set
+        member val columns: 'Data[] = columns.Value with get, set
         /// <summary>
         /// The header to display for the column. If a string is passed, it can be used as a default for the column ID. If a function is passed, it will be passed a props object for the header and should return the rendered header value (the exact type depends on the adapter being used).
         /// <code>
@@ -86,7 +86,7 @@ module rec Types =
         ///     }) => unknown)
         /// </code>
         /// </summary>
-        member val header: HeaderRenderProps<'Data> -> obj = header.Value with get,set
+        member val header: HeaderRenderProps<'Data> -> obj = header.Value with get, set
         /// <summary>
         /// The footer to display for the column. If a function is passed, it will be passed a props object for the footer and should return the rendered footer value (the exact type depends on the adapter being used).
         /// <code>
@@ -99,7 +99,7 @@ module rec Types =
         ///     }) => unknown)
         /// </code>
         /// </summary>
-        member val footer: FooterRenderProps<'Data> -> obj = footer.Value with get,set
+        member val footer: FooterRenderProps<'Data> -> obj = footer.Value with get, set
         /// <summary>
         /// The cell to display each row for the column. If a function is passed, it will be passed a props object for the cell and should return the rendered cell value (the exact type depends on the adapter being used).
         /// <code>
@@ -115,11 +115,11 @@ module rec Types =
         ///     }) => unknown)
         /// </code>
         /// </summary>
-        member val cell: CellRenderProps<'Data> -> obj = cell.Value with get,set
-        member val meta: obj = meta.Value with get,set
+        member val cell: CellRenderProps<'Data> -> obj = cell.Value with get, set
+        member val meta: obj = meta.Value with get, set
 
 
-    [<AllowNullLiteral;Interface>]
+    [<AllowNullLiteral; Interface>]
     type TableState =
         inherit VisibilityTableState
         inherit ColumnOrderTableState
@@ -131,12 +131,12 @@ module rec Types =
         inherit ColumnSizingTableState
         inherit PaginationTableState
         inherit RowSelectionTableState
-    
+
     type Updater<'T> = U2<('T -> 'T), 'T>
 
-    [<AllowNullLiteral;Interface>]
+    [<AllowNullLiteral; Interface>]
     type TableFeature = interface end
-        
+
     [<JS.Pojo>]
     type TableOptions<'Data>
         (
@@ -158,30 +158,30 @@ module rec Types =
             ?getSubRows: 'Data * int -> 'Data[],
             ?getRowId: 'Data * int * Row<'Data> -> string
         ) =
-        member val data: 'Data[] option = data with get,set
-        member val columns: ColumnDef<'Data>[] option = columns with get,set
-        member val defaultColumn: ColumnDef<'Data> option = defaultColumn with get,set
-        member val initialState: TableState option = initialState with get,set
-        member val autoResetAll: bool option = autoResetAll with get,set
-        member val meta: obj option = meta with get,set
-        member val state: TableState option = state with get,set
-        member val onStateChange: (Updater<'Data> -> unit) option = onStateChange with get,set
-        member val debugAll: bool option = debugAll with get,set
-        member val debugTable: bool option = debugTable with get,set
-        member val debugHeaders: bool option = debugHeaders with get,set
-        member val debugColumns: bool option = debugColumns with get,set
-        member val debugRows: bool option = debugRows with get,set
-        member val _features: TableFeature[] option = _features with get,set
-        member val getCoreRowModel: ((TableOptions<'Data> -> unit) -> RowModel<'Data>) option = getCoreRowModel with get,set 
-        member val getSubRows: ('Data * int -> 'Data[]) option = getSubRows with get,set
-        member val getRowId: ('Data * int * Row<'Data> -> string) option = getRowId with get,set
+        member val data: 'Data[] option = data with get, set
+        member val columns: ColumnDef<'Data>[] option = columns with get, set
+        member val defaultColumn: ColumnDef<'Data> option = defaultColumn with get, set
+        member val initialState: TableState option = initialState with get, set
+        member val autoResetAll: bool option = autoResetAll with get, set
+        member val meta: obj option = meta with get, set
+        member val state: TableState option = state with get, set
+        member val onStateChange: (Updater<'Data> -> unit) option = onStateChange with get, set
+        member val debugAll: bool option = debugAll with get, set
+        member val debugTable: bool option = debugTable with get, set
+        member val debugHeaders: bool option = debugHeaders with get, set
+        member val debugColumns: bool option = debugColumns with get, set
+        member val debugRows: bool option = debugRows with get, set
+        member val _features: TableFeature[] option = _features with get, set
+        member val getCoreRowModel: ((TableOptions<'Data> -> unit) -> RowModel<'Data>) option = getCoreRowModel with get, set
+        member val getSubRows: ('Data * int -> 'Data[]) option = getSubRows with get, set
+        member val getRowId: ('Data * int * Row<'Data> -> string) option = getRowId with get, set
 
     [<AllowNullLiteral; Interface>]
     type RowModel<'Data> =
-        abstract member rows: Row<'Data>[] with get,set
-        abstract member flatRows: Row<'Data>[] with get,set
-        abstract member rowsById: System.Collections.Generic.IDictionary<string, Row<'Data>> with get,set
-        
+        abstract member rows: Row<'Data>[] with get, set
+        abstract member flatRows: Row<'Data>[] with get, set
+        abstract member rowsById: System.Collections.Generic.IDictionary<string, Row<'Data>> with get, set
+
     [<AllowNullLiteral; Interface>]
     type Table<'Data> =
         /// This is the resolved initial state of the table.
@@ -229,8 +229,8 @@ module rec Types =
         abstract member getFlatHeaders: (unit -> Header<'Data>[]) with get
         /// Returns a flattened array of leaf-node Header objects for the table.
         abstract member getLeafHeaders: (unit -> Header<'Data>[]) with get
-     
-    [<AllowNullLiteral;Interface>]
+
+    [<AllowNullLiteral; Interface>]
     type Column<'Data> =
         /// <summary>
         /// The resolved unique identifier for the column resolved in this priority:
@@ -255,31 +255,31 @@ module rec Types =
         abstract member getFlatColumns: (unit -> Column<'Data>[]) with get
         /// Returns an array of all leaf-node columns for this column. If a column has no children, it is considered the only leaf-node column.
         abstract member getLeafColumns: (unit -> Column<'Data>[]) with get
-        
-    [<AllowNullLiteral;Interface>]
+
+    [<AllowNullLiteral; Interface>]
     type HeaderGroup<'Data> =
         /// The unique identifier for the header group.
-        abstract member id: string with get,set
+        abstract member id: string with get, set
         /// The depth of the header group, zero-indexed based.
-        abstract member depth: int with get,set
+        abstract member depth: int with get, set
         /// An array of Header objects that belong to this header group
-        abstract member headers: Header<'Data>[] with get,set
-     
-    [<AllowNullLiteral;Interface>]
+        abstract member headers: Header<'Data>[] with get, set
+
+    [<AllowNullLiteral; Interface>]
     type Header<'Data, 'Value> =
         inherit Header<'Data>
 
-    [<AllowNullLiteral;Interface>]
+    [<AllowNullLiteral; Interface>]
     type Column<'Data, 'Value> =
         inherit Column<'Data>
 
-    [<AllowNullLiteral;Interface>]
+    [<AllowNullLiteral; Interface>]
     type HeaderContext<'Data, 'Value> =
-        abstract member table: TableOptions<'Data> with get,set
-        abstract member header: Header<'Data, 'Value> with get,set
-        abstract member column: Column<'Data, 'Value> with get,set
+        abstract member table: TableOptions<'Data> with get, set
+        abstract member header: Header<'Data, 'Value> with get, set
+        abstract member column: Column<'Data, 'Value> with get, set
 
-    [<AllowNullLiteral;Interface>]
+    [<AllowNullLiteral; Interface>]
     type Header<'Data> =
         /// The unique identifier for the header.
         abstract member id: string with get
@@ -310,45 +310,47 @@ module rec Types =
         /// flexRender(header.column.columnDef.header, header.getContext())
         /// </code></example>
         abstract member getContext: (unit -> HeaderContext<'Data, obj>) with get
+
     [<Erase; AutoOpen>]
     module Header =
         type Table<'Data> with
             /// Returns all header groups for the table.
-            member _.getHeaderGroups with get(): (unit -> HeaderGroup<'Data>[]) = unbox null
+            member _.getHeaderGroups: (unit -> HeaderGroup<'Data>[]) = unbox null
             /// If pinning, returns the header groups for the left pinned columns.
-            member _.getLeftHeaderGroups with get(): (unit -> HeaderGroup<'Data>[]) = unbox null
+            member _.getLeftHeaderGroups: (unit -> HeaderGroup<'Data>[]) = unbox null
             /// If pinning, returns the header groups for columns that are not pinned.
-            member _.getCenterHeaderGroups with get(): (unit -> HeaderGroup<'Data>[]) = unbox null
+            member _.getCenterHeaderGroups: (unit -> HeaderGroup<'Data>[]) = unbox null
             /// If pinning, returns the header groups for the right pinned columns.
-            member _.getRightHeaderGroups with get(): (unit -> HeaderGroup<'Data>[]) = unbox null
-        
+            member _.getRightHeaderGroups: (unit -> HeaderGroup<'Data>[]) = unbox null
+
             /// Returns all footer groups for the table.
-            member _.getFooterGroups with get(): (unit -> HeaderGroup<'Data>[]) = unbox null
+            member _.getFooterGroups: (unit -> HeaderGroup<'Data>[]) = unbox null
             /// If pinning, returns the footer groups for the left pinned columns.
-            member _.getLeftFooterGroups with get(): (unit -> HeaderGroup<'Data>[]) = unbox null
+            member _.getLeftFooterGroups: (unit -> HeaderGroup<'Data>[]) = unbox null
             /// If pinning, returns the footer groups for columns that are not pinned.
-            member _.getCenterFooterGroups with get(): (unit -> HeaderGroup<'Data>[]) = unbox null
+            member _.getCenterFooterGroups: (unit -> HeaderGroup<'Data>[]) = unbox null
             /// If pinning, returns the footer groups for the right pinned columns.
-            member _.getRightFooterGroups with get(): (unit -> HeaderGroup<'Data>[]) = unbox null
-        
+            member _.getRightFooterGroups: (unit -> HeaderGroup<'Data>[]) = unbox null
+
             /// Returns headers for all columns in the table, including parent headers.
-            member _.getFlatHeaders with get(): (unit -> Header<'Data, obj>[]) = unbox null
+            member _.getFlatHeaders: (unit -> Header<'Data, obj>[]) = unbox null
             /// If pinning, returns headers for all left pinned columns in the table, including parent headers.
-            member _.getLeftFlatHeaders with get(): (unit -> Header<'Data, obj>[]) = unbox null
+            member _.getLeftFlatHeaders: (unit -> Header<'Data, obj>[]) = unbox null
             /// If pinning, returns headers for all columns that are not pinned, including parent headers.
-            member _.getCenterFlatHeaders with get(): (unit -> Header<'Data, obj>[]) = unbox null
+            member _.getCenterFlatHeaders: (unit -> Header<'Data, obj>[]) = unbox null
             /// If pinning, returns headers for all right pinned columns in the table, including parent headers.
-            member _.getRightFlatHeaders with get(): (unit -> Header<'Data, obj>[]) = unbox null
-        
+            member _.getRightFlatHeaders: (unit -> Header<'Data, obj>[]) = unbox null
+
             /// Returns headers for all leaf columns in the table, (not including parent headers).
-            member _.getLeafHeaders with get(): (unit -> Header<'Data, obj>[]) = unbox null
+            member _.getLeafHeaders: (unit -> Header<'Data, obj>[]) = unbox null
             /// If pinning, returns headers for all left pinned leaf columns in the table, (not including parent headers).
-            member _.getLeftLeafHeaders with get(): (unit -> Header<'Data, obj>[]) = unbox null
+            member _.getLeftLeafHeaders: (unit -> Header<'Data, obj>[]) = unbox null
             /// If pinning, returns headers for all columns that are not pinned, (not including parent headers).
-            member _.getCenterLeafHeaders with get(): (unit -> Header<'Data, obj>[]) = unbox null
+            member _.getCenterLeafHeaders: (unit -> Header<'Data, obj>[]) = unbox null
             /// If pinning, returns headers for all right pinned leaf columns in the table, (not including parent headers).
-            member _.getRightLeafHeaders with get(): (unit -> Header<'Data, obj>[]) = unbox null
-    [<AllowNullLiteral;Interface>]
+            member _.getRightLeafHeaders: (unit -> Header<'Data, obj>[]) = unbox null
+
+    [<AllowNullLiteral; Interface>]
     type Row<'Data> =
         /// The resolved unique identifier for the row resolved via the options.getRowId option. Defaults to the row's index (or relative index if it is a subRow)
         abstract member id: string with get
@@ -380,21 +382,21 @@ module rec Types =
         /// Returns all of the Cells for the row.
         abstract member getAllCells: (unit -> Cell<'Data>[]) with get
 
-    [<AllowNullLiteral;Interface>]
+    [<AllowNullLiteral; Interface>]
     type CellContext<'Data, 'Value> =
         inherit TableRenderProp<'Data>
         inherit RowRenderProp<'Data>
-        abstract member column: Column<'Data, 'Value> with get,set
-        abstract member cell: Cell<'Data, 'Value> with get,set
-        abstract member getValue: (unit -> 'Value) with get,set
-        abstract member renderValue: (unit -> 'Value option) with get,set
-       
-    [<AllowNullLiteral;Interface>]
+        abstract member column: Column<'Data, 'Value> with get, set
+        abstract member cell: Cell<'Data, 'Value> with get, set
+        abstract member getValue: (unit -> 'Value) with get, set
+        abstract member renderValue: (unit -> 'Value option) with get, set
+
+    [<AllowNullLiteral; Interface>]
     type Cell<'Data, 'Value> =
         inherit Cell<'Data>
 
 
-    [<AllowNullLiteral;Interface>]
+    [<AllowNullLiteral; Interface>]
     type Cell<'Data> =
         /// The unique ID for the cell across the entire table.
         abstract member id: string with get
@@ -413,96 +415,106 @@ module rec Types =
         /// </summary>
         /// <example>
         /// <code>flexRender(cell.column.columnDef.cell, cell.getContext())</code>
-        /// </example> 
+        /// </example>
         abstract member getContext: CellContext<'Data, obj> with get
 
-    
+
     [<AllowNullLiteral; Interface>]
     type FilterFnProps<'Data> =
         abstract member row: Row<'Data> with get
         abstract member columnId: string with get
         abstract member filterValue: obj with get
         abstract member addMeta: (obj -> unit) with get
+
     [<AutoOpen; Erase>]
     module States =
         [<AllowNullLiteral; Interface>]
         type VisibilityTableState = interface end
-        type VisibilityState = Map<string, bool>
-        
-        
 
-        [<AllowNullLiteral;Interface>]
+        type VisibilityState = Map<string, bool>
+
+
+
+        [<AllowNullLiteral; Interface>]
         type ColumnOrderTableState = interface end
+
         [<AllowNullLiteral; Erase>]
         type ColumnPinningTableState = interface end
-        [<AllowNullLiteral;Interface>]
+
+        [<AllowNullLiteral; Interface>]
         type FiltersTableState = interface end
-        
+
         [<StringEnum>]
         type SortDirection =
             | Asc
             | Desc
+
         [<Interface; AllowNullLiteral>]
         type SortingTableState = interface end
-            
+
         [<Pojo>]
         type ColumnSort(id: string, desc: bool) =
-            member val id = id with get,set
-            member val desc = desc with get,set
+            member val id = id with get, set
+            member val desc = desc with get, set
+
         type SortingState = ColumnSort[]
-        
-        
+
+
         [<Interface; AllowNullLiteral>]
         type ExpandedTableState = interface end
-        
+
         [<StringEnum>]
         type ExpandedState = U2<bool, Map<string, bool>>
-        
-        
-        
+
+
+
         [<AllowNullLiteral; Interface>]
         type GroupingTableState = interface end
-        
+
         type GroupingState = string[]
-        
-        
+
+
         [<AllowNullLiteral; Interface>]
         type PaginationTableState = interface end
-        
+
         [<Pojo>]
         type PaginationState(pageIndex: int, pageSize: int) =
-            member val pageIndex = pageIndex with get,set
-            member val pageSize = pageSize with get,set
-        
+            member val pageIndex = pageIndex with get, set
+            member val pageSize = pageSize with get, set
+
         [<AllowNullLiteral; Interface>]
         type PaginationInitialTableState = interface end
-        
-        
+
+
         [<AllowNullLiteral; Interface>]
         type RowSelectionTableState = interface end
+
         type RowSelectionState = Map<string, bool>
-        
-        
-        
-        [<AllowNullLiteral;Interface>]
+
+
+
+        [<AllowNullLiteral; Interface>]
         type OnChangeFn<'State> = interface end
-        
+
         [<StringEnum>]
         type ColumnPinningPosition =
             | [<CompiledValue(false)>] False
             | Left
             | Right
+
         [<JS.Pojo>]
         type ColumnPinningState(?left: string[], ?right: string[]) =
-            member val left = left with get,set
-            member val right = right with get,set
-        
+            member val left = left with get, set
+            member val right = right with get, set
+
         [<AllowNullLiteral; Interface>]
         type ColumnSizingTableState = interface end
+
         type ColumnSizingState = Map<string, int>
-        
+
         [<Pojo>]
-        type ColumnSizingInfoState(
+        type ColumnSizingInfoState
+            (
                 ?startOffset: int,
                 ?startSize: int,
                 ?deltaOffset: int,
@@ -510,105 +522,117 @@ module rec Types =
                 ?isResizingColumn: string,
                 ?columnSizingStart: (string * int)[]
             ) =
-            member val startOffset = startOffset with get,set
-            member val startSize = startSize with get,set
-            member val deltaOffset = deltaOffset with get,set
-            member val deltaPercentage = deltaPercentage with get,set
-            member val isResizingColumn = isResizingColumn with get,set
-            member val columnSizingStart = columnSizingStart with get,set
-            
+            member val startOffset = startOffset with get, set
+            member val startSize = startSize with get, set
+            member val deltaOffset = deltaOffset with get, set
+            member val deltaPercentage = deltaPercentage with get, set
+            member val isResizingColumn = isResizingColumn with get, set
+            member val columnSizingStart = columnSizingStart with get, set
+
         [<Pojo>]
-        type GlobalFilterTableState(globalFilter: obj) = member val globalFilter = globalFilter with get,set
+        type GlobalFilterTableState(globalFilter: obj) =
+            member val globalFilter = globalFilter with get, set
+
         [<AllowNullLiteral; Interface>]
         type GlobalFilterState = interface end
-        
+
         [<Pojo>]
-        type RowPinningRowState(rowPinning: RowPinningState) = member val rowPinning = rowPinning with get,set
+        type RowPinningRowState(rowPinning: RowPinningState) =
+            member val rowPinning = rowPinning with get, set
+
         [<Pojo>]
-        type RowPinningState(
-                ?top: string[],
-                ?bottom: string[]
-            ) =
-            member val top = top with get,set
-            member val bottom = bottom with get,set
-        
+        type RowPinningState(?top: string[], ?bottom: string[]) =
+            member val top = top with get, set
+            member val bottom = bottom with get, set
+
         [<StringEnum>]
         type RowPinningPosition =
             | [<CompiledValue(false)>] False
             | Top
             | Bottom
-            
-            
+
+
 [<AutoOpen>]
 module TanStack =
     [<Import("createSolidTable", "@tanstack/solid-table")>]
-    let createTable<'Data>(options: TableOptions<'Data>): Table<'Data> = jsNative
+    let createTable<'Data> (options: TableOptions<'Data>) : Table<'Data> = jsNative
+
     [<Import("getCoreRowModel", "@tanstack/solid-table")>]
-    let getCoreRowModel<'Data>(): CoreRowModel<'Data> = jsNative
+    let getCoreRowModel<'Data> () : CoreRowModel<'Data> = jsNative
+
     [<Import("flexRender", "@tanstack/solid-table")>]
-    let flexRender<'Data>([<ParamArray>] values): HtmlElement = jsNative
+    let flexRender<'Data> ([<ParamArray>] values) : HtmlElement = jsNative
 
     type HeaderRenderProp<'Data> with
         member _.header
-            with set(value: Header<'Data>) = ()
-            and get(): Header<'Data> = unbox null
+            with set (value: Header<'Data>) = ()
+            and get (): Header<'Data> = unbox null
+
     type TableRenderProp<'Data> with
         member _.table
-            with set(value: TableOptions<'Data>) = ()
-            and get(): TableOptions<'Data> = unbox null
+            with set (value: TableOptions<'Data>) = ()
+            and get (): TableOptions<'Data> = unbox null
+
     type ColumnRenderProp<'Data> with
         member _.column
-            with set(value: Column<'Data>) = ()
-            and get() = unbox null
+            with set (value: Column<'Data>) = ()
+            and get () = unbox null
+
     type RowRenderProp<'Data> with
         member _.row
-            with set(value: Row<'Data>) = ()
-            and get() = unbox null
+            with set (value: Row<'Data>) = ()
+            and get () = unbox null
+
     type CellRenderProp<'Data> with
         member _.cell
-            with set(value: Cell<'Data>) = ()
-            and get() = unbox null
+            with set (value: Cell<'Data>) = ()
+            and get () = unbox null
+
     type VisibilityTableState with
         member _.columnVisibility
-            with set(value: VisibilityState) = ()
-            and get(): VisibilityState = unbox null
+            with set (value: VisibilityState) = ()
+            and get (): VisibilityState = unbox null
+
     type ColumnPinningTableState with
         member _.columnPinning
-            with set(value: ColumnPinningState) = ()
-            and get(): ColumnPinningState = unbox null
+            with set (value: ColumnPinningState) = ()
+            and get (): ColumnPinningState = unbox null
+
     type SortingTableState with
         member _.sorting
-            with set(value: SortingState) = ()
-            and get(): SortingState = unbox null
-    
+            with set (value: SortingState) = ()
+            and get (): SortingState = unbox null
+
     type ExpandedTableState with
         member _.expanded
-            with set(value: ExpandedState) = ()
-            and get(): ExpandedState = unbox null
-    
+            with set (value: ExpandedState) = ()
+            and get (): ExpandedState = unbox null
+
     type GroupingTableState with
         member _.grouping
-            with set(value: GroupingState) = ()
-            and get(): GroupingState = unbox null
-    
+            with set (value: GroupingState) = ()
+            and get (): GroupingState = unbox null
+
     type PaginationTableState with
         member _.pagination
-            with set(value: PaginationState) = ()
-            and get(): PaginationState = unbox null
-    
+            with set (value: PaginationState) = ()
+            and get (): PaginationState = unbox null
+
     type PaginationInitialTableState with
         member _.pagination
-            with set(value: PaginationState option) = ()
-            and get(): PaginationState option = unbox null
-    
+            with set (value: PaginationState option) = ()
+            and get (): PaginationState option = unbox null
+
     type RowSelectionTableState with
         member _.rowSelection
-            with set(value: RowSelectionState) = ()
-            and get(): RowSelectionState = unbox null
+            with set (value: RowSelectionState) = ()
+            and get (): RowSelectionState = unbox null
+
     type ColumnSizingTableState with
         member _.columnSizing
-            with set(value: ColumnSizingState) = ()
-            and get(): ColumnSizingState = unbox null
+            with set (value: ColumnSizingState) = ()
+            and get (): ColumnSizingState = unbox null
+
         member _.columnSizingInfo
-            with set(value: ColumnSizingInfoState) = ()
-            and get(): ColumnSizingInfoState = unbox null
+            with set (value: ColumnSizingInfoState) = ()
+            and get (): ColumnSizingInfoState = unbox null

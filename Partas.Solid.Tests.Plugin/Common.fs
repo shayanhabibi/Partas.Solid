@@ -13,6 +13,7 @@ let platformShell =
 
 let buildCases () =
     let dir = $"{__SOURCE_DIRECTORY__}/Compiled/"
+
     cli {
         Shell platformShell
         WorkingDirectory dir
@@ -25,9 +26,14 @@ let buildCases () =
 
 let runCase folderName caseName =
     let dir = $"{__SOURCE_DIRECTORY__}/Compiled/{folderName}"
-    let readLinesOf = fun (s: string) ->
-        File.ReadAllLines($"{dir}/{caseName}/{caseName}{s}")
-        |> Array.filter ((<>) "")
+
+    let readLinesOf =
+        fun (s: string) ->
+            File.ReadAllLines ($"{dir}/{caseName}/{caseName}{s}")
+            |> Array.filter ((<>) "")
+
     let result = readLinesOf ".fs.jsx"
     let expected = readLinesOf ".expected"
-    result |> shouldEqual expected
+
+    result
+    |> shouldEqual expected

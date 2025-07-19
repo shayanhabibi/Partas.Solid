@@ -28,13 +28,8 @@ type Polymorph =
 type PolymorphicExtensions =
     /// For Kobalte or other supporting libraries
     [<Erase; Extension>]
-    static member as'<'Base when 'Base :> Polymorph> (
-            this: 'Base,
-            morph: #HtmlTag
-        ): 'Base = this
+    static member as'<'Base when 'Base :> Polymorph>(this: 'Base, morph: #HtmlTag) : 'Base = this
+
     /// For Kobalte or other supporting libraries
     [<Erase; Extension>]
-    static member as'<'Base when 'Base :> Polymorph > (
-            this: 'Base,
-            morph: TagValue
-        ): 'Base = this
+    static member as'<'Base when 'Base :> Polymorph>(this: 'Base, morph: TagValue) : 'Base = this

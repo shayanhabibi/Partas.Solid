@@ -9,12 +9,12 @@ open Fable.Core.JS
 [<Erase>]
 type PartasTable<'Data>() =
     interface RegularNode
+
     [<Erase>]
-    member val dataStack: DataStack<'Data> = undefined with get,set
+    member val dataStack: DataStack<'Data> = undefined with get, set
+
     [<SolidTypeComponent>]
     member props.__ =
 
-        let options =
-            TableOptions<'Data>(
-            )   .data(fun () -> props.dataStack.data)
-        div()
+        let options = TableOptions<'Data>().data (fun () -> props.dataStack.data)
+        div ()

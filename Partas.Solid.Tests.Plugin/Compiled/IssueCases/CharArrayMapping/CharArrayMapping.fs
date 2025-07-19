@@ -6,8 +6,14 @@ open Fable.Core
 [<Erase>]
 type WordRotate() =
     inherit div()
-    [<Erase>] member val words: string = unbox null with get,set
+
+    [<Erase>]
+    member val words: string = unbox null with get, set
+
     [<SolidTypeComponentAttribute>]
     member props.constructor =
-        For(each = (props.words.ToCharArray() |> Array.map string))
-
+        For (
+            each =
+                (props.words.ToCharArray ()
+                 |> Array.map string)
+        )

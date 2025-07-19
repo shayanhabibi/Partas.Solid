@@ -3,22 +3,23 @@
 open Partas.Solid
 open Fable.Core
 
-type [<Erase>] MyTag() =
+[<Erase>]
+type MyTag() =
     interface RegularNode
-    [<SolidTypeComponent>]
-    member props.typeDef =
-        div()
 
-type [<Erase>] TagWithProp() =
+    [<SolidTypeComponent>]
+    member props.typeDef = div ()
+
+[<Erase>]
+type TagWithProp() =
     interface RegularNode
-    [<SolidTypeComponent>]
-    member props.typeDef =
-        div(class' = "SomeClass")
 
-type [<Erase>] TagWithProps() =
+    [<SolidTypeComponent>]
+    member props.typeDef = div (class' = "SomeClass")
+
+[<Erase>]
+type TagWithProps() =
     interface RegularNode
+
     [<SolidTypeComponent>]
-    member props.typeDef =
-        div(class' = "SomeClass", draggable = "drag")
-
-
+    member props.typeDef = div (class' = "SomeClass", draggable = "drag")

@@ -5,26 +5,30 @@ open Fable.Core
 open Partas.Solid.Tests.Shared.LibraryImport
 
 
-type [<Erase>] MyTag() =
+[<Erase>]
+type MyTag() =
     interface RegularNode
-    [<SolidTypeComponent>]
-    member props.typeDef =
-        Imported()
 
-type [<Erase>] MyOtherTag() =
-    interface RegularNode
     [<SolidTypeComponent>]
-    member props.typeDef =
-        CustomTag()
-        
-type [<Erase>] ImportedTagWithProps() =
-    interface RegularNode
-    [<SolidTypeComponent>]
-    member props.typeDef =
-        Imported(class' = "Test props")
+    member props.typeDef = Imported ()
 
-type [<Erase>] UserTagWithProps() =
+[<Erase>]
+type MyOtherTag() =
     interface RegularNode
+
     [<SolidTypeComponent>]
-    member props.typeDef =
-        CustomTag(class' = "test bops")
+    member props.typeDef = CustomTag ()
+
+[<Erase>]
+type ImportedTagWithProps() =
+    interface RegularNode
+
+    [<SolidTypeComponent>]
+    member props.typeDef = Imported (class' = "Test props")
+
+[<Erase>]
+type UserTagWithProps() =
+    interface RegularNode
+
+    [<SolidTypeComponent>]
+    member props.typeDef = CustomTag (class' = "test bops")
