@@ -4,7 +4,39 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Partas.Solid", "Partas.Soli
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Partas.Solid.FablePlugin", "Partas.Solid.FablePlugin\Partas.Solid.FablePlugin.fsproj", "{1AE69025-B907-4C3A-AB48-0093DB5070A4}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Partas.Solid.Tests", "Partas.Solid.Tests\Partas.Solid.Tests.fsproj", "{C08FF805-9A5B-4529-B78A-AC7C67F0DFF8}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ScratchTests", "ScratchTests\ScratchTests.fsproj", "{D37CEC92-48BD-4872-8D8B-66721E37E85F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{18D88D48-EDE5-4FB6-8BC4-BE6602CA3871}"
+				ProjectSection(SolutionItems) = preProject
+								build.fsx = build.fsx
+				EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{44C0FC57-5623-45D9-8E50-84717E7246CA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C9A5BC5B-8F6C-4565-A278-58DC93F4C2E2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6B45F8BE-1215-4F84-A7F6-50227F03A938}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		.github\workflows\package.yml = .github\workflows\package.yml
+		.github\ISSUE_TEMPLATE\bug-report---plugin-compilation.md = .github\ISSUE_TEMPLATE\bug-report---plugin-compilation.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".environment", ".environment", "{6C4442D5-CCA1-4419-853E-04F17CF40674}"
+				ProjectSection(SolutionItems) = preProject
+								.gitignore = .gitignore
+								LICENSE.txt = LICENSE.txt
+								README.md = README.md
+					.editorconfig = .editorconfig
+					.config/dotnet-tools.json = .config/dotnet-tools.json
+					docs/RELEASE_NOTES.md = docs/RELEASE_NOTES.md
+					cliff.toml = cliff.toml
+					.cliffignore = .cliffignore
+				EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Partas.Solid.Tests.Core", "Partas.Solid.Tests.Core\Partas.Solid.Tests.Core.fsproj", "{B3D8EF27-8A7F-46A9-9E71-3AD47B666C60}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Partas.Solid.Tests.Plugin", "Partas.Solid.Tests.Plugin\Partas.Solid.Tests.Plugin.fsproj", "{3C3EE6AA-E4DB-4852-BBC9-620A3FD48CB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,13 +52,28 @@ Global
 		{1AE69025-B907-4C3A-AB48-0093DB5070A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AE69025-B907-4C3A-AB48-0093DB5070A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AE69025-B907-4C3A-AB48-0093DB5070A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C08FF805-9A5B-4529-B78A-AC7C67F0DFF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C08FF805-9A5B-4529-B78A-AC7C67F0DFF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C08FF805-9A5B-4529-B78A-AC7C67F0DFF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C08FF805-9A5B-4529-B78A-AC7C67F0DFF8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{107B9E6E-5EF2-4ECA-91F1-11D3A7940D4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{107B9E6E-5EF2-4ECA-91F1-11D3A7940D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{107B9E6E-5EF2-4ECA-91F1-11D3A7940D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{107B9E6E-5EF2-4ECA-91F1-11D3A7940D4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D37CEC92-48BD-4872-8D8B-66721E37E85F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D37CEC92-48BD-4872-8D8B-66721E37E85F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D37CEC92-48BD-4872-8D8B-66721E37E85F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D37CEC92-48BD-4872-8D8B-66721E37E85F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3D8EF27-8A7F-46A9-9E71-3AD47B666C60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3D8EF27-8A7F-46A9-9E71-3AD47B666C60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3D8EF27-8A7F-46A9-9E71-3AD47B666C60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3D8EF27-8A7F-46A9-9E71-3AD47B666C60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C3EE6AA-E4DB-4852-BBC9-620A3FD48CB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C3EE6AA-E4DB-4852-BBC9-620A3FD48CB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C3EE6AA-E4DB-4852-BBC9-620A3FD48CB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C3EE6AA-E4DB-4852-BBC9-620A3FD48CB4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2360B137-35B4-4CC8-A004-E19DEC1D5759} = {44C0FC57-5623-45D9-8E50-84717E7246CA}
+		{1AE69025-B907-4C3A-AB48-0093DB5070A4} = {44C0FC57-5623-45D9-8E50-84717E7246CA}
+		{D37CEC92-48BD-4872-8D8B-66721E37E85F} = {C9A5BC5B-8F6C-4565-A278-58DC93F4C2E2}
+		{B3D8EF27-8A7F-46A9-9E71-3AD47B666C60} = {C9A5BC5B-8F6C-4565-A278-58DC93F4C2E2}
+		{3C3EE6AA-E4DB-4852-BBC9-620A3FD48CB4} = {C9A5BC5B-8F6C-4565-A278-58DC93F4C2E2}
 	EndGlobalSection
 EndGlobal

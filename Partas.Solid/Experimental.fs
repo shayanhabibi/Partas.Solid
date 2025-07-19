@@ -17,11 +17,19 @@ open Fable.Core
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type NullLambdaBuilder() =
-    member inline _.Return(x) = fun () -> x
-    member inline _.Bind(m,f) = fun () -> f (m()) ()
+    member inline _.Return(x) =
+        fun () -> x
+
+    member inline _.Bind(m, f) =
+        fun () -> f (m ()) ()
+
     member inline _.Zero() = ignore
     member inline _.Delay(f) = f
-    member inline _.Combine([<InlineIfLambda>] PARTAS_FIRST: 'T -> unit,[<InlineIfLambda>] PARTAS_SECOND) = fun () -> PARTAS_FIRST(); PARTAS_SECOND()
+
+    member inline _.Combine([<InlineIfLambda>] PARTAS_FIRST: 'T -> unit, [<InlineIfLambda>] PARTAS_SECOND) =
+        fun () ->
+            PARTAS_FIRST ()
+            PARTAS_SECOND ()
 
 /// <summary>
 /// Lambdas that take null parameters and return a type are common enough to build
@@ -30,66 +38,112 @@ type NullLambdaBuilder() =
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type BaseLambdaBuilder() =
-    member inline _.Return(x) = fun () -> x
-    member inline _.Bind(m,f) = fun () -> f (m()) ()
+    member inline _.Return(x) =
+        fun () -> x
+
+    member inline _.Bind(m, f) =
+        fun () -> f (m ()) ()
+
     member inline _.Delay(f) = f
-    member inline _.Combine([<InlineIfLambda>] PARTAS_FIRST: 'T -> unit,[<InlineIfLambda>] PARTAS_SECOND) = ignore PARTAS_FIRST; PARTAS_SECOND()
-    member inline _.Yield(PARTAS_VALUE) = PARTAS_VALUE
+
+    member inline _.Combine([<InlineIfLambda>] PARTAS_FIRST: 'T -> unit, [<InlineIfLambda>] PARTAS_SECOND) =
+        ignore PARTAS_FIRST
+        PARTAS_SECOND ()
+
+    member inline _.Yield(PARTAS_VALUE) =
+        PARTAS_VALUE
 
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type LambdaBuilder() =
     inherit BaseLambdaBuilder()
     member inline _.Zero() = ignore
-    member inline _.Run(code: unit -> 'T): unit -> 'T = fun () -> code()
+
+    member inline _.Run(code: unit -> 'T) : unit -> 'T =
+        fun () -> code ()
+
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type BatchBuilder() =
     inherit BaseLambdaBuilder()
-    member inline _.Run(code: unit -> 'T): 'T = batch(fun () -> code())
+
+    member inline _.Run(code: unit -> 'T) : 'T =
+        batch (fun () -> code ())
+
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type CreateEffectBuilder() =
     inherit NullLambdaBuilder()
-    member inline _.Run(effect) = createEffect(fun () -> effect() |> ignore)
+
+    member inline _.Run(effect) =
+        createEffect (fun () ->
+            effect ()
+            |> ignore)
+
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type OnMountBuilder() =
     inherit NullLambdaBuilder()
-    member inline _.Run(effect) = onMount(fun () -> effect() |> ignore)
+
+    member inline _.Run(effect) =
+        onMount (fun () ->
+            effect ()
+            |> ignore)
+
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type OnCleanupBuilder() =
     inherit NullLambdaBuilder()
-    member inline _.Run(effect) = onCleanup(fun () -> effect() |> ignore)
+
+    member inline _.Run(effect) =
+        onCleanup (fun () ->
+            effect ()
+            |> ignore)
+
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type CreateMemoBuilder() =
     inherit BaseLambdaBuilder()
-    member inline _.Run(computation: unit -> 'T): unit -> 'T = createMemo(fun () -> computation())
+
+    member inline _.Run(computation: unit -> 'T) : unit -> 'T =
+        createMemo (fun () -> computation ())
+
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type CreateSelectorBuilder() =
     inherit BaseLambdaBuilder()
-    member inline _.Run(computation: unit -> 'T): 'U -> bool = createSelector(fun () -> computation())
+
+    member inline _.Run(computation: unit -> 'T) : 'U -> bool =
+        createSelector (fun () -> computation ())
+
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type CreateReactionBuilder() =
     inherit BaseLambdaBuilder()
-    member inline _.Run(computation: unit -> unit): (unit -> unit) -> unit = createReaction(fun () -> computation())
-    member inline _.Zero(value: unit) = ignore value
+
+    member inline _.Run(computation: unit -> unit) : (unit -> unit) -> unit =
+        createReaction (fun () -> computation ())
+
+    member inline _.Zero(value: unit) =
+        ignore value
+
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type ChildrenBuilder() =
     inherit BaseLambdaBuilder()
-    member inline _.Run(computation: unit -> #HtmlElement): unit -> #HtmlElement = children(fun () -> computation())
+
+    member inline _.Run(computation: unit -> #HtmlElement) : unit -> #HtmlElement =
+        children (fun () -> computation ())
+
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 [<Erase>]
 type LazyBuilder() =
     inherit BaseLambdaBuilder()
-    member inline _.Run(computation: unit -> 'T): 'C = lazy'(fun () -> computation())
 
-[<AutoOpen;Erase>]
+    member inline _.Run(computation: unit -> 'T) : 'C =
+        lazy' (fun () -> computation ())
+
+[<AutoOpen; Erase>]
 module Builders =
     /// <summary>
     /// Wraps the computation in <c>fun () -> ...</c>
@@ -98,7 +152,9 @@ module Builders =
     /// let config = lambda { Data.config.data }
     /// console.log (config())
     /// </code></example>
-    let [<Erase>] lambda = LambdaBuilder()
+    [<Erase>]
+    let lambda = LambdaBuilder ()
+
     /// <summary>
     /// Wraps the computation in <c>createEffect(fun () -> ...)</c>
     /// </summary>
@@ -111,7 +167,9 @@ module Builders =
     ///     | _ -> ()
     /// }
     /// </code></example>
-    let [<Erase>] effect = CreateEffectBuilder()
+    [<Erase>]
+    let effect = CreateEffectBuilder ()
+
     /// <summary>
     /// Wraps the computation in <c>onMount(fun () -> ...)</c>
     /// </summary>
@@ -120,7 +178,9 @@ module Builders =
     ///     configStore.Update Data.Config.data
     /// }
     /// </code></example>
-    let [<Erase>] mount = OnMountBuilder()
+    [<Erase>]
+    let mount = OnMountBuilder ()
+
     /// <summary>
     /// Wraps the computation in <c>onCleanup(fun () -> ...)</c>
     /// </summary>
@@ -129,7 +189,9 @@ module Builders =
     ///     configStore.Update Data.Config.data
     /// }
     /// </code></example>
-    let [<Erase>] cleanup = OnCleanupBuilder()
+    [<Erase>]
+    let cleanup = OnCleanupBuilder ()
+
     /// <summary>
     /// Wraps the computation in <c>createMemo(fun () -> ...)</c>
     /// </summary>
@@ -139,7 +201,9 @@ module Builders =
     ///     // some expensive value
     /// }
     /// </code></example>
-    let [<Erase>] memo = CreateMemoBuilder()
+    [<Erase>]
+    let memo = CreateMemoBuilder ()
+
     /// <summary>
     /// Wraps the computation in <c>batch(fun () -> ...)</c>
     /// </summary>
@@ -148,7 +212,9 @@ module Builders =
     ///     // ... some reactive tasks here
     /// }
     /// </code></example>
-    let [<Erase>] batch = BatchBuilder()
+    [<Erase>]
+    let batch = BatchBuilder ()
+
     /// <summary>
     /// Wraps the computation in <c>lazy'(fun () -> ...)</c>
     /// </summary>
@@ -157,7 +223,9 @@ module Builders =
     ///     importComponent "./MyComponent.fs.jsx"
     /// }
     /// </code></example>
-    let [<Erase>] lazyload = LazyBuilder()
+    [<Erase>]
+    let lazyload = LazyBuilder ()
+
     /// <summary>
     /// Wraps the computation in <c>createSelect(fun () -> ...)</c>
     /// </summary>
@@ -167,7 +235,9 @@ module Builders =
     /// }
     /// console.log (isSelected item)
     /// </code></example>
-    let [<Erase>] selector = CreateSelectorBuilder()
+    [<Erase>]
+    let selector = CreateSelectorBuilder ()
+
     /// <summary>
     /// Wraps the computation in <c>children(fun () -> ...)</c>
     /// </summary>
@@ -183,17 +253,20 @@ module Builders =
     /// // ...
     /// if hasChildren() then resolvedChildren()
     /// </code></example>
-    let [<Erase>] children = ChildrenBuilder()
+    [<Erase>]
+    let children = ChildrenBuilder ()
+
     /// <summary>
     /// Wraps the computation in <c>createReaction(fun () -> ...)</c>
     /// </summary>
     /// <example><code>
     /// let isOpen,setOpen = createSignal false
-    /// let onFirstOpen = reaction { 
+    /// let onFirstOpen = reaction {
     ///   // ... do something on first time
     ///   // ... isOpen changes
     /// }
-    /// onFirstOpen (fun () -> isOpen()) 
+    /// onFirstOpen (fun () -> isOpen())
     /// // This will run the first time `isOpen` changes
     /// </code></example>
-    let [<Erase>] reaction = CreateReactionBuilder()
+    [<Erase>]
+    let reaction = CreateReactionBuilder ()
