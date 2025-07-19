@@ -38,7 +38,7 @@ module Builder =
     type VoidNode =
         inherit HtmlTag
 
-    
+
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     type IChildLambdaProvider =
         inherit HtmlElement
@@ -143,7 +143,7 @@ module Builder =
     /// let tag = !@div
     /// </code></example>
     [<Erase>]
-    type TagValue(tag: unit -> #HtmlElement) =
+    type TagValue(tag: FSharpFunc<_,#HtmlElement>) =
         /// <summary>
         /// Directs the plugin to build the call site as a Tag
         /// in JSX.
@@ -201,8 +201,7 @@ module Builder =
     /// let tag = !@div
     /// </code></example>
     [<Erase>]
-    let (!@) (this: unit -> 'T) =
-        TagValue (unbox this)
+    let (!@) (this: FSharpFunc<_,#HtmlElement>) = TagValue(unbox this)
 
     /// Alias used in the provided builder
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
