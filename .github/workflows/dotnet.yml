@@ -18,29 +18,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-#   fantomas-check:
-#     runs-on: ubuntu-22.04
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v4
-
-#       - name: Setup .NET
-#         uses: actions/setup-dotnet@v3
-#         with:
-#           dotnet-version: ${{ env.DOTNET_VERSION }}
-
-#       - name: Tool Restore
-#         run: dotnet tool restore
-
-#       - name: Lint
-#         run: dotnet fantomas -r --check .
-
   build:
     runs-on: ubuntu-22.04
-    # needs: ['fantomas-check']
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up git-cliff
+        uses: kenji-miyake/setup-git-cliff@v1
 
       # workaround for https://github.com/actions/runner/issues/2033
       - name: ownership workaround
@@ -51,17 +38,5 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Restore nuget dependencies
-        run: dotnet restore Partas.Solid.sln
-
-      - name: Compile the main solution
-        run: dotnet build Partas.Solid.sln --no-restore
-
-      - name: Test the main solution
-        run: dotnet test Partas.Solid.sln --no-restore --no-build
-
-      - name: Restore Solid nuget dependencies
-        run: dotnet restore Partas.Solid.sln
-
-      - name: Compile Solid solution
-        run: dotnet build Partas.Solid.sln --no-restore
+      - name: Run test script
+        run: dotnet fsi ./build.fsx

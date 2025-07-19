@@ -5,573 +5,459 @@ open Partas.Solid.Experimental.U
 
 /// <summary>Providing the attribute <c>``alignment-baseline``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type alignmentbaselineAttributeInterfaceProvider =
-    interface end
+type alignmentbaselineAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``baseline-shift``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type baselineshiftAttributeInterfaceProvider =
-    interface end
+type baselineshiftAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>clip</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type clipAttributeInterfaceProvider =
-    interface end
+type clipAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``clip-path``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type clippathAttributeInterfaceProvider =
-    interface end
+type clippathAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``clip-rule``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type clipruleAttributeInterfaceProvider =
-    interface end
+type clipruleAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>color</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type colorAttributeInterfaceProvider =
-    interface end
+type colorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``color-interpolation``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type colorinterpolationAttributeInterfaceProvider =
-    interface end
+type colorinterpolationAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``color-interpolation-filters``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type colorinterpolationfiltersAttributeInterfaceProvider =
-    interface end
+type colorinterpolationfiltersAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``color-profile``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type colorprofileAttributeInterfaceProvider =
-    interface end
+type colorprofileAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``color-rendering``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type colorrenderingAttributeInterfaceProvider =
-    interface end
+type colorrenderingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>cursor</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type cursorAttributeInterfaceProvider =
-    interface end
+type cursorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>direction</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type directionAttributeInterfaceProvider =
-    interface end
+type directionAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>display</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type displayAttributeInterfaceProvider =
-    interface end
+type displayAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``dominant-baseline``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type dominantbaselineAttributeInterfaceProvider =
-    interface end
+type dominantbaselineAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``enable-background``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type enablebackgroundAttributeInterfaceProvider =
-    interface end
+type enablebackgroundAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>fill</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type fillAttributeInterfaceProvider =
-    interface end
+type fillAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``fill-opacity``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type fillopacityAttributeInterfaceProvider =
-    interface end
+type fillopacityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``fill-rule``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type fillruleAttributeInterfaceProvider =
-    interface end
+type fillruleAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>filter</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type filterAttributeInterfaceProvider =
-    interface end
+type filterAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``flood-color``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type floodcolorAttributeInterfaceProvider =
-    interface end
+type floodcolorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``flood-opacity``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type floodOpacityAttributeInterfaceProvider =
-    interface end
+type floodOpacityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-family``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type fontFamilyAttributeInterfaceProvider =
-    interface end
+type fontFamilyAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-size``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type fontSizeAttributeInterfaceProvider =
-    interface end
+type fontSizeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-size-adjust``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type fontSizeAdjustAttributeInterfaceProvider =
-    interface end
+type fontSizeAdjustAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-stretch``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type fontStretchAttributeInterfaceProvider =
-    interface end
+type fontStretchAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-style``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type fontStyleAttributeInterfaceProvider =
-    interface end
+type fontStyleAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-variant``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type fontVariantAttributeInterfaceProvider =
-    interface end
+type fontVariantAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-weight``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type fontWeightAttributeInterfaceProvider =
-    interface end
+type fontWeightAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``glyph-orientation-horizontal``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type glyphOrientationHorizontalAttributeInterfaceProvider =
-    interface end
+type glyphOrientationHorizontalAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``glyph-orientation-vertical``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type glyphOrientationVerticalAttributeInterfaceProvider =
-    interface end
+type glyphOrientationVerticalAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``image-rendering``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type imageRenderingAttributeInterfaceProvider =
-    interface end
+type imageRenderingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>kerning</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type kerningAttributeInterfaceProvider =
-    interface end
+type kerningAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``letter-spacing``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type letterSpacingAttributeInterfaceProvider =
-    interface end
+type letterSpacingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``marker-end``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type markerEndAttributeInterfaceProvider =
-    interface end
+type markerEndAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``marker-mid``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type markerMidAttributeInterfaceProvider =
-    interface end
+type markerMidAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``marker-start``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type markerStartAttributeInterfaceProvider =
-    interface end
+type markerStartAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>mask</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type maskAttributeInterfaceProvider =
-    interface end
+type maskAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>opacity</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type opacityAttributeInterfaceProvider =
-    interface end
+type opacityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>overflow</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type overflowAttributeInterfaceProvider =
-    interface end
+type overflowAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>pathLength</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type pathLengthAttributeInterfaceProvider =
-    interface end
+type pathLengthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``pointer-events``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type pointerEventsAttributeInterfaceProvider =
-    interface end
+type pointerEventsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``shape-rendering``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type shapeRenderingAttributeInterfaceProvider =
-    interface end
+type shapeRenderingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stop-color``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type stopColorAttributeInterfaceProvider =
-    interface end
+type stopColorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stop-opacity``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type stopOpacityAttributeInterfaceProvider =
-    interface end
+type stopOpacityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>stroke</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type strokeAttributeInterfaceProvider =
-    interface end
+type strokeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-dasharray``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type strokeDasharrayAttributeInterfaceProvider =
-    interface end
+type strokeDasharrayAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-dashoffset``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type strokeDashoffsetAttributeInterfaceProvider =
-    interface end
+type strokeDashoffsetAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-linecap``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type strokeLinecapAttributeInterfaceProvider =
-    interface end
+type strokeLinecapAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-linejoin``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type strokeLinejoinAttributeInterfaceProvider =
-    interface end
+type strokeLinejoinAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-miterlimit``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type strokeMiterlimitAttributeInterfaceProvider =
-    interface end
+type strokeMiterlimitAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-opacity``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type strokeOpacityAttributeInterfaceProvider =
-    interface end
+type strokeOpacityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-width``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type strokeWidthAttributeInterfaceProvider =
-    interface end
+type strokeWidthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``text-anchor``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type textAnchorAttributeInterfaceProvider =
-    interface end
+type textAnchorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``text-decoration``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type textDecorationAttributeInterfaceProvider =
-    interface end
+type textDecorationAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``text-rendering``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type textRenderingAttributeInterfaceProvider =
-    interface end
+type textRenderingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``unicode-bidi``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type unicodeBidiAttributeInterfaceProvider =
-    interface end
+type unicodeBidiAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>visibility</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type visibilityAttributeInterfaceProvider =
-    interface end
+type visibilityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``word-spacing``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type wordSpacingAttributeInterfaceProvider =
-    interface end
+type wordSpacingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``writing-mode``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type writingModeAttributeInterfaceProvider =
-    interface end
+type writingModeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>version</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type versionAttributeInterfaceProvider =
-    interface end
+type versionAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>baseProfile</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type baseProfileAttributeInterfaceProvider =
-    interface end
+type baseProfileAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>x</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type xAttributeInterfaceProvider =
-    interface end
+type xAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>y</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type yAttributeInterfaceProvider =
-    interface end
+type yAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>width</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type widthAttributeInterfaceProvider =
-    interface end
+type widthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>height</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type heightAttributeInterfaceProvider =
-    interface end
+type heightAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>contentScriptType</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type contentScriptTypeAttributeInterfaceProvider =
-    interface end
+type contentScriptTypeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>contentStyleType</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type contentStyleTypeAttributeInterfaceProvider =
-    interface end
+type contentStyleTypeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>xmlns</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type xmlnsAttributeInterfaceProvider =
-    interface end
+type xmlnsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>href</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type hrefAttributeInterfaceProvider =
-    interface end
+type hrefAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>markerUnits</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type markerUnitsAttributeInterfaceProvider =
-    interface end
+type markerUnitsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>refX</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type refXAttributeInterfaceProvider =
-    interface end
+type refXAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>refY</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type refYAttributeInterfaceProvider =
-    interface end
+type refYAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>markerWidth</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type markerWidthAttributeInterfaceProvider =
-    interface end
+type markerWidthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>markerHeight</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type markerHeightAttributeInterfaceProvider =
-    interface end
+type markerHeightAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>orient</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type orientAttributeInterfaceProvider =
-    interface end
+type orientAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>maskUnits</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type maskUnitsAttributeInterfaceProvider =
-    interface end
+type maskUnitsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>maskContentUnits</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type maskContentUnitsAttributeInterfaceProvider =
-    interface end
+type maskContentUnitsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>patternUnits</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type patternUnitsAttributeInterfaceProvider =
-    interface end
+type patternUnitsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>patternContentUnits</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type patternContentUnitsAttributeInterfaceProvider =
-    interface end
+type patternContentUnitsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>patternTransform</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type patternTransformAttributeInterfaceProvider =
-    interface end
+type patternTransformAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>preserveAspectRatio</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type preserveAspectRatioAttributeInterfaceProvider =
-    interface end
+type preserveAspectRatioAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>viewBox</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type viewBoxAttributeInterfaceProvider =
-    interface end
+type viewBoxAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>type'</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type typeAttributeInterfaceProvider =
-    interface end
+type typeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>operator</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type operatorAttributeInterfaceProvider =
-    interface end
+type operatorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>kernelUnitLength</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type kernelUnitLengthAttributeInterfaceProvider =
-    interface end
+type kernelUnitLengthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>surfaceScale</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type surfaceScaleAttributeInterfaceProvider =
-    interface end
+type surfaceScaleAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``lightning-color``</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type lightningColorAttributeInterfaceProvider =
-    interface end
+type lightningColorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>dx</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type dxAttributeInterfaceProvider =
-    interface end
+type dxAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>dy</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type dyAttributeInterfaceProvider =
-    interface end
+type dyAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>stdDeviation</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type stdDeviationAttributeInterfaceProvider =
-    interface end
+type stdDeviationAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>specularExponent</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type specularExponentAttributeInterfaceProvider =
-    interface end
+type specularExponentAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>x1</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type x1AttributeInterfaceProvider =
-    interface end
+type x1AttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>x2</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type x2AttributeInterfaceProvider =
-    interface end
+type x2AttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>y1</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type y1AttributeInterfaceProvider =
-    interface end
+type y1AttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>y2</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type y2AttributeInterfaceProvider =
-    interface end
+type y2AttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>cx</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type cxAttributeInterfaceProvider =
-    interface end
+type cxAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>cy</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type cyAttributeInterfaceProvider =
-    interface end
+type cyAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>r</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type rAttributeInterfaceProvider =
-    interface end
+type rAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>rx</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type rxAttributeInterfaceProvider =
-    interface end
+type rxAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>ry</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type ryAttributeInterfaceProvider =
-    interface end
+type ryAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>d</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type dAttributeInterfaceProvider =
-    interface end
+type dAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>points</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type pointsAttributeInterfaceProvider =
-    interface end
+type pointsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>rotate</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type rotateAttributeInterfaceProvider =
-    interface end
+type rotateAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>textLength</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type textLengthAttributeInterfaceProvider =
-    interface end
+type textLengthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>lengthAdjust</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type lengthAdjustAttributeInterfaceProvider =
-    interface end
+type lengthAdjustAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>z</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type zAttributeInterfaceProvider =
-    interface end
+type zAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>offset</c> to interfaces to prevent collisions</summary>
 [<AllowNullLiteral; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type offsetAttributeInterfaceProvider =
-    interface end
+type offsetAttributeInterfaceProvider = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type TransformableSVGAttributes =
-    interface end
+type TransformableSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type ConditionalProcessingSVGAttributes =
-    interface end
+type ConditionalProcessingSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type ExternalResourceSVGAttributes =
-    interface end
+type ExternalResourceSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type AnimationTimingSVGAttributes =
-    interface end
+type AnimationTimingSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type AnimationValueSVGAttributes =
-    interface end
+type AnimationValueSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type AnimationAdditionSVGAttributes =
-    interface end
+type AnimationAdditionSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type AnimationAttributeTargetSVGAttributes =
-    interface end
+type AnimationAttributeTargetSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
@@ -656,13 +542,11 @@ type FilterPrimitiveElementSVGAttributes =
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type SingleInputFilterSVGAttributes =
-    interface end
+type SingleInputFilterSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type DoubleInputFilterSVGAttributes =
-    interface end
+type DoubleInputFilterSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
@@ -718,7 +602,7 @@ type ShapeElementSVGAttributes =
     inherit strokeMiterlimitAttributeInterfaceProvider
     inherit strokeOpacityAttributeInterfaceProvider
     inherit strokeWidthAttributeInterfaceProvider
-    
+
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type ContainerElementSVGAttributes =
@@ -731,7 +615,7 @@ type ContainerElementSVGAttributes =
     inherit filterAttributeInterfaceProvider
     inherit maskAttributeInterfaceProvider
     inherit opacityAttributeInterfaceProvider
-    
+
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type TextContentElementSVGAttributes =
@@ -771,8 +655,7 @@ type TextContentElementSVGAttributes =
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-type ZoomAndPanSVGAttributes =
-    interface end
+type ZoomAndPanSVGAttributes = interface end
 
 [<AllowNullLiteral>]
 [<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
@@ -1332,8 +1215,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.alignmentBaseline
-            with inline set(value: string) = this.``alignment-baseline`` <- value
-            and inline get(): string = this.``alignment-baseline``
+            with inline set (value: string) = this.``alignment-baseline`` <- value
+            and inline get (): string = this.``alignment-baseline``
 
     type baselineshiftAttributeInterfaceProvider with
         [<Erase>]
@@ -1344,8 +1227,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.baselineShift
-            with inline set(value: U2<float, string>) = this.``baseline-shift`` <- value
-            and inline get(): U2<float, string> = this.``baseline-shift``
+            with inline set (value: U2<float, string>) = this.``baseline-shift`` <- value
+            and inline get (): U2<float, string> = this.``baseline-shift``
 
     type clipAttributeInterfaceProvider with
         [<Erase>]
@@ -1362,8 +1245,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.clipPath
-            with inline set(value: string) = this.``clip-path`` <- value
-            and inline get(): string = this.``clip-path``
+            with inline set (value: string) = this.``clip-path`` <- value
+            and inline get (): string = this.``clip-path``
 
     type clipruleAttributeInterfaceProvider with
         [<Erase>]
@@ -1374,8 +1257,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.clipRule
-            with inline set(value: string) = this.``clip-rule`` <- value
-            and inline get(): string = this.``clip-rule``
+            with inline set (value: string) = this.``clip-rule`` <- value
+            and inline get (): string = this.``clip-rule``
 
     type colorAttributeInterfaceProvider with
         [<Erase>]
@@ -1392,8 +1275,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.colorInterpolation
-            with inline set(value: string) = this.``color-interpolation`` <- value
-            and inline get(): string = this.``color-interpolation``
+            with inline set (value: string) = this.``color-interpolation`` <- value
+            and inline get (): string = this.``color-interpolation``
 
     type colorinterpolationfiltersAttributeInterfaceProvider with
         [<Erase>]
@@ -1404,8 +1287,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.colorInterpolationFilters
-            with inline set(value: string) = this.``color-interpolation-filters`` <- value
-            and inline get(): string = this.``color-interpolation-filters``
+            with inline set (value: string) = this.``color-interpolation-filters`` <- value
+            and inline get (): string = this.``color-interpolation-filters``
 
     type colorprofileAttributeInterfaceProvider with
         [<Erase>]
@@ -1416,8 +1299,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.colorProfile
-            with inline set(value: string) = this.``color-profile`` <- value
-            and inline get(): string = this.``color-profile``
+            with inline set (value: string) = this.``color-profile`` <- value
+            and inline get (): string = this.``color-profile``
 
     type colorrenderingAttributeInterfaceProvider with
         [<Erase>]
@@ -1428,8 +1311,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.colorRendering
-            with inline set(value: string) = this.``color-rendering`` <- value
-            and inline get(): string = this.``color-rendering``
+            with inline set (value: string) = this.``color-rendering`` <- value
+            and inline get (): string = this.``color-rendering``
 
     type cursorAttributeInterfaceProvider with
         [<Erase>]
@@ -1458,8 +1341,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.dominantBaseline
-            with inline set(value: string) = this.``dominant-baseline`` <- value
-            and inline get(): string = this.``dominant-baseline``
+            with inline set (value: string) = this.``dominant-baseline`` <- value
+            and inline get (): string = this.``dominant-baseline``
 
     type enablebackgroundAttributeInterfaceProvider with
         [<Erase>]
@@ -1470,8 +1353,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.enableBackground
-            with inline set(value: string) = this.``enable-background`` <- value
-            and inline get(): string = this.``enable-background``
+            with inline set (value: string) = this.``enable-background`` <- value
+            and inline get (): string = this.``enable-background``
 
     type fillAttributeInterfaceProvider with
         [<Erase>]
@@ -1488,8 +1371,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.fillOpacity
-            with inline set(value: string) = this.``fill-opacity`` <- value
-            and inline get(): string = this.``fill-opacity``
+            with inline set (value: string) = this.``fill-opacity`` <- value
+            and inline get (): string = this.``fill-opacity``
 
     type fillruleAttributeInterfaceProvider with
         [<Erase>]
@@ -1500,8 +1383,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.fillRule
-            with inline set(value: string) = this.``fill-rule`` <- value
-            and inline get(): string = this.``fill-rule``
+            with inline set (value: string) = this.``fill-rule`` <- value
+            and inline get (): string = this.``fill-rule``
 
     type filterAttributeInterfaceProvider with
         [<Erase>]
@@ -1518,8 +1401,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.floodColor
-            with inline set(value: string) = this.``flood-color`` <- value
-            and inline get(): string = this.``flood-color``
+            with inline set (value: string) = this.``flood-color`` <- value
+            and inline get (): string = this.``flood-color``
 
     type floodOpacityAttributeInterfaceProvider with
         [<Erase>]
@@ -1530,8 +1413,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.floodOpacity
-            with inline set(value: string) = this.``flood-opacity`` <- value
-            and inline get(): string = this.``flood-opacity``
+            with inline set (value: string) = this.``flood-opacity`` <- value
+            and inline get (): string = this.``flood-opacity``
 
     type fontFamilyAttributeInterfaceProvider with
         [<Erase>]
@@ -1542,8 +1425,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.fontFamily
-            with inline set(value: string) = this.``font-family`` <- value
-            and inline get(): string = this.``font-family``
+            with inline set (value: string) = this.``font-family`` <- value
+            and inline get (): string = this.``font-family``
 
     type fontSizeAttributeInterfaceProvider with
         [<Erase>]
@@ -1554,8 +1437,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.fontSize
-            with inline set(value: string) = this.``font-size`` <- value
-            and inline get(): string = this.``font-size``
+            with inline set (value: string) = this.``font-size`` <- value
+            and inline get (): string = this.``font-size``
 
     type fontSizeAdjustAttributeInterfaceProvider with
         [<Erase>]
@@ -1566,8 +1449,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.fontSizeAdjust
-            with inline set(value: U2<float, string>) = this.``font-size-adjust`` <- value
-            and inline get(): U2<float, string> = this.``font-size-adjust``
+            with inline set (value: U2<float, string>) = this.``font-size-adjust`` <- value
+            and inline get (): U2<float, string> = this.``font-size-adjust``
 
     type fontStretchAttributeInterfaceProvider with
         [<Erase>]
@@ -1578,8 +1461,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.fontStretch
-            with inline set(value: string) = this.``font-stretch`` <- value
-            and inline get(): string = this.``font-stretch``
+            with inline set (value: string) = this.``font-stretch`` <- value
+            and inline get (): string = this.``font-stretch``
 
     type fontStyleAttributeInterfaceProvider with
         [<Erase>]
@@ -1590,8 +1473,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.fontStyle
-            with inline set(value: string) = this.``font-style`` <- value
-            and inline get(): string = this.``font-style``
+            with inline set (value: string) = this.``font-style`` <- value
+            and inline get (): string = this.``font-style``
 
     type fontVariantAttributeInterfaceProvider with
         [<Erase>]
@@ -1602,8 +1485,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.fontVariant
-            with inline set(value: string) = this.``font-variant`` <- value
-            and inline get(): string = this.``font-variant``
+            with inline set (value: string) = this.``font-variant`` <- value
+            and inline get (): string = this.``font-variant``
 
     type fontWeightAttributeInterfaceProvider with
         [<Erase>]
@@ -1614,8 +1497,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.fontWeight
-            with inline set(value: U2<float, string>) = this.``font-weight`` <- value
-            and inline get(): U2<float, string> = this.``font-weight``
+            with inline set (value: U2<float, string>) = this.``font-weight`` <- value
+            and inline get (): U2<float, string> = this.``font-weight``
 
     type glyphOrientationHorizontalAttributeInterfaceProvider with
         [<Erase>]
@@ -1626,8 +1509,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.glyphOrientationHorizontal
-            with inline set(value: string) = this.``glyph-orientation-horizontal`` <- value
-            and inline get(): string = this.``glyph-orientation-horizontal``
+            with inline set (value: string) = this.``glyph-orientation-horizontal`` <- value
+            and inline get (): string = this.``glyph-orientation-horizontal``
 
     type glyphOrientationVerticalAttributeInterfaceProvider with
         [<Erase>]
@@ -1638,8 +1521,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.glyphOrientationVertical
-            with inline set(value: string) = this.``glyph-orientation-vertical`` <- value
-            and inline get(): string = this.``glyph-orientation-vertical``
+            with inline set (value: string) = this.``glyph-orientation-vertical`` <- value
+            and inline get (): string = this.``glyph-orientation-vertical``
 
     type imageRenderingAttributeInterfaceProvider with
         [<Erase>]
@@ -1650,8 +1533,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.imageRendering
-            with inline set(value: string) = this.``image-rendering`` <- value
-            and inline get(): string = this.``image-rendering``
+            with inline set (value: string) = this.``image-rendering`` <- value
+            and inline get (): string = this.``image-rendering``
 
     type kerningAttributeInterfaceProvider with
         [<Erase>]
@@ -1668,8 +1551,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.letterSpacing
-            with inline set(value: U2<float, string>) = this.``letter-spacing`` <- value
-            and inline get(): U2<float, string> = this.``letter-spacing``
+            with inline set (value: U2<float, string>) = this.``letter-spacing`` <- value
+            and inline get (): U2<float, string> = this.``letter-spacing``
 
     type markerEndAttributeInterfaceProvider with
         [<Erase>]
@@ -1680,8 +1563,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.markerEnd
-            with inline set(value: string) = this.``marker-end`` <- value
-            and inline get(): string = this.``marker-end``
+            with inline set (value: string) = this.``marker-end`` <- value
+            and inline get (): string = this.``marker-end``
 
     type markerMidAttributeInterfaceProvider with
         [<Erase>]
@@ -1692,8 +1575,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.markerMid
-            with inline set(value: string) = this.``marker-mid`` <- value
-            and inline get(): string = this.``marker-mid``
+            with inline set (value: string) = this.``marker-mid`` <- value
+            and inline get (): string = this.``marker-mid``
 
     type markerStartAttributeInterfaceProvider with
         [<Erase>]
@@ -1704,8 +1587,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.markerStart
-            with inline set(value: string) = this.``marker-start`` <- value
-            and inline get(): string = this.``marker-start``
+            with inline set (value: string) = this.``marker-start`` <- value
+            and inline get (): string = this.``marker-start``
 
     type maskAttributeInterfaceProvider with
         [<Erase>]
@@ -1740,8 +1623,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.pointerEvents
-            with inline set(value: string) = this.``pointer-events`` <- value
-            and inline get(): string = this.``pointer-events``
+            with inline set (value: string) = this.``pointer-events`` <- value
+            and inline get (): string = this.``pointer-events``
 
     type shapeRenderingAttributeInterfaceProvider with
         [<Erase>]
@@ -1752,8 +1635,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.shapeRendering
-            with inline set(value: string) = this.``shape-rendering`` <- value
-            and inline get(): string = this.``shape-rendering``
+            with inline set (value: string) = this.``shape-rendering`` <- value
+            and inline get (): string = this.``shape-rendering``
 
     type stopColorAttributeInterfaceProvider with
         [<Erase>]
@@ -1764,8 +1647,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.stopColor
-            with inline set(value: string) = this.``stop-color`` <- value
-            and inline get(): string = this.``stop-color``
+            with inline set (value: string) = this.``stop-color`` <- value
+            and inline get (): string = this.``stop-color``
 
     type stopOpacityAttributeInterfaceProvider with
         [<Erase>]
@@ -1776,8 +1659,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.stopOpacity
-            with inline set(value: string) = this.``stop-opacity`` <- value
-            and inline get(): string = this.``stop-opacity``
+            with inline set (value: string) = this.``stop-opacity`` <- value
+            and inline get (): string = this.``stop-opacity``
 
     type strokeAttributeInterfaceProvider with
         [<Erase>]
@@ -1794,8 +1677,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.strokeDasharray
-            with inline set(value: string) = this.``stroke-dasharray`` <- value
-            and inline get(): string = this.``stroke-dasharray``
+            with inline set (value: string) = this.``stroke-dasharray`` <- value
+            and inline get (): string = this.``stroke-dasharray``
 
     type strokeDashoffsetAttributeInterfaceProvider with
         [<Erase>]
@@ -1806,8 +1689,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.strokeDashoffset
-            with inline set(value: U2<float, string>) = this.``stroke-dashoffset`` <- value
-            and inline get(): U2<float, string> = this.``stroke-dashoffset``
+            with inline set (value: U2<float, string>) = this.``stroke-dashoffset`` <- value
+            and inline get (): U2<float, string> = this.``stroke-dashoffset``
 
     type strokeLinecapAttributeInterfaceProvider with
         [<Erase>]
@@ -1818,8 +1701,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.strokeLinecap
-            with inline set(value: string) = this.``stroke-linecap`` <- value
-            and inline get(): string = this.``stroke-linecap``
+            with inline set (value: string) = this.``stroke-linecap`` <- value
+            and inline get (): string = this.``stroke-linecap``
 
     type strokeLinejoinAttributeInterfaceProvider with
         [<Erase>]
@@ -1830,8 +1713,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.strokeLinejoin
-            with inline set(value: string) = this.``stroke-linejoin`` <- value
-            and inline get(): string = this.``stroke-linejoin``
+            with inline set (value: string) = this.``stroke-linejoin`` <- value
+            and inline get (): string = this.``stroke-linejoin``
 
     type strokeMiterlimitAttributeInterfaceProvider with
         [<Erase>]
@@ -1842,8 +1725,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.strokeMiterlimit
-            with inline set(value: string) = this.``stroke-miterlimit`` <- value
-            and inline get(): string = this.``stroke-miterlimit``
+            with inline set (value: string) = this.``stroke-miterlimit`` <- value
+            and inline get (): string = this.``stroke-miterlimit``
 
     type strokeOpacityAttributeInterfaceProvider with
         [<Erase>]
@@ -1854,8 +1737,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.strokeOpacity
-            with inline set(value: string) = this.``stroke-opacity`` <- value
-            and inline get(): string = this.``stroke-opacity``
+            with inline set (value: string) = this.``stroke-opacity`` <- value
+            and inline get (): string = this.``stroke-opacity``
 
     type strokeWidthAttributeInterfaceProvider with
         [<Erase>]
@@ -1866,8 +1749,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.strokeWidth
-            with inline set(value: U2<float, string>) = this.``stroke-width`` <- value
-            and inline get(): U2<float, string> = this.``stroke-width``
+            with inline set (value: U2<float, string>) = this.``stroke-width`` <- value
+            and inline get (): U2<float, string> = this.``stroke-width``
 
     type textAnchorAttributeInterfaceProvider with
         [<Erase>]
@@ -1878,8 +1761,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.textAnchor
-            with inline set(value: string) = this.``text-anchor`` <- value
-            and inline get(): string = this.``text-anchor``
+            with inline set (value: string) = this.``text-anchor`` <- value
+            and inline get (): string = this.``text-anchor``
 
     type textDecorationAttributeInterfaceProvider with
         [<Erase>]
@@ -1890,8 +1773,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.textDecoration
-            with inline set(value: string) = this.``text-decoration`` <- value
-            and inline get(): string = this.``text-decoration``
+            with inline set (value: string) = this.``text-decoration`` <- value
+            and inline get (): string = this.``text-decoration``
 
     type textRenderingAttributeInterfaceProvider with
         [<Erase>]
@@ -1902,8 +1785,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.textRendering
-            with inline set(value: string) = this.``text-rendering`` <- value
-            and inline get(): string = this.``text-rendering``
+            with inline set (value: string) = this.``text-rendering`` <- value
+            and inline get (): string = this.``text-rendering``
 
     type unicodeBidiAttributeInterfaceProvider with
         [<Erase>]
@@ -1914,8 +1797,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.unicodeBidi
-            with inline set(value: string) = this.``unicode-bidi`` <- value
-            and inline get(): string = this.``unicode-bidi``
+            with inline set (value: string) = this.``unicode-bidi`` <- value
+            and inline get (): string = this.``unicode-bidi``
 
     type visibilityAttributeInterfaceProvider with
         [<Erase>]
@@ -1932,8 +1815,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.wordSpacing
-            with inline set(value: U2<float, string>) = this.``word-spacing`` <- value
-            and inline get(): U2<float, string> = this.``word-spacing``
+            with inline set (value: U2<float, string>) = this.``word-spacing`` <- value
+            and inline get (): U2<float, string> = this.``word-spacing``
 
     type writingModeAttributeInterfaceProvider with
         [<Erase>]
@@ -1944,8 +1827,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.writingMode
-            with inline set(value: string) = this.``writing-mode`` <- value
-            and inline get(): string = this.``writing-mode``
+            with inline set (value: string) = this.``writing-mode`` <- value
+            and inline get (): string = this.``writing-mode``
 
     type versionAttributeInterfaceProvider with
         [<Erase>]
@@ -2118,8 +2001,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.lightningColor
-            with inline set(value: string) = this.``lightning-color`` <- value
-            and inline get(): string = this.``lightning-color``
+            with inline set (value: string) = this.``lightning-color`` <- value
+            and inline get (): string = this.``lightning-color``
 
     type dxAttributeInterfaceProvider with
         [<Erase>]
@@ -2387,8 +2270,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.lightingColor
-            with inline set(value: string) = this.``lighting-color`` <- value
-            and inline get(): string = this.``lighting-color``
+            with inline set (value: string) = this.``lighting-color`` <- value
+            and inline get (): string = this.``lighting-color``
 
     type FilterPrimitiveElementSVGAttributes with
         [<Erase>]
@@ -2444,8 +2327,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.colorInterpolation
-            with inline set(value: string) = this.``color-interpolation`` <- value
-            and inline get(): string = this.``color-interpolation``
+            with inline set (value: string) = this.``color-interpolation`` <- value
+            and inline get (): string = this.``color-interpolation``
 
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
@@ -2455,8 +2338,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.colorRendering
-            with inline set(value: string) = this.``color-rendering`` <- value
-            and inline get(): string = this.``color-rendering``
+            with inline set (value: string) = this.``color-rendering`` <- value
+            and inline get (): string = this.``color-rendering``
 
     type AnimateMotionSVGAttributes with
         [<Erase>]
@@ -2713,8 +2596,8 @@ module AttributeExtensions =
 
         [<Erase>]
         member this.method
-            with set(_: string) = ()
-            and get(): string = JS.undefined
+            with set (_: string) = ()
+            and get (): string = JS.undefined
 
         [<Erase>]
         member _.spacing
@@ -2738,7 +2621,7 @@ module Svg =
     type animate() =
         interface RegularNode
         interface AnimateSVGAttributes
-    
+
     [<Erase>]
     type animateMotion() =
         interface RegularNode
@@ -2828,7 +2711,7 @@ module Svg =
     type feFuncA() =
         interface RegularNode
         interface FeFuncSVGAttributes
- 
+
     [<Erase>]
     type feFuncB() =
         interface RegularNode
@@ -2838,7 +2721,7 @@ module Svg =
     type feFuncG() =
         interface RegularNode
         interface FeFuncSVGAttributes
- 
+
     [<Erase>]
     type feFuncR() =
         interface RegularNode
@@ -2988,7 +2871,7 @@ module Svg =
     type stop() =
         interface VoidNode
         interface StopSVGAttributes
- 
+
     [<Erase>]
     type svg() =
         interface RegularNode
@@ -3023,7 +2906,7 @@ module Svg =
     type use'() =
         interface RegularNode
         interface UseSVGAttributes
-        
+
     [<Erase>]
     type view() =
         interface RegularNode

@@ -25,9 +25,10 @@ module Bindings =
     type Setter<'T> = 'T -> unit
     type Accessor<'T> = unit -> 'T
     type Signal<'T> = Accessor<'T> * Setter<'T>
-    
-    type ContextProvider = inherit HtmlContainer
-    
+
+    type ContextProvider =
+        inherit HtmlContainer
+
     /// <summary>
     /// Created by passing a <c>JS.Pojo</c> (recommended) to a createContext call as a type arg or value. Defaults
     /// are set by calling the constructor with any default values wanted.<br/><br/>
@@ -39,36 +40,47 @@ module Bindings =
     [<Erase>]
     type For<'T>() =
         interface HtmlElement
+
         [<Erase>]
         member this.each
             with set (value: 'T[]) = ()
+
         [<Erase>]
         member inline _.Zero() : HtmlContainerFun = ignore
+
         [<Erase>]
-        member inline _.Yield(PARTAS_VALUE: 'T -> Accessor<int> -> #HtmlElement) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_VALUE
-    
+        member inline _.Yield(PARTAS_VALUE: 'T -> Accessor<int> -> #HtmlElement) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_VALUE
+
     [<PartasImport("Index", "solid-js")>]
     [<Erase>]
     type Index<'T>() =
         interface HtmlElement
+
         [<Erase>]
         member this.each
             with set (value: 'T[]) = ()
+
         [<Erase>]
         member inline _.Zero() : HtmlContainerFun = ignore
+
         [<Erase>]
-        member inline _.Yield(PARTAS_VALUE: Accessor<'T> -> int -> #HtmlElement) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_VALUE
+        member inline _.Yield(PARTAS_VALUE: Accessor<'T> -> int -> #HtmlElement) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_VALUE
 
     [<PartasImport("Show", "solid-js")>]
     [<Erase>]
     type Show() =
         interface HtmlContainer
+
         [<Erase>]
         member this.when'
             with set (value: bool) = ()
+
         [<Erase>]
         member this.fallback
             with set (value: HtmlElement) = ()
+
         [<Erase>]
         member this.keyed
             with set (value: bool) = ()
@@ -77,6 +89,7 @@ module Bindings =
     [<Erase>]
     type Match() =
         interface HtmlContainer
+
         [<Erase>]
         member this.when'
             with set (value: bool) = ()
@@ -85,9 +98,11 @@ module Bindings =
     [<Erase>]
     type Switch() =
         interface HtmlElement
+
         [<Erase>]
         member this.fallback
             with set (value: HtmlElement) = ()
+
         [<Erase>]
         member inline _.Combine
             ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
@@ -95,50 +110,65 @@ module Bindings =
             fun PARTAS_BUILDER ->
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND PARTAS_BUILDER
+
         [<Erase>]
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun = PARTAS_DELAY()
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
+            PARTAS_DELAY ()
+
         [<Erase>]
         member inline _.Zero() : HtmlContainerFun = ignore
-        [<Erase>]
-        member inline _.Yield(PARTAS_ELEMENT: Match) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
-    [<PartasImport("Suspense","solid-js")>]
+        [<Erase>]
+        member inline _.Yield(PARTAS_ELEMENT: Match) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+
+    [<PartasImport("Suspense", "solid-js")>]
     [<Erase>]
     type Suspense() =
         interface HtmlContainer
+
         [<Erase>]
         member this.fallback
             with set (value: HtmlElement) = ()
-    [<PartasImport("SuspenseList","solid-js")>]
+
+    [<PartasImport("SuspenseList", "solid-js")>]
     [<Erase>]
     type SuspenseList() =
         interface HtmlContainer
+
         [<Erase>]
         member this.revealOrder
             with set (value: string) = ()
+
         [<Erase>]
         member this.tail
             with set (value: string) = ()
+
         [<Erase>]
         member this.fallback
             with set (value: HtmlElement) = ()
-    [<PartasImport("Portal","solid-js/web")>]
+
+    [<PartasImport("Portal", "solid-js/web")>]
     [<Erase>]
     type Portal() =
         interface HtmlContainer
+
         [<Erase>]
         member this.mount
             with set (value: Element) = ()
+
         [<Erase>]
         member this.useShadow
             with set (value: bool) = ()
 
     module ErrorBoundary =
         type Fallback = delegate of err: obj * reset: (unit -> unit) -> HtmlElement
-    [<PartasImport("ErrorBoundary","solid-js")>]
+
+    [<PartasImport("ErrorBoundary", "solid-js")>]
     [<Erase>]
     type ErrorBoundary() =
         interface HtmlContainer
+
         [<Erase>]
         member this.fallback
             with set (value: ErrorBoundary.Fallback) = ()
@@ -160,15 +190,15 @@ module Bindings =
         static member Run(PARTAS_THIS: Switch, PARTAS_RUNEXPR: HtmlContainerFun) =
             PARTAS_RUNEXPR Unchecked.defaultof<_>
             PARTAS_THIS
-        
+
         /// <summary>
         /// Replace a signals value. This is synonymous with using the Setters as normal.
         /// </summary>
         /// <param name="setter">The signal setter</param>
         /// <param name="value">The next value</param>
         [<Extension; Erase>]
-        static member inline Invoke(setter: Setter<'T>, value: 'T): unit =
-            setter(value)
+        static member inline Invoke(setter: Setter<'T>, value: 'T) : unit =
+            setter (value)
         // In the case of calling Invoke on a setter, we want the alternate behaviour to be suggested first.
         /// <summary>
         /// Modify a signal value by performing computation on its previous value
@@ -176,9 +206,9 @@ module Bindings =
         /// <param name="setter">The signal setter</param>
         /// <param name="handler">The handler that takes the previous value and returns the next.</param>
         [<Extension; Erase>]
-        static member inline Invoke(setter: Setter<'T>, handler: 'T -> 'T): unit =
-            setter(unbox<'T> handler)
-        
+        static member inline Invoke(setter: Setter<'T>, handler: 'T -> 'T) : unit =
+            setter (unbox<'T> handler)
+
         /// <summary>
         /// Modify a signal value by replacing it with a new value.
         /// </summary>
@@ -186,8 +216,10 @@ module Bindings =
         /// <param name="value">The new value</param>
         /// <returns>The new value</returns>
         [<Extension; Erase>]
-        static member inline InvokeAndGet(setter: Setter<'T>, value: 'T): 'T =
-            setter(value) |> unbox<'T>
+        static member inline InvokeAndGet(setter: Setter<'T>, value: 'T) : 'T =
+            setter (value)
+            |> unbox<'T>
+
         /// <summary>
         /// Modify a signal value by performing computation its previous value.
         /// </summary>
@@ -195,9 +227,10 @@ module Bindings =
         /// <param name="handler">The handler that takes the previous value and returns the next.</param>
         /// <returns>The new value</returns>
         [<Extension; Erase>]
-        static member inline InvokeAndGet(setter: Setter<'T>, handler: 'T -> 'T): 'T =
-            setter(unbox<'T> handler) |> unbox<'T>
-            
+        static member inline InvokeAndGet(setter: Setter<'T>, handler: 'T -> 'T) : 'T =
+            setter (unbox<'T> handler)
+            |> unbox<'T>
+
     [<Interface; AllowNullLiteral>]
     type ResourceFetcherInfo<'T> =
         /// Previous value
@@ -211,14 +244,14 @@ module Bindings =
         /// an erased union of the type and bool.
         /// </remarks>
         abstract refetching: bool
-    
-    
+
+
     /// <summary>
     /// Arguments that are available to consume within the handler. The first is the source signal
     /// if any was provided (else null), and the second is an object with two properties, the previous
     /// value via <c>_.value</c>, and whether the fetcher was initiated by a <c>refetch</c> via <c>_.refetching</c>.
     /// </summary>
-    type ResourceFetcher<'U, 'T> = 'U -> ResourceFetcherInfo<'T> -> JS.Promise<'T> 
+    type ResourceFetcher<'U, 'T> = 'U -> ResourceFetcherInfo<'T> -> JS.Promise<'T>
 
     [<RequireQualifiedAccess; StringEnum>]
     type SolidResourceState =
@@ -237,6 +270,7 @@ module Bindings =
         /// Attention, will be undefined while loading
         [<Emit("$0()")>]
         abstract current: 'T
+
         abstract state: SolidResourceState
         abstract loading: bool
         abstract error: exn option
@@ -255,23 +289,30 @@ module Bindings =
         /// to be provided as an erased union of a provided type and bool instead of just bool.
         /// </summary>
         [<Extension; Erase>]
-        static member inline refetchingWith<'T>(this: ResourceFetcherInfo<_>): U2<'T, bool> = unbox<U2<'T, bool>> this.refetching
+        static member inline refetchingWith<'T>(this: ResourceFetcherInfo<_>) : U2<'T, bool> =
+            unbox<U2<'T, bool>> this.refetching
+
         [<Extension; Erase>]
-        static member inline refetchingWith<'T, 'U>(this: ResourceFetcherInfo<'U>): U2<'T, bool> = unbox<U2<'T, bool>> this.refetching
+        static member inline refetchingWith<'T, 'U>(this: ResourceFetcherInfo<'U>) : U2<'T, bool> =
+            unbox<U2<'T, bool>> this.refetching
+
         [<Emit("$0.refetch($1)")>]
         [<Extension; Erase>]
-        static member inline refetchWith<'U>(this: SolidResourceManager<obj>, input: 'U): JS.Promise<obj> = jsNative 
+        static member inline refetchWith<'U>(this: SolidResourceManager<obj>, input: 'U) : JS.Promise<obj> = jsNative
+
         [<Emit("$0.refetch($1)")>]
         [<Extension; Erase>]
-        static member inline refetchWith<'U, 'T>(this: SolidResourceManager<'T>, input: 'U): JS.Promise<'T> = jsNative 
-        
+        static member inline refetchWith<'U, 'T>(this: SolidResourceManager<'T>, input: 'U) : JS.Promise<'T> = jsNative
+
     type SolidStoreSetter<'T> =
         /// Replace old store value with new
         [<Emit("$0($1)")>]
         abstract Update: newValue: 'T -> unit
+
         /// Update store specifying updater function from old value to new value
         [<Emit("$0($1)")>]
         abstract Update: updater: ('T -> 'T) -> unit
+
         /// Update store using native solid path syntax
         [<Emit("$0(...$1)")>]
         abstract UpdatePath: pathArgs: obj[] -> unit
@@ -279,25 +320,30 @@ module Bindings =
     type SolidStorePath<'T, 'Value>(setter: SolidStoreSetter<'T>, path: obj[]) =
         member _.Setter = setter
         member _.Path = path
+
         /// Choose the store item that should be updated
         member inline this.Map(map: 'Value -> 'Value2) =
-            SolidStorePath<'T, 'Value2>(
+            SolidStorePath<'T, 'Value2> (
                 this.Setter,
-                Experimental.namesofLambda map |> Array.map box |> Array.append this.Path
+                Experimental.namesofLambda map
+                |> Array.map box
+                |> Array.append this.Path
             )
+
         /// Update store item using new value
         member this.Update(value: 'Value) : unit =
-            this.Setter.UpdatePath(Array.append this.Path [| value |])
+            this.Setter.UpdatePath (Array.append this.Path [| value |])
+
         /// Update store item specifying updater function from old value to new value
         member this.Update(updater: 'Value -> 'Value) : unit =
-            this.Setter.UpdatePath(Array.append this.Path [| updater |])
+            this.Setter.UpdatePath (Array.append this.Path [| updater |])
 
     [<AutoOpen>]
     module SolidExtensions =
 
         type SolidStoreSetter<'T> with
             /// Access more convenient way of updating store items
-            member this.Path = SolidStorePath<'T, 'T>(this, [||])
+            member this.Path = SolidStorePath<'T, 'T> (this, [||])
 
     [<Extension; Erase>]
     type SolidStorePathExtensions =
@@ -305,26 +351,29 @@ module Bindings =
         /// Select store item by index
         [<Extension; Erase>]
         static member inline Item(this: SolidStorePath<'T, 'Value array>, index: int) =
-            SolidStorePath<'T, 'Value>(this.Setter, Array.append this.Path [| index |])
+            SolidStorePath<'T, 'Value> (this.Setter, Array.append this.Path [| index |])
 
         /// Select store item by predicate
         [<Extension; Erase>]
         static member inline Find(this: SolidStorePath<'T, 'Value array>, predicate: 'Value -> bool) =
-            SolidStorePath<'T, 'Value>(this.Setter, Array.append this.Path [| predicate |])
+            SolidStorePath<'T, 'Value> (this.Setter, Array.append this.Path [| predicate |])
 
 [<AutoOpen>]
 [<Erase>]
 type Bindings =
     /// Returns a memo evaluating to the resolved children which updates whenever the children change.
     [<ImportMember("solid-js")>]
-    static member children(value: unit -> #HtmlElement): unit -> #HtmlElement = jsNative
+    static member children(value: unit -> #HtmlElement) : unit -> #HtmlElement = jsNative
+
     [<ImportMember("solid-js")>]
-    static member mergeProps([<ParamList>] values: 'T[]): 'T = jsNative
+    static member mergeProps([<ParamList>] values: 'T[]) : 'T = jsNative
+
     [<ImportMember("solid-js")>]
-    static member splitProps(o: 'T, properties: string array, otherProperties: string array): 'T * 'T = jsNative
+    static member splitProps(o: 'T, properties: string array, otherProperties: string array) : 'T * 'T = jsNative
+
     [<ImportMember("solid-js")>]
-    static member splitProps(o: 'T, properties: string array): 'T * 'T = jsNative
-    
+    static member splitProps(o: 'T, properties: string array) : 'T * 'T = jsNative
+
     [<ImportMember("solid-js/web")>]
     static member render(code: unit -> #HtmlElement, element: #Element) : unit = jsNative
 
@@ -333,8 +382,10 @@ type Bindings =
 
     [<ImportMember("solid-js")>]
     static member createSignal(value: 'T) : Signal<'T> = jsNative
+
     [<ImportMember("solid-js"); ParamObject(1)>]
-    static member createSignal(value: 'T, ?equals: ('T -> 'T -> bool), ?name: string, ?``internal``: bool): Signal<'T> = jsNative
+    static member createSignal(value: 'T, ?equals: ('T -> 'T -> bool), ?name: string, ?``internal``: bool) : Signal<'T> = jsNative
+
     [<ImportMember("solid-js")>]
     static member createMemo(value: unit -> 'T) : (unit -> 'T) = jsNative
 
@@ -345,34 +396,56 @@ type Bindings =
     static member createEffect(effect: 'T -> 'T, initialValue: 'T) : unit = jsNative
 
     [<ImportMember("solid-js")>]
-    static member createContext<'T> (?value: 'T): Context<'T> = jsNative
-    
+    static member createContext<'T>(?value: 'T) : Context<'T> = jsNative
+
     [<ImportMember("solid-js")>]
-    static member useContext(context: Context<'T>): 'T = jsNative
+    static member useContext(context: Context<'T>) : 'T = jsNative
+
     [<ImportMember("solid-js"); ParamObject(fromIndex = 2)>]
     static member createResource
-        (source: unit -> 'U option, fetcher: ResourceFetcher<'U option, 'T>, ?initialValue: 'T, ?name: string, ?deferStream: bool, ?onHydrated: (unit -> unit), ?ssrLoadFrom: string, ?storage: Signal<'T>): SolidResource<'T> * SolidResourceManager<'T> = jsNative
+        (
+            source: unit -> 'U option,
+            fetcher: ResourceFetcher<'U option, 'T>,
+            ?initialValue: 'T,
+            ?name: string,
+            ?deferStream: bool,
+            ?onHydrated: (unit -> unit),
+            ?ssrLoadFrom: string,
+            ?storage: Signal<'T>
+        ) : SolidResource<'T> * SolidResourceManager<'T> =
+        jsNative
+
     [<ImportMember("solid-js"); ParamObject(fromIndex = 1)>]
     static member createResource
-        (fetcher: ResourceFetcher<unit, 'T>, ?initialValue: 'T, ?name: string, ?deferStream: bool, ?onHydrated: (unit -> unit), ?ssrLoadFrom: string, ?storage: Signal<'T>): SolidResource<'T> * SolidResourceManager<'T> = jsNative
+        (
+            fetcher: ResourceFetcher<unit, 'T>,
+            ?initialValue: 'T,
+            ?name: string,
+            ?deferStream: bool,
+            ?onHydrated: (unit -> unit),
+            ?ssrLoadFrom: string,
+            ?storage: Signal<'T>
+        ) : SolidResource<'T> * SolidResourceManager<'T> =
+        jsNative
+
     [<ImportMember("solid-js")>]
-    static member createResource
-        (fetcher: ResourceFetcher<unit, 'T>): SolidResource<'T> * SolidResourceManager<'T> = jsNative
+    static member createResource(fetcher: ResourceFetcher<unit, 'T>) : SolidResource<'T> * SolidResourceManager<'T> = jsNative
+
     [<ImportMember("solid-js")>]
-    static member createResource
-        (source: unit -> 'U option, fetcher: ResourceFetcher<'U option, 'T>): SolidResource<'T> * SolidResourceManager<'T> = jsNative
-    
+    static member createResource(source: unit -> 'U option, fetcher: ResourceFetcher<'U option, 'T>) : SolidResource<'T> * SolidResourceManager<'T> =
+        jsNative
+
     /// Fetcher will be called immediately
     [<ImportMember("solid-js"); ParamObject(fromIndex = 1)>]
-    static member createResource
-        (fetcher: unit -> JS.Promise<'T>, ?initialValue: 'T)
-        : SolidResource<'T> * SolidResourceManager<'T> =
-        jsNative
+    static member createResource(fetcher: unit -> JS.Promise<'T>, ?initialValue: 'T) : SolidResource<'T> * SolidResourceManager<'T> = jsNative
+
     /// Injects Async.StartAsPromise to the fetcher
-    static member inline createResource
-        (fetcher: unit -> Async<'T>, ?initialValue: 'T)
-        : SolidResource<'T> * SolidResourceManager<'T> =
-            createResource(fetcher >> Async.StartAsPromise, ?initialValue = initialValue)
+    static member inline createResource(fetcher: unit -> Async<'T>, ?initialValue: 'T) : SolidResource<'T> * SolidResourceManager<'T> =
+        createResource (
+            fetcher
+            >> Async.StartAsPromise,
+            ?initialValue = initialValue
+        )
 
     /// Fetcher will be called only when source signal returns `Some('U)`
     [<ImportMember("solid-js"); ParamObject(fromIndex = 2)>]
@@ -380,12 +453,18 @@ type Bindings =
         (source: unit -> 'U option, fetcher: 'U -> JS.Promise<'T>, ?initialValue: 'T)
         : SolidResource<'T> * SolidResourceManager<'T> =
         jsNative
+
     /// Injects Async.StartAsPromise to the fetcher
     static member inline createResource
         (source: unit -> 'U option, fetcher: 'U -> Async<'T>, ?initialValue: 'T)
         : SolidResource<'T> * SolidResourceManager<'T> =
-        createResource(source, fetcher >> Async.StartAsPromise, ?initialValue = initialValue)
-    
+        createResource (
+            source,
+            fetcher
+            >> Async.StartAsPromise,
+            ?initialValue = initialValue
+        )
+
 
     [<ImportMember("solid-js")>]
     static member createRoot(fn (* dispose *) : Action -> 'T) : 'T = jsNative
@@ -433,6 +512,7 @@ type Bindings =
     /// Component lazy loading. Use in combination with `importComponent`
     [<Import("lazy", "solid-js")>]
     static member lazy'(import: unit -> JS.Promise<HtmlElement>) : HtmlElement = jsNative
+
     /// <summary>
     /// <c>createComputed</c> creates a new computation that immediately runs the given function in a tracking,
     /// thus automatically tracking its dependencies, and automatically reruns the function whenever the dependencies
@@ -448,19 +528,22 @@ type Bindings =
     /// <param name="fn">The function to run in a tracking scope.</param>
     /// <param name="value">The initial value to pass to the function.</param>
     [<ImportMember("solid-js")>]
-    static member createComputed<'T>(fn: 'T -> 'T, ?value: 'T): unit = jsNative
+    static member createComputed<'T>(fn: 'T -> 'T, ?value: 'T) : unit = jsNative
+
     /// <summary>
     /// Creates a readonly that only notifies downstream changes when the browser is idle. <c>timeoutMs</c> is the
     /// maximum time to wait before forcing the update.
     /// </summary>
     [<ImportMember("solid-js"); ParamObject(1)>]
-    static member createDeferred<'T>(source: unit -> 'T, ?timeoutMs: int, ?equals: 'T -> 'T -> bool, ?name: string): unit -> 'T = jsNative
+    static member createDeferred<'T>(source: unit -> 'T, ?timeoutMs: int, ?equals: 'T -> 'T -> bool, ?name: string) : unit -> 'T = jsNative
+
     /// <summary>
     /// Sometimes it is useful to separate tracking from re-execution. This primitive registers a side-effect
     /// that is run the first time the expression wrapped by the returned tracking is notified of a change.
     /// </summary>
     [<ImportMember("solid-js")>]
-    static member createReaction(onInvalidate: unit -> unit): (unit -> unit) -> unit = jsNative
+    static member createReaction(onInvalidate: unit -> unit) : (unit -> unit) -> unit = jsNative
+
     /// <summary>
     /// A render effect is a computation similar to a regular effect, but differs in when Solid schedules
     /// the first execution of the effect function. While createEffect waits for the current rendering
@@ -471,7 +554,8 @@ type Bindings =
     /// the rendering phase of itself, including setting of <b>refs</b>
     /// </summary>
     [<ImportMember("solid-js")>]
-    static member createRenderEffect<'T>(fn: 'T -> 'T, ?value: 'T): unit = jsNative
+    static member createRenderEffect<'T>(fn: 'T -> 'T, ?value: 'T) : unit = jsNative
+
     /// <summary>
     /// Creates a parameterised derived boolean signal <c>selector(key)</c> that indicates whether <c>key</c>
     /// is equal to the current value of the <c>source</c> signal. These signals are optimised to notify
@@ -485,7 +569,8 @@ type Bindings =
     /// <param name="source">The source signal to get the value from and compare with keys.</param>
     /// <param name="fn">A function to compare the key and the value, returning whether they should be treated as equal. Default: <c>=</c></param>
     [<ImportMember("solid-js")>]
-    static member createSelector<'T, 'U>(source: unit -> 'T, ?fn: 'U -> 'T -> bool): 'U -> bool = jsNative
+    static member createSelector<'T, 'U>(source: unit -> 'T, ?fn: 'U -> 'T -> bool) : 'U -> bool = jsNative
+
     /// <summary>
     /// Reactive map helper that caches each item by reference to avoid unnecessary recomputations.
     /// It only runs the mapping function once per value, and then moves or removes it as needed.
@@ -494,7 +579,8 @@ type Bindings =
     /// This is the underlying helper for the <c>For</c> component, which is used to render lists of items.
     /// </summary>
     [<ImportMember("solid-js")>]
-    static member mapArray<'T, 'U>(source: Accessor<'T[]>, fn: 'T -> Accessor<int> -> 'U): Accessor<'U[]> = jsNative
+    static member mapArray<'T, 'U>(source: Accessor<'T[]>, fn: 'T -> Accessor<int> -> 'U) : Accessor<'U[]> = jsNative
+
     /// <summary>
     /// Reactive helper that maps by index, similar to <c>mapArray</c>, but uses the index of the item in the array
     /// as the key for the mapping function. This is useful when you want to map over an array and use the index
@@ -503,4 +589,4 @@ type Bindings =
     /// This is the underlying helper for the <c>Index</c> component, which is used to render lists of items
     /// </summary>
     [<ImportMember("solid-js")>]
-    static member indexArray<'T, 'U>(source: Accessor<'T[]>, fn: Accessor<'T> -> int -> 'U): Accessor<'U[]> = jsNative
+    static member indexArray<'T, 'U>(source: Accessor<'T[]>, fn: Accessor<'T> -> int -> 'U) : Accessor<'U[]> = jsNative

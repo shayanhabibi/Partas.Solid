@@ -17,15 +17,21 @@ type internal InjectedLanguage =
 [<Erase>]
 type internal LanguageInjectionAttribute private (?injectedLanguage: InjectedLanguage, ?injectedLanguageName: string) =
     inherit Attribute()
+
     [<Erase>]
     member x.InjectedLanguage = injectedLanguage
+
     [<Erase>]
     member x.InjectedLanguageName = injectedLanguageName
+
     [<Erase>]
     member val Prefix = "" with get, set
+
     [<Erase>]
     member val Suffix = "" with get, set
+
     [<Erase>]
-    new(injectedLanguage: InjectedLanguage) = LanguageInjectionAttribute(injectedLanguage = injectedLanguage)
+    new(injectedLanguage: InjectedLanguage) = LanguageInjectionAttribute (injectedLanguage = injectedLanguage)
+
     [<Erase>]
-    new(injectedLanguageName: string) = LanguageInjectionAttribute(injectedLanguageName = injectedLanguageName)
+    new(injectedLanguageName: string) = LanguageInjectionAttribute (injectedLanguageName = injectedLanguageName)

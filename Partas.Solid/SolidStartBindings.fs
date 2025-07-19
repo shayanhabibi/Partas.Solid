@@ -99,58 +99,79 @@ type HttpStatusCode =
 module Bindings =
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
     module Spec =
-        let [<Literal>] path = "@solidjs/start"
-    
+        [<Literal>]
+        let path = "@solidjs/start"
+
     [<Erase; AutoOpen>]
     type Exports =
         [<Emit("\"use server\"", isStatement = true)>]
         static member useServer: unit = jsNative
+
         [<Mangle>]
         static member inline getServerFunctionMeta =
-            let inline fn(): unit -> {| id: string |} = (JsInterop.import "getServerFunctionMeta" Spec.path)
-            (fn()()).id
-        [<ImportMember(Spec.path + "/config")>]
-        static member defineConfig(config: obj): obj = jsNative
-        static member inline defineConfig(objList: (string * obj) list) = defineConfig(JsInterop.createObj objList) 
-        
-    [<ImportMember(Spec.path + "/server")>]
+            let inline fn () : unit -> {| id: string |} =
+                (JsInterop.import "getServerFunctionMeta" Spec.path)
+
+            (fn () ()).id
+
+        [<ImportMember(Spec.path
+                       + "/config")>]
+        static member defineConfig(config: obj) : obj = jsNative
+
+        static member inline defineConfig(objList: (string * obj) list) =
+            defineConfig (JsInterop.createObj objList)
+
+    [<ImportMember(Spec.path
+                   + "/server")>]
     type StartServer() =
         interface FragmentNode
+
         [<DefaultValue>]
-        val mutable document: ({|children: HtmlElement; assets: link; scripts: script|} -> html)
-    
+        val mutable document:
+            ({| children: HtmlElement
+                assets: link
+                scripts: script |}
+                -> html)
+
     [<Erase>]
     module Client =
-        [<ImportMember(Spec.path + "/client")>]
+        [<ImportMember(Spec.path
+                       + "/client")>]
         let mount (fn: unit -> HtmlElement, el: obj) = jsNative
-        
-    [<ImportMember(Spec.path + "/client")>]
+
+    [<ImportMember(Spec.path
+                   + "/client")>]
     type StartClient() =
         interface HtmlElement
-    
+
     type private T = HttpStatusCode
-    
+
     [<ImportMember(Spec.path)>]
     type HttpStatusCode() =
         interface VoidNode
+
         [<DefaultValue>]
         val mutable code: T
-    
+
     [<ImportMember(Spec.path)>]
     type HttpHeader() =
         interface VoidNode
+
         [<DefaultValue>]
         val mutable name: string
+
         [<DefaultValue>]
         val mutable value: string
 
-    [<ImportMember(Spec.path + "/router")>]
+    [<ImportMember(Spec.path
+                   + "/router")>]
     type FileRoutes() =
         interface HtmlElement
+
         [<Emit("$0")>]
-        member this.ToRoute() = unbox<Router.Bindings.Route> this
-    
+        member this.ToRoute() =
+            unbox<Router.Bindings.Route> this
+
     type Exports with
         [<ImportMember(Spec.path)>]
-        static member clientOnly (importFunc: unit -> JS.Promise<HtmlElement>): TagValue = jsNative
-    
+        static member clientOnly(importFunc: unit -> JS.Promise<HtmlElement>) : TagValue = jsNative

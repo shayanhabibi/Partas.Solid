@@ -4,6 +4,7 @@ open System
 open Fable
 open Fable.AST
 open Fable.AST.Fable
+
 /// Identifies what type of member the transformation sequence originated from
 /// Currently ?unutilised
 [<RequireQualifiedAccess>]
@@ -11,6 +12,7 @@ type internal TransformationKind =
     | MemberDecl
     | MemberCall
     | TypeMemberDecl
+
 /// Used in Active Pattern Matches to identify if a MemberRef is one of these
 [<RequireQualifiedAccess>]
 type internal MemberRefType =
@@ -30,10 +32,10 @@ type internal IdentType =
     // identifies props identifier
     | Props
     // identifies ContextProviders
-    | ContextProvider 
+    | ContextProvider
     // Identifies for loops
     // | Enumerator of EnumType
-    
+
     // Builders - PARTAS_{...}
     | Yield
     | First
@@ -44,7 +46,7 @@ type internal IdentType =
     | Cont
     | Value
     | Text
-    
+
     // Special cases
 
     // Unknown
@@ -76,24 +78,28 @@ module ComponentFlag =
     /// Minimal transformations. Any optimisations that are skippable are skipped.
     [<Literal>]
     let None =
-        ComponentFlag.SkipPojoOptimisation ||| ComponentFlag.SkipCEOptimisation
+        ComponentFlag.SkipPojoOptimisation
+        ||| ComponentFlag.SkipCEOptimisation
 
     [<Literal>]
-    let VerboseDebugMode = ComponentFlag.DebugMode ||| ComponentFlag.PrintDisposals
+    let VerboseDebugMode =
+        ComponentFlag.DebugMode
+        ||| ComponentFlag.PrintDisposals
+
 /// A record which is passed through almost all transformation patterns and methods.
 /// It can therefor be used to pass contextual information, or access the plugin helper
 /// from within the transformation tree (to shoot out a warning or something)
 type internal PluginContext =
-    {
-        Helper: PluginHelper
-        Kind: TransformationKind
-        SetterArray: ResizeArray<string * Expr>
-        GetterArray: ResizeArray<string>
-        SetterCollector: (string * Expr) -> unit
-        GetterCollector: string -> unit
-        Flags: ComponentFlag
-    }
-    member this.HasFlag flag = this.Flags.HasFlag flag
+    { Helper: PluginHelper
+      Kind: TransformationKind
+      SetterArray: ResizeArray<string * Expr>
+      GetterArray: ResizeArray<string>
+      SetterCollector: (string * Expr) -> unit
+      GetterCollector: string -> unit
+      Flags: ComponentFlag }
+
+    member this.HasFlag flag =
+        this.Flags.HasFlag flag
 
 /// Container for Funcs of the PluginContext type
 [<RequireQualifiedAccess>]
@@ -113,84 +119,96 @@ module internal PluginContext =
     ///     let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl
     /// </code></example>
     let create helper kind flags =
-        let ctx = {
-            Helper = helper
-            Kind = kind
-            SetterArray = new ResizeArray<string * Expr> [||]
-            GetterArray = new ResizeArray<string> [||]
-            SetterCollector = fun _  -> ()
-            GetterCollector = fun _ -> ()
-            Flags = flags
-        }
-        { ctx with SetterCollector = ctx.SetterArray.Add; GetterCollector = ctx.GetterArray.Add }
-    
+        let ctx =
+            { Helper = helper
+              Kind = kind
+              SetterArray = new ResizeArray<string * Expr> [||]
+              GetterArray = new ResizeArray<string> [||]
+              SetterCollector = fun _ -> ()
+              GetterCollector = fun _ -> ()
+              Flags = flags }
+
+        { ctx with
+            SetterCollector = ctx.SetterArray.Add
+            GetterCollector = ctx.GetterArray.Add }
+
     /// Condition. Check if flags contains enum
-    let hasFlag flag (ctx: PluginContext)= ctx.HasFlag flag
-    
-    /// Get the PluginHelper from the context    
+    let hasFlag flag (ctx: PluginContext) =
+        ctx.HasFlag flag
+
+    /// Get the PluginHelper from the context
     let helper = _.Helper
-    
+
     /// Get the Entity from an EntityRef
     let getEntity = _.Helper.GetEntity
-    
+
     /// Get the MemberFunctionOrValue from a MemberRef
     let getMember = _.Helper.GetMember
-    
+
     /// Emit a msg on Fable compilation as a warning
     let logWarning = _.Helper.LogWarning
-    
+
     /// Emit a msg on Fable compilation as an error.
     /// This will complete the transformation before emitting all collected errors.
     let logError = _.Helper.LogError
-    
+
     /// Access the setter array without clearing it
-    let peekSetters = _.SetterArray.ToArray() >> Array.toList
-    
+    let peekSetters =
+        _.SetterArray.ToArray()
+        >> Array.toList
+
     /// Access the getter array without clearing it
-    let peekGetters = _.GetterArray.ToArray() >> Array.toList
-    
+    let peekGetters =
+        _.GetterArray.ToArray()
+        >> Array.toList
+
     /// Logs a warning if a setter key has already been provided a value.
     let checkDuplicateSetter (ctx: PluginContext) (setter: string * Expr) =
         ctx
         |> _.SetterArray
-        |> _.Exists(fst >> (=) (fst setter))
+        |> _.Exists(
+            fst
+            >> (=) (fst setter)
+        )
         |> function
-            | true -> $"Multiple defaults for the same property in a `SolidTypeComponent` are not allowed: '{fst setter}' was set more than once" |> logError ctx
+            | true ->
+                $"Multiple defaults for the same property in a `SolidTypeComponent` are not allowed: '{fst setter}' was set more than once"
+                |> logError ctx
             | false -> ()
-            
+
     /// <summary>
     /// Adds an attribute (or more precise to say the element <c>props</c>) property set name and the value
     /// it is being set to. This is lifted at the end of the transformations to produce a <c>solid-js</c> mergeProps.
     /// </summary>
-    let addSetter ctx setter=
+    let addSetter ctx setter =
         checkDuplicateSetter ctx setter
         ctx.SetterCollector setter
-    
+
     /// <summary>
     /// Adds an attribute (or more precise to say the element <c>props</c>) property access selector to the context.
     /// This is lifted at the end of the transformations to produce a <c>solid-js</c> splitProps.
     /// </summary>
     let addGetter = _.GetterCollector
-    
-    
+
+
     /// <summary>
     /// Lift the getter array values. This clears the context values for the array. Use <c>peekGetters</c> to observe
     /// the elements without clearing them.
     /// </summary>
     let getGetters (ctx: PluginContext) =
         let getters = peekGetters ctx
-        ctx.GetterArray.Clear()
+        ctx.GetterArray.Clear ()
         getters
-    
+
     /// <summary>
     /// Lift the setter array values. This clears the context values for the array. Use <c>peekSetters</c> to observe
     /// the elements without clearing them.
     /// </summary>
     let getSetters (ctx: PluginContext) =
         let setters = peekSetters ctx
-        ctx.SetterArray.Clear()
+        ctx.SetterArray.Clear ()
         setters
-    
+
     /// <summary>
     /// When disposing of an expression (ie not including it in the final transformation tree), you can apply this
     /// func with a <c>PluginContext</c> and a context string (such as in what process this is occuring, eg: 'property
@@ -200,18 +218,24 @@ module internal PluginContext =
     /// <param name="ctx"></param>
     /// <param name="disposalContext"></param>
     /// <param name="expr"></param>
-    let debugDisposal (ctx: PluginContext) (disposalContext: string) (expr: Expr)=
-        if ctx|> hasFlag ComponentFlag.PrintDisposals then
+    let debugDisposal (ctx: PluginContext) (disposalContext: string) (expr: Expr) =
+        if
+            ctx
+            |> hasFlag ComponentFlag.PrintDisposals
+        then
             match expr with
-            | Value(UnitConstant, _)
-            | IdentExpr({ Name = "returnVal" }) -> ()
+            | Value (UnitConstant, _)
+            | IdentExpr ({ Name = "returnVal" }) -> ()
             | expr ->
-                let helper = ctx |> helper
+                let helper =
+                    ctx
+                    |> helper
+
                 let msg = $"An expression was disposed of during {disposalContext}:\n{expr}"
+
                 match expr.Range with
-                | Some range ->
-                    helper.LogWarning(msg, range)
-                | _ -> helper.LogWarning(msg)
+                | Some range -> helper.LogWarning (msg, range)
+                | _ -> helper.LogWarning (msg)
 
 /// DU which holds a string of the name for the Tag, or an expression containing the name of the tag, and where it
 /// should be imported from on compilation.
@@ -231,10 +255,13 @@ type internal PropList = PropInfo list
 /// The intermediary object that clearly categorizes expressions for rendering, irregardless of whether the
 /// types like TagInfo are refactored
 type internal ElementBuilder =
-    {
-        TagSource: TagSource
-        Properties: PropList
-        Children: Expr list
-        Range: SourceLocation option
-    }
-    static member create tagSource properties range = { TagSource = tagSource; Properties = properties; Children = []; Range = range }
+    { TagSource: TagSource
+      Properties: PropList
+      Children: Expr list
+      Range: SourceLocation option }
+
+    static member create tagSource properties range =
+        { TagSource = tagSource
+          Properties = properties
+          Children = []
+          Range = range }

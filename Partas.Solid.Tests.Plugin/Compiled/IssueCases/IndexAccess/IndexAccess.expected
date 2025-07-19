@@ -1,0 +1,10 @@
+import { splitProps } from "solid-js";
+import { defaultOf } from "../../fable_modules/fable-library-js.5.0.0-alpha.13/Util.js";
+
+export function TestStringAccess(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["index"]);
+    const context = defaultOf();
+    return <div>
+        {context.value()[PARTAS_LOCAL.index]}
+    </div>;
+}

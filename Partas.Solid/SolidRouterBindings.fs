@@ -22,24 +22,31 @@ module Bindings =
         | Preload
 
     [<Pojo>]
-    type NavigateOptions
-        (
-            ?resolve: bool,
-            ?replace: bool,
-            ?scroll: bool,
-            ?state: obj
-        )=
-        member val resolve: bool = resolve |> Option.defaultValue !!null with get,set
-        member val replace: bool = replace |> Option.defaultValue !!null with get,set
-        member val scroll: bool = scroll |> Option.defaultValue !!null with get,set
-        member val state: obj = state |> Option.defaultValue !!null with get,set
+    type NavigateOptions(?resolve: bool, ?replace: bool, ?scroll: bool, ?state: obj) =
+        member val resolve: bool =
+            resolve
+            |> Option.defaultValue !!null with get, set
+
+        member val replace: bool =
+            replace
+            |> Option.defaultValue !!null with get, set
+
+        member val scroll: bool =
+            scroll
+            |> Option.defaultValue !!null with get, set
+
+        member val state: obj =
+            state
+            |> Option.defaultValue !!null with get, set
 
     type Navigator =
         [<Emit("$0($1...)")>]
         abstract member Invoke: ``to``: string * ?options: NavigateOptions -> unit
+
         /// Replaces NavigateOptions
         [<Emit("$0($1...)"); ParamObject(1)>]
         abstract member InvokeOptions: ``to``: string * ?resolve: bool * ?replace: bool * ?scroll: bool * ?state: obj -> unit
+
         [<Emit("$0($1...)")>]
         abstract member Invoke: delta: float -> unit
 
@@ -89,18 +96,23 @@ module Bindings =
     [<PartasImport("Route", "@solidjs/router")>]
     type Route() =
         interface HtmlElement
+
         [<Erase>]
         member this.path
             with set (value: string) = ()
+
         [<Erase>]
         member this.component'
             with set (value: TagValue) = ()
+
         [<Erase>]
         member this.matchFilters
             with set (value: obj) = ()
+
         [<Erase>]
         member this.preload
             with set (value: RoutePreloadFunc) = ()
+
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Combine
@@ -109,46 +121,61 @@ module Bindings =
             fun PARTAS_BUILDER ->
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND PARTAS_BUILDER
+
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun = PARTAS_DELAY()
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
+            PARTAS_DELAY ()
+
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Zero() : HtmlContainerFun = ignore
+
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     [<Pojo>]
-    type RootConfig (path: string, ``component``: HtmlElement) =
+    type RootConfig(path: string, ``component``: HtmlElement) =
         member val path: string = jsNative with get, set
+
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member val ``component``: HtmlElement = jsNative with get, set
+
         /// <summary> Alias for <c>_.``component``</c></summary>
         member this.component'
-            with inline set(value: HtmlElement) = this.``component`` <- value
-            and inline get(): HtmlElement = this.``component``
+            with inline set (value: HtmlElement) = this.``component`` <- value
+            and inline get (): HtmlElement = this.``component``
+
     [<PartasImport("Router", "@solidjs/router")>] // Replaces Import as it doesn't impact the builder param names
     type Router() =
         interface HtmlElement
+
         [<Erase>]
         member this.root
             with set (value: TagValue) = ()
+
         [<Erase>]
         member this.base'
             with set (value: string) = ()
+
         [<Erase>]
         member this.actionBase
             with set (value: string) = ()
+
         [<Erase>]
         member this.preload
             with set (value: bool) = ()
+
         [<Erase>]
         member this.explicitLinks
             with set (value: bool) = ()
+
         [<Erase>]
         member this.url
             with set (value: string) = ()
+
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Combine
@@ -157,25 +184,32 @@ module Bindings =
             fun PARTAS_BUILDER ->
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND PARTAS_BUILDER
+
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun = PARTAS_DELAY()
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
+            PARTAS_DELAY ()
+
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
         member inline _.Zero() : HtmlContainerFun = ignore
+
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+
         [<Erase>]
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: RootConfig[]) : HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield(PARTAS_ELEMENT: RootConfig[]) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     [<PartasImport("HashRouter", "@solidjs/router")>]
     type HashRouter() =
         inherit Router()
 
     [<Pojo>]
-    type PreloadData (preloadData: bool) =
+    type PreloadData(preloadData: bool) =
         member val preloadData: bool = jsNative with get, set
 
     [<Erase>]
@@ -195,24 +229,31 @@ module Bindings =
     [<Import("A", "@solidjs/router")>]
     type A() =
         interface RegularNode
+
         [<Erase>]
         member this.href
             with set (value: string) = ()
+
         [<Erase>]
         member this.noScroll
             with set (value: bool) = ()
+
         [<Erase>]
         member this.replace
             with set (value: bool) = ()
+
         [<Erase>]
         member this.state
             with set (value: obj) = ()
+
         [<Erase>]
         member this.activeClass
             with set (value: string) = ()
+
         [<Erase>]
         member this.inactiveClass
             with set (value: string) = ()
+
         [<Erase>]
         member this.end'
             with set (value: bool) = ()
@@ -220,9 +261,11 @@ module Bindings =
     [<Import("Navigate", "@solidjs/router")>]
     type Navigate() =
         interface RegularNode
+
         [<Erase>]
         member this.href
             with set (value: string) = ()
+
         [<Erase>]
         member this.state
             with set (value: obj) = ()
