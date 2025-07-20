@@ -9,11 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <h3><!-- 9 -->Other</h3>
 - [skip ci] by @shayanhabibi
+- [skip ci] by @actions-user
+- [skip ci] by @shayanhabibi
 - [skip ci] by @shayanhabibi
 - [skip ci] by @shayanhabibi
 - [skip ci] by @shayanhabibi
 - [skip-ci] by @shayanhabibi
 
+<h2>New Contributors</h2>
+* @actions-user made their first contribution
 
 ## [1.2.0] - 2025-07-20
 
@@ -136,14 +140,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stop being lazy and re-include analyser on spec test by @shayanhabibi
 - More spec test by @shayanhabibi
 - Make the prop setter more specific to prevent lifting setters #24 by @shayanhabibi
-- Prebuilt generic builders up to four parameters by @shayanhabibi
 
 
 ## [0.2.35] - 2025-05-17
-
-<h3><!-- 3 -->Changed</h3>
-- CreatResource overloads to match solid-js spec. Cannot be tupled by @shayanhabibi
-- CreatResource overloads to match solid-js spec by @shayanhabibi
 
 <h3><!-- 9 -->Other</h3>
 - 0.2.35 by @shayanhabibi
@@ -185,7 +184,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <h3><!-- 3 -->Changed</h3>
 - Update readme by @shayanhabibi
-- Complete createSignal binding by @shayanhabibi
 - Cleanup first pass transformation by @shayanhabibi
 - Refactor TagInfo out of transformation. Replace with initialising ElementBuilder
 - Update readme by @shayanhabibi
@@ -339,17 +337,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix expression transformations by @shayanhabibi
 
 <h3><!-- 9 -->Other</h3>
-- Prevent prop getters in builders being transformed out by @shayanhabibi
 - Transform inside arrays by @shayanhabibi
 - Transform inside anon records by @shayanhabibi
 - Log warning if setting multiple of the same property by @shayanhabibi
-- Prevent a builder from containing only a setter to create open tags instead of a self closing tag by @shayanhabibi
 - Prevent setters at the head of a builder not being transformed. by @shayanhabibi
 - Implementation of patterns to green informal tests of SolidBindings from Oxpecker.Solid.Tests by @shayanhabibi
 - Workable iteration of new plugin transpiler. by @shayanhabibi
 - More forky and less derivative by @shayanhabibi
 - More forky and less derivative by @shayanhabibi
-- Init 0.1.0 by @shayanhabibi
 
 <h2>New Contributors</h2>
 * @shayanhabibi made their first contribution
