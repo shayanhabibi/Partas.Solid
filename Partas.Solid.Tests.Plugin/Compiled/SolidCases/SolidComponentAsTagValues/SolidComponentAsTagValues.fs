@@ -8,21 +8,22 @@ open Fable.Core.JsInterop
 [<Erase>]
 type CustomTag() =
     interface RegularNode
+
     [<Erase>]
-    member val icon: TagValue = unbox null with get,set
+    member val icon: TagValue = unbox null with get, set
+
     [<SolidTypeComponent>]
     member props.constructor =
         props.icon <- !@button
-        div() {
+
+        div () {
             props.icon % {| class' = "KeyVal" |}
             props.icon % {| class' = "KeyVal2" |}
-            props.icon % div(class' = "constructor") { button() { "internal" } }
+            props.icon % div (class' = "constructor") { button () { "internal" } }
 
         }
 
 [<SolidComponent>]
 let Rock () =
     let Comp = !@Imported
-    CustomTag(icon = unbox !@a) {
-        Comp % Imported(other = !@ModuleTag )
-    }
+    CustomTag (icon = unbox !@a) { Comp % Imported (other = !@ModuleTag) }

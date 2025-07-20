@@ -6,11 +6,11 @@ open Fable.Core
 #nowarn 64
 
 [<SolidComponent>]
-let ModuleTag() =
-    div()
+let ModuleTag () = div ()
 
 [<Import("FakeImportedTag", "fakeLibrary")>]
 type Imported() =
     interface RegularNode
+
     [<Erase>]
-    member val other: TagValue = jsNative with get,set
+    member val other: TagValue = jsNative with get, set

@@ -143,7 +143,7 @@ module Builder =
     /// let tag = !@div
     /// </code></example>
     [<Erase>]
-    type TagValue(tag: FSharpFunc<_,#HtmlElement>) =
+    type TagValue(tag: FSharpFunc<_, #HtmlElement>) =
         /// <summary>
         /// Directs the plugin to build the call site as a Tag
         /// in JSX.
@@ -201,7 +201,8 @@ module Builder =
     /// let tag = !@div
     /// </code></example>
     [<Erase>]
-    let (!@) (this: FSharpFunc<_,#HtmlElement>) = TagValue(unbox this)
+    let (!@) (this: FSharpFunc<_, #HtmlElement>) =
+        TagValue (unbox this)
 
     /// Alias used in the provided builder
     [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
