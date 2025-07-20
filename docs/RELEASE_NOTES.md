@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<h2>[Unreleased]</h2>
+
+<h3><!-- 9 -->Other</h3>
+- [skip ci] by @shayanhabibi
+- [skip ci] by @shayanhabibi
+- [skip ci] by @shayanhabibi
+- [skip ci] by @shayanhabibi
+- [skip-ci] by @shayanhabibi
+
+
+## [1.2.0] - 2025-07-20
+
+<h3><!-- 0 -->Features</h3>
+- SolidComponent let bindings can be used as TagValues by @shayanhabibi in [#36](https://github.com/shayanhabibi/Partas.Solid/pull/36)
+
+<h3><!-- 1 -->Added</h3>
+- Commit generated release notes & trigger CI on tag version push by @shayanhabibi
+
+<h3><!-- 5 -->Fixed</h3>
+- Delegate versioning of packages to the build script appropriately by @shayanhabibi
+
+
 ## [1.1.6] - 2025-07-19
 
 <h3><!-- 0 -->Features</h3>
@@ -332,6 +354,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <h2>New Contributors</h2>
 * @shayanhabibi made their first contribution
 
+[unreleased]: https://github.com/shayanhabibi/Partas.Solid/compare/1.2.0..HEAD
+[1.2.0]: https://github.com/shayanhabibi/Partas.Solid/compare/1.1.6..1.2.0
 [1.1.6]: https://github.com/shayanhabibi/Partas.Solid/compare/v1.1.5..1.1.6
 [1.1.5]: https://github.com/shayanhabibi/Partas.Solid/compare/1.1.5..v1.1.5
 [1.1.5]: https://github.com/shayanhabibi/Partas.Solid/compare/1.0.0..1.1.5
