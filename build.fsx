@@ -244,6 +244,14 @@ Ops.Clean
 ==> Ops.Build
 ==> Ops.Test
 
+// We want to prevent CheckFormat causing failure of master branch
+// commits due to formatting, especially if the changes only relate
+// to the build scripts or other.
+if Git.Information.getBranchName "." = "master" then
+    Ops.Format
+    ==> Ops.CheckFormat
+    |> ignore
+
 Ops.RestoreTools
 ==> Ops.Test
 
