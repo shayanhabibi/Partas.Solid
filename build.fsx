@@ -236,7 +236,8 @@ Ops.Test
 ==> Ops.Nuget
 ==> Ops.Publish
 
-Ops.ReleaseNotes
+Ops.GitCliff
+==> Ops.ReleaseNotes
 ==> Ops.Publish
 
 Ops.Test
