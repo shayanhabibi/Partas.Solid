@@ -248,7 +248,6 @@ Ops.Test
 
 Ops.GitCliff
 ==> Ops.ReleaseNotes
-==> Ops.Publish
 
 Ops.Test
 ==> Ops.Nuget

@@ -8,7 +8,7 @@ env:
   DOTNET_VERSION: 9.0.101
 
 jobs:
-  package:
+  publish:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
@@ -30,4 +30,6 @@ jobs:
 
       - name: Publish Release Notes
         run: dotnet fsi ./build.fsx target releasenotes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
