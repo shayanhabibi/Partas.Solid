@@ -27,6 +27,7 @@ commit_parsers = [
     # Ignore commit if has 'changelog: ignore' in footer
     { footer = "^changelog: ?ignore", skip = true },
     { message = "^==", skip = true},
+    { message = "^[skip ci]", skip = true},
     # GROUP FEATURES
     { message = "^feat", group = "<!-- 0 -->Features" },
     # GROUP ADDED
