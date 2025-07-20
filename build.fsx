@@ -106,6 +106,12 @@ Target.create Ops.Format (fun _ ->
         Trace.log $"Errors while formatting all files: %A{result.Messages}")
 
 Target.create Ops.CheckFormat (fun _ ->
+    let errorAction =
+        if Git.Information.getBranchName "." = "master" then
+            Trace.traceImportant
+        else
+            failwith
+
     let result =
         sourceFiles
         |> Seq.map (sprintf "\"%s\"")
@@ -116,10 +122,10 @@ Target.create Ops.CheckFormat (fun _ ->
     if result.ExitCode = 0 then
         Trace.log "No files need formatting"
     elif result.ExitCode = 99 then
-        failwith "Some files need formatting, run `dotnet fsi build.fsx target Format` to format them."
+        errorAction "Some files need formatting, run `dotnet fsi build.fsx target Format` to format them."
     else
         Trace.logf $"Errors while formatting: %A{result.Errors}"
-        failwith "Unknown errors while formatting")
+        errorAction "Unknown errors while formatting")
 
 Target.create Ops.GitCliff (fun _ ->
     { ExecParams.Empty with
@@ -215,12 +221,9 @@ Target.create Ops.PublishLocal (fun _ ->
 
 Target.create Ops.ReleaseNotes (fun _ ->
     Git.FileStatus.getAllFiles "./docs"
-    |> Seq.iter ( function
-        | Git.FileStatus.FileStatus.Modified, "RELEASE_NOTES.md" ->
-            Git.Commit.execExtended "./docs" "[skip ci]" "docs: Update RELEASE_NOTES.md"
-        | _ -> ()
-        )
-    )
+    |> Seq.iter (function
+        | Git.FileStatus.FileStatus.Modified, "RELEASE_NOTES.md" -> Git.Commit.execExtended "./docs" "[skip ci]" "docs: Update RELEASE_NOTES.md"
+        | _ -> ()))
 
 Ops.GitCliff
 ==> Ops.AssemblyInfo
@@ -243,14 +246,6 @@ Ops.Test
 Ops.Clean
 ==> Ops.Build
 ==> Ops.Test
-
-// We want to prevent CheckFormat causing failure of master branch
-// commits due to formatting, especially if the changes only relate
-// to the build scripts or other.
-if Git.Information.getBranchName "." = "master" then
-    Ops.Format
-    ==> Ops.CheckFormat
-    |> ignore
 
 Ops.RestoreTools
 ==> Ops.Test
