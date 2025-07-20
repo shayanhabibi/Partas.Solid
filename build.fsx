@@ -222,7 +222,7 @@ Target.create Ops.PublishLocal (fun _ ->
 Target.create Ops.ReleaseNotes (fun _ ->
     Git.FileStatus.getAllFiles "./docs"
     |> Seq.iter (function
-        | Git.FileStatus.FileStatus.Modified, "RELEASE_NOTES.md" -> Git.Commit.execExtended "./docs" "[skip ci]" "docs: Update RELEASE_NOTES.md"
+        | _, "RELEASE_NOTES.md" -> Git.Commit.execExtended "./docs" "[skip ci]" "docs: Update RELEASE_NOTES.md"
         | _ -> ()))
 
 Ops.GitCliff
