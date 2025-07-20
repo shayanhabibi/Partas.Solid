@@ -90,7 +90,9 @@ let SolidCases =
           "CssStyles"
           |> runSolidCase "CssStyle definitions compiles correct output"
           "ChildLambdaProvider"
-          |> runSolidCase "ChildLambdaProvider interfaces" ]
+          |> runSolidCase "ChildLambdaProvider interfaces"
+          "SolidComponentAsTagValues"
+          |> runSolidCase "SolidComponent let bindings as TagValues" ]
 
 [<Tests>]
 let AttributeCases =
