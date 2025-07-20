@@ -220,16 +220,20 @@ Target.create Ops.PublishLocal (fun _ ->
     ))
 
 Target.create Ops.ReleaseNotes (fun _ ->
-    Git.FileStatus.getAllFiles "./docs"
-    |> Seq.iter (function
-        | _, "RELEASE_NOTES.md" ->
-            Git.Staging.stageFile "./docs" "RELEASE_NOTES.md"
-            |> function
-                | _ -> ()
-            Git.CommandHelper.directRunGitCommandAndFail "." "config --local user.email \"action@github.com\""
-            Git.CommandHelper.directRunGitCommandAndFail "." "config --local user.name \"GitHub Action\""
-            Git.Commit.execExtended "./docs" "[skip ci]" "docs: Update RELEASE_NOTES.md"
-        | _ -> ()))
+    Git.Staging.stageFile "./docs" "RELEASE_NOTES.md"
+    |> function
+        | true, _, _ ->
+            Git.FileStatus.getAllFiles "./docs"
+            |> Seq.iter (function
+                | _, "RELEASE_NOTES.md" ->
+                    Git.CommandHelper.directRunGitCommandAndFail "." "config --local user.email \"action@github.com\""
+                    Git.CommandHelper.directRunGitCommandAndFail "." "config --local user.name \"GitHub Action\""
+                    Git.Commit.execExtended "./docs" "[skip ci]" "docs: Update RELEASE_NOTES.md"
+                    Git.Branches.push "."
+                | _ -> ())
+        | _, _, msg ->
+            Trace.traceImportant msg
+    )
 
 Ops.GitCliff
 ==> Ops.AssemblyInfo
