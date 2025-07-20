@@ -88,6 +88,9 @@
         <Content Include="AttributeCases\PartasImportAttr\PartasImportAttr.expected" />
         <Compile Include="AttributeCases\Pojo\Pojo.fs" />
         <Content Include="AttributeCases\Pojo\Pojo.expected" />
+        <Compile Include="SolidCases\SolidComponentAsTagValues\SolidComponentAsTagValuesTypes.fs" />
+        <Compile Include="SolidCases\SolidComponentAsTagValues\SolidComponentAsTagValues.fs" />
+        <Content Include="SolidCases\SolidComponentAsTagValues\SolidComponentAsTagValues.expected" />
 <!--        <Content Include="Spec\Components.fs" />-->
     </ItemGroup>
 
