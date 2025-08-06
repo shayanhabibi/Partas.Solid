@@ -226,14 +226,15 @@ Target.create Ops.ReleaseNotes (fun _ ->
             Git.FileStatus.getAllFiles "./docs"
             |> Seq.iter (function
                 | _, "RELEASE_NOTES.md" ->
-                    Git.CommandHelper.directRunGitCommandAndFail "." "config --local user.email \"41898282+github-actions[bot]@users.noreply.github.com\""
+                    Git.CommandHelper.directRunGitCommandAndFail
+                        "."
+                        "config --local user.email \"41898282+github-actions[bot]@users.noreply.github.com\""
+
                     Git.CommandHelper.directRunGitCommandAndFail "." "config --local user.name \"GitHub Action\""
                     Git.Commit.execExtended "./docs" "[skip ci]" "docs: Update RELEASE_NOTES.md"
                     Git.Branches.push "."
                 | _ -> ())
-        | _, _, msg ->
-            Trace.traceImportant msg
-    )
+        | _, _, msg -> Trace.traceImportant msg)
 
 Ops.GitCliff
 ==> Ops.AssemblyInfo
