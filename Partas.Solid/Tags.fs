@@ -28,6 +28,9 @@ module Tags =
         [<Extension; Erase>]
         static member on(this: #HtmlTag, eventName: string, eventHandler: Event -> unit) = this
 
+        [<Extension; Erase>]
+        static member on(this: #HtmlTag, eventName: string, eventHandler: obj) = this
+
         /// Add data attribute to the element
         [<Extension; Erase>]
         static member data(this: #HtmlTag, name: string, value: string) = this
