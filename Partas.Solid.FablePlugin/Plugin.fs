@@ -1,7 +1,7 @@
 ﻿namespace Partas.Solid
 // The majority of this plugin behaviour is enabled by the following pattern matchers and functions:
 // - BuilderCollector
-//     Collects everything in the tag builder computations 
+//     Collects everything in the tag builder computations
 // - PropsCollector
 //     Collects all the properties passed to tag constructors
 // - TagConstructor
@@ -61,8 +61,8 @@ module internal rec AST =
                 | IfThenElse(ValueUnrollerFeedback ctx guardExprs, ValueUnrollerFeedback ctx thenExprs, ValueUnrollerFeedback ctx elseExprs, range) ->
                     IfThenElse(Sequential guardExprs, Sequential thenExprs, Sequential elseExprs, range) :: rest
                 | expr -> expr :: rest
-            
-        
+
+
         /// <summary>
         /// Recognizes whether current expression is considered a prop setter by
         /// any of our definitions.
@@ -88,22 +88,20 @@ module internal rec AST =
                     None
             // This is a setter to a val mutable field.
             | Set(
-                (
+                expr = (
                     // Defined locally
                     IdentExpr(Ident.IdentIs ctx IdentType.Props)
                     // inherited
-                  | TypeCast(IdentExpr(Ident.IdentIs ctx IdentType.Props), _)
-                )
-                ,FieldSet(name)
-                ,_
-                ,expr
-                ,_) ->
+                  | TypeCast(expr = IdentExpr(Ident.IdentIs ctx IdentType.Props))
+                );
+                kind = FieldSet(name);
+                value = expr) ->
                 Some(name, expr)
-                
+
             | _ -> None
         /// <summary>
         /// Recognizes whether current expression is considered a prop setter by any
-        /// of our definitions. 
+        /// of our definitions.
         /// </summary>
         /// <remarks>
         /// It is imperative that this recognizer in a recursive transformation tree
@@ -112,23 +110,20 @@ module internal rec AST =
         /// </remarks>
         let private (|PropertyGetter|_|) (ctx: PluginContext) = function
             | Get(
-                (
+                expr = (
                     // Defined locally
                     IdentExpr(Ident.IdentIs ctx IdentType.Props)
                     // Inherited
-                  | TypeCast(IdentExpr(Ident.IdentIs ctx IdentType.Props), _)
-                ),
-                FieldGet({ Name = prop }), _, _
-                )
+                  | TypeCast(expr = IdentExpr(Ident.IdentIs ctx IdentType.Props))
+                );
+                kind = FieldGet({ Name = prop }))
             | Call(
-                _,
-                {
+                info = {
                     ThisArg = Some(IdentExpr(Ident.IdentIs ctx IdentType.Props))
                     Args = [ _ ]
                     MemberRef = MemberRef.Option.PartasName ctx prop
-                } & { MemberRef =Some(MemberRef.MemberRefIs ctx MemberRefType.Getter) },
-                _,
-                _) ->
+                } & { MemberRef =Some(MemberRef.MemberRefIs ctx MemberRefType.Getter) }
+                ) ->
                 Some(prop)
             | _ -> None
         // Collects and transforms any of our 'special' `props` usage so that we can
@@ -165,9 +160,10 @@ module internal rec AST =
                 | _, _ -> None
             // member val set/get
             | Set( // With inheritance within the same module etc, there may be a TypeCast on the IdentExpr.
-                Expr.TypeCastDrill ctx (IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal)), // TypeCast drill to first expr
-                FieldSet(prop),
-                _, expr, _) ->
+                expr = Expr.TypeCastDrill ctx (IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal)) // TypeCast drill to first expr
+                kind = FieldSet(prop)
+                value = expr
+                ) ->
                 (prop, transform ctx expr)
                 |> Some
             // Inlined named overloads to `[<DefaultValue>] val mutable` properties/attributes
@@ -175,9 +171,9 @@ module internal rec AST =
                     { IsThisArgument = true; IsCompilerGenerated = true },
                     IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal),
                     Set(
-                        IdentExpr({  IsThisArgument = true (*; IsCompilerGenerated = false *) }),
-                        FieldSet(prop),
-                        _, expr, _
+                        expr = IdentExpr({  IsThisArgument = true (*; IsCompilerGenerated = false *) })
+                        kind = FieldSet(prop)
+                        value = expr
                     )
                 ) ->
                 (prop, transform ctx expr) |> Some
@@ -185,7 +181,7 @@ module internal rec AST =
             | Call(
                 Value(ValueKind.UnitConstant, None),
                 {
-                    MemberRef = Some(MemberRef(_, { CompiledName = extensionName }))
+                    MemberRef = Some(MemberRef( info = { CompiledName = extensionName }))
                     Args = exprs
                 },
                 Type.MetaType,
@@ -200,7 +196,7 @@ module internal rec AST =
                     let propName =
                         match extensionName with
                         | "bool" | "on" | "use" -> $"{extensionName}:{prop}"
-                        | "data" -> $"data-{prop}" 
+                        | "data" -> $"data-{prop}"
                         | "attr" -> prop
                         | _ -> failwith "Unreachable"
                     Some(propName, transform ctx value)
@@ -217,40 +213,28 @@ module internal rec AST =
                     when fable5 ->
                     Some("{..." + ident + "} bool:n$", Value(ValueKind.BoolConstant(false), None))
                 // handles tupled getters `div().spread(someEnumerable[0])`
-                | "spread", [ (TypeCast(
-                        Get(
-                            IdentExpr({ Name = ident }),
-                            TupleIndex indx,
-                            _,
-                            _
-                            )
-                        , _
-                        )
+                | "spread", [ (
+                    TypeCast(
+                        expr = Get( expr = IdentExpr({ Name = ident })
+                                    kind = TupleIndex indx ) )
                     ) | (
                         Get(
-                            IdentExpr({ Name = ident }),
-                            TupleIndex indx,
-                            _,
-                            _
+                            expr = IdentExpr({ Name = ident })
+                            kind = TupleIndex indx
                         )
                     ) ] ->
                     Some("{..." + ident + "[" + string indx + "]} bool:n$", Value(ValueKind.BoolConstant(false), None))
                 // handles field getters `div().spread(props.otherProps)`
                 | "spread", [ (TypeCast(
-                        Get(
-                            IdentExpr({ Name = ident }),
-                            FieldGet { Name = identSuffix },
-                            _,
-                            _
+                        expr = Get(
+                            expr = IdentExpr({ Name = ident })
+                            kind = FieldGet { Name = identSuffix }
                             )
-                        , _
                         )
                     ) | (
                         Get(
-                            IdentExpr({ Name = ident }),
-                            FieldGet { Name = identSuffix },
-                            _,
-                            _
+                            expr = IdentExpr({ Name = ident })
+                            kind = FieldGet { Name = identSuffix }
                         )
                     ) ] ->
                     Some("{..." + ident + "." + identSuffix + "} bool:n$", Value(ValueKind.BoolConstant(false), None))
@@ -297,22 +281,20 @@ module internal rec AST =
                     | expr -> expr
                     |> fun expr ->
                         Some(attrName, expr)
-                    
-                    
 
                 | _ ->
                     $"Unhandled extension: {extensionName}\nProvidedValues: {exprs}"
                     |> PluginContext.logError ctx
                     None
             | Call(
-                Value(ValueKind.UnitConstant, None),
-                {
+                callee = Value(ValueKind.UnitConstant, None)
+                info = {
                     MemberRef = (
                         Some(MemberRef.MemberRefIs ctx MemberRefType.Setter)
                          & MemberRef.Option.PartasName ctx propName
                     )
                     Args = ValueUnrollerFeedback ctx [ value ] :: _
-                }, _, _) ->
+                }) ->
                 let transformedPropName =
                     match propName with
                     | Utils.StartsWithTrimmed "aria" propName ->
@@ -323,10 +305,10 @@ module internal rec AST =
         /// wraps single expressions in a list and feeds back to the list collector
         let (|PropCollectorFeeder|) (ctx: PluginContext): Expr -> PropList = fun e -> [ e ] |> function
             | PropCollector ctx props -> props
-            
+
         /// Use this active recognizer on expression lists to collect all the properties.
         /// If an unexpected expression is read, then it will dispose of it with a warning in
-        /// compilation 
+        /// compilation
         let (|PropCollector|) (ctx: PluginContext): Expr list -> PropList = function
             | [] -> []
             | Sequential (PropCollector ctx headProps) :: PropCollector ctx tailProps ->
@@ -345,7 +327,7 @@ module internal rec AST =
                     PluginContext.debugDisposal ctx "PropCollector" expr
                     []
                 |> (@) props
-    
+
     (*
     The tag constructor recognizer actively matches ANY expression pattern that, according to our
     scheme, should be transpiled into a JSX tag. This must occur from within this recognizer, regardless
@@ -358,15 +340,15 @@ module internal rec AST =
         // a local tag using the PartasImport attribute
         // Non LibraryImports that require LibraryImport injection via the attribute PartasImportAttribute
         | Call(
-            (   (* Callee *)
+            callee = (
                 (Expr.ImportedConstructor ctx & Import(_, t, r)) // Captures constructors from other modules with PartasImportAttribute
               | (IdentExpr(Ident.IdentIs ctx IdentType.Constructor) & IdentExpr({ Type = t; Range = r })) // Captures constructors defined in the same module with PartasImportAttribute
-            ),
-            {   (* CallInfo *)
+            )
+            info = {   (* CallInfo *)
                 Args = PropCollector ctx props
-            }, (* Type *)
-            (Type.PartasName ctx typeName & Type.HasPartasImport ctx (selector, path)),
-            range) ->
+            }
+            typ = (Type.PartasName ctx _ & Type.HasPartasImport ctx (selector, path))
+            range = range) ->
             let importExpr =
                 Import(
                     { Selector = selector
@@ -379,15 +361,15 @@ module internal rec AST =
         // a local tag using the PartasImport attribute
         // Non LibraryImports that require LibraryImport injection via the attribute PartasProxyImportAttribute
         | Call(
-            (   (* Callee *)
+            callee = (
                 (Expr.ImportedConstructor ctx & Import(_, t, r)) // Captures constructors from other modules with PartasImportAttribute
               | (IdentExpr(Ident.IdentIs ctx IdentType.Constructor) & IdentExpr({ Type = t; Range = r })) // Captures constructors defined in the same module with PartasImportAttribute
-            ),
-            {   (* CallInfo *)
+            )
+            info = {
                 Args = PropCollector ctx props
-            }, (* Type *)
-            (Type.PartasName ctx typeName & Type.HasPartasProxyImport ctx (key, selector, path)),
-            range) ->
+            }
+            typ = (Type.PartasName ctx _ & Type.HasPartasProxyImport ctx (key, selector, path))
+            range = range) ->
             let importExpr =
                 Get(
                     Import(
@@ -452,7 +434,7 @@ module internal rec AST =
             |> Some
         // WITH PROPS & EXTENSION
         | Call(Import({ Kind = MemberImport(MemberRef({ FullName = Utils.EndsWith "HtmlElementExtensions" | Utils.EndsWith "PolymorphicExtensions" }, _)) }, _, _) as callee, ({
-                Args = TagConstructor ctx tagInfo :: rest 
+                Args = TagConstructor ctx tagInfo :: rest
             } as callInfo), _, _) ->
             // We compile all the information of the extension call into the callinfo and make the rest almost impossible to mistake
             // for a different type of expression. We can then add this to the property list
@@ -463,28 +445,23 @@ module internal rec AST =
                     |> Some
         // WITH CHILDREN
         | Call(
-            Expr.ImportedContainerExtensionName ctx "Run", // run is being called. builder being applied to obj. obj is arg 1.
-            {   // Check the first argument, which is the argument this is being called against, for the constructor which called it.
+            callee = Expr.ImportedContainerExtensionName ctx "Run" // run is being called. builder being applied to obj. obj is arg 1.
+            info = {   // Check the first argument, which is the argument this is being called against, for the constructor which called it.
                 Args = TagConstructor ctx tagInfo :: BuilderCollector ctx rest // The rest are the computations being applied
-            },
-            typ,
-            range) ->
+            }) ->
             { tagInfo with Children = rest @ tagInfo.Children }
             |> Some
-        
+
         | Let(Ident.IdentIs ctx IdentType.Element, TagConstructor ctx tagInfo, BuilderCollectorFeedback ctx body) ->
             { tagInfo with Children = body @ tagInfo.Children }
             |> Some
         // An imported context
         | CurriedApply(
-            Import(
+            applied = Import(
                 { Kind = MemberImport(MemberRef(_,{ CompiledName = typeName })) } as imp,
                 (Type.PartasName ctx "ContextProvider" as typ),
-                irange),
-            props,
-            _,
-            range
-            ) ->
+                irange)
+            args = props) ->
             {
                 TagSource = TagSource.LibraryImport(Import({ imp with Selector = typeName + ".Provider" }, typ, irange))
                 Properties = [("value", Sequential(props))]
@@ -494,10 +471,9 @@ module internal rec AST =
             |> Some
         // Local defined context
         | CurriedApply(
-                IdentExpr({ Name = typeName; Type = Type.PartasName ctx "ContextProvider" }),
-                props,
-                _,
-                range
+                applied = IdentExpr({ Name = typeName; Type = Type.PartasName ctx "ContextProvider" })
+                args = props
+                range = range
             ) ->
             {
                 TagSource = TagSource.AutoImport $"{typeName}.Provider"
@@ -507,11 +483,11 @@ module internal rec AST =
             }
             |> Some
         | _ -> None
-            
+
     /// Transforms a single expression before wrapping it in a list and feeding it back to the BuilderCollector.
     let (|BuilderCollectorFeedback|) (ctx: PluginContext): Expr -> Expr list = fun e -> [ transform ctx e ] |> function
         | BuilderCollector ctx feedback -> feedback
-    
+
     /// This active recognizer is a bit more psychotic in terms of recursion
     let (|BuilderCollector|) (ctx: PluginContext): Expr list -> Expr list = function
         | [] -> []
@@ -539,9 +515,22 @@ module internal rec AST =
             // Note: this must come before recognizer for lambda with 3 and lambda with 2 parameters
             // Captures and correctly generates lambda in ChildLambdaProvider4
             | Lambda(
-                Ident.IdentIs ctx IdentType.Cont,
-                TypeCast(Lambda(p1, Lambda(p2, Lambda(p3, Lambda(p4, BuilderCollectorFeedback ctx expr, _), _), _), _), _),
-                _
+                arg = Ident.IdentIs ctx IdentType.Cont
+                body =
+                    TypeCast( expr =
+                        Lambda( arg = p1;
+                        body =
+                            Lambda( arg = p2;
+                            body =
+                                Lambda( arg = p3;
+                                body =
+                                    Lambda( arg = p4;
+                                    body = BuilderCollectorFeedback ctx expr
+                                    )
+                                )
+                            )
+                        )
+                    )
                 ) ->
                 let getHead = List.tryHead >> Option.defaultValue (Value(UnitConstant, None))
                 Delegate([ p1; p2; p3; p4], getHead expr, None, []) :: restBuilds
@@ -626,13 +615,13 @@ module internal rec AST =
             // Trust the F# compiler to not allow invalid elements within the builder.
             | _ ->
                 expr :: restBuilds
-    
-    // TODO - correct documentation and refactor since TagInfo is refactored out            
+
+    // TODO - correct documentation and refactor since TagInfo is refactored out
     /// <summary>
     /// Collates TagInfos into ElementBuilders which can then be rendered via `renderElement`<br/>
     /// Performs final clean up of properties by trimming reserved identifiers of the attribute keys
     /// </summary>
-    let collectTagInfo (ctx: PluginContext): ElementBuilder -> ElementBuilder = function
+    let collectTagInfo (_ctx: PluginContext): ElementBuilder -> ElementBuilder = function
         | { Properties = props } as eleBuilder ->
             {
                 eleBuilder with
@@ -667,11 +656,11 @@ module internal rec AST =
                 if ctx |> PluginContext.hasFlag ComponentFlag.SkipPojoOptimisation
                 then original |> Some
                 else optimisedExpr
-                    
+
             | _ -> None
     let (|SpecialAttributeTransformation|_|) (ctx: PluginContext): Expr -> Expr option = function
         | SpecialAttributeTransformation.Pojo ctx expr -> Some expr
-        | _ -> None    
+        | _ -> None
     /// <summary>
     /// First pass transformations of all expressions.<br/>
     /// Reduce AST where reasonable; capture and expand tags where encountered; dispose only in exceptional circumstances.<br/>
@@ -710,14 +699,12 @@ module internal rec AST =
             expr
         // Transform calls that are getters
         | Call(
-            Expr.ImportedGetter ctx,
-            {
+            callee = Expr.ImportedGetter ctx
+            info = {
                 ThisArg = Some(ident)
-                Args = args
                 MemberRef = MemberRef.Option.PartasName ctx prop
-            } & { MemberRef =Some(MemberRef.MemberRefIs ctx MemberRefType.Getter) },
-            _,
-            _) ->
+            } & { MemberRef =Some(MemberRef.MemberRefIs ctx MemberRefType.Getter) })
+         ->
             Get(
                 expr = ident,
                 kind = GetKind.FieldGet(
@@ -732,7 +719,7 @@ module internal rec AST =
                 typ = Any,
                 range = None
             )
-        
+
         // Transform branch expressions
         | IfThenElse(guardExpr, thenExpr, elseExpr, range) ->
             IfThenElse(
@@ -782,11 +769,11 @@ module internal rec AST =
         | Value(
                 (
                  NewAnonymousRecord(_)
-                | NewArray(ArrayValues _, _, _)
-                | NewList(Some _, _)
+                | NewArray(newKind = ArrayValues _)
+                | NewList(headAndTail = Some _)
                 | NewRecord(_)
                 | StringTemplate(_)
-                | NewOption(Some _, _, _)
+                | NewOption(value = Some _)
                 | NewTuple(_)
                 | NewUnion(_)
                 ) as valueKind,
@@ -827,7 +814,7 @@ module internal rec AST =
                 range
             )
         // Capture and include index access
-        | Get(expr, ExprGet(getExpr) & ExprGet(Call(callee, callInfo, _, _)), typ, range) ->
+        | Get(expr, ExprGet(getExpr) & ExprGet(Call(_)), typ, range) ->
             match transform ctx getExpr with
             | Value(UnitConstant, None) | Value(Null(Any), None) -> transform ctx expr
             | getExpr ->
@@ -857,7 +844,7 @@ module internal rec AST =
                 ObjectExpr(exprMembers, typ, exprOption |> Option.map (transform ctx))
         // No further first pass transformations applicable
         | _ as expr -> expr
-        
+
     /// Plugin support for extending Polymorphic attributes
     module Polymorphism =
         let (|PolymorphicAttribute|_|) (ctx: PluginContext) : string -> string option = function
@@ -879,7 +866,7 @@ module internal rec AST =
                 | { Kind = MemberImport(MemberRef(EntityRef.TagValue, { CompiledName = "render" })) }
                     -> Some()
                 | _ -> None
-        
+
         /// Will retrieve the wrapped type entity ref if it is a valid TagValue type
         let (|GetType|_|) = function
             | DeclaredType(EntityRef.TagValue, _) -> Some()
@@ -899,13 +886,10 @@ module internal rec AST =
             | _ -> None
         let (|TagValue|_|) (ctx: PluginContext): Expr -> Expr option = function
             | Call(
-                Import({ Selector = "op_BangAt"; Kind = MemberImport(MemberRef({ FullName = "Partas.Solid.Builder" }, _)) }, _, _),
-                {
-                    Args = Lambda(_, Call(callee, callInfo, _, _), _) :: _
-                },
-                _,
-                range
-                ) ->
+                callee = Import({ Selector = "op_BangAt"; Kind = MemberImport(MemberRef({ FullName = "Partas.Solid.Builder" }, _)) }, _, _)
+                info = {
+                    Args = Lambda(body = Call(callee = callee; info = callInfo)) :: _
+                }) ->
                 match callee with
                 // Some ident
                 | IdentExpr({ Type = Type.PartasName ctx typeName } as identee) ->
@@ -921,9 +905,8 @@ module internal rec AST =
                 // prevent import of native tags
                 | Expr.NativeImportedConstructor ctx
                     & Import(
-                        importInfo,
-                        typ & Type.PartasName ctx typeName,
-                        range
+                        typ = typ & Type.PartasName ctx typeName
+                        range = range
                     ) ->
                     IdentExpr({ Name = typeName; Type = typ; IsMutable = false ; IsThisArgument = false ; IsCompilerGenerated = true; Range = range })
                     |> Some
@@ -943,12 +926,12 @@ module internal rec AST =
                     | _ ->
                         expr
                         |> Some
-                | Import({ Kind = UserImport false }, _, _) ->
+                | Import(info = { Kind = UserImport false }) ->
                     Some callee
                 | _ -> None
             | TypeCast(TagValue ctx expr, _) -> expr |> Some
             | _ -> None
-        
+
         let (|TagRender|_|) (ctx: PluginContext): Expr -> Expr option =
             let rec (|UnrollTypeCast|) = function
                 | TypeCast(UnrollTypeCast expr, _) -> expr
@@ -956,13 +939,13 @@ module internal rec AST =
             function
             // A call to render a tagvalue with a constructor
             | Call(
-                Import(ImportInfo.Render, _, _),
-                {
+                callee = Import(info = ImportInfo.Render)
+                info = {
                     ThisArg = thisArg // contains info on the left expr of render
                     Args = (
                         UnrollTypeCast(TagConstructor ctx tagInfo) :: BuilderCollector ctx rest
                     )
-                }, _, _ ) ->
+                }) ->
                 { tagInfo with Children = rest @ tagInfo.Children }
                 |> collectTagInfo ctx
                 |> fun eleBuilder ->
@@ -975,14 +958,13 @@ module internal rec AST =
             // a call to render a tagvalue with an anon record
             // todo - support key,value pair list
             | Call(
-                Import(ImportInfo.Render, _, _),
-                {
+                callee = Import(ImportInfo.Render, _, _)
+                info = {
                     ThisArg = thisArg
                     Args = CollectProperties ctx props
-                },
-                _,
-                range
-                ) ->
+                }
+                range = range)
+             ->
                 let importExpr =
                     match thisArg with
                     | Some(PropsGetterOrSetter ctx expr) ->
@@ -999,14 +981,14 @@ module internal rec AST =
                 |> renderElement ctx
                 |> Some
             | _ -> None
-            
+
 [<AutoOpen>]
 module internal SolidComponentFlagsExtensions =
     let debug (memberDecl: MemberDecl) =
         Console.WriteLine "\nSTART MEMBER DECL!!!"
         Console.WriteLine memberDecl.Body
         Console.WriteLine "END MEMBER DECL!!!\n"
-                
+
 type SolidTypeComponentAttribute(flag: int) =
     inherit MemberDeclarationPluginAttribute()
     let flags = enum<ComponentFlag> flag
@@ -1035,7 +1017,7 @@ type SolidTypeComponentAttribute(flag: int) =
             }
     override this.TransformCall(_, _, expr) =
         expr
-    
+
     new() = SolidTypeComponentAttribute(int ComponentFlag.Default)
     new(compileOptions: ComponentFlag) = SolidTypeComponentAttribute(int compileOptions)
 
@@ -1055,6 +1037,6 @@ type SolidComponentAttribute(flag: int) =
         }
     override this.TransformCall(_, _, expr) =
         expr
-    
+
     new() = SolidComponentAttribute(int ComponentFlag.Default)
     new(compileOptions: ComponentFlag) = SolidComponentAttribute(int compileOptions)
