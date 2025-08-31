@@ -1,5 +1,5 @@
 import { For, createSignal, splitProps } from "solid-js";
-import { split } from "../../fable_modules/fable-library-js.5.0.0-alpha.13/String.js";
+import { split } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/String.js";
 
 export function WordRotate(props) {
     const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["duration", "words"]);

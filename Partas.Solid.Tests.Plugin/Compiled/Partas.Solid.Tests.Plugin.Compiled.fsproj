@@ -84,6 +84,8 @@
         <Content Include="IssueCases\ThisArgTransforms\ThisArgTransforms.expected" />
         <Compile Include="IssueCases\InheritedProperty\InheritedProperty.fs" />
         <Content Include="IssueCases\InheritedProperty\InheritedProperty.expected" />
+        <Compile Include="IssueCases\ObjectEventHandler\ObjectEventHandler.fs" />
+        <Content Include="IssueCases\ObjectEventHandler\ObjectEventHandler.expected" />
         <Compile Include="AttributeCases\PartasImportAttr\PartasImportAttr.fs" />
         <Content Include="AttributeCases\PartasImportAttr\PartasImportAttr.expected" />
         <Compile Include="AttributeCases\Pojo\Pojo.fs" />

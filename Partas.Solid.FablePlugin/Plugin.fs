@@ -22,6 +22,7 @@ open Partas.Solid.Baked
 do ()
 
 module internal rec AST =
+    module Utils = Patterns
     [<AutoOpen>]
     module AttributesAndProperties =
         let (|ValueUnrollerFeedback|) (ctx: PluginContext) (expr: Expr): Expr list =
@@ -131,10 +132,14 @@ module internal rec AST =
         let (|PropsGetterOrSetter|_|) (ctx: PluginContext) = function
             | PropertyGetter ctx prop ->
                 PluginContext.addGetter ctx prop
-                Baked.propGetter prop |> Some
+                AstUtils.GetProp(
+                    "PARTAS_LOCAL",
+                    StringUtils.TrimReservedIdentifiers prop
+                    )
+                |> Some
             | PropertySetter ctx (prop, expr) ->
                 PluginContext.addSetter ctx (prop, transform ctx expr)
-                Expr.Value(UnitConstant, None)
+                AstUtils.Unit
                 |> Some
             | _ -> None
         // Determines at top level whether the current expression could be considered
@@ -191,17 +196,17 @@ module internal rec AST =
                 let fable5 = ctx |> PluginContext.helper |> _.Options |> _.Define |> List.contains "FABLE_COMPILER_5"
                 match extensionName, exprs with
                 | (
-                    "on" | "bool" | "data" | "attr" | "use"
+                    "on" | "bool" | "data" | "attr" | "use" | "prop"
                     ), [ Value(StringConstant prop, _); value ] ->
                     let propName =
                         match extensionName with
-                        | "bool" | "on" | "use" -> $"{extensionName}:{prop}"
+                        | "bool" | "on" | "use" | "prop" -> $"{extensionName}:{prop}"
                         | "data" -> $"data-{prop}"
                         | "attr" -> prop
                         | _ -> failwith "Unreachable"
                     Some(propName, transform ctx value)
                 | ("ref" | "style'" | "classList"), [ identExpr ] ->
-                    Some(extensionName |> Utils.trimReservedIdentifiers, transform ctx identExpr)
+                    Some(extensionName |> StringUtils.TrimReservedIdentifiers, transform ctx identExpr)
                 | "spread", _ when fable4 ->
                     $"Spread is not supported in fable4"
                     |> PluginContext.logError ctx
@@ -211,7 +216,7 @@ module internal rec AST =
                     Some("{...PARTAS_OTHERS} bool:n$", Value(ValueKind.BoolConstant(false), None))
                 | "spread", [ (TypeCast(IdentExpr({ Name = ident }), _) | IdentExpr({ Name = ident })) ]
                     when fable5 ->
-                    Some("{..." + ident + "} bool:n$", Value(ValueKind.BoolConstant(false), None))
+                    Some("{..." + ident + "} bool:n$", AstUtils.Value(false))
                 // handles tupled getters `div().spread(someEnumerable[0])`
                 | "spread", [ (
                     TypeCast(
@@ -223,7 +228,7 @@ module internal rec AST =
                             kind = TupleIndex indx
                         )
                     ) ] ->
-                    Some("{..." + ident + "[" + string indx + "]} bool:n$", Value(ValueKind.BoolConstant(false), None))
+                    Some("{..." + ident + "[" + string indx + "]} bool:n$", AstUtils.Value(false))
                 // handles field getters `div().spread(props.otherProps)`
                 | "spread", [ (TypeCast(
                         expr = Get(
@@ -237,7 +242,7 @@ module internal rec AST =
                             kind = FieldGet { Name = identSuffix }
                         )
                     ) ] ->
-                    Some("{..." + ident + "." + identSuffix + "} bool:n$", Value(ValueKind.BoolConstant(false), None))
+                    Some("{..." + ident + "." + identSuffix + "} bool:n$", AstUtils.Value(false))
                 | "spread", [ expr ]
                     when fable4 ->
                     $"Spread does not support this as a value in Fable 4 or below:\n{expr}"
@@ -256,14 +261,8 @@ module internal rec AST =
                             Tags = [ "jsx" ]
                             Args = [ tagName ; internalCollection ]
                         } as callInfo), typ, range)
-                        when callee = importJsxCreate && typ = jsxElementType ->
-                        let c: Ident = { Name = "PARTAS_POLYPROPS"
-                                         Type = typ
-                                         IsMutable = false
-                                         IsThisArgument = false
-                                         IsCompilerGenerated = true
-                                         Range = range
-                                          }
+                        when callee = JsxUtils.CreateElementImportExpr && typ = JsxUtils.ElementType ->
+                        let c: Ident = AstUtils.Ident("PARTAS_POLYPROPS")
                         Lambda(c,
                             Call(
                             callee,
@@ -271,7 +270,7 @@ module internal rec AST =
                                         tagName;
                                         Value(
                                             NewList(Some(
-                                                Value(NewTuple([ Value(StringConstant "{...PARTAS_POLYPROPS} on:n$", None); TypeCast(Value(ValueKind.BoolConstant false, None), Type.Any) ], false), None)
+                                                JsxUtils.Prop("{...PARTAS_POLYPROPS} on:n$", AstUtils.Value(false))
                                                 , internalCollection
                                             ), Any),
                                             None
@@ -532,7 +531,7 @@ module internal rec AST =
                         )
                     )
                 ) ->
-                let getHead = List.tryHead >> Option.defaultValue (Value(UnitConstant, None))
+                let getHead = List.tryHead >> Option.defaultValue AstUtils.Unit
                 Delegate([ p1; p2; p3; p4], getHead expr, None, []) :: restBuilds
             // Captures and correctly generates lambda in ChildLambdaProvider3
             | Lambda(
@@ -548,7 +547,7 @@ module internal rec AST =
                 TypeCast(Lambda(item, Lambda(index, BuilderCollectorFeedback ctx expr, _), _), _),
                 _
                 ) ->
-                let getHead = List.tryHead >> Option.defaultValue (Value(UnitConstant, None))
+                let getHead = List.tryHead >> Option.defaultValue AstUtils.Unit
                 Delegate([ item; index ], getHead expr, None, []) :: restBuilds
             // Builder op
             | Lambda(
@@ -568,7 +567,7 @@ module internal rec AST =
                 BuilderCollectorFeedback ctx thenExpr,
                 BuilderCollectorFeedback ctx elseExpr,
                 range) ->
-                let getHead = List.tryHead >> Option.defaultValue (Value(UnitConstant, None))
+                let getHead = List.tryHead >> Option.defaultValue AstUtils.Unit
                 [ IfThenElse(
                     getHead guardExpr,
                     getHead thenExpr,
@@ -594,9 +593,9 @@ module internal rec AST =
                 expr :: restBuilds
             // hand this off to our main transform loop
             | Get(BuilderCollectorFeedback ctx [ expr ], ExprGet(BuilderCollectorFeedback ctx [ otherExprs ]), _, range) ->
-                Get(expr, ExprGet otherExprs, Any, range) :: restBuilds
-            | Get(BuilderCollectorFeedback ctx exprs, _, _, _) ->
-                let head = exprs |> (List.tryHead >> Option.defaultValue (Value(UnitConstant, None)))
+                AstUtils.GetProp(expr, otherExprs, ?range = range) :: restBuilds
+            | Get(expr = BuilderCollectorFeedback ctx exprs) ->
+                let head = exprs |> (List.tryHead >> Option.defaultValue AstUtils.Unit)
                 head :: restBuilds
             // This is an artifact from the builder and is a noop anyway, so we can  dispose
             | Lambda(
@@ -627,7 +626,7 @@ module internal rec AST =
                 eleBuilder with
                     Properties =
                         props
-                        |> List.map (fun (prop,expr) -> (prop |> Utils.trimReservedIdentifiers, expr) )
+                        |> List.map (fun (prop,expr) -> (prop |> StringUtils.TrimReservedIdentifiers, expr) )
             }
     module SpecialAttributeTransformation =
         let (|Pojo|_|) (ctx: PluginContext): Expr -> Expr option = function
@@ -705,20 +704,7 @@ module internal rec AST =
                 MemberRef = MemberRef.Option.PartasName ctx prop
             } & { MemberRef =Some(MemberRef.MemberRefIs ctx MemberRefType.Getter) })
          ->
-            Get(
-                expr = ident,
-                kind = GetKind.FieldGet(
-                        {
-                            Name = prop
-                            FieldType = None
-                            IsMutable = false
-                            MaybeCalculated = false
-                            Tags = []
-                        }
-                    ),
-                typ = Any,
-                range = None
-            )
+            AstUtils.GetPropField(ident, prop)
 
         // Transform branch expressions
         | IfThenElse(guardExpr, thenExpr, elseExpr, range) ->
@@ -740,7 +726,7 @@ module internal rec AST =
                 { Name = name; IsCompilerGenerated = true },
                 TypeCast(IdentExpr({ Name = otherName; IsCompilerGenerated = true }), Unit),
                 None)
-            when name = otherName -> Value(UnitConstant, None)
+            when name = otherName -> AstUtils.Unit
         // Transform the contents of TypeCasts
         | TypeCast(expr, _) -> transform ctx expr
         // Attribute expression pairs are invalid on first pass, as they should be collected within tag expressions.
@@ -819,11 +805,7 @@ module internal rec AST =
             | Value(UnitConstant, None) | Value(Null(Any), None) -> transform ctx expr
             | getExpr ->
                 // PluginContext.debugDisposal ctx "Transform of Get ExprGet" getExpr
-                Get(
-                    transform ctx expr,
-                    ExprGet(getExpr),
-                    typ,
-                    range)
+                AstUtils.GetProp(transform ctx expr, getExpr)
         // Transform nested expressions
         | Get(expr1, kind, typ, range) -> //transform inside Get expressions
             Get(
@@ -850,38 +832,38 @@ module internal rec AST =
         let (|PolymorphicAttribute|_|) (ctx: PluginContext) : string -> string option = function
             | "as'" -> Some "as"
             | "asChild" -> Some "asChild"
-            | Utils.StartsWithTrimmed "__PARTAS_POLYMORPHIC__" attrName -> Some (attrName |> Utils.trimReservedIdentifiers)
+            | Utils.StartsWithTrimmed "__PARTAS_POLYMORPHIC__" attrName -> Some (attrName |> StringUtils.TrimReservedIdentifiers)
             | _ -> None
     /// Plugin support for the TagValue magics
     module TagValue =
         module EntityRef =
             let (|TagValue|_|) = function
-                | { FullName = "Partas.Solid.Builder.TagValue" } -> Some()
-                | _ -> None
+                | { FullName = "Partas.Solid.Builder.TagValue" } -> true
+                | _ -> false
         module ImportInfo =
             let (|TagValue|_|) = function
-                | { Kind = MemberImport(MemberRef(EntityRef.TagValue, _)) } -> Some()
-                | _ -> None
+                | { Kind = MemberImport(MemberRef(EntityRef.TagValue, _)) } -> true
+                | _ -> false
             let (|Render|_|) = function
                 | { Kind = MemberImport(MemberRef(EntityRef.TagValue, { CompiledName = "render" })) }
-                    -> Some()
-                | _ -> None
+                    -> true
+                | _ -> false
 
         /// Will retrieve the wrapped type entity ref if it is a valid TagValue type
-        let (|GetType|_|) = function
-            | DeclaredType(EntityRef.TagValue, _) -> Some()
-            | LambdaType(GetType, _ ) -> Some()
-            | _ -> None
+        let (|GetType|_|): Type -> bool = function
+            | DeclaredType(EntityRef.TagValue, _)
+            | LambdaType(GetType, _ ) -> true
+            | _ -> false
         let (|CollectProperties|_|) (ctx: PluginContext) = function
             | [ TypeCast(Value(NewAnonymousRecord(values, fields, _, _), _), _) ] ->
                 values
                 |> List.zip (fields |> Array.toList)
-                |> List.map (fun (s,e) ->
-                    e
+                |> List.map (fun (str,expr) ->
+                    expr
                     |> transform ctx
-                    |> fun e ->
-                        s |> Utils.trimReservedIdentifiers,
-                        e)
+                    |> fun expr ->
+                        str |> StringUtils.TrimReservedIdentifiers,
+                        expr)
                 |> Some
             | _ -> None
         let (|TagValue|_|) (ctx: PluginContext): Expr -> Expr option = function
@@ -897,7 +879,7 @@ module internal rec AST =
                     // In the case where the referenced tag is a constructor, then it is a SolidTypeComponent, and we
                     // actually intend to reference the name of the type.
                     | CallInfo.Constructor ctx ->
-                        IdentExpr({ identee with Name = typeName |> Utils.trimReservedIdentifiers }) |> Some
+                        IdentExpr({ identee with Name = typeName |> StringUtils.TrimReservedIdentifiers }) |> Some
                     // Where the above is not true, the referenced tag is a let binding, and therefore a SolidComponent,
                     // so we intent to reference the name of the binding.
                     | _ ->
@@ -908,7 +890,7 @@ module internal rec AST =
                         typ = typ & Type.PartasName ctx typeName
                         range = range
                     ) ->
-                    IdentExpr({ Name = typeName; Type = typ; IsMutable = false ; IsThisArgument = false ; IsCompilerGenerated = true; Range = range })
+                    AstUtils.IdentExpr(typeName)
                     |> Some
                 // an imported tag
                 | Import(
@@ -924,8 +906,7 @@ module internal rec AST =
                     // If the above is not true, then the tag is a SolidComponent let binding, and the name of the
                     // component will be the name of the binding.
                     | _ ->
-                        expr
-                        |> Some
+                        Some expr
                 | Import(info = { Kind = UserImport false }) ->
                     Some callee
                 | _ -> None

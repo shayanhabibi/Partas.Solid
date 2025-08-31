@@ -55,7 +55,9 @@ let IssueCases =
           testCase "#28 ThisArg is transformed"
           <| runIssueCase "ThisArgTransforms"
           testCase "#29 val mutable overloads render 2"
-          <| runIssueCase "InheritedProperty" ]
+          <| runIssueCase "InheritedProperty"
+          testCase "#37 passing objects as event handlers"
+          <| runIssueCase "ObjectEventHandler" ]
 
 [<Tests>]
 let SolidCases =
