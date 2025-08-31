@@ -4,7 +4,9 @@ open System
 open Fable
 open Fable.AST
 open Fable.AST.Fable
+
 module Utils = Patterns
+
 /// Defines patterns for the PluginHelper which establishes whether the plugin is available
 /// for use in the environment based on the language target etc
 [<RequireQualifiedAccess>]
@@ -20,8 +22,8 @@ module internal FableRequirements =
 
     let (|FileExtension|_|) (input: PluginHelper) =
         match input.Options.FileExtension with
-        | Utils.EndsWith(".js")
-        | Utils.EndsWith(".jsx") -> true
+        | Utils.EndsWith (".js")
+        | Utils.EndsWith (".jsx") -> true
         | _ -> false
 
 /// Patterns which specify whether certain members are valid for the attribute to
@@ -74,10 +76,10 @@ module internal SchemaRules =
 /// reused or verbose Expr constructors should
 /// be lifted into this module.
 module internal Baked =
-    let private importMergeProps = AstUtils.Import("mergeProps", "solid-js")
-    let private importSplitProps = AstUtils.Import("splitProps", "solid-js")
+    let private importMergeProps = AstUtils.Import ("mergeProps", "solid-js")
+    let private importSplitProps = AstUtils.Import ("splitProps", "solid-js")
     let jsxElementType = JsxUtils.ElementType
-    let spreadPropertyExpression = AstUtils.IdentExpr("PARTAS_OTHERS")
+    let spreadPropertyExpression = AstUtils.IdentExpr ("PARTAS_OTHERS")
 
     /// Converts property setters into a sugar for setting their defaults by
     /// converting them into a mergeProps, which merges an object with the key,value pairs
@@ -86,41 +88,62 @@ module internal Baked =
         match values with
         | [] -> rest
         | _ ->
-            AstUtils.Sequential(
-                AstUtils.SetProp(
-                    AstUtils.IdentExpr("props"),
-                    AstUtils.Call(importMergeProps, AstUtils.CallInfo(args = [
-                         let trimReservedIdentifier = fun (name, expr) -> StringUtils.TrimReservedIdentifiers name, expr
-                         AstUtils.Object(List.map trimReservedIdentifier values)
-                         AstUtils.IdentExpr("props") ] )) ),
-                rest )
+            AstUtils.Sequential (
+                AstUtils.SetProp (
+                    AstUtils.IdentExpr ("props"),
+                    AstUtils.Call (
+                        importMergeProps,
+                        AstUtils.CallInfo (
+                            args =
+                                [ let trimReservedIdentifier =
+                                      fun (name, expr) -> StringUtils.TrimReservedIdentifiers name, expr
+
+                                  AstUtils.Object (List.map trimReservedIdentifier values)
+                                  AstUtils.IdentExpr ("props") ]
+                        )
+                    )
+                ),
+                rest
+            )
 
     /// It renders the JSX splitProps, with the given values split into PARTAS_LOCAL, and the rest
     /// into PARTAS_OTHERS
     let convertGettersToObject (values: string list) (rest: Expr) =
         Expr.Let (
-            ident =
-                AstUtils.Ident("[PARTAS_LOCAL, PARTAS_OTHERS]"),
+            ident = AstUtils.Ident ("[PARTAS_LOCAL, PARTAS_OTHERS]"),
             value =
-                AstUtils.Call(
+                AstUtils.Call (
                     importSplitProps,
-                    AstUtils.CallInfo(args =
-                        [ AstUtils.IdentExpr("props")
-                          AstUtils.ValueArray(values |> List.map AstUtils.Value) ] ) ),
+                    AstUtils.CallInfo (
+                        args =
+                            [ AstUtils.IdentExpr ("props")
+                              AstUtils.ValueArray (
+                                  values
+                                  |> List.map AstUtils.Value
+                              ) ]
+                    )
+                ),
             body = rest
         )
 
-    let propGetter (getTarget: string) = AstUtils.GetProp("PARTAS_LOCAL", StringUtils.TrimReservedIdentifiers getTarget)
+    let propGetter (getTarget: string) =
+        AstUtils.GetProp ("PARTAS_LOCAL", StringUtils.TrimReservedIdentifiers getTarget)
 
     /// Renders an ElementBuilder into the final Expr. Performs ONE final transformation; it will
     /// pattern match the tagname "Fragment" and remove it to render `<> </>`.
     let renderElement (ctx: PluginContext) (builder: ElementBuilder) =
         let renderTagName =
             function
-            | TagSource.AutoImport "Fragment" -> AstUtils.Value("")
+            | TagSource.AutoImport "Fragment" -> AstUtils.Value ("")
             | TagSource.LibraryImport imp -> imp
-            | TagSource.AutoImport name -> AstUtils.Value(name)
-        JsxUtils.CreateElement(renderTagName builder.TagSource, builder.Properties, builder.Children |> List.rev)
+            | TagSource.AutoImport name -> AstUtils.Value (name)
+
+        JsxUtils.CreateElement (
+            renderTagName builder.TagSource,
+            builder.Properties,
+            builder.Children
+            |> List.rev
+        )
 
 module internal MemberRef =
     let (|MemberRefIs|) (ctx: PluginContext) : MemberRef -> MemberRefType =

@@ -16,16 +16,11 @@ module SpecialAttributes =
     /// <c>EventListenerObject</c> &amp; <c>AddEventListenerOptions</c>
     /// </summary>
     [<JS.Pojo>]
-    type OnHandler(
-        handleEvent: Event -> unit,
-        ?once: bool,
-        ?passive: bool,
-        ?capture: bool
-        ) =
-        member val handleEvent: (Event -> unit) = JS.undefined with get,set
-        member val once: bool = JS.undefined with get,set
-        member val passive: bool = JS.undefined with get,set
-        member val capture: bool = JS.undefined with get,set
+    type OnHandler(handleEvent: Event -> unit, ?once: bool, ?passive: bool, ?capture: bool) =
+        member val handleEvent: (Event -> unit) = JS.undefined with get, set
+        member val once: bool = JS.undefined with get, set
+        member val passive: bool = JS.undefined with get, set
+        member val capture: bool = JS.undefined with get, set
 
 module Decorators =
     [<Emit("/*@once*/")>]

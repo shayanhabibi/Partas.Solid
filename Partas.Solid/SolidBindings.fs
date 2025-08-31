@@ -46,6 +46,7 @@ module Bindings =
         [<Erase>]
         member this.each
             with set (value: 'T[]) = ()
+
         /// Fallback element to render while the list is loading.
         [<DefaultValue; Erase>]
         val mutable fallback: HtmlElement
@@ -56,53 +57,72 @@ module Bindings =
         [<Erase>]
         member inline _.Yield(PARTAS_VALUE: 'T -> Accessor<int> -> #HtmlElement) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_VALUE
+
     [<PartasImport("Dynamic", "solid-js/web")>]
     type Dynamic<'T>() =
         interface HtmlElement
+
         [<DefaultValue; Erase>]
         val mutable component': TagValue
+
         [<Erase>]
         member this.componentAsString
-            with inline set(value: string) = this.component' <- unbox value
-            and inline get() = unbox<string> this.component'
+            with inline set (value: string) = this.component' <- unbox value
+            and inline get () = unbox<string> this.component'
+
         [<Obsolete(message = "Not implemented yet", error = true)>]
         [<CustomOperation "dynamicAttr">]
-        member inline _.DynamicAttrOp([<InlineIfLambda>] PARTAS_FIRST, PARTAS_DYN_MAP: 'T -> 'U, PARTAS_DYN_VAL: 'U): HtmlContainerFun =
+        member inline _.DynamicAttrOp([<InlineIfLambda>] PARTAS_FIRST, PARTAS_DYN_MAP: 'T -> 'U, PARTAS_DYN_VAL: 'U) : HtmlContainerFun =
             ignore PARTAS_DYN_MAP
             ignore PARTAS_DYN_VAL
             PARTAS_FIRST
+
         [<Erase>]
         member inline _.Zero() : HtmlContainerFun = ignore
+
         [<Erase>]
-        member inline _.Yield(PARTAS_CONT: unit): HtmlContainerFun = ignore
+        member inline _.Yield(PARTAS_CONT: unit) : HtmlContainerFun = ignore
+
         [<Erase>]
-        member inline _.Yield(PARTAS_ELEMENT: #HtmlElement): HtmlContainerFun =
+        member inline _.Yield(PARTAS_ELEMENT: #HtmlElement) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+
         [<Erase>]
-        member inline _.Yield(PARTAS_TEXT: string): HtmlContainerFun =
+        member inline _.Yield(PARTAS_TEXT: string) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_TEXT
+
         [<Erase>]
-        member inline _.Yield(PARTAS_VALUE: int): HtmlContainerFun =
+        member inline _.Yield(PARTAS_VALUE: int) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_VALUE
+
         [<Erase>]
-        member inline _.Yield(PARTAS_VALUE: float): HtmlContainerFun =
+        member inline _.Yield(PARTAS_VALUE: float) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_VALUE
+
         [<Erase>]
-        member inline _.Combine([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun): HtmlContainerFun =
+        member inline _.Combine
+            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
+            : HtmlContainerFun =
             fun PARTAS_BUILDER ->
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND PARTAS_BUILDER
+
         [<Erase>]
         member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) =
-            PARTAS_DELAY()
+            PARTAS_DELAY ()
+
         [<Erase>]
-        member inline _.For([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: unit -> HtmlContainerFun): HtmlContainerFun =
+        member inline _.For
+            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: unit -> HtmlContainerFun)
+            : HtmlContainerFun =
             fun PARTAS_BUILDER ->
                 PARTAS_FIRST PARTAS_BUILDER
-                PARTAS_SECOND() PARTAS_BUILDER
+                PARTAS_SECOND () PARTAS_BUILDER
+
     [<Import("NoHydration", "solid-js/web")>]
     type NoHydration() =
         interface FragmentNode
+
     [<PartasImport("Index", "solid-js")>]
     [<Erase>]
     type Index<'T>() =
@@ -125,19 +145,25 @@ module Bindings =
     [<Import("Show", "solid-js")>]
     type Show() =
         interface HtmlContainer
+
         [<Erase; DefaultValue>]
         val mutable when': bool
+
         [<Erase; DefaultValue>]
         val mutable fallback: HtmlElement
+
         [<Erase; DefaultValue>]
         val mutable keyed: bool
+
     [<PartasImport("Show", "solid-js")>]
     [<Erase>]
     type Show<'T>() =
         interface HtmlElement
+
         [<Erase>]
         member this.when'
             with set (value: 'T) = ()
+
         [<Erase>]
         member this.fallback
             with set (value: HtmlElement) = ()
@@ -145,11 +171,13 @@ module Bindings =
         [<Erase>]
         member this.keyed
             with set (value: bool) = ()
-        [<Erase; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-        member inline _.Zero(): HtmlContainerFun = ignore
 
         [<Erase; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: 'T -> #HtmlElement): HtmlContainerFun = fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Zero() : HtmlContainerFun = ignore
+
+        [<Erase; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        member inline _.Yield(PARTAS_ELEMENT: 'T -> #HtmlElement) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     [<PartasImport("Match", "solid-js")>]
     [<Erase>]
@@ -213,6 +241,7 @@ module Bindings =
             /// Reveals all items in the list at the same time
             /// </summary>
             | Together
+
         [<StringEnum; RequireQualifiedAccess>]
         type Tail =
             | Collapsed
@@ -222,8 +251,10 @@ module Bindings =
     [<Erase>]
     type SuspenseList() =
         interface HtmlContainer
+
         [<Erase; DefaultValue>]
         val mutable revealOrder: SuspenseList.RevealOrder
+
         [<Erase; DefaultValue>]
         val mutable tail: SuspenseList.Tail
 
@@ -235,10 +266,13 @@ module Bindings =
     [<Erase>]
     type Portal() =
         interface HtmlContainer
+
         [<DefaultValue; Erase>]
         val mutable mount: Element
+
         [<DefaultValue; Erase>]
         val mutable useShadow: bool
+
         [<DefaultValue; Erase>]
         val mutable isSVG: bool
 
@@ -253,8 +287,10 @@ module Bindings =
         [<Erase>]
         member this.fallback
             with set (value: ErrorBoundary.Fallback) = ()
+
         [<Erase>]
-        member this.plainFallback with inline set(value: HtmlElement) = this.fallback <- unbox value
+        member inline this.plainFallback
+            with inline set (value: HtmlElement) = this.fallback <- unbox value
 
     [<Erase>]
     type Extensions =
@@ -273,10 +309,12 @@ module Bindings =
         static member Run(PARTAS_THIS: Switch, PARTAS_RUNEXPR: HtmlContainerFun) =
             PARTAS_RUNEXPR Unchecked.defaultof<_>
             PARTAS_THIS
+
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: Dynamic<'T>, PARTAS_RUNEXPR: HtmlContainerFun) =
             PARTAS_RUNEXPR Unchecked.defaultof<_>
             PARTAS_THIS
+
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: Show<'T>, PARTAS_RUNEXPR: HtmlContainerFun) =
             PARTAS_RUNEXPR Unchecked.defaultof<_>
@@ -489,6 +527,7 @@ type Bindings =
 
     [<ImportMember("solid-js")>]
     static member createMemo(value: unit -> 'T) : (unit -> 'T) = jsNative
+
     [<ImportMember("solid-js"); ParamObject(2)>]
     static member createMemo(memo: 'T -> 'T, initialValue: 'T, ?equals: ComparisonFunc<'T>) = jsNative
 
@@ -519,6 +558,7 @@ type Bindings =
     /// </remarks>
     [<ImportMember("solid-js")>]
     static member createEffect(effect: unit -> unit) : unit = jsNative
+
     /// <summary>
     /// Runs whenever a signal which is accessed within the null func is modified. Also runs on mounting.
     /// </summary>
