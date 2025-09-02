@@ -1,4 +1,62 @@
-﻿namespace Partas.Solid.Experimental
+﻿namespace Partas.Solid
+
+// Attributes that are matched in Partas.Solid.FablePlugin to support special transformations
+
+open System
+
+/// Used for types that have inbuilt Builder computation support but are an imported
+/// component from an external library.
+/// This prevents the obfuscation/generalisation of property names which lets us be
+/// more confident in less strict patterns matching the appropriate targets with discrimination.
+/// We will add the import attribute afterwards
+// [<AttributeUsage(AttributeTargets.Class)>]
+type PartasImportAttribute(selector: string, path: string) =
+    inherit Attribute()
+
+
+// aliases
+type EditorBrowsable = System.ComponentModel.EditorBrowsableAttribute
+type EditorBrowsableState = System.ComponentModel.EditorBrowsableState
+
+namespace JetBrains.Annotations
+
+open System
+open Fable.Core
+
+[<Erase>]
+type internal InjectedLanguage =
+    | CSS = 0
+    | HTML = 1
+    | JAVASCRIPT = 2
+    | JSON = 3
+    | XML = 4
+
+[<AttributeUsage(AttributeTargets.Parameter
+                 ||| AttributeTargets.Field
+                 ||| AttributeTargets.Property)>]
+[<Erase>]
+type internal LanguageInjectionAttribute private (?injectedLanguage: InjectedLanguage, ?injectedLanguageName: string) =
+    inherit Attribute()
+
+    [<Erase>]
+    member x.InjectedLanguage = injectedLanguage
+
+    [<Erase>]
+    member x.InjectedLanguageName = injectedLanguageName
+
+    [<Erase>]
+    member val Prefix = "" with get, set
+
+    [<Erase>]
+    member val Suffix = "" with get, set
+
+    [<Erase>]
+    new(injectedLanguage: InjectedLanguage) = LanguageInjectionAttribute (injectedLanguage = injectedLanguage)
+
+    [<Erase>]
+    new(injectedLanguageName: string) = LanguageInjectionAttribute (injectedLanguageName = injectedLanguageName)
+
+namespace Partas.Solid.Experimental
 
 open Fable.Core
 

@@ -4,12 +4,13 @@ open Fable.Core
 open Fable.Core.JS
 open Fable.Core.JsInterop
 open Partas.Solid.Experimental.U
+open Partas.Solid
 
 [<AutoOpen>]
 module Types =
     [<RequireQualifiedAccess>]
     [<StringEnum(CaseRules.KebabCase)>]
-    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
+    [<EditorBrowsable(EditorBrowsableState.Advanced)>]
     type AtRules =
         | [<CompiledName("@charset")>] CharSet
         | [<CompiledName("@counter-style")>] CounterStyle
@@ -31,7 +32,7 @@ module Types =
         | [<CompiledName("@viewport")>] Viewport
 
     [<RequireQualifiedAccess>]
-    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
+    [<EditorBrowsable(EditorBrowsableState.Advanced)>]
     [<StringEnum(CaseRules.KebabCase)>]
     type Globals =
         | [<CompiledName("-moz-initial")>] MozInitial
@@ -42,7 +43,7 @@ module Types =
         | Unset
 
     [<RequireQualifiedAccess>]
-    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
+    [<EditorBrowsable(EditorBrowsableState.Advanced)>]
     [<StringEnum(CaseRules.KebabCase)>]
     type AccentColor =
         | [<CompiledName("-moz-initial")>] MozInitial

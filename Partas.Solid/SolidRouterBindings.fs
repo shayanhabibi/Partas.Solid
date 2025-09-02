@@ -14,7 +14,7 @@ open Partas.Solid
 module Bindings =
 
     [<RequireQualifiedAccess>]
-    [<StringEnum(CaseRules.LowerFirst)>]
+    [<StringEnum>]
     type Intent =
         | Initial
         | Native
@@ -97,24 +97,25 @@ module Bindings =
     type Route() =
         interface HtmlElement
 
-        [<Erase>]
-        member this.path
-            with set (value: string) = ()
+        [<Erase; DefaultValue>]
+        val mutable path: string
 
         [<Erase>]
-        member this.component'
-            with set (value: TagValue) = ()
+        member this.paths
+            with inline get (): string array = unbox this.path
+            and inline set (value: string array) = this.path <- unbox<string> value
+
+        [<Erase; DefaultValue>]
+        val mutable component': TagValue
+
+        [<Erase; DefaultValue>]
+        val mutable matchFilters: obj
+
+        [<Erase; DefaultValue>]
+        val mutable preload: RoutePreloadFunc
 
         [<Erase>]
-        member this.matchFilters
-            with set (value: obj) = ()
-
-        [<Erase>]
-        member this.preload
-            with set (value: RoutePreloadFunc) = ()
-
-        [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         member inline _.Combine
             ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
@@ -123,16 +124,16 @@ module Bindings =
                 PARTAS_SECOND PARTAS_BUILDER
 
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
             PARTAS_DELAY ()
 
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         member inline _.Zero() : HtmlContainerFun = ignore
 
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
@@ -140,7 +141,7 @@ module Bindings =
     type RootConfig(path: string, ``component``: HtmlElement) =
         member val path: string = jsNative with get, set
 
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         member val ``component``: HtmlElement = jsNative with get, set
 
         /// <summary> Alias for <c>_.``component``</c></summary>
@@ -152,32 +153,26 @@ module Bindings =
     type Router() =
         interface HtmlElement
 
-        [<Erase>]
-        member this.root
-            with set (value: TagValue) = ()
+        [<Erase; DefaultValue>]
+        val mutable root: TagValue
+
+        [<Erase; DefaultValue>]
+        val mutable base': string
+
+        [<Erase; DefaultValue>]
+        val mutable actionBase: string
+
+        [<Erase; DefaultValue>]
+        val mutable preload: bool
+
+        [<Erase; DefaultValue>]
+        val mutable explicitLinks: bool
+
+        [<Erase; DefaultValue>]
+        val mutable url: string
 
         [<Erase>]
-        member this.base'
-            with set (value: string) = ()
-
-        [<Erase>]
-        member this.actionBase
-            with set (value: string) = ()
-
-        [<Erase>]
-        member this.preload
-            with set (value: bool) = ()
-
-        [<Erase>]
-        member this.explicitLinks
-            with set (value: bool) = ()
-
-        [<Erase>]
-        member this.url
-            with set (value: string) = ()
-
-        [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         member inline _.Combine
             ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
@@ -186,21 +181,21 @@ module Bindings =
                 PARTAS_SECOND PARTAS_BUILDER
 
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
             PARTAS_DELAY ()
 
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         member inline _.Zero() : HtmlContainerFun = ignore
 
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: RootConfig[]) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
@@ -208,19 +203,45 @@ module Bindings =
     type HashRouter() =
         inherit Router()
 
+    [<PartasImport("MemoryRouter", "@solidjs/router")>]
+    type MemoryRouter() =
+        inherit Router()
+
+        [<Erase; DefaultValue>]
+        val mutable history: MemoryHistory
+
+    and MemoryHistory private () =
+        [<Erase>]
+        member this.get() : string = jsNative
+
+        [<Erase; ParamObject(0)>]
+        member this.set(value: string, ?scroll: bool, ?replace: bool) : unit = jsNative
+
+        [<Erase>]
+        member this.back() = jsNative
+
+        [<Erase>]
+        member this.forward() = jsNative
+
+        [<Erase>]
+        member this.go(n: int) : unit = jsNative
+
+        [<Erase>]
+        member this.listen(listener: string -> unit) : unit -> unit = jsNative
+
     [<Pojo>]
     type PreloadData(preloadData: bool) =
         member val preloadData: bool = jsNative with get, set
 
     [<Erase>]
     type Extensions =
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: Router, PARTAS_RUN: HtmlContainerFun) =
             PARTAS_RUN Unchecked.defaultof<_>
             PARTAS_THIS
 
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: Route, PARTAS_RUN: HtmlContainerFun) =
             PARTAS_RUN Unchecked.defaultof<_>
@@ -230,50 +251,168 @@ module Bindings =
     type A() =
         interface RegularNode
 
-        [<Erase>]
-        member this.href
-            with set (value: string) = ()
+        [<Erase; DefaultValue>]
+        val mutable href: string
 
-        [<Erase>]
-        member this.noScroll
-            with set (value: bool) = ()
+        [<Erase; DefaultValue>]
+        val mutable noScroll: bool
 
-        [<Erase>]
-        member this.replace
-            with set (value: bool) = ()
+        [<Erase; DefaultValue>]
+        val mutable replace: bool
 
-        [<Erase>]
-        member this.state
-            with set (value: obj) = ()
+        [<Erase; DefaultValue>]
+        val mutable state: obj
 
-        [<Erase>]
-        member this.activeClass
-            with set (value: string) = ()
+        [<Erase; DefaultValue>]
+        val mutable activeClass: string
 
-        [<Erase>]
-        member this.inactiveClass
-            with set (value: string) = ()
+        [<Erase; DefaultValue>]
+        val mutable inactiveClass: string
 
-        [<Erase>]
-        member this.end'
-            with set (value: bool) = ()
+        [<Erase; DefaultValue>]
+        val mutable end': bool
 
     [<Import("Navigate", "@solidjs/router")>]
     type Navigate() =
         interface RegularNode
 
-        [<Erase>]
-        member this.href
-            with set (value: string) = ()
+        [<Erase; DefaultValue>]
+        val mutable href: string
 
-        [<Erase>]
-        member this.state
-            with set (value: obj) = ()
+        [<Erase; DefaultValue>]
+        val mutable state: obj
 
+    type SolidAction<'Input, 'Result> =
+        abstract url: string with get, set
+        abstract member with': 'Input -> string
+
+    type Submission<'Input, 'Result> =
+        abstract input: 'Input with get
+        abstract result: 'Result option with get
+        abstract error: obj with get
+        abstract pending: bool with get
+        abstract url: string with get
+        abstract clear: (unit -> unit)
+        abstract retry: (unit -> unit)
+
+    type Extensions with
+        [<Extension>]
+        static member pending(this: Submission<'Input, unit>[]) : bool = undefined
+
+    type AsyncAccessor<'T> =
+        [<Emit "$0()">]
+        abstract Invoke: unit -> 'T
+
+        abstract latest: 'T
+
+    type Query<'Input, 'Output> =
+        [<Emit("$0($1)")>]
+        abstract Invoke: 'Input -> 'Output
+
+        [<Emit "$0.key">]
+        abstract key: string
+
+        [<Emit "$0.keyFor($1)">]
+        abstract keyFor: 'Input -> string
+
+    type Extensions with
+
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<Extension>]
+        [<Emit "$0.latest">]
+        static member latest<'T>(this: unit -> 'T) : 'T = jsNative
+
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<Extension>]
+        [<Emit "$0.key">]
+        static member key(this: FSharpFunc<_, _>) : string = jsNative
+
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<Extension>]
+        [<Emit "$0.keyFor($1)">]
+        static member keyFor(this: FSharpFunc<_, _>, value: string) : string = jsNative
 
 [<AutoOpen>]
 [<Erase>]
 type Bindings =
+    /// Actions only work with POST requests.
+    [<ImportMember("@solidjs/router"); ParamObject(1)>]
+    static member action<'Input, 'Output>
+        (handler: 'Input -> Promise<'Output>, ?name: string, ?onComplete: Submission<'Input, 'Output> -> unit)
+        : SolidAction<'Input, 'Output> =
+        jsNative
+
+    /// This can avoid the use of formData etc. However, it requires client-side javascript
+    /// and is not progressively enhanceable like forms are.
+    [<ImportMember("@solidjs/router")>]
+    static member useAction<'Input, 'Result>(action: SolidAction<'Input, 'Result>) : 'Input -> 'Result = jsNative
+
+    [<ImportMember("@solidjs/router")>]
+    static member useSubmission<'Input>(action: SolidAction<'Input, unit>, ?filter: 'Input -> bool) : Submission<'Input, unit> = jsNative
+
+    [<ImportMember("@solidjs/router")>]
+    static member useSubmissions<'Input>(action: SolidAction<'Input, unit>, ?filter: 'Input -> bool) : Submission<'Input, unit>[] = jsNative
+
+    [<ImportMember("@solidjs/router")>]
+    static member createAsync<'T>
+        (
+            fn: 'T option -> Promise<'T>,
+            ?name: string,
+            ?initialValue: 'T,
+            ?deferStream: bool,
+            ?onHydrated: unit -> unit,
+            ?ssrLoadFrom: string,
+            ?storage: unit -> Signal<'T>
+        ) : Accessor<'T> =
+        jsNative
+
+    [<Import("createAsync", "@solidjs/router")>]
+    static member createAsyncWithLatest<'T>
+        (
+            fn: 'T option -> Promise<'T>,
+            ?name: string,
+            ?initialValue: 'T,
+            ?deferStream: bool,
+            ?onHydrated: unit -> unit,
+            ?ssrLoadFrom: string,
+            ?storage: unit -> Signal<'T>
+        ) : AsyncAccessor<'T> =
+        jsNative
+
+    [<ImportMember("@solidjs/router")>]
+    static member createAsyncStore<'T>
+        (
+            fn: 'T option -> Promise<'T>,
+            ?name: string,
+            ?initialValue: 'T,
+            ?deferStream: bool,
+            ?reconcile: obj,
+            ?onHydrated: unit -> unit,
+            ?ssrLoadFrom: string
+        ) : Accessor<'T> =
+        jsNative
+
+    [<Import("createAsyncStore", "@solidjs/router")>]
+    static member createAsyncStoreWithLatest<'T>
+        (
+            fn: 'T option -> Promise<'T>,
+            ?name: string,
+            ?initialValue: 'T,
+            ?deferStream: bool,
+            ?reconcile: obj,
+            ?onHydrated: unit -> unit,
+            ?ssrLoadFrom: string
+        ) : AsyncAccessor<'T> =
+        jsNative
+
+    [<ImportMember("@solidjs/router")>]
+    static member query<'Input, 'Output>(fn: FSharpFunc<'Input, 'Output>, ?name: string) : FSharpFunc<'Input, 'Output> = jsNative
+
+    [<Import("query", "@solidjs/router")>]
+    static member query'<'Input, 'Output>(fn: FSharpFunc<'Input, 'Output>, ?name: string) : Query<'Input, 'Output> = jsNative
+
+    [<ImportMember("@solidjs/router")>]
+    static member revalidate(key: string, ?force: bool) : unit = jsNative
 
     [<ImportMember("@solidjs/router")>]
     static member useNavigate() : Navigator = jsNative
@@ -301,3 +440,7 @@ type Bindings =
 
     [<ImportMember("@solidjs/router")>]
     static member useSearchParams() : Signal<obj> = jsNative
+
+    [<ImportMember("@solidjs/router")>]
+    static member createMemoryHistory() : MemoryHistory = jsNative
+// TODO preload, json, redirect and reload
