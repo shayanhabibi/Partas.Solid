@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2025-09-03
+
+<h3><!-- 5 -->Fixed</h3>
+- SolidJs 1.9 & Codebase refactor by @shayanhabibi in [#39](https://github.com/shayanhabibi/Partas.Solid/pull/39)
+
+<h2>New Contributors</h2>
+* @github-actions[bot] made their first contribution
+
 ## [1.2.1] - 2025-08-06
 
 <h3><!-- 5 -->Fixed</h3>
@@ -355,6 +363,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <h2>New Contributors</h2>
 * @shayanhabibi made their first contribution
 
+[2.0.0]: https://github.com/shayanhabibi/Partas.Solid/compare/1.2.1..2.0.0
 [1.2.1]: https://github.com/shayanhabibi/Partas.Solid/compare/1.2.0..1.2.1
 [1.2.0]: https://github.com/shayanhabibi/Partas.Solid/compare/1.1.6..1.2.0
 [1.1.6]: https://github.com/shayanhabibi/Partas.Solid/compare/v1.1.5..1.1.6
