@@ -18,9 +18,6 @@
     </PropertyGroup>
     <ItemGroup>
         <None Include="../README.md" Pack="true" PackagePath="\" />
-        <Compile Include="../Common/AssemblyInfo.fs">
-            <Link>AssemblyInfo.fs</Link>
-        </Compile>
         <Compile Include="Utils.fs" />
         <Compile Include="Types.fs" />
         <Compile Include="Spec.fs" />

@@ -22,9 +22,6 @@
 
     <ItemGroup>
       <None Include="../README.md" Pack="true" PackagePath="\" />
-        <Compile Include="../Common/AssemblyInfo.fs">
-            <Link>AssemblyInfo.fs</Link>
-        </Compile>
       <Compile Include="AttributesAliasesExtensions.fs" />
       <Compile Include="Builder.fs" />
       <Compile Include="HtmlAttributes.fs" />
