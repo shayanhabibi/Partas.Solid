@@ -7,6 +7,8 @@ open System
 
 #nowarn 49
 
+type ComparisonFunc<'T> = delegate of prev: 'T * next: 'T -> bool
+
 [<AutoOpen>]
 module Bindings =
 
@@ -36,72 +38,215 @@ module Bindings =
     /// </summary>
     type Context<'T> = 'T -> ContextProvider
 
-    [<PartasImport("For", "solid-js")>]
+
+
+    [<PartasImport("Dynamic", "solid-js/web")>]
+    type Dynamic<'T>() =
+        interface HtmlElement
+
+        [<DefaultValue; Erase>]
+        val mutable component': TagValue
+
+        [<Erase>]
+        member this.componentAsString
+            with inline set (value: string) = this.component' <- unbox value
+            and inline get () = unbox<string> this.component'
+
+        [<Obsolete(message = "Not implemented yet", error = true)>]
+        [<CustomOperation "dynamicAttr">]
+        member inline _.DynamicAttrOp([<InlineIfLambda>] PARTAS_FIRST, PARTAS_DYN_MAP: 'T -> 'U, PARTAS_DYN_VAL: 'U) : HtmlContainerFun =
+            ignore PARTAS_DYN_MAP
+            ignore PARTAS_DYN_VAL
+            PARTAS_FIRST
+
+        [<Erase>]
+        member inline _.Zero() : HtmlContainerFun = ignore
+
+        [<Erase>]
+        member inline _.Yield(PARTAS_CONT: unit) : HtmlContainerFun = ignore
+
+        [<Erase>]
+        member inline _.Yield(PARTAS_ELEMENT: #HtmlElement) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+
+        [<Erase>]
+        member inline _.Yield(PARTAS_TEXT: string) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_TEXT
+
+        [<Erase>]
+        member inline _.Yield(PARTAS_VALUE: int) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_VALUE
+
+        [<Erase>]
+        member inline _.Yield(PARTAS_VALUE: float) : HtmlContainerFun =
+            fun PARTAS_CONT -> ignore PARTAS_VALUE
+
+        [<Erase>]
+        member inline _.Combine
+            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
+            : HtmlContainerFun =
+            fun PARTAS_BUILDER ->
+                PARTAS_FIRST PARTAS_BUILDER
+                PARTAS_SECOND PARTAS_BUILDER
+
+        [<Erase>]
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) =
+            PARTAS_DELAY ()
+
+        [<Erase>]
+        member inline _.For
+            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: unit -> HtmlContainerFun)
+            : HtmlContainerFun =
+            fun PARTAS_BUILDER ->
+                PARTAS_FIRST PARTAS_BUILDER
+                PARTAS_SECOND () PARTAS_BUILDER
+
+    module ErrorBoundary =
+        type Fallback = delegate of err: obj * reset: (unit -> unit) -> HtmlElement
+
+    [<Import("ErrorBoundary", "solid-js")>]
+    [<Erase>]
+    type ErrorBoundary() =
+        interface HtmlContainer
+
+        [<Erase; DefaultValue>]
+        val mutable fallback: ErrorBoundary.Fallback
+
+        [<Erase>]
+        member inline this.plainFallback
+            with inline set (value: HtmlElement) = this.fallback <- unbox value
+
+    [<Import("For", "solid-js")>]
     [<Erase>]
     type For<'T>() =
         interface HtmlElement
+        interface ChildLambdaProvider2<'T, Accessor<int>>
 
-        [<Erase>]
-        member this.each
-            with set (value: 'T[]) = ()
+        [<Erase; DefaultValue>]
+        val mutable each: 'T[]
 
-        [<Erase>]
-        member inline _.Zero() : HtmlContainerFun = ignore
+        /// Fallback element to render while the list is loading.
+        [<DefaultValue; Erase>]
+        val mutable fallback: HtmlElement
 
-        [<Erase>]
-        member inline _.Yield(PARTAS_VALUE: 'T -> Accessor<int> -> #HtmlElement) : HtmlContainerFun =
-            fun PARTAS_CONT -> ignore PARTAS_VALUE
-
-    [<PartasImport("Index", "solid-js")>]
+    [<Import("Index", "solid-js")>]
     [<Erase>]
     type Index<'T>() =
         interface HtmlElement
+        interface ChildLambdaProvider2<Accessor<'T>, int>
 
-        [<Erase>]
-        member this.each
-            with set (value: 'T[]) = ()
+        [<Erase; DefaultValue>]
+        val mutable each: 'T[]
 
-        [<Erase>]
-        member inline _.Zero() : HtmlContainerFun = ignore
+        [<Erase; DefaultValue>]
+        val mutable fallback: HtmlElement
 
-        [<Erase>]
-        member inline _.Yield(PARTAS_VALUE: Accessor<'T> -> int -> #HtmlElement) : HtmlContainerFun =
-            fun PARTAS_CONT -> ignore PARTAS_VALUE
+    [<Import("NoHydration", "solid-js/web")>]
+    type NoHydration() =
+        interface FragmentNode
 
-    [<PartasImport("Show", "solid-js")>]
+    [<Import("Portal", "solid-js/web")>]
     [<Erase>]
+    type Portal() =
+        interface HtmlContainer
+
+        [<DefaultValue; Erase>]
+        val mutable mount: Element
+
+        [<DefaultValue; Erase>]
+        val mutable useShadow: bool
+
+        [<DefaultValue; Erase>]
+        val mutable isSVG: bool
+
+
+    [<Import("Show", "solid-js")>]
     type Show() =
         interface HtmlContainer
 
-        [<Erase>]
-        member this.when'
-            with set (value: bool) = ()
+        [<Erase; DefaultValue>]
+        val mutable when': bool
 
-        [<Erase>]
-        member this.fallback
-            with set (value: HtmlElement) = ()
+        [<Erase; DefaultValue>]
+        val mutable fallback: HtmlElement
 
-        [<Erase>]
-        member this.keyed
-            with set (value: bool) = ()
+        [<Erase; DefaultValue>]
+        val mutable keyed: bool
 
-    [<PartasImport("Match", "solid-js")>]
+    [<Import("Show", "solid-js")>]
+    [<Erase>]
+    type Show<'T>() =
+        interface HtmlElement
+        interface ChildLambdaProvider<'T>
+
+        [<Erase; DefaultValue>]
+        val mutable when': 'T
+
+        [<Erase; DefaultValue>]
+        val mutable fallback: HtmlElement
+
+        [<Erase; DefaultValue>]
+        val mutable keyed: bool
+
+    [<Import("Suspense", "solid-js")>]
+    [<Erase>]
+    type Suspense() =
+        interface HtmlContainer
+
+        [<Erase; DefaultValue>]
+        val mutable fallback: HtmlElement
+
+    module SuspenseList =
+        [<StringEnum; RequireQualifiedAccess>]
+        type RevealOrder =
+            /// <summary>
+            /// Reveals each item in the list once the previous item has finished
+            /// rendering. This is the default
+            /// </summary>
+            | Forwards
+            /// <summary>
+            /// Reveals each item once the next item has finished rendering
+            /// </summary>
+            | Backwards
+            /// <summary>
+            /// Reveals all items in the list at the same time
+            /// </summary>
+            | Together
+
+        [<StringEnum; RequireQualifiedAccess>]
+        type Tail =
+            | Collapsed
+            | Hidden
+
+    [<Import("SuspenseList", "solid-js")>]
+    [<Erase>]
+    type SuspenseList() =
+        interface HtmlContainer
+
+        [<Erase; DefaultValue>]
+        val mutable revealOrder: SuspenseList.RevealOrder
+
+        [<Erase; DefaultValue>]
+        val mutable tail: SuspenseList.Tail
+
+        [<Erase; DefaultValue>]
+        val mutable fallback: HtmlElement
+
+    [<Import("Match", "solid-js")>]
     [<Erase>]
     type Match() =
         interface HtmlContainer
 
-        [<Erase>]
-        member this.when'
-            with set (value: bool) = ()
+        [<Erase; DefaultValue>]
+        val mutable when': bool
 
     [<PartasImport("Switch", "solid-js")>]
     [<Erase>]
     type Switch() =
         interface HtmlElement
 
-        [<Erase>]
-        member this.fallback
-            with set (value: HtmlElement) = ()
+        [<Erase; DefaultValue>]
+        val mutable fallback: HtmlElement
 
         [<Erase>]
         member inline _.Combine
@@ -122,72 +267,15 @@ module Bindings =
         member inline _.Yield(PARTAS_ELEMENT: Match) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
-    [<PartasImport("Suspense", "solid-js")>]
-    [<Erase>]
-    type Suspense() =
-        interface HtmlContainer
-
-        [<Erase>]
-        member this.fallback
-            with set (value: HtmlElement) = ()
-
-    [<PartasImport("SuspenseList", "solid-js")>]
-    [<Erase>]
-    type SuspenseList() =
-        interface HtmlContainer
-
-        [<Erase>]
-        member this.revealOrder
-            with set (value: string) = ()
-
-        [<Erase>]
-        member this.tail
-            with set (value: string) = ()
-
-        [<Erase>]
-        member this.fallback
-            with set (value: HtmlElement) = ()
-
-    [<PartasImport("Portal", "solid-js/web")>]
-    [<Erase>]
-    type Portal() =
-        interface HtmlContainer
-
-        [<Erase>]
-        member this.mount
-            with set (value: Element) = ()
-
-        [<Erase>]
-        member this.useShadow
-            with set (value: bool) = ()
-
-    module ErrorBoundary =
-        type Fallback = delegate of err: obj * reset: (unit -> unit) -> HtmlElement
-
-    [<PartasImport("ErrorBoundary", "solid-js")>]
-    [<Erase>]
-    type ErrorBoundary() =
-        interface HtmlContainer
-
-        [<Erase>]
-        member this.fallback
-            with set (value: ErrorBoundary.Fallback) = ()
-
     [<Erase>]
     type Extensions =
-
-        [<Extension; Erase>]
-        static member Run(PARTAS_THIS: For<'T>, PARTAS_RUNEXPR: HtmlContainerFun) =
-            PARTAS_RUNEXPR Unchecked.defaultof<_>
-            PARTAS_THIS
-
-        [<Extension; Erase>]
-        static member Run(PARTAS_THIS: Index<'T>, PARTAS_RUNEXPR: HtmlContainerFun) =
-            PARTAS_RUNEXPR Unchecked.defaultof<_>
-            PARTAS_THIS
-
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: Switch, PARTAS_RUNEXPR: HtmlContainerFun) =
+            PARTAS_RUNEXPR Unchecked.defaultof<_>
+            PARTAS_THIS
+
+        [<Extension; Erase>]
+        static member Run(PARTAS_THIS: Dynamic<'T>, PARTAS_RUNEXPR: HtmlContainerFun) =
             PARTAS_RUNEXPR Unchecked.defaultof<_>
             PARTAS_THIS
 
@@ -380,18 +468,81 @@ type Bindings =
     [<ImportMember("solid-js/web")>]
     static member renderToString(fn: unit -> #HtmlElement) : string = jsNative
 
+    /// <remarks>
+    /// Note: to store a function, you will have to keep in mind that subsequent 'setting' of the signal will
+    /// have to be in function form (except during initial assignment):
+    /// <code>
+    /// let myFunc () = console.log("myFunc")
+    /// let accessor, setter = createSignal(unbox&lt;unit -> (unit -> unit)> myFunc)
+    /// let myNewFunc () = console.log("newFunc")
+    /// setter &lt;| fun () -> myNewFunc
+    /// </code>
+    /// </remarks>>
     [<ImportMember("solid-js")>]
     static member createSignal(value: 'T) : Signal<'T> = jsNative
 
     [<ImportMember("solid-js"); ParamObject(1)>]
-    static member createSignal(value: 'T, ?equals: ('T -> 'T -> bool), ?name: string, ?``internal``: bool) : Signal<'T> = jsNative
+    static member createSignal(value: 'T, ?equals: ComparisonFunc<'T>, ?name: string, ?``internal``: bool) : Signal<'T> = jsNative
 
     [<ImportMember("solid-js")>]
     static member createMemo(value: unit -> 'T) : (unit -> 'T) = jsNative
 
+    [<ImportMember("solid-js"); ParamObject(2)>]
+    static member createMemo(memo: 'T -> 'T, initialValue: 'T, ?equals: ComparisonFunc<'T>) = jsNative
+
+    /// <summary>
+    /// Runs whenever a signal which is accessed within the null func is modified. Also runs on mounting.
+    /// </summary>
+    /// <remarks>
+    /// Effects are a general way to make arbitrary code ("side effects") run whenever dependencies change,
+    /// e.g., to modify the DOM manually. createEffect creates a new computation that runs the given function
+    /// in a tracking scope, thus automatically tracking its dependencies, and automatically reruns the function
+    /// whenever the dependencies update.<br/><br/>
+    /// The effect will also run once, immediately after it is created, to initialize the DOM to the
+    /// correct state. This is called the "mounting" phase. However, we recommend using onMount instead,
+    /// which is a more explicit way to express this.
+    /// <br/>
+    /// The effect callback can return a value, which will be passed as the prev argument to the next
+    /// invocation of the effect. This is useful for memoizing values that are expensive to compute.<br/><br/>
+    /// <para>Effects are meant primarily for side effects that read but don't write to the reactive system:
+    /// it's best to avoid setting signals in effects, which without care can cause additional rendering
+    /// or even infinite effect loops. Instead, prefer using createMemo to compute new values that depend
+    /// on other reactive values, so the reactive system knows what depends on what, and can optimize accordingly.
+    /// If you do end up setting a signal within an effect, computations subscribed to that signal will be executed
+    /// only once the effect completes; see batch for more detail.</para>
+    /// <para>The first execution of the effect function is not immediate; it's scheduled to run after the
+    /// current rendering phase (e.g., after calling the function passed to render, createRoot, or runWithOwner).
+    /// If you want to wait for the first execution to occur, use queueMicrotask (which runs before the browser
+    /// renders the DOM) or await Promise.resolve() or setTimeout(..., 0) (which runs after browser rendering).</para>
+    /// </remarks>
     [<ImportMember("solid-js")>]
     static member createEffect(effect: unit -> unit) : unit = jsNative
 
+    /// <summary>
+    /// Runs whenever a signal which is accessed within the null func is modified. Also runs on mounting.
+    /// </summary>
+    /// <remarks>
+    /// Effects are a general way to make arbitrary code ("side effects") run whenever dependencies change,
+    /// e.g., to modify the DOM manually. createEffect creates a new computation that runs the given function
+    /// in a tracking scope, thus automatically tracking its dependencies, and automatically reruns the function
+    /// whenever the dependencies update.<br/><br/>
+    /// The effect will also run once, immediately after it is created, to initialize the DOM to the
+    /// correct state. This is called the "mounting" phase. However, we recommend using onMount instead,
+    /// which is a more explicit way to express this.
+    /// <br/>
+    /// The effect callback can return a value, which will be passed as the prev argument to the next
+    /// invocation of the effect. This is useful for memoizing values that are expensive to compute.<br/><br/>
+    /// <para>Effects are meant primarily for side effects that read but don't write to the reactive system:
+    /// it's best to avoid setting signals in effects, which without care can cause additional rendering
+    /// or even infinite effect loops. Instead, prefer using createMemo to compute new values that depend
+    /// on other reactive values, so the reactive system knows what depends on what, and can optimize accordingly.
+    /// If you do end up setting a signal within an effect, computations subscribed to that signal will be executed
+    /// only once the effect completes; see batch for more detail.</para>
+    /// <para>The first execution of the effect function is not immediate; it's scheduled to run after the
+    /// current rendering phase (e.g., after calling the function passed to render, createRoot, or runWithOwner).
+    /// If you want to wait for the first execution to occur, use queueMicrotask (which runs before the browser
+    /// renders the DOM) or await Promise.resolve() or setTimeout(..., 0) (which runs after browser rendering).</para>
+    /// </remarks>
     [<ImportMember("solid-js")>]
     static member createEffect(effect: 'T -> 'T, initialValue: 'T) : unit = jsNative
 

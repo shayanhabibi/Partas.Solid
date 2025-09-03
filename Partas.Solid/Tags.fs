@@ -10,6 +10,23 @@ open Partas.Solid.Experimental.U
 #nowarn 1182
 
 [<AutoOpen>]
+module SpecialAttributes =
+    /// <summary>
+    /// An additional special syntax that allows full control of capture, passive, once and signal is an intersection or combination of
+    /// <c>EventListenerObject</c> &amp; <c>AddEventListenerOptions</c>
+    /// </summary>
+    [<JS.Pojo>]
+    type OnHandler(handleEvent: Event -> unit, ?once: bool, ?passive: bool, ?capture: bool) =
+        member val handleEvent: (Event -> unit) = JS.undefined with get, set
+        member val once: bool = JS.undefined with get, set
+        member val passive: bool = JS.undefined with get, set
+        member val capture: bool = JS.undefined with get, set
+
+module Decorators =
+    [<Emit("/*@once*/")>]
+    let once: unit = jsNative
+
+[<AutoOpen>]
 module Tags =
     /// Fragment (or template) node, only renders children, not itself
     [<Erase>]
@@ -24,12 +41,18 @@ module Tags =
         [<Extension; Erase>]
         static member attr(this: #HtmlTag, name: string, value: obj) = this
 
+        /// Forces the prop to be treated as a property instead of an attribute.
+        [<Extension; Erase>]
+        static member prop(this: #HtmlTag, name: string, value: obj) = this
+
         /// Add event handler to the element through the corresponding attribute
         [<Extension; Erase>]
         static member on(this: #HtmlTag, eventName: string, eventHandler: Event -> unit) = this
 
+        /// Add event handler to the element with the v1.9 syntax that is an intersection
+        /// of EventListenerObject and AddEventListenerOptions
         [<Extension; Erase>]
-        static member on(this: #HtmlTag, eventName: string, eventHandler: obj) = this
+        static member on(this: #HtmlTag, eventName: string, eventHandler: OnHandler) = this
 
         /// Add data attribute to the element
         [<Extension; Erase>]

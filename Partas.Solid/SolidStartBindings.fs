@@ -97,7 +97,7 @@ type HttpStatusCode =
 
 [<AutoOpen>]
 module Bindings =
-    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    [<EditorBrowsable(EditorBrowsableState.Never)>]
     module Spec =
         [<Literal>]
         let path = "@solidjs/start"
@@ -106,6 +106,8 @@ module Bindings =
     type Exports =
         [<Emit("\"use server\"", isStatement = true)>]
         static member useServer: unit = jsNative
+
+        [<ImportMember("@solidjs/start/server")>]
 
         [<Mangle>]
         static member inline getServerFunctionMeta =
@@ -175,3 +177,6 @@ module Bindings =
     type Exports with
         [<ImportMember(Spec.path)>]
         static member clientOnly(importFunc: unit -> JS.Promise<HtmlElement>) : TagValue = jsNative
+
+        [<ImportMember("@solidjs/start/server"); ParamObject(1)>]
+        static member createHandler(fn: unit -> StartServer, ?mode: string) : unit = jsNative

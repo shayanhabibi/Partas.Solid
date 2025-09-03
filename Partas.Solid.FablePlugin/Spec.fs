@@ -5,6 +5,8 @@ open Fable
 open Fable.AST
 open Fable.AST.Fable
 
+module Utils = Patterns
+
 /// Defines patterns for the PluginHelper which establishes whether the plugin is available
 /// for use in the environment based on the language target etc
 [<RequireQualifiedAccess>]
@@ -15,14 +17,14 @@ module internal FableRequirements =
 
     let (|Language|_|) (input: PluginHelper) =
         match input.Options.Language with
-        | Language.JavaScript -> Some ()
-        | _ -> None
+        | Language.JavaScript -> true
+        | _ -> false
 
     let (|FileExtension|_|) (input: PluginHelper) =
         match input.Options.FileExtension with
-        | s when s.EndsWith ".jsx" -> Some ()
-        | s when s.EndsWith ".js" -> Some () // Temporary allowance
-        | _ -> None
+        | Utils.EndsWith (".js")
+        | Utils.EndsWith (".jsx") -> true
+        | _ -> false
 
 /// Patterns which specify whether certain members are valid for the attribute to
 /// compile to.
@@ -74,41 +76,10 @@ module internal SchemaRules =
 /// reused or verbose Expr constructors should
 /// be lifted into this module.
 module internal Baked =
-    let private importMergeProps =
-        Import (
-            { Selector = "mergeProps"
-              Path = "solid-js"
-              Kind = UserImport false },
-            Type.Any,
-            None
-        )
-
-    let private importSplitProps =
-        Import (
-            { Selector = "splitProps"
-              Path = "solid-js"
-              Kind = UserImport false },
-            Type.Any,
-            None
-        )
-
-    let jsxElementType =
-        Type.DeclaredType (
-            ref =
-                { FullName = "Fable.Core.JSX.Element"
-                  Path = EntityPath.CoreAssemblyName "Fable.Core" },
-            genericArgs = []
-        )
-
-    let spreadPropertyExpression =
-        IdentExpr (
-            { Name = "PARTAS_OTHERS"
-              Type = jsxElementType
-              IsMutable = false
-              IsThisArgument = false
-              IsCompilerGenerated = true
-              Range = None }
-        )
+    let private importMergeProps = AstUtils.Import ("mergeProps", "solid-js")
+    let private importSplitProps = AstUtils.Import ("splitProps", "solid-js")
+    let jsxElementType = JsxUtils.ElementType
+    let spreadPropertyExpression = AstUtils.IdentExpr ("PARTAS_OTHERS")
 
     /// Converts property setters into a sugar for setting their defaults by
     /// converting them into a mergeProps, which merges an object with the key,value pairs
@@ -117,186 +88,61 @@ module internal Baked =
         match values with
         | [] -> rest
         | _ ->
-            Sequential
-                [ Expr.Set (
-                      expr =
-                          IdentExpr (
-                              { Name = "props"
-                                Type = jsxElementType
-                                IsMutable = false
-                                IsThisArgument = false
-                                IsCompilerGenerated = true
-                                Range = None }
-                          ),
-                      kind = SetKind.ValueSet,
-                      typ = Type.Any,
-                      value =
-                          Call (
-                              callee = importMergeProps,
-                              info =
-                                  CallInfo.Create (
-                                      args =
-                                          [ Value (
-                                                kind =
-                                                    ValueKind.NewAnonymousRecord (
-                                                        values =
-                                                            (values
-                                                             |> List.map snd),
-                                                        fieldNames =
-                                                            (values
-                                                             |> List.map (
-                                                                 fst
-                                                                 >> Utils.trimReservedIdentifiers
-                                                             )
-                                                             |> List.toArray),
-                                                        genArgs = [],
-                                                        isStruct = false
-                                                    ),
-                                                range = None
-                                            )
-                                            IdentExpr (
-                                                { Name = "props"
-                                                  Type = jsxElementType
-                                                  IsMutable = false
-                                                  IsThisArgument = false
-                                                  IsCompilerGenerated = true
-                                                  Range = None }
-                                            ) ]
-                                  ),
-                              typ = Type.Any,
-                              range = None
-                          ),
-                      range = None
-                  )
-                  rest ]
+            AstUtils.Sequential (
+                AstUtils.SetProp (
+                    AstUtils.IdentExpr ("props"),
+                    AstUtils.Call (
+                        importMergeProps,
+                        AstUtils.CallInfo (
+                            args =
+                                [ let trimReservedIdentifier =
+                                      fun (name, expr) -> StringUtils.TrimReservedIdentifiers name, expr
+
+                                  AstUtils.Object (List.map trimReservedIdentifier values)
+                                  AstUtils.IdentExpr ("props") ]
+                        )
+                    )
+                ),
+                rest
+            )
 
     /// It renders the JSX splitProps, with the given values split into PARTAS_LOCAL, and the rest
     /// into PARTAS_OTHERS
     let convertGettersToObject (values: string list) (rest: Expr) =
         Expr.Let (
-            ident =
-                { Name = "[PARTAS_LOCAL, PARTAS_OTHERS]"
-                  Type = Type.Any
-                  IsMutable = false
-                  IsThisArgument = false
-                  IsCompilerGenerated = false
-                  Range = None },
+            ident = AstUtils.Ident ("[PARTAS_LOCAL, PARTAS_OTHERS]"),
             value =
-                Expr.Call (
-                    callee = importSplitProps,
-                    info =
-                        CallInfo.Create (
-                            args =
-                                [ IdentExpr (
-                                      { Name = "props"
-                                        Type = jsxElementType
-                                        IsMutable = false
-                                        IsThisArgument = false
-                                        IsCompilerGenerated = true
-                                        Range = None }
-                                  )
-                                  Value (
-                                      kind =
-                                          ValueKind.NewArray (
-                                              newKind =
-                                                  NewArrayKind.ArrayValues (
-                                                      [ for value in values do
-                                                            Value (StringConstant (value), None) ]
-                                                  ),
-                                              typ = Type.Any,
-                                              kind = ArrayKind.ImmutableArray
-                                          ),
-                                      range = None
-                                  ) ]
-                        ),
-                    typ = Type.Any,
-                    range = None
+                AstUtils.Call (
+                    importSplitProps,
+                    AstUtils.CallInfo (
+                        args =
+                            [ AstUtils.IdentExpr ("props")
+                              AstUtils.ValueArray (
+                                  values
+                                  |> List.map AstUtils.Value
+                              ) ]
+                    )
                 ),
             body = rest
         )
 
-    let importJsxCreate =
-        Import (
-            info =
-                { Selector = "create"
-                  Path = "@fable-org/fable-library-js/JSX.js"
-                  Kind = ImportKind.UserImport false },
-            typ = Type.Any,
-            range = None
-        )
-
-    let listItemType =
-        Type.Tuple (genericArgs = [ Type.String; Type.Any ], isStruct = false)
-
-    let emptyList =
-        Value (kind = NewList (headAndTail = None, typ = listItemType), range = None)
-
-    let flattenExpressions (exprs: Expr list) =
-        (emptyList, exprs)
-        ||> List.fold (fun acc prop -> Value (kind = NewList (headAndTail = Some (prop, acc), typ = listItemType), range = None))
-
-    /// Renders a identifier getter in the JSX of `PARTAS_LOCAL.{getter-target}`
     let propGetter (getTarget: string) =
-        Get (
-            IdentExpr
-                { Name = "PARTAS_LOCAL"
-                  Type = jsxElementType
-                  IsMutable = false
-                  IsThisArgument = true
-                  IsCompilerGenerated = true
-                  Range = None },
-            GetKind.ExprGet (Value (StringConstant (Utils.trimReservedIdentifiers getTarget), None)),
-            Type.Any,
-            None
-        )
-
-    let wrapChildrenExpression childrenExpression =
-        Value (
-            kind =
-                NewTuple (
-                    values =
-                        [ Value (kind = StringConstant "children", range = None)
-                          TypeCast (childrenExpression, Type.Any)
-
-                          ],
-                    isStruct = false
-                ),
-            range = None
-        )
+        AstUtils.GetProp ("PARTAS_LOCAL", StringUtils.TrimReservedIdentifiers getTarget)
 
     /// Renders an ElementBuilder into the final Expr. Performs ONE final transformation; it will
     /// pattern match the tagname "Fragment" and remove it to render `<> </>`.
     let renderElement (ctx: PluginContext) (builder: ElementBuilder) =
-        let renderProp ((name: string, expr: Expr): PropInfo) =
-            Value (NewTuple ([ Value (StringConstant name, None); TypeCast (expr, Type.Any) ], false), None)
-
-        let renderPropList = List.map renderProp
-
         let renderTagName =
             function
-            | TagSource.AutoImport "Fragment" -> Value (StringConstant "", None)
+            | TagSource.AutoImport "Fragment" -> AstUtils.Value ("")
             | TagSource.LibraryImport imp -> imp
-            | TagSource.AutoImport name -> Value (StringConstant name, None)
+            | TagSource.AutoImport name -> AstUtils.Value (name)
 
-        let internalCollection =
-            (builder.Children
-             |> List.rev
-             |> flattenExpressions
-             |> wrapChildrenExpression)
-            :: renderPropList builder.Properties
-            |> flattenExpressions
-
-        Call (
-            callee = importJsxCreate,
-            info =
-                { ThisArg = None
-                  Args = [ renderTagName builder.TagSource; internalCollection ]
-                  SignatureArgTypes = []
-                  GenericArgs = []
-                  MemberRef = None
-                  Tags = [ "jsx" ] },
-            typ = jsxElementType,
-            range = None
+        JsxUtils.CreateElement (
+            renderTagName builder.TagSource,
+            builder.Properties,
+            builder.Children
+            |> List.rev
         )
 
 module internal MemberRef =
@@ -327,7 +173,7 @@ module internal MemberRef =
                 | Utils.EndsWithTrimmed "_$ctor" memberName
                 | memberName ->
                     memberName
-                    |> Utils.trimReservedIdentifiers
+                    |> StringUtils.TrimReservedIdentifiers
                     |> Some
         | GeneratedMemberRef (_) -> None
 
@@ -361,32 +207,32 @@ module internal MemberRef =
 module internal Expr =
     let (|ImportedConstructor|_|) (ctx: PluginContext) =
         function
-        | Import ({ Kind = UserImport _ }, Any, _) -> Some ()
-        | Import ({ Kind = MemberImport (MemberRef.MemberRefIs ctx MemberRefType.Constructor) }, _, _) -> Some ()
-        | _ -> None
+        | Import ({ Kind = UserImport _ }, Any, _)
+        | Import ({ Kind = MemberImport (MemberRef.MemberRefIs ctx MemberRefType.Constructor) }, _, _) -> true
+        | _ -> false
 
     let (|NativeImportedConstructor|_|) (ctx: PluginContext) =
         function
         | Import ({ Kind = MemberImport (MemberRef ({ FullName = Utils.StartsWith "Partas.Solid.Tags" | Utils.StartsWith "Partas.Solid.Svg" }, _)) },
                   _,
-                  _) & ImportedConstructor ctx -> Some ()
-        | _ -> None
+                  _) & ImportedConstructor ctx -> true
+        | _ -> false
 
     let (|ImportedSetter|_|) (ctx: PluginContext) =
         function
         | Import ({ Selector = Utils.StartsWith "Partas_Solid"
                     Kind = MemberImport (MemberRef.MemberRefIs ctx MemberRefType.Setter) },
                   _,
-                  _) -> Some ()
-        | _ -> None
+                  _) -> true
+        | _ -> false
 
     let (|ImportedGetter|_|) (ctx: PluginContext) =
         function
         | Import ({ Selector = Utils.StartsWith "Partas_Solid"
                     Kind = MemberImport (MemberRef.MemberRefIs ctx MemberRefType.Getter) },
                   _,
-                  _) -> Some ()
-        | _ -> None
+                  _) -> true
+        | _ -> false
 
     let (|ImportedExtensionName|_|) (ctx: PluginContext) =
         function
@@ -429,9 +275,8 @@ module internal Type =
         | GetDeclaredType ctx (Type.DeclaredType ({ FullName = Utils.StartsWith "Partas.Solid" as fullName }, _)) ->
             fullName
             |> _.Split('.')
-            |> Array.rev
-            |> Array.head
-            |> Utils.trimReservedIdentifiers
+            |> Array.last
+            |> StringUtils.TrimReservedIdentifiers
             |> Some
         | _ -> None
 
@@ -444,8 +289,7 @@ module internal Type =
             |> PluginContext.getEntity ctx
             |> _.Attributes
             |> Seq.tryFind (
-                _.Entity
-                >> _.FullName
+                _.Entity.FullName
                 >> (=) attrName
             )
         | _ -> None
@@ -477,10 +321,10 @@ module internal Type =
         | _ -> None
 
     /// Determines if type has POJO attribute
-    let (|HasPojo|_|) (ctx: PluginContext) : Type -> unit option =
+    let (|HasPojo|_|) (ctx: PluginContext) : Type -> bool =
         function
-        | HasAttribute ctx "Fable.Core.JS.PojoAttribute" _ -> Some ()
-        | _ -> None
+        | HasAttribute ctx "Fable.Core.JS.PojoAttribute" _ -> true
+        | _ -> false
 
 /// <summary>
 /// Pattern matches for EntityRef expr nodes
@@ -491,8 +335,7 @@ module internal EntityRef =
         PluginContext.getEntity ctx
         >> _.Attributes
         >> Seq.tryFind (
-            _.Entity
-            >> _.FullName
+            _.Entity.FullName
             >> (=) attrName
         )
 
@@ -544,10 +387,10 @@ module internal Ident =
         | { Name = Utils.StartsWith "PARTAS_TEXT" } -> IdentType.Text
         | _ -> IdentType.Other
 
-    let (|HasPojo|_|) (ctx: PluginContext) : Ident -> unit option =
+    let (|HasPojo|_|) (ctx: PluginContext) : Ident -> bool =
         function
-        | { Type = Type.HasPojo ctx } -> Some ()
-        | _ -> None
+        | { Type = Type.HasPojo ctx } -> true
+        | _ -> false
 
 /// Contains patterns to match CallInfo's with common member ref or thisarg patterns.
 /// Honestly, they're only used probably once each in current iterations, but I think
@@ -555,18 +398,18 @@ module internal Ident =
 module internal CallInfo =
     let (|PropertySetter|_|) (ctx: PluginContext) =
         function
-        | { ThisArg = Some (IdentExpr (Ident.IdentIs ctx IdentType.Props)) } -> Some ()
-        | _ -> None
+        | { ThisArg = Some (IdentExpr (Ident.IdentIs ctx IdentType.Props)) } -> true
+        | _ -> false
 
     let (|Constructor|_|) (ctx: PluginContext) =
         function
-        | { MemberRef = Some (MemberRef.MemberRefIs ctx MemberRefType.Constructor) } -> Some ()
-        | _ -> None
+        | { MemberRef = Some (MemberRef.MemberRefIs ctx MemberRefType.Constructor) } -> true
+        | _ -> false
 
     let (|Pojo|_|) (ctx: PluginContext) =
         function
-        | { MemberRef = Some (MemberRef (EntityRef.HasPojo ctx, _)) } -> Some ()
-        | _ -> None
+        | { MemberRef = Some (MemberRef (EntityRef.HasPojo ctx, _)) } -> true
+        | _ -> false
 
     /// Matches a constructor which has the Pojo attribute. It extracts the parameter names and matches
     /// them to the values in the call and emits them.

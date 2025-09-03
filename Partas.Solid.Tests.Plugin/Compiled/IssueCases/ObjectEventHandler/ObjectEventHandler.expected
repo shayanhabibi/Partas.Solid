@@ -1,0 +1,11 @@
+import { some } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Option.js";
+
+export function test() {
+    return <div on:event={{
+            handleEvent: (e) => {
+                console.log(some(e));
+            },
+            passive: true,
+        }} />;
+}
+

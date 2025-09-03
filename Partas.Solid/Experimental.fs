@@ -14,7 +14,7 @@ open Fable.Core
 /// Lambdas that are of the signature <c>unit -> unit</c> are common enough that we can
 /// build this as a base for things like <c>createEffect</c> to inherit
 /// </summary>
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type NullLambdaBuilder() =
     member inline _.Return(x) =
@@ -35,7 +35,7 @@ type NullLambdaBuilder() =
 /// Lambdas that take null parameters and return a type are common enough to build
 /// a sugar wrapper that things like <c>createMemo</c> can inherit
 /// </summary>
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type BaseLambdaBuilder() =
     member inline _.Return(x) =
@@ -53,7 +53,7 @@ type BaseLambdaBuilder() =
     member inline _.Yield(PARTAS_VALUE) =
         PARTAS_VALUE
 
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type LambdaBuilder() =
     inherit BaseLambdaBuilder()
@@ -62,7 +62,7 @@ type LambdaBuilder() =
     member inline _.Run(code: unit -> 'T) : unit -> 'T =
         fun () -> code ()
 
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type BatchBuilder() =
     inherit BaseLambdaBuilder()
@@ -70,7 +70,7 @@ type BatchBuilder() =
     member inline _.Run(code: unit -> 'T) : 'T =
         batch (fun () -> code ())
 
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type CreateEffectBuilder() =
     inherit NullLambdaBuilder()
@@ -80,7 +80,7 @@ type CreateEffectBuilder() =
             effect ()
             |> ignore)
 
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type OnMountBuilder() =
     inherit NullLambdaBuilder()
@@ -90,7 +90,7 @@ type OnMountBuilder() =
             effect ()
             |> ignore)
 
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type OnCleanupBuilder() =
     inherit NullLambdaBuilder()
@@ -100,7 +100,7 @@ type OnCleanupBuilder() =
             effect ()
             |> ignore)
 
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type CreateMemoBuilder() =
     inherit BaseLambdaBuilder()
@@ -108,7 +108,7 @@ type CreateMemoBuilder() =
     member inline _.Run(computation: unit -> 'T) : unit -> 'T =
         createMemo (fun () -> computation ())
 
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type CreateSelectorBuilder() =
     inherit BaseLambdaBuilder()
@@ -116,7 +116,7 @@ type CreateSelectorBuilder() =
     member inline _.Run(computation: unit -> 'T) : 'U -> bool =
         createSelector (fun () -> computation ())
 
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type CreateReactionBuilder() =
     inherit BaseLambdaBuilder()
@@ -127,7 +127,7 @@ type CreateReactionBuilder() =
     member inline _.Zero(value: unit) =
         ignore value
 
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type ChildrenBuilder() =
     inherit BaseLambdaBuilder()
@@ -135,7 +135,7 @@ type ChildrenBuilder() =
     member inline _.Run(computation: unit -> #HtmlElement) : unit -> #HtmlElement =
         children (fun () -> computation ())
 
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<EditorBrowsable(EditorBrowsableState.Never)>]
 [<Erase>]
 type LazyBuilder() =
     inherit BaseLambdaBuilder()
