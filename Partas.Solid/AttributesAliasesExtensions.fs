@@ -4,19 +4,19 @@
 
 open System
 
+// aliases
+type EditorBrowsable = System.ComponentModel.EditorBrowsableAttribute
+type EditorBrowsableState = System.ComponentModel.EditorBrowsableState
+
 /// Used for types that have inbuilt Builder computation support but are an imported
 /// component from an external library.
 /// This prevents the obfuscation/generalisation of property names which lets us be
 /// more confident in less strict patterns matching the appropriate targets with discrimination.
 /// We will add the import attribute afterwards
 // [<AttributeUsage(AttributeTargets.Class)>]
+[<Fable.Core.Erase>]
 type PartasImportAttribute(selector: string, path: string) =
     inherit Attribute()
-
-
-// aliases
-type EditorBrowsable = System.ComponentModel.EditorBrowsableAttribute
-type EditorBrowsableState = System.ComponentModel.EditorBrowsableState
 
 namespace JetBrains.Annotations
 
