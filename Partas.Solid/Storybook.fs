@@ -38,7 +38,11 @@ module Builder =
             fun PARTAS_BUILDER ->
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND () PARTAS_BUILDER
-
+        [<CustomOperation "render">]
+        member inline _.Render([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, [<InlineIfLambda>] PARTAS_RENDER: 'T -> #Partas.Solid.Builder.HtmlElement): StorybookFun<'T> =
+            fun PARTAS_BUILDER ->
+                ignore PARTAS_RENDER
+                PARTAS_FIRST PARTAS_BUILDER
     type StorybookArgs<'T> with
         member inline _.Combine([<InlineIfLambda>] PARTAS_FIRST: StorybookArgsFun<'T>, [<InlineIfLambda>] PARTAS_SECOND: StorybookArgsFun<'T>): StorybookArgsFun<'T> =
             fun PARTAS_BUILDER ->

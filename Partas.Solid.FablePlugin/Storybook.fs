@@ -346,6 +346,15 @@ module internal rec StorybookCases =
                 Cases = cases |> List.collect _.Cases |> List.distinct
             } )
 
+module internal rec StorybookRender =
+    let getRender (ctx: PluginContext) (expr: Expr) =
+        let predicate = function
+            | Lambda(name = Some (StartsWith "PARTAS_RENDER")) -> true
+            | _ -> false
+        findAndDiscardElse predicate expr
+        |> List.tryHead
+        |> Option.map (AST.transform ctx)
+
 module internal rec StorybookVariantsAndArgs =
     type RawVariantExpr = RawVariantExpr of variantName: string * expr: Expr
     type Variant = Variant of variantName: string * args: (string * Expr) list
@@ -372,8 +381,13 @@ module internal rec StorybookVariantsAndArgs =
             | _ -> None
         let processRawVariantExpr (RawVariantExpr(name,expr)) =
             let predicate = function
-                | Set _
-                | Call(callee = Import(info = { Kind = ImportKind.MemberImport (MemberRef(info = { CompiledName = StartsWith "set_" })) })) ->
+                | Set _ -> true
+                | Call(callee = Import(info = { Kind = ImportKind.MemberImport (MemberRef(info = { CompiledName = compiledName })) }))
+                    when
+                        compiledName
+                        |> _.Split('.')
+                        |> Array.last
+                        |> _.StartsWith("set_") ->
                     true
                 | _ -> false
             findAndDiscardElse predicate expr
@@ -381,9 +395,17 @@ module internal rec StorybookVariantsAndArgs =
                 | Set(kind = SetKind.FieldSet propName; value = value) ->
                     Some(propName, value)
                 | Call(
-                   callee = Import(info = { Kind = ImportKind.MemberImport (MemberRef(info = { CompiledName = StartsWithTrimmed "set_" prop }))})
+                   callee = Import(info = { Kind = ImportKind.MemberImport (MemberRef(info = { CompiledName = compiledName }))})
                    info = { Args = exprs }
-                   ) ->
+                   )
+                    when
+                        compiledName.Split('.')
+                        |> Array.last
+                        |> _.StartsWith("set_") ->
+                    let prop =
+                        compiledName.Split('.')
+                        |> Array.last
+                        |> function StartsWithTrimmed "set_" value -> value | _ -> failwith "Unreachable"
                     Some (prop,
                     if exprs.Length > 1 then
                         Sequential exprs
@@ -403,8 +425,13 @@ module internal rec StorybookVariantsAndArgs =
             | _ -> false
         let processRawVariantExpr expr =
             let predicate = function
-                | Set _
-                | Call(callee = Import(info = { Kind = ImportKind.MemberImport (MemberRef(info = { CompiledName = StartsWith "set_" })) })) ->
+                | Set _ -> true
+                | Call(callee = Import(info = { Kind = ImportKind.MemberImport (MemberRef(info = { CompiledName = compiledName })) }))
+                    when
+                        compiledName
+                        |> _.Split('.')
+                        |> Array.last
+                        |> _.StartsWith("set_") ->
                     true
                 | _ -> false
             findAndDiscardElse predicate expr
@@ -412,9 +439,17 @@ module internal rec StorybookVariantsAndArgs =
                 | Set(kind = SetKind.FieldSet propName; value = value) ->
                     Some(propName, value)
                 | Call(
-                   callee = Import(info = { Kind = ImportKind.MemberImport (MemberRef(info = { CompiledName = StartsWithTrimmed "set_" prop }))})
+                   callee = Import(info = { Kind = ImportKind.MemberImport (MemberRef(info = { CompiledName = compiledName }))})
                    info = { Args = exprs }
-                   ) ->
+                   )
+                    when
+                        compiledName.Split('.')
+                        |> Array.last
+                        |> _.StartsWith("set_") ->
+                    let prop =
+                        compiledName.Split('.')
+                        |> Array.last
+                        |> function StartsWithTrimmed "set_" value -> value | _ -> failwith "Unreachable"
                     Some (prop,
                     if exprs.Length > 1 then
                         Sequential exprs
@@ -426,6 +461,8 @@ module internal rec StorybookVariantsAndArgs =
         findAndDiscardElse predicate expr
         |> List.collect processRawVariantExpr
         |> AstUtils.Object
+
+open StorybookVariantsAndArgs
 
 module internal StorybookAST =
     let getComponentExprFromEntity (ctx: PluginContext) (entity: Entity) =
@@ -459,7 +496,7 @@ module internal StorybookAST =
         | ArgType of string * Expr
         | Arg of string * Expr
 
-    let createMeta (ctx: PluginContext) (expr: Expr) =
+    let createMeta (ctx: PluginContext) (memberDecl: MemberDecl) (expr: Expr)=
         let typ =
             match expr with
             | Call(typ = DeclaredType(_, GetDeclaredType typ :: _)) -> typ
@@ -472,6 +509,7 @@ module internal StorybookAST =
         let properties = StorybookTypeRecursion.collectEntityMembers ctx entity
         let args = StorybookVariantsAndArgs.getArgs ctx expr
         let variants = StorybookVariantsAndArgs.getVariants ctx expr
+        let render = StorybookRender.getRender ctx expr
         let argTypes =
             properties |> List.map (fun prop ->
                 let docs = prop.XmlDocs |> Option.map (fun docs ->
@@ -715,21 +753,38 @@ module internal StorybookAST =
                             ?description = description
                             )
                     | _ -> AstUtils.Unit
-                    // | _ -> ()
-                let argType =
-                    makeArgType prop.Type
-                    |> fun expr -> prop.Name, expr
-                // [ MetaExpr.ArgType argType ]
                 makeArgType prop.Type
                 |> fun expr ->
                     prop.Name, expr
                 )
+        let closeLastTemplate = "\nconst $PARTAS_DISCARD = { $discard: true"
+        let compExpr =
+            AstUtils.Emit(
+                [
+                    $"$0\n }};\n\nexport default {memberDecl.Name};\n"
+                    yield! (variants |> List.mapi (fun idx (Variant(name,_)) ->
+                        $"export const {name} = ${idx + 2}" ) )
+                    closeLastTemplate
+                ] |> String.concat "\n",
+                AstUtils.CallInfo(args = [
+                    getComponentExprFromEntity ctx entity
+                    AstUtils.Value memberDecl.Name
+                    yield! (
+                        variants |> List.map (fun (Variant (_,expr)) ->
+                                AstUtils.Object([
+                                    "args", AstUtils.Object(expr)
+                                ])
+                            )
+                        )
+                ])
+                )
         [
-            "component", getComponentExprFromEntity ctx entity
             "args", args
             "argTypes", AstUtils.Object argTypes
+            if render.IsSome then
+                "render", render.Value
+            "component", compExpr
         ] |> AstUtils.Object
-        , variants
         // , ()
 
     [<return: Struct>]
@@ -738,18 +793,16 @@ module internal StorybookAST =
             ValueSome expr
         | _ -> ValueNone
 
-    let getRoot (ctx: PluginContext) expr =
+    let transform (ctx: PluginContext) (memberDecl: MemberDecl) =
         let predicate = function RootExpr ctx _ -> true | _ -> false
+        let expr = memberDecl.Body
         findAndDiscardElse predicate expr
         |> function
             | [ expr ]->
-                createMeta ctx expr
+                createMeta ctx memberDecl expr
 
             | _ -> failwith $"Unexpected content {expr}"
 
-    let rec transform ctx = function
-        // | RootExpr ctx expr -> expr
-        | expr -> expr |> getRoot ctx
 
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type PartasStorybookAttribute(compFlags: int) =
@@ -758,11 +811,11 @@ type PartasStorybookAttribute(compFlags: int) =
     override this.Transform(pluginHelper, file, memberDecl) =
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl flags
         memberDecl |> printfn "%A"
-        memberDecl.Body
+        memberDecl
         |> StorybookAST.transform ctx
         |> fun e ->
-            snd e |> sprintf "%A" |> PluginContext.logWarning ctx
-            { memberDecl with Body = fst e }
+            { memberDecl with Body = e }
+            // snd e |> sprintf "%A" |> PluginContext.logWarning ctx
         // |> printfn "%A"
         // |> printfn "%A"
         // memberDecl
