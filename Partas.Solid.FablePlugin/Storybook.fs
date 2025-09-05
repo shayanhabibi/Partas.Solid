@@ -13,19 +13,8 @@ open System.Xml.XPath
 [<assembly: ScanForPlugins>]
 do ()
 
-(*
-Doc members
-DefaultValue
-Description = summary
-*)
-// Make a computation expression for rendering variants and the main
-
-/// </summary>
-// Get docs off types
-// get docs off members
-
 [<RequireQualifiedAccess>]
-type FieldType =
+type internal FieldType =
     | Field of Field
     | Member of MemberFunctionOrValue
     member this.Type =
@@ -59,7 +48,7 @@ type FieldType =
         | Field field -> field.Name
         | Member memb -> memb.DisplayName
 
-type ControlType =
+type internal ControlType =
     | Object
     | Boolean
     | Check
@@ -90,9 +79,26 @@ type ControlType =
         | Color -> "color"
         | Date -> "date"
         | Text -> "text"
+    /// Defaults to Object if fails to match
+    static member Parse(value: string) =
+        match value.ToLower() with
+        | "boolean" | "bool" -> Boolean
+        | "check" -> Check
+        | "inline-check" | "inlinecheck" -> InlineCheck
+        | "radio" -> Radio
+        | "inline-radio" | "inlineradio" -> InlineRadio
+        | "select" -> Select
+        | "multi-select" | "multiselect" -> MultiSelect
+        | "number" | "int" | "float" -> Number
+        | "range" -> Range
+        | "file" -> File
+        | "color" | "colour" -> Color
+        | "date" | "datetime" -> Date
+        | "text" | "string" -> Text
+        | _ -> Object
 
 [<AutoOpen>]
-module Utils =
+module internal Utils =
     type AstUtils with
         static member TableInfo(?summary: string, ?detail: string) =
             [
@@ -209,11 +215,9 @@ module internal rec StorybookTypeRecursion =
                 rest
             | ent ->
                 ent :: rest
-    let filterMembers (ctx: PluginContext) (decls: MemberFunctionOrValue seq) =
+    let private filterMembers (ctx: PluginContext) (decls: MemberFunctionOrValue seq) =
         decls
         |> Seq.filter (fun memb ->
-            $"{memb.FullName} | {memb.ToString()}"
-            |> PluginContext.logWarning ctx
             (
                  memb.IsInline
                 || memb.IsInternal
@@ -223,20 +227,20 @@ module internal rec StorybookTypeRecursion =
             && memb.IsSetter
             )
 
-    let getFilteredMembers (ctx: PluginContext) (decl: DeclaredType) =
+    let private getFilteredMembers (ctx: PluginContext) (decl: DeclaredType) =
         let entity = ctx.Helper.GetEntity decl.Entity
         entity.MembersFunctionsAndValues
         |> filterMembers ctx
 
-    let getEntityInterfaces (ctx: PluginContext) (ent: Entity) =
+    let private getEntityInterfaces (ctx: PluginContext) (ent: Entity) =
         ent.AllInterfaces
         |> Seq.toList
         |> function FeedInterface ctx interfaces -> interfaces
 
-    let getEntity (ctx: PluginContext) (entityRef: DeclaredType) =
+    let private getEntity (ctx: PluginContext) (entityRef: DeclaredType) =
         ctx.Helper.GetEntity entityRef.Entity
 
-    let rec getEntityMembers (ctx: PluginContext) (entity: Entity) =
+    let rec private getEntityMembers (ctx: PluginContext) (entity: Entity) =
         let getMembers =
             entity.MembersFunctionsAndValues
             |> filterMembers ctx
@@ -246,7 +250,7 @@ module internal rec StorybookTypeRecursion =
         |> Option.map (getEntity ctx >> getEntityMembers ctx)
         |> Option.defaultValue []
         |> List.append getMembers
-    let rec collectEntityFields (ctx: PluginContext) (ent: Entity) =
+    let rec private collectEntityFields (ctx: PluginContext) (ent: Entity) =
         ent.BaseType
         |> Option.map (getEntity ctx >> collectEntityFields ctx)
         |> Option.defaultValue []
@@ -275,13 +279,17 @@ module internal rec StorybookCases =
         PropertyName: string
         Cases: string list
     }
-    let makeCases (ctx: PluginContext) (typ: Type) (CasesExpr caseExpr) =
+    let private makeCases (ctx: PluginContext) (typ: Type) (CasesExpr caseExpr) =
         let fieldExtractor: Expr -> string option = function
             | Get(expr = IdentExpr { Type = identTyp }; kind = (
                 GetKind.ExprGet(Value(kind = ValueKind.StringConstant(field)))
                | GetKind.FieldGet( { Name = field } )
                 )) when identTyp = typ ->
                 Some field
+            | Call(callee=Import(typ = LambdaType(argType = typInfo); info = { Kind = MemberImport(MemberRef(_, { CompiledName = compiledName })) })) when typ = typInfo ->
+                compiledName.Split('.') |> Array.last
+                |> function StartsWithTrimmed "get_" value -> value |> StringUtils.TrimReservedIdentifiers |> Some
+                            | _ -> None
             | _ -> None
         let rec (|GetCases|): Expr -> string list =
             function
@@ -318,24 +326,18 @@ module internal rec StorybookCases =
             | Expr.TypeCast(expr = GetCases values) -> values
             | _ -> []
         let field = caseExpr |> findAndDiscardElse (fieldExtractor >> _.IsSome) |> List.choose fieldExtractor
-        field |> sprintf "%A" |> PluginContext.logWarning ctx
         field |> List.map(fun fieldName -> {
                 PropertyName = fieldName
                 Cases = caseExpr
                         |> function GetCases values -> values } )
 
-
-    let findMatchers (ctx: PluginContext) (expr: Expr list) =
+    let private findMatchers (ctx: PluginContext) (expr: Expr list) =
         let matcher =
             findAndDiscardElse (function
             | Let(ident = { Name = StartsWith("matchValue"); Type = Type.String }) -> true
             | _ -> false
             )
         expr |> List.collect matcher |> List.map CasesExpr
-        // |> fun values ->
-        //     values |> sprintf "%A"
-        //     |> PluginContext.logWarning ctx
-        //     values
 
     let getCases (ctx: PluginContext) (entityTyp: Type) (expr: Expr) =
         findMatchers ctx [expr]
@@ -460,7 +462,6 @@ module internal rec StorybookVariantsAndArgs =
                 )
         findAndDiscardElse predicate expr
         |> List.collect processRawVariantExpr
-        |> AstUtils.Object
 
 open StorybookVariantsAndArgs
 
@@ -472,7 +473,6 @@ module internal StorybookAST =
             AstUtils.IdentExpr(name)
         else
             AstUtils.Import(name, entRef.SourcePath |> Option.defaultValue "", entRef)
-
 
     let createUnionExprs(ctx: PluginContext) (entity: Entity) =
         let cases =
@@ -487,6 +487,7 @@ module internal StorybookAST =
         )
     let createStringEnumExprArray (ctx: PluginContext) (values: string list) =
         values |> List.map AstUtils.Value |> AstUtils.ValueArray
+
     let private extractElementValue elementName: XDocument -> _ =
         _.XPathSelectElement($"//{elementName}")
         >> Option.ofObj
@@ -496,33 +497,107 @@ module internal StorybookAST =
         | ArgType of string * Expr
         | Arg of string * Expr
 
+    /// Some argtypes will have the information available to them to create the
+    /// argument on the spot such as with fields that start with 'on' or have the
+    /// partas spy attribute
+    type FieldData = {
+        Name: string
+        Arg: Expr option
+        ArgType: Expr
+        XmlDocs: XDocument option
+    }
+    type StorybookAttributes = {
+        Spy: bool
+        ControlType: string option
+        HideControl: bool
+    }
+    type XmlDocInformation = {
+        DefaultValue: string option
+        Summary: string option
+        Storybook: StorybookAttributes
+    }
+
+    let readXmlDocStringForField (prop: FieldType) =
+        prop.XmlDocs |> Option.map (fun docs ->
+        let normalizedDocs = "<document>" + docs + "</document>"
+        let read value =
+            use reader = new System.IO.StringReader(value)
+            XDocument.Load(reader)
+        let docs = read normalizedDocs
+        docs
+        )
     let createMeta (ctx: PluginContext) (memberDecl: MemberDecl) (expr: Expr)=
         let typ =
+            // The computation expression gives us the generic arg in a predictable position
             match expr with
             | Call(typ = DeclaredType(_, GetDeclaredType typ :: _)) -> typ
             | _ -> failwith $"CreateMeta: Unexpected expr -> {expr}"
         let entity =
+            // We dig through the type to find the first declared entity in the generic arg
             match typ with
             | StorybookTypeRecursion.GetGenericArg ctx entity ->
                 entity
-        let predefinedCases = StorybookCases.getCases ctx typ expr
-        let properties = StorybookTypeRecursion.collectEntityMembers ctx entity
-        let args = StorybookVariantsAndArgs.getArgs ctx expr
-        let variants = StorybookVariantsAndArgs.getVariants ctx expr
+        let entityXmlDocs =
+            // We extract the xml docs off the constructor if present,
+            // else we try to find if there are docs on a member with the
+            // solidtypecomponent attribute
+            entity.MembersFunctionsAndValues
+            |> Seq.tryFind _.IsConstructor
+            |> Option.bind (_.XmlDoc >> fun docs -> if docs |> Option.exists String.IsNullOrWhiteSpace then None else docs)
+            |> Option.orElse (
+                entity.MembersFunctionsAndValues |> Seq.tryFind (_.Attributes >> Seq.exists (_.Entity.FullName >> (=) "Partas.Solid.SolidTypeComponent"))
+                |> Option.bind(_.XmlDoc >> Option.bind (fun docs -> if docs |> String.IsNullOrWhiteSpace then None else Some docs))
+                )
+        let predefinedCases =
+            // Cases from the `case` CE op
+            StorybookCases.getCases ctx typ expr
+        let properties =
+            // All property members of a type that are not
+            // derived from native partas solid tags
+            StorybookTypeRecursion.collectEntityMembers ctx entity
+        let args =
+            // Args defined in arg computation ops
+            getArgs ctx expr
+        let variants =
+            getVariants ctx expr
+            // We reverse the list so the variants are in the same order
+            // they were defined
+            |> List.rev
+        // The render custom op
         let render = StorybookRender.getRender ctx expr
-        let argTypes =
+        // Creating the field data
+        let fieldData =
             properties |> List.map (fun prop ->
-                let docs = prop.XmlDocs |> Option.map (fun docs ->
-                    let normalizedDocs = "<document>" + docs + "</document>"
-                    let read value =
-                        use reader = new System.IO.StringReader(value)
-                        XDocument.Load(reader)
-                    let docs = read normalizedDocs
-                    docs
-                    )
+                let docs = readXmlDocStringForField prop
                 let getElementValue value = docs |> Option.bind (extractElementValue value)
-                let description = getElementValue "summary"
-                let defaultValue = getElementValue "defaultValue"
+                let docData =
+                    let controlTypeAttribute =
+                        docs |> Option.bind (
+                            _.XPathSelectElements("//storybook[@controlType]")
+                            >> Seq.map (_.XPathEvaluate("string(@controlType)") >> unbox<string>)
+                            >> Seq.tryHead
+                            )
+                    {
+                        Summary = getElementValue "summary"
+                        DefaultValue = getElementValue "defaultValue"
+                        Storybook = {
+                            Spy =
+                                docs |> Option.map (
+                                    _.XPathSelectElements("//storybook[@spy]")
+                                    >> Seq.map (_.XPathEvaluate("string(@spy)") >> unbox<string>)
+                                    >> Seq.tryHead
+                                    >> Option.exists ((=) "true")
+                                    )
+                                |> Option.defaultValue false
+                            ControlType = controlTypeAttribute
+                            HideControl =
+                                controlTypeAttribute |> Option.exists (_.ToLower() >> (=) "false")
+                                || (controlTypeAttribute |> Option.exists (_.ToLower().StartsWith("hide")))
+                        }
+                    }
+                let defaultValue = docData.DefaultValue
+                let description = docData.Summary
+                // options from the case names
                 let options =
                     predefinedCases |> List.tryFind (_.PropertyName >> (=) prop.Name) |> Option.map _.Cases
                 let rec makeArgType typ =
@@ -755,9 +830,32 @@ module internal StorybookAST =
                     | _ -> AstUtils.Unit
                 makeArgType prop.Type
                 |> fun expr ->
-                    prop.Name, expr
+                    let name = prop.Name |> StringUtils.TrimReservedIdentifiers
+                    {
+                        Name = name
+                        Arg =
+                            let maybeArg = args |> List.tryFind (fst >> StringUtils.TrimReservedIdentifiers >> (=) name) |> Option.map snd
+                            maybeArg
+                            |> Option.orElse(
+                                if (prop.Type.IsDelegateType || prop.Type.IsLambdaType) && (prop.Name.StartsWith "on" || docData.Storybook.Spy) then
+                                    Some <| AstUtils.Call(AstUtils.Import("fn", "storybook/test"), AstUtils.CallInfo())
+                                else None )
+                        ArgType = expr
+                        XmlDocs = docs
+                    }
                 )
+        // The closing macro string for valid jsx when considering what fable will push at
+        // the end
         let closeLastTemplate = "\nconst $PARTAS_DISCARD = { $discard: true"
+        (*  The component property is a required property. Being the most predictable
+            property we're going to set, we place it at the end.
+            The Value field is then turned into a Emit macro instead of just an import expr.
+            This lets us 'inject' extra definitions, handle default exportation, et al.
+            Since we are not in control of the closing bracket and comma for the object, we
+            place a dummy discard at the end of the macro which will ensure the generation is
+            valid JSX.
+            If we don't create the macro string with the idents of the exports embedded, then we
+            end up generating string idents (if they are passed as values to the macro as usual).*)
         let compExpr =
             AstUtils.Emit(
                 [
@@ -768,7 +866,7 @@ module internal StorybookAST =
                 ] |> String.concat "\n",
                 AstUtils.CallInfo(args = [
                     getComponentExprFromEntity ctx entity
-                    AstUtils.Value memberDecl.Name
+                    AstUtils.Value (memberDecl.Name |> StringUtils.TrimReservedIdentifiers)
                     yield! (
                         variants |> List.map (fun (Variant (_,expr)) ->
                                 AstUtils.Object([
@@ -778,14 +876,32 @@ module internal StorybookAST =
                         )
                 ])
                 )
+        let argNames = args |> List.map (function name,expr -> name |> StringUtils.TrimReservedIdentifiers, expr)
         [
-            "args", args
-            "argTypes", AstUtils.Object argTypes
+            "args",
+                fieldData
+                |> List.choose(fun data ->
+                        argNames
+                        |> List.tryFind (fst >> (=) data.Name)
+                        |> function
+                            | Some (_, expr) ->
+                                Some(data.Name, expr)
+                            | None when data.Arg.IsSome ->
+                                Some(data.Name, data.Arg.Value)
+                            | _ -> None
+                    )
+                |> AstUtils.Object
+            "argTypes", AstUtils.Object (fieldData |> List.map (function { Name = name; ArgType = expr } -> name,expr))
             if render.IsSome then
                 "render", render.Value
             "component", compExpr
         ] |> AstUtils.Object
-        // , ()
+        |> fun expr ->
+            match memberDecl with
+            | { XmlDoc = None | Some "" } ->
+                { memberDecl with XmlDoc = entityXmlDocs }
+            | _ -> memberDecl
+            |> function memberDecl -> { memberDecl with Body = expr }
 
     [<return: Struct>]
     let rec (|RootExpr|_|) ctx = function
@@ -810,18 +926,11 @@ type PartasStorybookAttribute(compFlags: int) =
     let flags = enum<ComponentFlag> compFlags
     override this.Transform(pluginHelper, file, memberDecl) =
         let ctx = PluginContext.create pluginHelper TransformationKind.MemberDecl flags
-        memberDecl |> printfn "%A"
+        if flags.HasFlag(ComponentFlag.DebugMode) then
+            memberDecl.Body
+            |> printfn "START MEMBER DECL!!!\n%A\nEND MEMBER DECL!!!"
         memberDecl
         |> StorybookAST.transform ctx
-        |> fun e ->
-            { memberDecl with Body = e }
-            // snd e |> sprintf "%A" |> PluginContext.logWarning ctx
-        // |> printfn "%A"
-        // |> printfn "%A"
-        // memberDecl
-        // |> fun newExpr ->
-            // newExpr |> printfn "%A"
-            // { memberDecl with Body = newExpr }
 
     override this.TransformCall(_, _, expr) =
         expr
