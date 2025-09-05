@@ -11,52 +11,105 @@ module Builder =
     type StorybookArgs<'T> = interface end
     type StorybookFun<'T> = Storybook<'T> -> unit
     type StorybookArgsFun<'T> = StorybookArgs<'T> -> unit
+
     type Storybook<'T> with
-        member inline _.Combine([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, [<InlineIfLambda>] PARTAS_SECOND: StorybookFun<'T>): StorybookFun<'T> =
+        member inline _.Combine
+            ([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, [<InlineIfLambda>] PARTAS_SECOND: StorybookFun<'T>)
+            : StorybookFun<'T> =
             fun PARTAS_BUILDER ->
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND PARTAS_BUILDER
-        member inline _.Zero(): StorybookFun<'T> = ignore
-        member inline _.Yield(_: unit): StorybookFun<'T> = ignore
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> StorybookFun<'T>): StorybookFun<'T> = PARTAS_DELAY()
-        member inline _.Yield([<InlineIfLambda>] PARTAS_ELEMENT: 'T -> 'Value): StorybookFun<'T> = fun PARTAS_YIELD -> ignore PARTAS_ELEMENT
-        member inline _.Yield(PARTAS_VALUE: StorybookArgs<'T>): StorybookFun<'T> = fun PARTAS_YIELD -> ignore PARTAS_VALUE
+
+        member inline _.Zero() : StorybookFun<'T> = ignore
+        member inline _.Yield(_: unit) : StorybookFun<'T> = ignore
+
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> StorybookFun<'T>) : StorybookFun<'T> =
+            PARTAS_DELAY ()
+
+        member inline _.Yield([<InlineIfLambda>] PARTAS_ELEMENT: 'T -> 'Value) : StorybookFun<'T> =
+            fun PARTAS_YIELD -> ignore PARTAS_ELEMENT
+
+        member inline _.Yield(PARTAS_VALUE: StorybookArgs<'T>) : StorybookFun<'T> =
+            fun PARTAS_YIELD -> ignore PARTAS_VALUE
+
         [<CustomOperation "cases">]
-        member inline _.Cases([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, PARTAS_CASES: ('T -> obj)): StorybookFun<'T> = fun PARTAS_BUILDER ->
-            ignore PARTAS_CASES
-            PARTAS_FIRST PARTAS_BUILDER
+        member inline _.Cases([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, PARTAS_CASES: ('T -> obj)) : StorybookFun<'T> =
+            fun PARTAS_BUILDER ->
+                ignore PARTAS_CASES
+                PARTAS_FIRST PARTAS_BUILDER
+
         [<CustomOperation "args">]
-        member inline _.Args([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, [<InlineIfLambda>] PARTAS_ARGS: ('T -> unit)): StorybookFun<'T> = fun PARTAS_BUILDER ->
-            ignore PARTAS_ARGS
-            PARTAS_FIRST PARTAS_BUILDER
+        member inline _.Args([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, [<InlineIfLambda>] PARTAS_ARGS: ('T -> unit)) : StorybookFun<'T> =
+            fun PARTAS_BUILDER ->
+                ignore PARTAS_ARGS
+                PARTAS_FIRST PARTAS_BUILDER
+
         [<CustomOperation "args">]
-        member inline _.Args([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, PARTAS_VARIANT: string, [<InlineIfLambda>] PARTAS_VARIANT_ARGS: ('T -> unit)): StorybookFun<'T> = fun PARTAS_BUILDER ->
-            ignore ("PARTAS_VARIANT" + PARTAS_VARIANT)
-            ignore PARTAS_VARIANT_ARGS
-            PARTAS_FIRST PARTAS_BUILDER
-        member inline _.For([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, [<InlineIfLambda>] PARTAS_SECOND: unit -> StorybookFun<'T>): StorybookFun<'T> =
+        member inline _.Args
+            ([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, PARTAS_VARIANT: string, [<InlineIfLambda>] PARTAS_VARIANT_ARGS: ('T -> unit))
+            : StorybookFun<'T> =
+            fun PARTAS_BUILDER ->
+                ignore (
+                    "PARTAS_VARIANT"
+                    + PARTAS_VARIANT
+                )
+
+                ignore PARTAS_VARIANT_ARGS
+                PARTAS_FIRST PARTAS_BUILDER
+
+        member inline _.For
+            ([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, [<InlineIfLambda>] PARTAS_SECOND: unit -> StorybookFun<'T>)
+            : StorybookFun<'T> =
             fun PARTAS_BUILDER ->
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND () PARTAS_BUILDER
+
         [<CustomOperation "render">]
-        member inline _.Render([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, [<InlineIfLambda>] PARTAS_RENDER: 'T -> #Partas.Solid.Builder.HtmlElement): StorybookFun<'T> =
+        member inline _.Render
+            ([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, [<InlineIfLambda>] PARTAS_RENDER: 'T -> #Partas.Solid.Builder.HtmlElement)
+            : StorybookFun<'T> =
             fun PARTAS_BUILDER ->
                 ignore PARTAS_RENDER
                 PARTAS_FIRST PARTAS_BUILDER
+
+        [<CustomOperation "render">]
+        member inline _.Render
+            (
+                [<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>,
+                PARTAS_RENDER_VARIANT: string,
+                [<InlineIfLambda>] PARTAS_VARIANT_RENDER: 'T -> #Partas.Solid.Builder.HtmlElement
+            ) : StorybookFun<'T> =
+            fun PARTAS_BUILDER ->
+                ignore (
+                    "PARTAS_RENDER_VARIANT"
+                    + PARTAS_RENDER_VARIANT
+                )
+
+                ignore PARTAS_VARIANT_RENDER
+                PARTAS_FIRST PARTAS_BUILDER
+
     type StorybookArgs<'T> with
-        member inline _.Combine([<InlineIfLambda>] PARTAS_FIRST: StorybookArgsFun<'T>, [<InlineIfLambda>] PARTAS_SECOND: StorybookArgsFun<'T>): StorybookArgsFun<'T> =
+        member inline _.Combine
+            ([<InlineIfLambda>] PARTAS_FIRST: StorybookArgsFun<'T>, [<InlineIfLambda>] PARTAS_SECOND: StorybookArgsFun<'T>)
+            : StorybookArgsFun<'T> =
             fun PARTAS_BUILDER ->
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND PARTAS_BUILDER
-        member inline _.Zero(): StorybookArgsFun<'T> = ignore
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> StorybookArgsFun<'T>): StorybookArgsFun<'T> = PARTAS_DELAY()
-        member inline _.Yield(PARTAS_VALUE: ('T -> 'Value) * ('Value)): StorybookArgsFun<'T> = fun PARTAS_YIELD -> ignore PARTAS_VALUE
+
+        member inline _.Zero() : StorybookArgsFun<'T> = ignore
+
+        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> StorybookArgsFun<'T>) : StorybookArgsFun<'T> =
+            PARTAS_DELAY ()
+
+        member inline _.Yield(PARTAS_VALUE: ('T -> 'Value) * ('Value)) : StorybookArgsFun<'T> =
+            fun PARTAS_YIELD -> ignore PARTAS_VALUE
 
     type StorybookExtensions =
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: Storybook<'T>, PARTAS_RUN: StorybookFun<'T>) =
             PARTAS_RUN PARTAS_THIS
             PARTAS_THIS
+
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: StorybookArgs<'T>, PARTAS_RUN: StorybookArgsFun<'T>) =
             PARTAS_RUN PARTAS_THIS

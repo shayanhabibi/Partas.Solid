@@ -13,8 +13,8 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Authors>Shayan Habibi based on work by Vladimir Schur and contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
-        <Version>2.1.0-alpha.3</Version>
-        <PackageVersion>2.1.0-alpha.3</PackageVersion>
+        <Version>2.1.0-alpha.4</Version>
+        <PackageVersion>2.1.0-alpha.4</PackageVersion>
     </PropertyGroup>
     <ItemGroup>
         <None Include="../README.md" Pack="true" PackagePath="\" />

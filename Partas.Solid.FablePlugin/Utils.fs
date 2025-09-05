@@ -383,102 +383,102 @@ module Patterns =
 
 
 module Expr =
-    let rec findAndDiscardElse (predicate: Expr -> bool): Expr -> Expr list =
-        let filterList (values: Expr list): Expr list =
+    let rec findAndDiscardElse (predicate: Expr -> bool) : Expr -> Expr list =
+        let filterList (values: Expr list) : Expr list =
             List.collect (findAndDiscardElse predicate) values
+
         function
         | expr when predicate expr -> [ expr ]
-        | Expr.Call(callee = expr; info = { Args = exprs }) ->
-            expr :: exprs
+        | Expr.Call (callee = expr; info = { Args = exprs }) ->
+            expr
+            :: exprs
             |> filterList
-        | Expr.CurriedApply(applied= expr; args = exprs) ->
-            expr :: exprs
+        | Expr.CurriedApply (applied = expr; args = exprs) ->
+            expr
+            :: exprs
             |> filterList
-        | Expr.DecisionTree(expr=expr; targets = targets) ->
-            expr :: List.map snd targets
+        | Expr.DecisionTree (expr = expr; targets = targets) ->
+            expr
+            :: List.map snd targets
             |> filterList
-        | Expr.DecisionTreeSuccess(boundValues = exprs) ->
-            filterList exprs
-        | Expr.Delegate(body = expr) ->
-            findAndDiscardElse predicate expr
-        | Expr.Emit(info = { CallInfo = { Args = exprs } }) ->
-            filterList exprs
-        | Expr.ForLoop(start = start; body = body; limit = limit) ->
+        | Expr.DecisionTreeSuccess (boundValues = exprs) -> filterList exprs
+        | Expr.Delegate (body = expr) -> findAndDiscardElse predicate expr
+        | Expr.Emit (info = { CallInfo = { Args = exprs } }) -> filterList exprs
+        | Expr.ForLoop (start = start; body = body; limit = limit) ->
             [ start; body; limit ]
             |> filterList
-        | Expr.Get(expr = expr; kind = getKind) ->
+        | Expr.Get (expr = expr; kind = getKind) ->
             let maybeResult = findAndDiscardElse predicate expr
-            if maybeResult.IsEmpty |> not then maybeResult
+
+            if
+                maybeResult.IsEmpty
+                |> not
+            then
+                maybeResult
             else
-            match getKind with
-            | ExprGet expr ->
-                findAndDiscardElse predicate expr
-            | _ -> maybeResult
-        | Expr.IfThenElse(guardExpr = guardExpr; elseExpr = elseExpr; thenExpr = thenExpr) ->
+                match getKind with
+                | ExprGet expr -> findAndDiscardElse predicate expr
+                | _ -> maybeResult
+        | Expr.IfThenElse (guardExpr = guardExpr; elseExpr = elseExpr; thenExpr = thenExpr) ->
             [ guardExpr; elseExpr; thenExpr ]
             |> filterList
-        | Expr.Lambda(body = expr) ->
-            findAndDiscardElse predicate expr
-        | Expr.Let(body = body; value = value) ->
-            filterList [ body; value ]
-        | Expr.LetRec(bindings = bindings; body = body) ->
-            body :: List.map snd bindings
+        | Expr.Lambda (body = expr) -> findAndDiscardElse predicate expr
+        | Expr.Let (body = body; value = value) -> filterList [ body; value ]
+        | Expr.LetRec (bindings = bindings; body = body) ->
+            body
+            :: List.map snd bindings
             |> filterList
-        | Expr.ObjectExpr(baseCall = exprMaybe; members = members) ->
-            members |> List.map _.Body
-            |> List.append [ if exprMaybe.IsSome then exprMaybe.Value ]
+        | Expr.ObjectExpr (baseCall = exprMaybe; members = members) ->
+            members
+            |> List.map _.Body
+            |> List.append
+                [ if exprMaybe.IsSome then
+                      exprMaybe.Value ]
             |> filterList
-        | Expr.Operation(kind = OperationKind.Binary(left = left; right = right))
-        | Expr.Operation(kind = OperationKind.Logical(left = left; right = right)) ->
+        | Expr.Operation (kind = OperationKind.Binary (left = left; right = right))
+        | Expr.Operation (kind = OperationKind.Logical (left = left; right = right)) ->
             [ left; right ]
             |> filterList
-        | Expr.Operation(kind = OperationKind.Unary(operand = expr)) ->
-            findAndDiscardElse predicate expr
-        | Expr.Sequential exprs ->
-            filterList exprs
-        | Expr.Set(expr = expr; value = value; kind = kind) ->
+        | Expr.Operation (kind = OperationKind.Unary (operand = expr)) -> findAndDiscardElse predicate expr
+        | Expr.Sequential exprs -> filterList exprs
+        | Expr.Set (expr = expr; value = value; kind = kind) ->
             match kind with
             | ExprSet exprSet ->
                 [ expr; value; exprSet ]
                 |> filterList
-            | _ -> [ expr;value ] |> filterList
-        | Expr.TryCatch(body = expr; catch = catch; finalizer = finalizer) ->
-            [
-                expr
-                match catch with
-                | Some(_,value) -> value
-                | _ -> ()
-                match finalizer with
-                | Some value -> value
-                | _ -> ()
-            ]
+            | _ ->
+                [ expr; value ]
+                |> filterList
+        | Expr.TryCatch (body = expr; catch = catch; finalizer = finalizer) ->
+            [ expr
+              match catch with
+              | Some (_, value) -> value
+              | _ -> ()
+              match finalizer with
+              | Some value -> value
+              | _ -> () ]
             |> filterList
-        | Expr.TypeCast(expr = expr) -> findAndDiscardElse predicate expr
-        | Expr.Value(kind = kind) ->
+        | Expr.TypeCast (expr = expr) -> findAndDiscardElse predicate expr
+        | Expr.Value (kind = kind) ->
             match kind with
-            | ValueKind.NewAnonymousRecord(values = exprs) ->
-                filterList exprs
-            | NewArray(newKind = NewArrayKind.ArrayAlloc expr) ->
-                findAndDiscardElse predicate expr
-            | NewArray(newKind = NewArrayKind.ArrayFrom expr) ->
-                findAndDiscardElse predicate expr
-            | NewArray(newKind = NewArrayKind.ArrayValues exprs) ->
-                filterList exprs
-            | NewList(headAndTail = Some (head,tail)) ->
+            | ValueKind.NewAnonymousRecord (values = exprs) -> filterList exprs
+            | NewArray (newKind = NewArrayKind.ArrayAlloc expr) -> findAndDiscardElse predicate expr
+            | NewArray (newKind = NewArrayKind.ArrayFrom expr) -> findAndDiscardElse predicate expr
+            | NewArray (newKind = NewArrayKind.ArrayValues exprs) -> filterList exprs
+            | NewList (headAndTail = Some (head, tail)) ->
                 [ head; tail ]
                 |> filterList
-            | NewOption(value = Some expr) ->
-                findAndDiscardElse predicate expr
-            | NewTuple(values = exprs)
-            | NewUnion(values = exprs)
-            | StringTemplate(values = exprs; tag = None)
-            | NewRecord(values = exprs) ->
-                filterList exprs
-            | StringTemplate(values = exprs; tag = Some expr) ->
-                expr :: exprs
+            | NewOption (value = Some expr) -> findAndDiscardElse predicate expr
+            | NewTuple (values = exprs)
+            | NewUnion (values = exprs)
+            | StringTemplate (values = exprs; tag = None)
+            | NewRecord (values = exprs) -> filterList exprs
+            | StringTemplate (values = exprs; tag = Some expr) ->
+                expr
+                :: exprs
                 |> filterList
             | _ -> []
-        | Expr.WhileLoop(body = body; guard = guard) ->
+        | Expr.WhileLoop (body = body; guard = guard) ->
             [ guard; body ]
             |> filterList
         | _ -> []
