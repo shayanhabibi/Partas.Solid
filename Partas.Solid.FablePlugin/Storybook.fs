@@ -926,8 +926,11 @@ module internal StorybookAST =
                                 _.ToLower()
                                 >> (=) "false"
                             )
-                            || (controlTypeAttribute
-                                |> Option.exists (_.ToLower().StartsWith ("hide"))) } }
+                            || ((controlTypeAttribute: string option)
+                                |> Option.exists (
+                                    _.ToLower()
+                                    >> _.StartsWith("hide")
+                                )) } }
 
                 let defaultValue = docData.DefaultValue
                 let description = docData.Summary
