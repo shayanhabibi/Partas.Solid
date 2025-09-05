@@ -22,6 +22,7 @@
         <Compile Include="Types.fs" />
         <Compile Include="Spec.fs" />
         <Compile Include="Plugin.fs" />
+        <Compile Include="Storybook.fs" />
     </ItemGroup>
 
     <ItemGroup>

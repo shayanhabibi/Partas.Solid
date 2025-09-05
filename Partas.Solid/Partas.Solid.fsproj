@@ -36,6 +36,7 @@
       <Compile Include="SolidStartBindings.fs" />
       <Compile Include="Experimental.fs" />
       <Compile Include="PolymorphicSupport.fs" />
+      <Compile Include="Storybook.fs" />
     </ItemGroup>
 
     <ItemGroup>
