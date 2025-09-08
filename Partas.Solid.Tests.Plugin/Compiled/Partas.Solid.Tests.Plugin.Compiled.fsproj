@@ -93,6 +93,8 @@
         <Compile Include="SolidCases\SolidComponentAsTagValues\SolidComponentAsTagValuesTypes.fs" />
         <Compile Include="SolidCases\SolidComponentAsTagValues\SolidComponentAsTagValues.fs" />
         <Content Include="SolidCases\SolidComponentAsTagValues\SolidComponentAsTagValues.expected" />
+        <Compile Include="SolidCases\ValueUnrollerDecisionTree\ValueUnrollerDecisionTree.fs" />
+        <Content Include="SolidCases\ValueUnrollerDecisionTree\ValueUnrollerDecisionTree.expected" />
 <!--        <Content Include="Spec\Components.fs" />-->
     </ItemGroup>
 

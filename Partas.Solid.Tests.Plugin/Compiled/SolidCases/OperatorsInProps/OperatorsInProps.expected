@@ -1,3 +1,4 @@
+
 import { Match, Switch, splitProps, mergeProps, onCleanup, createEffect, createSignal, useContext, createContext } from "solid-js";
 import { twMerge } from "tailwind-merge";
 import { clsx } from "clsx";
@@ -76,8 +77,8 @@ export function Sidebar(props) {
             </Sheet>
         </Match>
         <Match when={!isMobile()}>
-            <div class={twMerge(clsx(["a1", "a2", "a3", ((PARTAS_LOCAL.variant === "floating") ? (true) : (PARTAS_LOCAL.variant === "inset")) ? ("?a1") : ("?a2")]))} />
-            <div class={twMerge(clsx(["b1", (PARTAS_LOCAL.side === "left") ? ("?b1") : ("?b2"), ((PARTAS_LOCAL.variant === "floating") ? (true) : (PARTAS_LOCAL.variant === "inset")) ? ("?b3") : ("?b4"), PARTAS_LOCAL.class]))}
+            <div class={twMerge(clsx(["a1", "a2", "a3", ((PARTAS_LOCAL.variant === "floating") ? true : (PARTAS_LOCAL.variant === "inset")) ? "?a1" : "?a2"]))} />
+            <div class={twMerge(clsx(["b1", (PARTAS_LOCAL.side === "left") ? "?b1" : "?b2", ((PARTAS_LOCAL.variant === "floating") ? true : (PARTAS_LOCAL.variant === "inset")) ? "?b3" : "?b4", PARTAS_LOCAL.class]))}
                 {...PARTAS_OTHERS} bool:n$={false}>
                 <div class="classend"
                     data-sidebar="sidebar">
