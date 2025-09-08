@@ -854,7 +854,7 @@ module internal rec AST =
         | Value(
                 (
                  NewAnonymousRecord(_)
-                | NewArray(newKind = ArrayValues _)
+                | NewArray _
                 | NewList(headAndTail = Some _)
                 | NewRecord(_)
                 | StringTemplate(_)
@@ -877,6 +877,10 @@ module internal rec AST =
                     NewOption(Some (transform ctx expr), typ, isStruct)
                 | NewArray(ArrayValues values, typ, kind) ->
                     NewArray(ArrayValues (transformValues values), typ, kind)
+                | NewArray(ArrayAlloc expr, typ, kind) ->
+                    NewArray(ArrayAlloc (transform ctx expr), typ, kind)
+                | NewArray(ArrayFrom expr, typ, kind) ->
+                    NewArray(ArrayFrom (transform ctx expr), typ, kind)
                 | NewList(Some(expr1, expr2), typ) ->
                     NewList(Some(transform ctx expr1, transform ctx expr2), typ)
                 | NewRecord(values, ref, genArgs) ->
