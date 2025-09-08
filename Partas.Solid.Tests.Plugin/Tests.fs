@@ -94,7 +94,9 @@ let SolidCases =
           "ChildLambdaProvider"
           |> runSolidCase "ChildLambdaProvider interfaces"
           "SolidComponentAsTagValues"
-          |> runSolidCase "SolidComponent let bindings as TagValues" ]
+          |> runSolidCase "SolidComponent let bindings as TagValues"
+          "ValueUnrollerDecisionTree"
+          |> runSolidCase "Decision Trees in arrays do not spawn singleton instructions" ]
 
 [<Tests>]
 let AttributeCases =

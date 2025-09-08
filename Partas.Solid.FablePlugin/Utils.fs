@@ -11,6 +11,12 @@ type AstUtilHelpers =
 open type AstUtilHelpers
 
 type AstUtils =
+
+    /// Creates a unit constant expression
+    static member inline Unit = Expr.Value (ValueKind.UnitConstant, range)
+    /// Creates a null constant expression
+    static member inline Null = Expr.Value (ValueKind.Null any, range)
+
     /// Creates a string constant expression
     static member inline Value(stringValue: string) =
         Expr.Value (ValueKind.StringConstant stringValue, range)
@@ -35,6 +41,14 @@ type AstUtils =
         nodes
         |> Array.toList
         |> Sequential
+
+    /// Will check if expr list is either empty, and emit a null; a single expr long, and emit that expr; else
+    /// wraps the expressions in a Sequential DU
+    static member inline Sequential(exprList: Expr list) : Expr =
+        match exprList with
+        | [] -> AstUtils.Unit
+        | [ expr ] -> expr
+        | _ -> Sequential exprList
 
     /// Creates a user import expression with the selector and path
     static member inline Import(selector: string, path: string) =
@@ -70,10 +84,6 @@ type AstUtils =
         let typ = defaultArg typ any
         Expr.Call (callee, info, typ, range)
 
-    /// Creates a unit constant expression
-    static member inline Unit = Expr.Value (ValueKind.UnitConstant, range)
-    /// Creates a null constant expression
-    static member inline Null = Expr.Value (ValueKind.Null any, range)
 
     /// Creates an anonymous record from the list of string (field) expr (value) tuples
     static member inline Object(pairs: (string * Expr) list) =
