@@ -49,12 +49,16 @@ module Builder =
             ([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, PARTAS_VARIANT: string, [<InlineIfLambda>] PARTAS_VARIANT_ARGS: ('T -> unit))
             : StorybookFun<'T> =
             fun PARTAS_BUILDER ->
-                ignore (
-                    "PARTAS_VARIANT"
-                    + PARTAS_VARIANT
-                )
+                fun (PARTAS_ARG_BUILDER: 'T) ->
+                    ignore (
+                        "PARTAS_VARIANT"
+                        + PARTAS_VARIANT
+                    )
 
-                ignore PARTAS_VARIANT_ARGS
+                    PARTAS_ARG_BUILDER
+                    |> PARTAS_VARIANT_ARGS
+                |> ignore
+
                 PARTAS_FIRST PARTAS_BUILDER
 
         member inline _.For
@@ -80,12 +84,43 @@ module Builder =
                 [<InlineIfLambda>] PARTAS_VARIANT_RENDER: 'T -> #Partas.Solid.Builder.HtmlElement
             ) : StorybookFun<'T> =
             fun PARTAS_BUILDER ->
-                ignore (
-                    "PARTAS_RENDER_VARIANT"
-                    + PARTAS_RENDER_VARIANT
-                )
+                fun PARTAS_RENDER_BUILDER ->
+                    ignore (
+                        "PARTAS_RENDER_VARIANT"
+                        + PARTAS_RENDER_VARIANT
+                    )
 
-                ignore PARTAS_VARIANT_RENDER
+                    PARTAS_RENDER_BUILDER
+                    |> PARTAS_VARIANT_RENDER
+                |> ignore
+
+                PARTAS_FIRST PARTAS_BUILDER
+
+        [<CustomOperation "decorator">]
+        member inline _.Decorator
+            ([<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>, [<InlineIfLambda>] PARTAS_DECORATOR: (unit -> 'T) -> Partas.Solid.Builder.HtmlElement)
+            =
+            fun PARTAS_BUILDER ->
+                ignore PARTAS_DECORATOR
+                PARTAS_FIRST PARTAS_BUILDER
+
+        [<CustomOperation "decorator">]
+        member inline _.Decorator
+            (
+                [<InlineIfLambda>] PARTAS_FIRST: StorybookFun<'T>,
+                PARTAS_DECORATOR_VARIANT: string,
+                [<InlineIfLambda>] PARTAS_VARIANT_DECORATOR: (unit -> 'T) -> Partas.Solid.Builder.HtmlElement
+            ) =
+            fun PARTAS_BUILDER ->
+                fun PARTAS_DECORATOR_BUILDER ->
+                    ignore (
+                        "PARTAS_DECORATOR_VARIANT"
+                        + PARTAS_DECORATOR_VARIANT
+                    )
+
+                    PARTAS_VARIANT_DECORATOR PARTAS_DECORATOR_BUILDER
+                |> ignore
+
                 PARTAS_FIRST PARTAS_BUILDER
 
     type StorybookArgs<'T> with

@@ -493,88 +493,168 @@ module Expr =
             |> filterList
         | _ -> []
 
-    let rec (|ExprMatchingFunFeedback|) (func: Expr -> bool): Expr -> Expr list = function
+    let rec (|ExprMatchingFunFeedback|) (func: Expr -> bool) : Expr -> Expr list =
+        function
         | expr when func expr -> [ expr ]
         | expr ->
             match [ expr ] with
             | ExprMatchingFun func result -> result
-    and (|ExprMatchingFun|) (func: Expr -> bool): Expr list -> Expr list = function
+
+    and (|ExprMatchingFun|) (func: Expr -> bool) : Expr list -> Expr list =
+        function
         | [] -> []
         | expr :: ExprMatchingFun func rest when func expr ->
-            expr :: rest
-        | Sequential(ExprMatchingFun func values) :: ExprMatchingFun func rest ->
-            values @ rest
+            expr
+            :: rest
+        | Sequential (ExprMatchingFun func values) :: ExprMatchingFun func rest ->
+            values
+            @ rest
         | expr :: ExprMatchingFun func rest ->
             match expr with
             | Value (kind, range) ->
                 match kind with
                 | StringTemplate (tag = tag; values = ExprMatchingFun func values) ->
                     match tag with
-                    | Some(ExprMatchingFunFeedback func tagValues) ->
-                        tagValues @ values @ rest
-                    | _ -> values @ rest
-                | NewOption (value = Some(ExprMatchingFunFeedback func values)) -> values @ rest
-                | NewArray (newKind = newKind ) ->
+                    | Some (ExprMatchingFunFeedback func tagValues) ->
+                        tagValues
+                        @ values
+                        @ rest
+                    | _ ->
+                        values
+                        @ rest
+                | NewOption (value = Some (ExprMatchingFunFeedback func values)) ->
+                    values
+                    @ rest
+                | NewArray (newKind = newKind) ->
                     match newKind with
                     | ArrayAlloc (ExprMatchingFunFeedback func values)
                     | ArrayFrom (ExprMatchingFunFeedback func values)
-                    | ArrayValues (ExprMatchingFun func values) -> values @ rest
-                | NewList (Some(ExprMatchingFunFeedback func left, ExprMatchingFunFeedback func right), _) ->
-                    left @ right @ rest
+                    | ArrayValues (ExprMatchingFun func values) ->
+                        values
+                        @ rest
+                | NewList (Some (ExprMatchingFunFeedback func left, ExprMatchingFunFeedback func right), _) ->
+                    left
+                    @ right
+                    @ rest
                 | NewTuple (values = ExprMatchingFun func values)
                 | NewRecord (values = ExprMatchingFun func values)
                 | NewAnonymousRecord (values = ExprMatchingFun func values)
-                | NewUnion (values = ExprMatchingFun func values) -> values @ rest
+                | NewUnion (values = ExprMatchingFun func values) ->
+                    values
+                    @ rest
                 | _ -> rest
             | TypeCast (expr = ExprMatchingFunFeedback func values)
-            | Lambda ( body = ExprMatchingFunFeedback func values)
+            | Lambda (body = ExprMatchingFunFeedback func values)
             | Delegate (body = ExprMatchingFunFeedback func values) ->
-                values @ rest
-            | ObjectExpr (members = members;  baseCall = baseCall) ->
+                values
+                @ rest
+            | ObjectExpr (members = members; baseCall = baseCall) ->
                 (members
-                |> List.collect (_.Body >> function ExprMatchingFunFeedback func values -> values))
-                @ (baseCall |> Option.map(function ExprMatchingFunFeedback func values -> values) |> Option.defaultValue [])
+                 |> List.collect (
+                     _.Body
+                     >> function
+                         | ExprMatchingFunFeedback func values -> values
+                 ))
+                @ (baseCall
+                   |> Option.map (function
+                       | ExprMatchingFunFeedback func values -> values)
+                   |> Option.defaultValue [])
                 @ rest
             | Call (callee = ExprMatchingFunFeedback func calleeValues; info = { Args = ExprMatchingFun func infoValues }) ->
-                calleeValues @ infoValues @ rest
+                calleeValues
+                @ infoValues
+                @ rest
             | CurriedApply (applied = ExprMatchingFunFeedback func values; args = ExprMatchingFun func argValues) ->
-                values @ argValues @ rest
+                values
+                @ argValues
+                @ rest
             | Operation (kind = operationKind) ->
                 match operationKind with
-                | Unary (operand = ExprMatchingFunFeedback func values) -> values @ rest
+                | Unary (operand = ExprMatchingFunFeedback func values) ->
+                    values
+                    @ rest
                 | Binary (left = ExprMatchingFunFeedback func left; right = ExprMatchingFunFeedback func right)
-                | Logical (left = ExprMatchingFunFeedback func left; right = ExprMatchingFunFeedback func right) -> left @ right @ rest
-            | Emit (info = { CallInfo = { Args = ExprMatchingFun func values } }) -> values @ rest
+                | Logical (left = ExprMatchingFunFeedback func left; right = ExprMatchingFunFeedback func right) ->
+                    left
+                    @ right
+                    @ rest
+            | Emit (info = { CallInfo = { Args = ExprMatchingFun func values } }) ->
+                values
+                @ rest
             | DecisionTree (ExprMatchingFunFeedback func values, targets) ->
-                values @
-                (
-                    targets
-                    |> List.collect (snd >> function ExprMatchingFunFeedback func values -> values)
-                ) @ rest
+                values
+                @ (targets
+                   |> List.collect (
+                       snd
+                       >> function
+                           | ExprMatchingFunFeedback func values -> values
+                   ))
+                @ rest
             | DecisionTreeSuccess (boundValues = ExprMatchingFun func values) ->
-                values @ rest
-            | Let (_, ExprMatchingFunFeedback func values, ExprMatchingFunFeedback func values2) -> values @ values2 @ rest
+                values
+                @ rest
+            | Let (_, ExprMatchingFunFeedback func values, ExprMatchingFunFeedback func values2) ->
+                values
+                @ values2
+                @ rest
             | LetRec (bindings, ExprMatchingFunFeedback func values) ->
-                (bindings |> List.collect (snd >> function ExprMatchingFunFeedback func values -> values))
-                @ values @ rest
+                (bindings
+                 |> List.collect (
+                     snd
+                     >> function
+                         | ExprMatchingFunFeedback func values -> values
+                 ))
+                @ values
+                @ rest
             | Get (expr = ExprMatchingFunFeedback func values; kind = kind) ->
                 match kind with
-                | ExprGet (ExprMatchingFunFeedback func kindValues) -> values @ kindValues @ rest
-                | _ -> values @ rest
+                | ExprGet (ExprMatchingFunFeedback func kindValues) ->
+                    values
+                    @ kindValues
+                    @ rest
+                | _ ->
+                    values
+                    @ rest
             | Set (expr = (ExprMatchingFunFeedback func values); kind = kind) ->
                 match kind with
-                | ExprSet (ExprMatchingFunFeedback func exprValues) -> values @ exprValues @ rest
-                | _ -> values @ rest
-            | WhileLoop (guard = ExprMatchingFunFeedback func guardValues; body = ExprMatchingFunFeedback func bodyValues) -> guardValues @ bodyValues @ rest
-            | ForLoop ( start = ExprMatchingFunFeedback func startValues; limit = ExprMatchingFunFeedback func limitValues; body = ExprMatchingFunFeedback func bodyValues) ->
-                startValues @ limitValues @ bodyValues @ rest
+                | ExprSet (ExprMatchingFunFeedback func exprValues) ->
+                    values
+                    @ exprValues
+                    @ rest
+                | _ ->
+                    values
+                    @ rest
+            | WhileLoop (guard = ExprMatchingFunFeedback func guardValues; body = ExprMatchingFunFeedback func bodyValues) ->
+                guardValues
+                @ bodyValues
+                @ rest
+            | ForLoop (
+                start = ExprMatchingFunFeedback func startValues
+                limit = ExprMatchingFunFeedback func limitValues
+                body = ExprMatchingFunFeedback func bodyValues) ->
+                startValues
+                @ limitValues
+                @ bodyValues
+                @ rest
             | TryCatch (body = ExprMatchingFunFeedback func bodyValues; catch = catch; finalizer = finalizer) ->
-                bodyValues @
-                (catch |> Option.map (snd >> function ExprMatchingFunFeedback func values -> values) |> Option.defaultValue []) @
-                (finalizer |> Option.map(function ExprMatchingFunFeedback func values -> values) |> Option.defaultValue []) @
-                rest
+                bodyValues
+                @ (catch
+                   |> Option.map (
+                       snd
+                       >> function
+                           | ExprMatchingFunFeedback func values -> values
+                   )
+                   |> Option.defaultValue [])
+                @ (finalizer
+                   |> Option.map (function
+                       | ExprMatchingFunFeedback func values -> values)
+                   |> Option.defaultValue [])
+                @ rest
             | IfThenElse (ExprMatchingFunFeedback func values, ExprMatchingFunFeedback func values2, ExprMatchingFunFeedback func values3, _) ->
-                values @ values2 @ values3 @ rest
+                values
+                @ values2
+                @ values3
+                @ rest
             | _ -> rest
 
 

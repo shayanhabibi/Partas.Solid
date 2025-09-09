@@ -297,7 +297,7 @@ module internal rec StorybookTypeRecursion =
         | [] -> []
         | declaredType :: FilterNativeTypes ctx rest ->
             match declaredType with
-            | typ when typ.Entity.FullName.StartsWith("Partas.Solid.Tags") -> rest
+            | typ when typ.Entity.FullName.StartsWith ("Partas.Solid.Tags") -> rest
             | ent ->
                 ent
                 :: rest
@@ -395,109 +395,155 @@ module internal rec StorybookCases =
         { PropertyName: string
           Cases: string list }
 
-    type CasesInfo = {
-        MatchExpr: Expr
-        CaseContainer: Expr
-    }
+    type CasesInfo =
+        { MatchExpr: Expr; CaseContainer: Expr }
     // When collecting cases, we should first be able to assembler
     // the type info and ident with a list of case expressions.
-    type CasesContext = {
-        Ident: Ident
-        Type: Type
-        CaseExprs: CasesInfo list
-    }
-    let private (|CaseProp|) (ctx: PluginContext): Expr -> string = function
-        | Get(kind = FieldGet({ Name = prop }))
-        | Call( info = { MemberRef = Some(MemberRef.MemberRefIs ctx MemberRefType.Getter)
-                     & MemberRef.Option.PartasName ctx prop } ) ->
-            prop
+    type CasesContext =
+        { Ident: Ident
+          Type: Type
+          CaseExprs: CasesInfo list }
+
+    let private (|CaseProp|) (ctx: PluginContext) : Expr -> string =
+        function
+        | Get (kind = FieldGet ({ Name = prop }))
+        | Call (info = { MemberRef = Some (MemberRef.MemberRefIs ctx MemberRefType.Getter) & MemberRef.Option.PartasName ctx prop }) -> prop
         | expr ->
             $"While processing a case matchValue expression, we encountered an unknown getter expression: {expr}"
             |> PluginContext.logWarning ctx
+
             "ERROR"
-    let private (|CaseValues|) (ctx: PluginContext): Expr -> string list = function
-        | Value(StringConstant(prop), _) -> [ prop ]
-        | DecisionTree(CaseValues ctx values, targets) ->
+
+    let private (|CaseValues|) (ctx: PluginContext) : Expr -> string list =
+        function
+        | Value (StringConstant (prop), _) -> [ prop ]
+        | DecisionTree (CaseValues ctx values, targets) ->
             let targets =
-                targets |> List.collect(snd >> function CaseValues ctx values -> values)
-            values @ targets
-        | IfThenElse(CaseValues ctx values,CaseValues ctx thens, CaseValues ctx elses,_) ->
-            values @ thens @ elses
-        | Operation(kind = Binary(left = CaseValues ctx left; right = CaseValues ctx right)) ->
-            left @ right
+                targets
+                |> List.collect (
+                    snd
+                    >> function
+                        | CaseValues ctx values -> values
+                )
+
+            values
+            @ targets
+        | IfThenElse (CaseValues ctx values, CaseValues ctx thens, CaseValues ctx elses, _) ->
+            values
+            @ thens
+            @ elses
+        | Operation (kind = Binary (left = CaseValues ctx left; right = CaseValues ctx right)) ->
+            left
+            @ right
         | _ -> []
 
-    let private (|CaseSubExpression|_|) (ctx: PluginContext) (cases: CasesContext): Expr -> CasesContext option = function
-        | Let({ Name = StartsWith "matchValue" }, body: Expr, value: Expr) ->
+    let private (|CaseSubExpression|_|) (ctx: PluginContext) (cases: CasesContext) : Expr -> CasesContext option =
+        function
+        | Let ({ Name = StartsWith "matchValue" }, body: Expr, value: Expr) ->
             // the body is the actual expression/getter.
-            Some {
-                cases with
-                    CaseExprs = {
-                        MatchExpr = body
-                        CaseContainer = value
-                    } :: cases.CaseExprs
-            }
+            Some
+                { cases with
+                    CaseExprs =
+                        { MatchExpr = body
+                          CaseContainer = value }
+                        :: cases.CaseExprs }
         | _ -> None
 
-    let private (|CollectMatchersFeedback|) (ctx: PluginContext): Expr -> Expr list = function
+    let private (|CollectMatchersFeedback|) (ctx: PluginContext) : Expr -> Expr list =
+        function
         | expr ->
-            [ expr ] |> function CollectMatchers ctx values -> values
+            [ expr ]
+            |> function
+                | CollectMatchers ctx values -> values
 
-    let private (|CollectMatchers|) (ctx: PluginContext): Expr list -> Expr list = function
+    let private (|CollectMatchers|) (ctx: PluginContext) : Expr list -> Expr list =
+        function
         | [] -> []
-        | Sequential(CollectMatchers ctx left) :: CollectMatchers ctx right ->
-            left @ right
+        | Sequential (CollectMatchers ctx left) :: CollectMatchers ctx right ->
+            left
+            @ right
         | expr :: CollectMatchers ctx rest ->
             match expr with
-            | Let({ Name = StartsWith "matchValue" }, body, value) ->
-                expr :: rest
-            | Call(info = { Args = CollectMatchers ctx values }) ->
-                values @ rest
-            | CurriedApply(CollectMatchersFeedback ctx values, CollectMatchers ctx otherValues, _, _) ->
-                values @ otherValues @ rest
-            | Lambda(body = CollectMatchersFeedback ctx values)
-            | Delegate(body = CollectMatchersFeedback ctx values) ->
-                values @ rest
+            | Let ({ Name = StartsWith "matchValue" }, body, value) ->
+                expr
+                :: rest
+            | Call (info = { Args = CollectMatchers ctx values }) ->
+                values
+                @ rest
+            | CurriedApply (CollectMatchersFeedback ctx values, CollectMatchers ctx otherValues, _, _) ->
+                values
+                @ otherValues
+                @ rest
+            | Lambda (body = CollectMatchersFeedback ctx values)
+            | Delegate (body = CollectMatchersFeedback ctx values) ->
+                values
+                @ rest
             | _ -> rest
 
 
-    let getCases (ctx: PluginContext) (entityTyp: Type)  =
-        let predicate = function Lambda(name = Some(StartsWith "PARTAS_CASES")) -> true | _ -> false
+    let getCases (ctx: PluginContext) (entityTyp: Type) =
+        let predicate =
+            function
+            | Lambda (name = Some (StartsWith "PARTAS_CASES")) -> true
+            | _ -> false
+
         function
         | ExprMatchingFunFeedback predicate caseExprs ->
             caseExprs
-            |> List.collect(function
-            | Lambda(arg = ident; body = expr) ->
-                let caseContext = {
-                    Ident = ident
-                    Type = entityTyp
-                    CaseExprs = []
-                }
-                let predicate = function
-                    | CaseSubExpression ctx caseContext _ -> true
-                    | _ -> false
-                match expr with
-                | ExprMatchingFunFeedback predicate caseSubExprs ->
-                    let folder = fun caseContext expr ->
-                            match expr with
-                            | CaseSubExpression ctx caseContext value ->
-                                value
-                            | _ -> caseContext
+            |> List.collect (
+                function
+                | Lambda (arg = ident; body = expr) ->
+                    let caseContext =
+                        { Ident = ident
+                          Type = entityTyp
+                          CaseExprs = [] }
 
-                    caseSubExprs
-                    |> List.fold folder caseContext
-            | e -> failwith $"This expr should have been unreachable inside the ExprMatchingFunFeedback loop. Please report this and the reproducing code. Expr: {e}"
-            >> _.CaseExprs
+                    let predicate =
+                        function
+                        | CaseSubExpression ctx caseContext _ -> true
+                        | _ -> false
+
+                    match expr with
+                    | ExprMatchingFunFeedback predicate caseSubExprs ->
+                        let folder =
+                            fun caseContext expr ->
+                                match expr with
+                                | CaseSubExpression ctx caseContext value -> value
+                                | _ -> caseContext
+
+                        caseSubExprs
+                        |> List.fold folder caseContext
+                | e ->
+                    failwith
+                        $"This expr should have been unreachable inside the ExprMatchingFunFeedback loop. Please report this and the reproducing code. Expr: {e}"
+                >> _.CaseExprs
             )
-            |> List.map(fun caseInfo ->
+            |> List.map (fun caseInfo ->
                 let prop =
-                    caseInfo.MatchExpr |> function CaseProp ctx prop -> prop
-                let matches =
-                    caseInfo.CaseContainer |> function
-                        | CaseValues ctx values -> values
-                { PropertyName = prop; Cases = matches |> List.distinct }
-                )
+                    caseInfo.MatchExpr
+                    |> function
+                        | CaseProp ctx prop -> prop
 
+                let matches =
+                    caseInfo.CaseContainer
+                    |> function
+                        | CaseValues ctx values -> values
+
+                { PropertyName = prop
+                  Cases =
+                    matches
+                    |> List.distinct })
+
+module internal rec StorybookDecorator =
+    let getDecorator (ctx: PluginContext) (expr: Expr) =
+        let predicate =
+            function
+            | Lambda (name = Some (StartsWith "PARTAS_DECORATOR")) -> true
+            | _ -> false
+
+        findAndDiscardElse predicate expr
+        |> List.tryHead
+        |> Option.map (AST.transform ctx)
 
 module internal rec StorybookRender =
     let getRender (ctx: PluginContext) (expr: Expr) =
@@ -512,60 +558,103 @@ module internal rec StorybookRender =
 
 module internal rec StorybookVariantsAndArgs =
     type RawVariantExpr = RawVariantExpr of variantName: string * expr: Expr
-    type Variant = Variant of variantName: string * args: (string * Expr) list
-    type VariantRender = VariantRender of variantName: string * render: Expr
+
+    type Variant =
+        | Variant of variantName: string * args: (string * Expr) list
+
+        member this.Destructure = let (Variant (name, args)) = this in name, args
+        member this.Name = let (Variant (name, _)) = this in name
+
+    type VariantRender =
+        | VariantRender of variantName: string * render: Expr
+
+        member this.Name = let (VariantRender (name, _)) = this in name
+
+    type VariantDecorator =
+        | VariantDecorator of variantName: string * decorator: Expr
+
+        member this.Name = let (VariantDecorator (name, _)) = this in name
+
+    type VariantKind =
+        | Arg of Variant
+        | Render of VariantRender
+        | Decorator of VariantDecorator
+
+        member this.Name =
+            match this with
+            | Arg variant -> variant.Name
+            | Render variant -> variant.Name
+            | Decorator variant -> variant.Name
+
+        member this.Prop =
+            match this with
+            | Arg (Variant (_, expr)) -> "args", AstUtils.Object expr
+            | Render (VariantRender (_, expr)) -> "render", expr
+            | Decorator (VariantDecorator (_, expr)) -> "decorators", AstUtils.ValueArray ([ expr ])
+
+    let getVariantDecorators (ctx: PluginContext) (expr: Expr) =
+        let predicate =
+            function
+            | Lambda (arg = { Name = StartsWith "PARTAS_DECORATOR_BUILDER" }) -> true
+            | _ -> false
+
+        match expr with
+        | ExprMatchingFunFeedback predicate values ->
+            values
+            |> List.map (function
+                | Lambda (
+                    arg = arg
+                    body = Sequential (TypeCast (expr = Value (kind = StringConstant (StartsWithTrimmed "PARTAS_DECORATOR_VARIANT" name))) :: exprs)) ->
+                    VariantDecorator (
+                        name,
+                        Lambda (
+                            arg,
+                            Sequential exprs
+                            |> AST.transform ctx,
+                            None
+                        )
+                    )
+                | _ -> failwith "UNREACHABLE")
 
     let getVariantRenders (ctx: PluginContext) (expr: Expr) =
         let predicate =
             function
-            | Expr.Sequential (TypeCast (expr = Value (kind = StringConstant (StartsWith "PARTAS_RENDER_VARIANT"))) :: _) -> true
+            | Lambda (arg = { Name = StartsWith "PARTAS_RENDER_BUILDER" }) -> true
             | _ -> false
 
-        let recursiveDiscovery expr =
-            findAndDiscardElse predicate expr
-            |> List.map (fun expr ->
-                match expr with
-                | Expr.Sequential (TypeCast (expr = Value (kind = StringConstant (StartsWithTrimmed "PARTAS_RENDER_VARIANT" name))) :: exprs) ->
-                    name,
-                    let predicate =
-                        function
-                        | Lambda (name = Some "PARTAS_VARIANT_RENDER") -> true
-                        | _ -> false
-
-                    List.collect (findAndDiscardElse predicate) exprs
-                    |> List.head
-                    |> AST.transform ctx
-                | _ -> failwith "Unreachable")
-            |> List.map VariantRender
-
-        recursiveDiscovery expr
+        match expr with
+        | ExprMatchingFunFeedback predicate values ->
+            values
+            |> List.map (function
+                | Lambda (
+                    arg = arg
+                    body = Sequential (TypeCast (expr = Value (kind = StringConstant (StartsWithTrimmed "PARTAS_RENDER_VARIANT" name))) :: exprs)) ->
+                    VariantRender (
+                        name,
+                        Lambda (
+                            arg,
+                            Sequential exprs
+                            |> AST.transform ctx,
+                            None
+                        )
+                    )
+                | _ -> failwith "UNREACHABLE")
 
     let getVariants (ctx: PluginContext) (expr: Expr) =
         let predicate =
             function
-            | Expr.Sequential (TypeCast (expr = Value (kind = StringConstant (StartsWith "PARTAS_VARIANT"))) :: _) -> true
+            | Lambda (arg = { Name = StartsWith "PARTAS_ARG_BUILDER" }) -> true
             | _ -> false
 
-        let rec recursiveDiscovery expr =
-            findAndDiscardElse predicate expr
-            |> List.collect (function
-                | Expr.Sequential (_ :: exprs) as expr ->
-                    expr
-                    :: (exprs
-                        |> List.collect recursiveDiscovery)
-                | e -> [ e ])
+        let rawVariantExpressions =
+            match expr with
+            | ExprMatchingFunFeedback predicate values ->
+                values
+                |> List.map (function
+                    | Lambda (body = Sequential (TypeCast (expr = Value (kind = StringConstant (StartsWithTrimmed "PARTAS_VARIANT" name))) :: exprs)) ->
+                        RawVariantExpr (name, Sequential exprs)
+                    | _ -> failwith "UNREACHABLE")
 
-        let extractVariantExprs =
-            function
-            | Sequential (nameExpr :: (Sequential (TypeCast (expr = expr) :: _) :: _)) ->
-                let variantName =
-                    match nameExpr with
-                    | TypeCast (expr = Value (kind = StringConstant (StartsWithTrimmed "PARTAS_VARIANT" variantName))) -> Some variantName
-                    | _ -> None
-
-                variantName
-                |> Option.map (fun variantName -> RawVariantExpr (variantName, expr))
-            | _ -> None
 
         let processRawVariantExpr (RawVariantExpr (name, expr)) =
             let predicate =
@@ -617,8 +706,7 @@ module internal rec StorybookVariantsAndArgs =
 
                 Variant (name, args)
 
-        recursiveDiscovery expr
-        |> List.choose extractVariantExprs
+        rawVariantExpressions
         |> List.map processRawVariantExpr
 
     let getArgs (ctx: PluginContext) (expr: Expr) =
@@ -819,43 +907,48 @@ module internal StorybookAST =
             // We reverse the list so the variants are in the same order
             // they were defined
             |> List.rev
+            |> List.map VariantKind.Arg
 
         let variantRenders =
             getVariantRenders ctx expr
             |> List.rev
+            |> List.map VariantKind.Render
+
+        let variantDecorators =
+            getVariantDecorators ctx expr
+            |> List.rev
+            |> List.map VariantKind.Decorator
+
+        let variantCollections =
+            let keyValuePair (variantKind: VariantKind) =
+                variantKind.Name, variantKind.Prop
+
+            [ yield! variants; yield! variantRenders; yield! variantDecorators ]
+            |> List.map keyValuePair
+            |> fun keyVals ->
+                query {
+                    for key, value in keyVals do
+                        groupValBy value key
+                }
+
 
         let variantCombinations =
-            variants
-            |> List.map (function
-                | Variant (name, args) ->
-                    variantRenders
-                    |> List.tryFind (
-                        (function
-                        | VariantRender (renderName, _) -> renderName)
-                        >> (=) name
-                    )
-                    |> function
-                        | Some (VariantRender (_, render)) -> name, AstUtils.Object [ "args", AstUtils.Object args; "render", render ]
-                        | None -> name, AstUtils.Object [ "args", AstUtils.Object args ])
-            |> List.append (
-                variantRenders
-                |> List.choose (function
-                    | VariantRender (name, render) ->
-                        if
-                            variants
-                            |> List.exists (
-                                (function
-                                | Variant (vname, _) -> vname)
-                                >> (=) name
-                            )
-                        then
-                            None
-                        else
-                            (name, AstUtils.Object [ "render", render ])
-                            |> Some)
-            )
+            [
+
+              for group in variantCollections do
+                  group.Key,
+                  AstUtils.Object
+                      [ for value in group do
+                            value ] ]
         // The render custom op
         let render = StorybookRender.getRender ctx expr
+        // The decorator custom op
+        let decorator =
+            StorybookDecorator.getDecorator ctx expr
+            |> Option.map (
+                List.singleton
+                >> AstUtils.ValueArray
+            )
         // Creating the field data
         let fieldData =
             properties
@@ -1253,6 +1346,8 @@ module internal StorybookAST =
               |> List.map (function
                   | { Name = name; ArgType = expr } -> name, expr)
           )
+          if decorator.IsSome then
+              "decorators", decorator.Value
           if render.IsSome then
               "render", render.Value
           "component", compExpr ]
