@@ -290,19 +290,20 @@ module internal Utils =
             |> AstUtils.Object
 
 module internal rec StorybookTypeRecursion =
-    let (|EntityFullName|): DeclaredType -> string = _.Entity.FullName
 
     /// Filter interfaces that are predefined as thats too much noise.
-    let (|FeedInterface|) (ctx: PluginContext) : DeclaredType list -> DeclaredType list =
+    let (|FilterNativeTypes|) (ctx: PluginContext) : DeclaredType list -> DeclaredType list =
         function
         | [] -> []
-        | declaredType :: FeedInterface ctx rest ->
+        | declaredType :: FilterNativeTypes ctx rest ->
             match declaredType with
-            | EntityFullName (StartsWith "Partas.Solid.Tags") -> rest
+            | typ when typ.Entity.FullName.StartsWith("Partas.Solid.Tags") -> rest
             | ent ->
                 ent
                 :: rest
 
+    /// Retrieve function members that are setters, and not inline, not internal, not private, and have
+    /// no more than 1 parameter.
     let private filterMembers (ctx: PluginContext) (decls: MemberFunctionOrValue seq) =
         decls
         |> Seq.filter (fun memb ->
@@ -315,21 +316,25 @@ module internal rec StorybookTypeRecursion =
             |> not
             && memb.IsSetter)
 
+    /// Retrieve function members from a type and filter them
     let private getFilteredMembers (ctx: PluginContext) (decl: DeclaredType) =
         let entity = ctx.Helper.GetEntity decl.Entity
 
         entity.MembersFunctionsAndValues
         |> filterMembers ctx
 
+    /// Retrieve entity interfaces that are filtered
     let private getEntityInterfaces (ctx: PluginContext) (ent: Entity) =
         ent.AllInterfaces
         |> Seq.toList
         |> function
-            | FeedInterface ctx interfaces -> interfaces
+            | FilterNativeTypes ctx interfaces -> interfaces
 
+    /// Retrieve the entity from a declared type
     let private getEntity (ctx: PluginContext) (entityRef: DeclaredType) =
         ctx.Helper.GetEntity entityRef.Entity
 
+    /// Retrieve the filtered members and functions of an entity
     let rec private getEntityMembers (ctx: PluginContext) (entity: Entity) =
         let getMembers =
             entity.MembersFunctionsAndValues
@@ -345,6 +350,7 @@ module internal rec StorybookTypeRecursion =
         |> Option.defaultValue []
         |> List.append getMembers
 
+    /// Given an entity, collect the fields of it, and its declared interfaces or base types.
     let rec private collectEntityFields (ctx: PluginContext) (ent: Entity) =
         ent.BaseType
         |> Option.map (
@@ -358,11 +364,13 @@ module internal rec StorybookTypeRecursion =
             >> not
         )
 
+    /// Retrieves the generic arg from one of our operations
     let (|GetGenericArg|) (ctx: PluginContext) =
         function
         | GetDeclaredType (Type.DeclaredType (ref, _)) -> ctx.Helper.GetEntity ref
         | _ -> failwith "Incorrect AST structure. Different to expected."
 
+    /// Collect the entity members and fields and process them
     let rec collectEntityMembers (ctx: PluginContext) (entity: Entity) =
         let baseAndEntityFields =
             collectEntityFields ctx entity
@@ -387,143 +395,109 @@ module internal rec StorybookCases =
         { PropertyName: string
           Cases: string list }
 
-    let private makeCases (ctx: PluginContext) (typ: Type) (CasesExpr caseExpr) =
-        let fieldExtractor: Expr -> string option =
-            function
-            | Get (
-                expr = IdentExpr { Type = identTyp }
-                kind = (GetKind.ExprGet (Value (kind = ValueKind.StringConstant (field))) | GetKind.FieldGet ({ Name = field }))) when identTyp = typ ->
-                Some field
-            | Call (
-                callee = Import (typ = LambdaType (argType = typInfo); info = { Kind = MemberImport (MemberRef (_, { CompiledName = compiledName })) })) when
-                typ = typInfo
-                ->
-                compiledName.Split ('.')
-                |> Array.last
-                |> function
-                    | StartsWithTrimmed "get_" value ->
-                        value
-                        |> StringUtils.TrimReservedIdentifiers
-                        |> Some
-                    | _ -> None
-            | _ -> None
+    type CasesInfo = {
+        MatchExpr: Expr
+        CaseContainer: Expr
+    }
+    // When collecting cases, we should first be able to assembler
+    // the type info and ident with a list of case expressions.
+    type CasesContext = {
+        Ident: Ident
+        Type: Type
+        CaseExprs: CasesInfo list
+    }
+    let private (|CaseProp|) (ctx: PluginContext): Expr -> string = function
+        | Get(kind = FieldGet({ Name = prop }))
+        | Call( info = { MemberRef = Some(MemberRef.MemberRefIs ctx MemberRefType.Getter)
+                     & MemberRef.Option.PartasName ctx prop } ) ->
+            prop
+        | expr ->
+            $"While processing a case matchValue expression, we encountered an unknown getter expression: {expr}"
+            |> PluginContext.logWarning ctx
+            "ERROR"
+    let private (|CaseValues|) (ctx: PluginContext): Expr -> string list = function
+        | Value(StringConstant(prop), _) -> [ prop ]
+        | DecisionTree(CaseValues ctx values, targets) ->
+            let targets =
+                targets |> List.collect(snd >> function CaseValues ctx values -> values)
+            values @ targets
+        | IfThenElse(CaseValues ctx values,CaseValues ctx thens, CaseValues ctx elses,_) ->
+            values @ thens @ elses
+        | Operation(kind = Binary(left = CaseValues ctx left; right = CaseValues ctx right)) ->
+            left @ right
+        | _ -> []
 
-        let rec (|GetCases|): Expr -> string list =
-            function
-            | Expr.Call (callee = GetCases values; info = { Args = GetCases headValues :: exprs }) ->
-                values
-                @ headValues
-                @ (exprs
-                   |> List.collect (function
-                       | GetCases values -> values))
-            | Expr.CurriedApply (applied = GetCases values; args = exprs) ->
-                values
-                @ (exprs
-                   |> List.collect (function
-                       | GetCases values -> values))
-            | Expr.DecisionTree (expr = GetCases values; targets = targets) ->
-                values
-                @ (targets
-                   |> List.collect (
-                       snd
-                       >> function
-                           | GetCases values -> values
-                   ))
-            | Expr.Delegate (body = GetCases values) -> values
-            | Expr.DecisionTreeSuccess (boundValues = exprs) ->
-                List.collect
-                    (function
-                    | GetCases values -> values)
-                    exprs
-            | Expr.Get (expr = GetCases values; kind = kind) ->
-                match kind with
-                | ExprGet (GetCases values) -> values
-                | _ -> []
-                @ values
-            | Expr.IfThenElse (guardExpr = GetCases values; elseExpr = GetCases elseValues; thenExpr = GetCases thenValues) ->
-                values
-                @ elseValues
-                @ thenValues
-            | Expr.Lambda (body = GetCases values) -> values
-            | Expr.Let (value = GetCases values; body = GetCases bodyValues) ->
-                values
-                @ bodyValues
-            | Expr.LetRec (bindings = exprs; body = GetCases values) ->
-                (exprs
-                 |> List.collect (
-                     snd
-                     >> function
-                         | GetCases values -> values
-                 ))
-                @ values
-            | Expr.ObjectExpr (baseCall = Some (GetCases values); members = members) ->
-                values
-                @ (members
-                   |> List.collect (
-                       _.Body
-                       >> function
-                           | GetCases memberValues -> memberValues
-                   ))
-            | Expr.ObjectExpr (members = members) ->
-                members
-                |> List.collect (
-                    _.Body
-                    >> function
-                        | GetCases values -> values
-                )
-            | Expr.Operation (
-                kind = OperationKind.Binary (
-                    operator = BinaryOperator.BinaryEqual; right = Value (kind = StringConstant value); left = GetCases values)) ->
-                value
-                :: values
-            | Expr.Operation (kind = OperationKind.Binary (operator = BinaryOperator.BinaryEqual; right = GetCases values; left = GetCases leftValues)) ->
-                leftValues
-                @ values
-            | Expr.Sequential (exprs = exprs) ->
-                exprs
-                |> List.collect (function
-                    | GetCases values -> values)
-            | Expr.TypeCast (expr = GetCases values) -> values
-            | _ -> []
+    let private (|CaseSubExpression|_|) (ctx: PluginContext) (cases: CasesContext): Expr -> CasesContext option = function
+        | Let({ Name = StartsWith "matchValue" }, body: Expr, value: Expr) ->
+            // the body is the actual expression/getter.
+            Some {
+                cases with
+                    CaseExprs = {
+                        MatchExpr = body
+                        CaseContainer = value
+                    } :: cases.CaseExprs
+            }
+        | _ -> None
 
-        let field =
-            caseExpr
-            |> findAndDiscardElse (
-                fieldExtractor
-                >> _.IsSome
+    let private (|CollectMatchersFeedback|) (ctx: PluginContext): Expr -> Expr list = function
+        | expr ->
+            [ expr ] |> function CollectMatchers ctx values -> values
+
+    let private (|CollectMatchers|) (ctx: PluginContext): Expr list -> Expr list = function
+        | [] -> []
+        | Sequential(CollectMatchers ctx left) :: CollectMatchers ctx right ->
+            left @ right
+        | expr :: CollectMatchers ctx rest ->
+            match expr with
+            | Let({ Name = StartsWith "matchValue" }, body, value) ->
+                expr :: rest
+            | Call(info = { Args = CollectMatchers ctx values }) ->
+                values @ rest
+            | CurriedApply(CollectMatchersFeedback ctx values, CollectMatchers ctx otherValues, _, _) ->
+                values @ otherValues @ rest
+            | Lambda(body = CollectMatchersFeedback ctx values)
+            | Delegate(body = CollectMatchersFeedback ctx values) ->
+                values @ rest
+            | _ -> rest
+
+
+    let getCases (ctx: PluginContext) (entityTyp: Type)  =
+        let predicate = function Lambda(name = Some(StartsWith "PARTAS_CASES")) -> true | _ -> false
+        function
+        | ExprMatchingFunFeedback predicate caseExprs ->
+            caseExprs
+            |> List.collect(function
+            | Lambda(arg = ident; body = expr) ->
+                let caseContext = {
+                    Ident = ident
+                    Type = entityTyp
+                    CaseExprs = []
+                }
+                let predicate = function
+                    | CaseSubExpression ctx caseContext _ -> true
+                    | _ -> false
+                match expr with
+                | ExprMatchingFunFeedback predicate caseSubExprs ->
+                    let folder = fun caseContext expr ->
+                            match expr with
+                            | CaseSubExpression ctx caseContext value ->
+                                value
+                            | _ -> caseContext
+
+                    caseSubExprs
+                    |> List.fold folder caseContext
+            | e -> failwith $"This expr should have been unreachable inside the ExprMatchingFunFeedback loop. Please report this and the reproducing code. Expr: {e}"
+            >> _.CaseExprs
             )
-            |> List.choose fieldExtractor
+            |> List.map(fun caseInfo ->
+                let prop =
+                    caseInfo.MatchExpr |> function CaseProp ctx prop -> prop
+                let matches =
+                    caseInfo.CaseContainer |> function
+                        | CaseValues ctx values -> values
+                { PropertyName = prop; Cases = matches |> List.distinct }
+                )
 
-        field
-        |> List.map (fun fieldName ->
-            { PropertyName = fieldName
-              Cases =
-                caseExpr
-                |> function
-                    | GetCases values -> values })
-
-    let private findMatchers (ctx: PluginContext) (expr: Expr list) =
-        let matcher =
-            findAndDiscardElse (function
-                | Let (
-                    ident = { Name = StartsWith ("matchValue")
-                              Type = Type.String }) -> true
-                | _ -> false)
-
-        expr
-        |> List.collect matcher
-        |> List.map CasesExpr
-
-    let getCases (ctx: PluginContext) (entityTyp: Type) (expr: Expr) =
-        findMatchers ctx [ expr ]
-        |> List.collect (makeCases ctx entityTyp)
-        |> List.groupBy _.PropertyName
-        |> List.map (fun (key, cases) ->
-            { PropertyName = key
-              Cases =
-                cases
-                |> List.collect _.Cases
-                |> List.distinct })
 
 module internal rec StorybookRender =
     let getRender (ctx: PluginContext) (expr: Expr) =
