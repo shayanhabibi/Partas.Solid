@@ -498,6 +498,14 @@ module internal rec StorybookCases =
                 { PropertyName = prop; Cases = matches |> List.distinct }
                 )
 
+module internal rec StorybookDecorator =
+    let getDecorator (ctx: PluginContext) (expr: Expr) =
+        let predicate = function
+            | Lambda(name = Some (StartsWith "PARTAS_DECORATOR")) -> true
+            | _ -> false
+        findAndDiscardElse predicate expr
+        |> List.tryHead
+        |> Option.map (AST.transform ctx)
 
 module internal rec StorybookRender =
     let getRender (ctx: PluginContext) (expr: Expr) =
@@ -512,60 +520,67 @@ module internal rec StorybookRender =
 
 module internal rec StorybookVariantsAndArgs =
     type RawVariantExpr = RawVariantExpr of variantName: string * expr: Expr
-    type Variant = Variant of variantName: string * args: (string * Expr) list
-    type VariantRender = VariantRender of variantName: string * render: Expr
+    type Variant = Variant of variantName: string * args: (string * Expr) list with
+        member this.Destructure =
+            let (Variant (name, args)) = this in name,args
+        member this.Name =
+            let (Variant(name,_)) = this in name
+    type VariantRender = VariantRender of variantName: string * render: Expr with
+        member this.Name = let (VariantRender(name, _)) = this in name
+    type VariantDecorator = VariantDecorator of variantName: string * decorator: Expr with
+        member this.Name = let (VariantDecorator(name, _)) = this in name
+    type VariantKind =
+        | Arg of Variant
+        | Render of VariantRender
+        | Decorator of VariantDecorator
+        member this.Name =
+            match this with
+            | Arg variant -> variant.Name
+            | Render variant -> variant.Name
+            | Decorator variant -> variant.Name
+        member this.Prop =
+            match this with
+            | Arg (Variant(_,expr)) ->
+                "args", AstUtils.Object expr
+            | Render(VariantRender(_,expr)) -> "render", expr
+            | Decorator(VariantDecorator(_, expr)) -> "decorators", AstUtils.ValueArray([expr])
+    let getVariantDecorators (ctx: PluginContext) (expr: Expr) =
+        let predicate = function
+            | Lambda(arg = { Name = StartsWith "PARTAS_DECORATOR_BUILDER" }) -> true
+            | _ -> false
+        match expr with
+        | ExprMatchingFunFeedback predicate values ->
+            values
+            |> List.map(function
+                | Lambda(arg = arg; body = Sequential(TypeCast(expr = Value(kind = StringConstant(StartsWithTrimmed "PARTAS_DECORATOR_VARIANT" name))) :: exprs)) ->
+                    VariantDecorator(name, Lambda(arg, Sequential exprs |> AST.transform ctx, None))
+                | _ -> failwith "UNREACHABLE" )
 
     let getVariantRenders (ctx: PluginContext) (expr: Expr) =
-        let predicate =
-            function
-            | Expr.Sequential (TypeCast (expr = Value (kind = StringConstant (StartsWith "PARTAS_RENDER_VARIANT"))) :: _) -> true
+        let predicate = function
+            | Lambda(arg = { Name = StartsWith "PARTAS_RENDER_BUILDER" }) -> true
             | _ -> false
-
-        let recursiveDiscovery expr =
-            findAndDiscardElse predicate expr
-            |> List.map (fun expr ->
-                match expr with
-                | Expr.Sequential (TypeCast (expr = Value (kind = StringConstant (StartsWithTrimmed "PARTAS_RENDER_VARIANT" name))) :: exprs) ->
-                    name,
-                    let predicate =
-                        function
-                        | Lambda (name = Some "PARTAS_VARIANT_RENDER") -> true
-                        | _ -> false
-
-                    List.collect (findAndDiscardElse predicate) exprs
-                    |> List.head
-                    |> AST.transform ctx
-                | _ -> failwith "Unreachable")
-            |> List.map VariantRender
-
-        recursiveDiscovery expr
-
+        match expr with
+        | ExprMatchingFunFeedback predicate values ->
+            values
+            |> List.map(function
+                | Lambda(arg = arg; body = Sequential(TypeCast(expr = Value(kind = StringConstant(StartsWithTrimmed "PARTAS_RENDER_VARIANT" name))) :: exprs)) ->
+                    VariantRender(name,Lambda(arg, Sequential exprs |> AST.transform ctx, None))
+                | _ -> failwith "UNREACHABLE" )
     let getVariants (ctx: PluginContext) (expr: Expr) =
-        let predicate =
-            function
-            | Expr.Sequential (TypeCast (expr = Value (kind = StringConstant (StartsWith "PARTAS_VARIANT"))) :: _) -> true
+        let predicate = function
+            | Lambda(arg = { Name = StartsWith "PARTAS_ARG_BUILDER" }) -> true
             | _ -> false
+        let rawVariantExpressions =
+            match expr with
+            | ExprMatchingFunFeedback predicate values ->
+                values
+                |> List.map(function
+                    | Lambda(body = Sequential(TypeCast(expr = Value(kind = StringConstant(StartsWithTrimmed "PARTAS_VARIANT" name))) :: exprs)) ->
+                        RawVariantExpr(name, Sequential exprs)
+                    | _ -> failwith "UNREACHABLE"
+                    )
 
-        let rec recursiveDiscovery expr =
-            findAndDiscardElse predicate expr
-            |> List.collect (function
-                | Expr.Sequential (_ :: exprs) as expr ->
-                    expr
-                    :: (exprs
-                        |> List.collect recursiveDiscovery)
-                | e -> [ e ])
-
-        let extractVariantExprs =
-            function
-            | Sequential (nameExpr :: (Sequential (TypeCast (expr = expr) :: _) :: _)) ->
-                let variantName =
-                    match nameExpr with
-                    | TypeCast (expr = Value (kind = StringConstant (StartsWithTrimmed "PARTAS_VARIANT" variantName))) -> Some variantName
-                    | _ -> None
-
-                variantName
-                |> Option.map (fun variantName -> RawVariantExpr (variantName, expr))
-            | _ -> None
 
         let processRawVariantExpr (RawVariantExpr (name, expr)) =
             let predicate =
@@ -617,8 +632,7 @@ module internal rec StorybookVariantsAndArgs =
 
                 Variant (name, args)
 
-        recursiveDiscovery expr
-        |> List.choose extractVariantExprs
+        rawVariantExpressions
         |> List.map processRawVariantExpr
 
     let getArgs (ctx: PluginContext) (expr: Expr) =
@@ -819,43 +833,45 @@ module internal StorybookAST =
             // We reverse the list so the variants are in the same order
             // they were defined
             |> List.rev
+            |> List.map VariantKind.Arg
 
         let variantRenders =
             getVariantRenders ctx expr
             |> List.rev
+            |> List.map VariantKind.Render
 
-        let variantCombinations =
-            variants
-            |> List.map (function
-                | Variant (name, args) ->
-                    variantRenders
-                    |> List.tryFind (
-                        (function
-                        | VariantRender (renderName, _) -> renderName)
-                        >> (=) name
-                    )
-                    |> function
-                        | Some (VariantRender (_, render)) -> name, AstUtils.Object [ "args", AstUtils.Object args; "render", render ]
-                        | None -> name, AstUtils.Object [ "args", AstUtils.Object args ])
-            |> List.append (
-                variantRenders
-                |> List.choose (function
-                    | VariantRender (name, render) ->
-                        if
-                            variants
-                            |> List.exists (
-                                (function
-                                | Variant (vname, _) -> vname)
-                                >> (=) name
-                            )
-                        then
-                            None
-                        else
-                            (name, AstUtils.Object [ "render", render ])
-                            |> Some)
-            )
+        let variantDecorators =
+            getVariantDecorators ctx expr
+            |> List.rev
+            |> List.map VariantKind.Decorator
+
+        let variantCollections =
+            let keyValuePair (variantKind: VariantKind) =
+                variantKind.Name,variantKind.Prop
+            [
+                yield! variants
+                yield! variantRenders
+                yield! variantDecorators
+            ] |> List.map keyValuePair
+            |> fun keyVals ->
+                query {
+                    for key,value in keyVals do
+                    groupValBy value key
+                }
+
+
+        let variantCombinations = [
+
+            for group in variantCollections do
+                group.Key, AstUtils.Object [
+                    for value in group do
+                        value
+                ]
+        ]
         // The render custom op
         let render = StorybookRender.getRender ctx expr
+        // The decorator custom op
+        let decorator = StorybookDecorator.getDecorator ctx expr |> Option.map (List.singleton >> AstUtils.ValueArray)
         // Creating the field data
         let fieldData =
             properties
@@ -1253,6 +1269,8 @@ module internal StorybookAST =
               |> List.map (function
                   | { Name = name; ArgType = expr } -> name, expr)
           )
+          if decorator.IsSome then
+              "decorators", decorator.Value
           if render.IsSome then
               "render", render.Value
           "component", compExpr ]
