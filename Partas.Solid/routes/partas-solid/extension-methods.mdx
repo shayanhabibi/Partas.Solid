@@ -20,6 +20,27 @@ Uses the solid-js `on:` directive to handle events for the given name.
 div().on("click", fun event -> JS.console.log "Clicked!)
 ```
 
+:::important
+
+Also supports the new syntax which uses an object handler
+
+:::
+
+### Object Handler
+
+```fsharp
+type OnHandler(
+    handleEvent: Event -> unit,
+    ?once: bool,
+    ?passive: bool,
+    ?capture: bool
+    )
+```
+
+```fsharp
+.on(OnHandler(ignore, capture = true))
+```
+
 ## Bool
 
 `.bool(name: string, value: bool)`

@@ -2,13 +2,13 @@
   "name": "partas-solid-start-template",
   "type": "module",
   "scripts": {
+    "postinstall": "patch-package",
     "dev": "vinxi dev",
     "build": "vinxi build",
     "start": "vinxi start",
     "version": "vinxi version"
   },
   "dependencies": {
-    "@docsearch/css": "^3.9.0",
     "@iconify-json/ri": "^1.2.5",
     "@kobalte/core": "^0.13.10",
     "@kobalte/solidbase": "^0.2.11",
@@ -31,5 +31,8 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "patch-package": "^8.0.0"
   }
 }

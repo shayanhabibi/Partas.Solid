@@ -1,3 +1,4 @@
+
 import { createSignal } from "solid-js";
 import { HiddenInputY, HiddenInputX, Thumb, Background, Label, Root } from "@kobalte/core/color-area";
 

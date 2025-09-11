@@ -47,6 +47,7 @@
         <Content Include="routes\partas-solid\solid-router.mdx" />
         <Content Include="routes\partas-solid\solid-meta.mdx" />
         <Content Include="routes\partas-solid\solid-start.mdx" />
+        <Content Include="routes\partas-solid\storybook.mdx" />
         <Content Include="routes\partas-solid\tag-values.mdx" />
         <Content Include="routes\partas-solid\api-differences.mdx" />
         <Content Include="routes\partas-solid\experimental.mdx" />
@@ -99,7 +100,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Partas.Solid" Version="1.1.5" />
+        <PackageReference Include="Partas.Solid" Version="2.1.0-alpha.5" />
         <PackageReference Include="Partas.Solid.ApexCharts" Version="0.2.2" />
         <PackageReference Include="Partas.Solid.Kobalte" Version="0.3.5" />
         <PackageReference Include="Partas.Solid.Lucide" Version="0.513.0" />

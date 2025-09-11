@@ -1,6 +1,7 @@
+
 import { createSignal } from "solid-js";
-import { toArray } from "../fable_modules/fable-library-js.5.0.0-alpha.13/Seq.js";
-import { rangeDouble } from "../fable_modules/fable-library-js.5.0.0-alpha.13/Range.js";
+import { toArray } from "../fable_modules/fable-library-js.5.0.0-alpha.14/Seq.js";
+import { rangeDouble } from "../fable_modules/fable-library-js.5.0.0-alpha.14/Range.js";
 import { SolidApexCharts } from "solid-apexcharts";
 
 function ApexChartExample() {

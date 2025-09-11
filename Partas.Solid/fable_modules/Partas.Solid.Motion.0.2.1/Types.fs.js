@@ -1,4 +1,5 @@
-import { class_type } from "../fable-library-js.5.0.0-alpha.13/Reflection.js";
+
+import { class_type } from "../fable-library-js.5.0.0-alpha.14/Reflection.js";
 
 export class InViewOption {
     constructor() {

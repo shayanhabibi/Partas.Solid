@@ -1,9 +1,10 @@
+
 import { twMerge } from "tailwind-merge";
 import { clsx } from "clsx";
 import { Show, For, splitProps } from "solid-js";
 import { getCoreRowModel, createSolidTable, flexRender } from "@tanstack/solid-table";
-import { Record } from "../fable_modules/fable-library-js.5.0.0-alpha.13/Types.js";
-import { record_type, string_type } from "../fable_modules/fable-library-js.5.0.0-alpha.13/Reflection.js";
+import { Record } from "../fable_modules/fable-library-js.5.0.0-alpha.14/Types.js";
+import { record_type, string_type } from "../fable_modules/fable-library-js.5.0.0-alpha.14/Reflection.js";
 import "~/app.css";
 
 

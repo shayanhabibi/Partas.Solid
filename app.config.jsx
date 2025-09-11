@@ -1,7 +1,12 @@
+import ssrConfig from './tailwind.ssr.config.js';
 import { defineConfig } from "@solidjs/start/config";
 import devtools from "solid-devtools/vite";
 import { withSolidBase } from "@kobalte/solidbase/config";
 import tailwindcss from "@tailwindcss/vite";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(withSolidBase(
     {
@@ -14,10 +19,10 @@ export default defineConfig(withSolidBase(
         // Vite config
         vite: {
             plugins:[
+                tailwindcss(),
                 devtools({
                     autoname: true
                 }),
-                // tailwindcss()
             ],
             server: {
                 watch: {
@@ -26,6 +31,11 @@ export default defineConfig(withSolidBase(
                         "**/*.fsx"
                     ]
                 }
+            },
+            resolve: {
+                alias: {
+                    "@docsearch/css": resolve(__dirname, "node_modules/@kobalte/solidbase/node_modules/@docsearch/css/dist/style.css"),
+                },
             },
         },
         // Vinxi/Nitro/SolidStart
@@ -161,6 +171,11 @@ export default defineConfig(withSolidBase(
                                 {
                                     title: "Experimental",
                                     link: "/experimental"
+                                },
+                                {
+                                    title: "Storybook Support",
+                                    link: "/storybook",
+                                    status: "new"
                                 }
                             ]
                         },

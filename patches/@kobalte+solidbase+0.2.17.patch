@@ -1,0 +1,12 @@
+diff --git a/node_modules/@kobalte/solidbase/dist/default-theme/components/DocSearch.css b/node_modules/@kobalte/solidbase/dist/default-theme/components/DocSearch.css
+index 7a50940..cd764f4 100644
+--- a/node_modules/@kobalte/solidbase/dist/default-theme/components/DocSearch.css
++++ b/node_modules/@kobalte/solidbase/dist/default-theme/components/DocSearch.css
+@@ -154,7 +154,6 @@
+ }
+ 
+ .DocSearch-Button .DocSearch-Button-Key {
+-	@apply font-sans;
+ 	display: block;
+ 	margin: 2px 0 0 0;
+ 	border: 1px solid var(--sb-docsearch-divider);

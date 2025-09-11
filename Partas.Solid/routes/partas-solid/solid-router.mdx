@@ -22,6 +22,8 @@ type Route() = interface HtmlElement
 
 ```fsharp
 val path: string
+// overload:
+val paths: string array
 ```
 
 ```fsharp
@@ -122,6 +124,7 @@ member hash: string
 
 ---
 
+
 ## Router
 
 ```fsharp
@@ -158,6 +161,49 @@ val children: RootConfig[]
 ```
 
 [See `Route`](#route) and also [see `RootConfig`](#rootconfig)
+
+---
+
+## MemoryHistory
+
+```fsharp
+type MemoryHistory
+```
+
+```fsharp
+member get(): string
+```
+
+```fsharp
+member set(value: string, ?scroll: bool, ?replace: bool): unit
+```
+
+```fsharp
+member back(): _
+```
+
+```fsharp
+member forward(): _
+```
+
+```fsharp
+member go(int): unit
+```
+
+```fsharp
+member listen(string -> unit): Accessor<unit>
+```
+
+
+## MemoryRouter
+
+```fsharp
+type MemoryRouter() = inherit Router()
+```
+
+```fsharp
+val history: MemoryHistory
+```
 
 ### RootConfig
 
@@ -241,6 +287,193 @@ val state: obj
 ```
 
 ---
+
+## SolidAction
+
+```fsharp
+type SolidAction<'Input, 'Result>
+```
+
+```fsharp
+abstract url: string
+```
+
+```fsharp
+abstract with': 'Input -> string
+```
+
+## Submission
+
+```fsharp
+type Submission<'Input, 'Result>
+```
+
+```fsharp
+abstract input: 'Input
+abstract result: 'Result option
+abstract error: obj
+abstract pending: bool
+abstract url: string
+abstract clear: (unit -> unit)
+abstract retry: (unit -> unit)
+```
+
+:::important[Extensions]
+
+```fsharp
+[<Extension>]
+static member pending(Submission<'Input, unit>[]): bool
+```
+
+:::
+
+## AsyncAccessor
+
+```fsharp
+type AsyncAccessor<'T>
+```
+
+```fsharp
+abstract Invoke: unit -> 'T
+```
+
+```fsharp
+abstract latest: 'T
+```
+
+## Query
+
+```fsharp
+type Query<'Input, 'Output>
+```
+
+```fsharp
+abstract Invoke: 'Input -> 'Output
+abstract key: string
+abstract keyFor: 'Input -> string
+```
+
+## action
+
+:::important
+Only works with `POST` requests
+:::
+
+```fsharp
+let action<'Input, 'Output> (
+    handler: 'Input -> Promise<'Output>,
+    ?name: string,
+    ?onComplete: Submission<'Input, Output> -> unit
+    ): SolidAction<'Input, 'Output>
+```
+
+## useAction
+
+:::warning
+You can avoid the use of formData using this, but it requires client-side javascript and is not
+progressively enhanceable like forms are.
+:::
+
+```fsharp
+let useAction<'Input, 'Result>(
+    action: SolidAction<'Input, 'Result>
+    ): 'Input -> 'Result
+```
+
+## useSubmission
+
+```fsharp
+let useSubmission<'Input>(
+    action: SolidAction<'Input, unit>,
+    ?filter: 'Input -> bool
+    ): Submission<'Input, unit>
+```
+
+## useSubmissions
+
+```fsharp
+let useSubmissions<'Input>(
+    action: SolidAction<'Input, unit>,
+    filter: 'Input -> bool
+    ): Submission<'Input, unit> array
+```
+
+## createAsync
+
+```fsharp
+let createAsync<'T> (
+    fn: 'T option -> Promise<'T>,
+    ?name: string,
+    ?initialValue: 'T,
+    ?deferStream: bool,
+    ?onHydrated: unit -> unit,
+    ?ssrLoadFrom: string,
+    ?storage: unit -> Signal<'T>
+    ): Accessor<'T>
+```
+
+With utility
+
+```fsharp
+let createAsyncWithLatest<'T> (
+    // ...
+    ): AsyncAccessor<'T>
+```
+
+## createAsyncStore
+
+```fsharp
+let createAsyncStore<'T>(
+    fn: 'T option -> Promise<'T>,
+    ?name: string,
+    ?initialValue: 'T,
+    ?deferStream: bool,
+    ?onHydrated: unit -> unit,
+    ?ssrLoadFrom: string,
+    ?storage: unit -> Signal<'T>
+    ): Accessor<'T>
+```
+
+With utility
+
+```fsharp
+let createAsyncStoreWithLatest<'T>(
+    // ...
+    ): AsyncAccessor<'T>
+```
+
+## query
+
+```fsharp
+let query<'Input, 'Output>(
+    fn: FSharpFunc<'Input, 'Output>,
+    ?name: string
+    ): FSharpFunc<'Input, 'Output>
+```
+
+With utility
+
+```fsharp
+let query'<'Input, 'Output>(
+    fn: FSharpFunc<'Input, 'Output>,
+    ?name: string
+    ): Query<'Input, 'Output>
+```
+
+## revalidate
+
+```fsharp
+let revalidate(
+    key: string,
+    ?force: bool
+    ): unit
+```
+
+## createMemoryHistory
+
+```fsharp
+let createMemoryHistory(): MemoryHistory
+```
 
 ## useNavigate
 

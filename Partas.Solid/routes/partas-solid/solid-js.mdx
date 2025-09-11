@@ -97,6 +97,22 @@ The default is set by calling the given `Context` function with the value.
 
 ---
 
+## Dynamic
+
+```fsharp
+type Dynamic<'T>() = interface HtmlElement
+```
+
+```fsharp
+val component': TagValue
+```
+
+```fsharp
+val componentAsString: string
+```
+
+Overload to `component'` accepting a string for native components.
+
 ## For
 
 ```fsharp
@@ -108,6 +124,12 @@ val each: 'T[]
 ```
 
 The array of items that are accessible within the child function.
+
+```fsharp
+val fallback: HtmlElement
+```
+
+Fallback element to render while the list is loading.
 
 
 ```fsharp
@@ -133,10 +155,20 @@ val each: 'T[]
 ```
 
 ```fsharp
+val fallback: HtmlElement
+```
+
+```fsharp
 val children: (item: Accessor<'T>) -> (index: int) -> #HtmlElement
 ```
 
 ---
+
+## NoHydration
+
+```fsharp
+type NoHydration() = interface FragmentNode
+```
 
 ## Show
 
@@ -155,6 +187,22 @@ val fallback: HtmlElement
 ```fsharp
 val keyed: bool
 ```
+
+:::warning[Render Function]
+
+Alternate typed syntax for using a render function:
+
+```fsharp
+type Show<'T>() =
+    interface HtmlElement
+    interface ChildLambdaProvider<'T>
+```
+
+```fsharp
+val when': 'T
+```
+
+:::
 
 ---
 
@@ -197,11 +245,24 @@ type SuspenseList() = interface HtmlContainer
 ```
 
 ```fsharp
-val revealOrder: string
+module SuspenseList =
+    [<StringEnum>]
+    type RevealOrder =
+        | Forwards
+        | Backwards
+        | Together
+        
+val revealOrder: SuspenseList.RevealOrder
 ```
 
 ```fsharp
-val tail: string
+module SuspenseList =
+    [<StringEnum>]
+    type Tail =
+        | Collapsed
+        | Hidden
+        
+val tail: SuspenseList.Tail
 ```
 
 ```fsharp
@@ -224,6 +285,10 @@ val mount: Element
 val useShadow: bool
 ```
 
+```fsharp
+val isSVG: bool
+```
+
 ---
 
 ## ErrorBoundary
@@ -233,8 +298,20 @@ type ErrorBoundary() = interface HtmlContainer
 ```
 
 ```fsharp
-val fallback: (err: obj) -> (reset: (unit -> unit)) -> HtmlElement
+module ErrorBoundary =
+    type Fallback = delegate of err: obj * reset: (unit -> unit) -> HtmlElement
 ```
+
+```fsharp
+val fallback: ErrorBoundary.Fallback
+```
+
+```fsharp
+val plainFallback: HtmlElement
+```
+
+Overload for `fallback` which accepts a simple `HtmlElement` when you don't need to introspect the error or reset
+the boundary.
 
 ---
 
@@ -310,12 +387,30 @@ let createSignal(
 
 [See `Signal<'T>`](#signal)
 
+
+:::warning[Working with Functions]
+To store a function, you will have to keep in mind that subsequent *setting* of the signal will have to be
+in function form (except during initial assignment):
+
+```fsharp
+let myFunc () = console.log("myFunc")
+let accessor,setter = createSignal(unbox<unit -> (unit -> unit)> myFunc)
+let myNewFunc () = console.log("newFunc")
+setter (fun () -> myNewFunc)
+```
+
+:::
+
 ---
 
 ## createMemo
 
 ```fsharp
 let createMemo(value: unit -> 'T): Accessor<'T>
+```
+
+```fsharp
+let createMemo(value: 'T -> 'T, initialValue: 'T): Accessor<'T>
 ```
 
 :::details[Experimental CE]

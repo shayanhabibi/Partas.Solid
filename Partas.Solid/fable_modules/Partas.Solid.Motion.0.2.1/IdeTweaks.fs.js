@@ -1,4 +1,5 @@
 
+
 export function LanguageInjectionAttribute_$ctor_Z2BFC2E1D(injectedLanguage_mut) {
     LanguageInjectionAttribute_$ctor_Z2BFC2E1D:
     while (true) {

@@ -1,4 +1,4 @@
-/*@import 'tailwindcss';*/
+@import 'tailwindcss';
 
 :root {
     --sb-hero-name-background: linear-gradient(-20deg, hsl(200, 98%, 39%) 30%, hsl(199, 95%, 74%));
