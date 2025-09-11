@@ -1,4 +1,3 @@
-import ssrConfig from './tailwind.ssr.config.js';
 import { defineConfig } from "@solidjs/start/config";
 import devtools from "solid-devtools/vite";
 import { withSolidBase } from "@kobalte/solidbase/config";
