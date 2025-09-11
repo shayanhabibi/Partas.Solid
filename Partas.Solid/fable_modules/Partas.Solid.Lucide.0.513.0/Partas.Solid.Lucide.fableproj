@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <FablePackageType>library</FablePackageType>
+        <TargetFramework>net9.0</TargetFramework>
+        <!--        <WarningsAsErrors>3239;0025</WarningsAsErrors>-->
+        <PackageId>Partas.Solid.Lucide</PackageId>
+        <Title>Partas.Solid.Lucide</Title>
+        <RootNamespace>Partas.Solid.Lucide</RootNamespace>
+        <AssemblyName>Partas.Solid.Lucide</AssemblyName>
+        <Company>F# Community</Company>
+        <Description>Bindings for Solid-Lucide in Partas.Solid</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/shayanhabibi/Partas.Bindings</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;Bindings;Solid-Lucide</PackageTags>
+        <Authors>Shayan Habibi</Authors>
+        <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
+        <Version>0.513.0</Version>
+        <!--        <PackageReadmeFile>README.md</PackageReadmeFile>-->
+        <PackageVersion>0.513.0</PackageVersion>
+        <!--        <PackageReleaseNotes>Init</PackageReleaseNotes>-->
+        <NpmDependencies>
+            <NpmPackage Name="lucide-solid" Version=">= 0.513.0" />
+        </NpmDependencies>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!--        <None Include="../README.md" Pack="true" PackagePath="\" />-->
+        <Compile Include="Lucide.fs" />
+        <Compile Include="LucideLab.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Fable.Core" Version="4.5.0" />
+        <PackageReference Include="Fable.Package.SDK" Version="1.3.1">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Partas.Solid" Version="1.0.0-alpha99" />
+        <PackageReference Include="Partas.Solid.FablePlugin" Version="1.0.0-alpha99" />
+    </ItemGroup>
+
+</Project>

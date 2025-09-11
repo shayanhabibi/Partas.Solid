@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <FablePackageType>library</FablePackageType>
+        <TargetFramework>net6.0</TargetFramework>
+        <WarningsAsErrors>3239;0025</WarningsAsErrors>
+        <PackageId>Partas.Solid</PackageId>
+        <Title>Partas.Solid</Title>
+        <RootNamespace>Partas.Solid</RootNamespace>
+        <AssemblyName>Partas.Solid</AssemblyName>
+        <Company>F# Community</Company>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/shayanhabibi/Partas.Solid</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>Partas;Oxpecker;F#;FSharp;Fable;fable-javascript;Web;Framework;Solid;Solidjs;DSL</PackageTags>
+        <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
+        <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Version>2.1.0-alpha.5</Version>
+        <PackageVersion>2.1.0-alpha.5</PackageVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Include="../README.md" Pack="true" PackagePath="\" />
+      <Compile Include="AttributesAliasesExtensions.fs" />
+      <Compile Include="Builder.fs" />
+      <Compile Include="HtmlAttributes.fs" />
+      <Compile Include="AriaAttributes.fs" />
+      <Compile Include="StyleSpec.fs" />
+      <Compile Include="Style.fs" />
+      <Compile Include="Tags.fs" />
+      <Compile Include="Svg.fs" />
+      <Compile Include="SolidBindings.fs" />
+      <Compile Include="SolidRouterBindings.fs" />
+      <Compile Include="SolidMetaBindings.fs" />
+      <Compile Include="SolidStartBindings.fs" />
+      <Compile Include="Experimental.fs" />
+      <Compile Include="PolymorphicSupport.fs" />
+      <Compile Include="Storybook.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Fable.Browser.Dom" Version="2.20.0" />
+      <PackageReference Include="Fable.Core" Version="5.0.0-beta.1" />
+      <PackageReference Include="Fable.Package.SDK" Version="1.3.2">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Partas.Solid.FablePlugin\Partas.Solid.FablePlugin.fsproj" />
+    </ItemGroup>
+
+</Project>
