@@ -1,0 +1,19 @@
+
+import { twMerge } from "tailwind-merge";
+import { clsx } from "clsx";
+import { splitProps } from "solid-js";
+
+export function Lib_cn_Z35CD86D0(classes) {
+    return twMerge(clsx(classes));
+}
+
+export function ValueUnrollTest(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div class={Lib_cn_Z35CD86D0(["bg-primary", (PARTAS_LOCAL.variant === "black") ? "black" : ((PARTAS_LOCAL.variant === "green") ? "green" : "brown")])} />;
+}
+
+export function ValueUnrollNestedTest(props) {
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    return <div class={Lib_cn_Z35CD86D0(["bg-primary", (PARTAS_LOCAL.variant === "black") ? ((props.altVariant === "blue") ? "black & blue" : "black") : ((PARTAS_LOCAL.variant === "green") ? ((PARTAS_LOCAL.altVariant === "orange") ? "orange & blue" : ((PARTAS_LOCAL.altVariant === "yellow") ? "yellow & blue" : "green & blue")) : "brown")])} />;
+}
+

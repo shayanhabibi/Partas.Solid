@@ -11,6 +11,12 @@ type AstUtilHelpers =
 open type AstUtilHelpers
 
 type AstUtils =
+
+    /// Creates a unit constant expression
+    static member inline Unit = Expr.Value (ValueKind.UnitConstant, range)
+    /// Creates a null constant expression
+    static member inline Null = Expr.Value (ValueKind.Null any, range)
+
     /// Creates a string constant expression
     static member inline Value(stringValue: string) =
         Expr.Value (ValueKind.StringConstant stringValue, range)
@@ -35,6 +41,14 @@ type AstUtils =
         nodes
         |> Array.toList
         |> Sequential
+
+    /// Will check if expr list is either empty, and emit a null; a single expr long, and emit that expr; else
+    /// wraps the expressions in a Sequential DU
+    static member inline Sequential(exprList: Expr list) : Expr =
+        match exprList with
+        | [] -> AstUtils.Unit
+        | [ expr ] -> expr
+        | _ -> Sequential exprList
 
     /// Creates a user import expression with the selector and path
     static member inline Import(selector: string, path: string) =
@@ -70,10 +84,6 @@ type AstUtils =
         let typ = defaultArg typ any
         Expr.Call (callee, info, typ, range)
 
-    /// Creates a unit constant expression
-    static member inline Unit = Expr.Value (ValueKind.UnitConstant, range)
-    /// Creates a null constant expression
-    static member inline Null = Expr.Value (ValueKind.Null any, range)
 
     /// Creates an anonymous record from the list of string (field) expr (value) tuples
     static member inline Object(pairs: (string * Expr) list) =
@@ -381,6 +391,271 @@ module Patterns =
         | GetDeclaredType (Type.DeclaredType (EntityRefHasAttribute pluginHelper attrName attr, _)) -> Some attr
         | _ -> None
 
+
+module Expr =
+    let rec findAndDiscardElse (predicate: Expr -> bool) : Expr -> Expr list =
+        let filterList (values: Expr list) : Expr list =
+            List.collect (findAndDiscardElse predicate) values
+
+        function
+        | expr when predicate expr -> [ expr ]
+        | Expr.Call (callee = expr; info = { Args = exprs }) ->
+            expr
+            :: exprs
+            |> filterList
+        | Expr.CurriedApply (applied = expr; args = exprs) ->
+            expr
+            :: exprs
+            |> filterList
+        | Expr.DecisionTree (expr = expr; targets = targets) ->
+            expr
+            :: List.map snd targets
+            |> filterList
+        | Expr.DecisionTreeSuccess (boundValues = exprs) -> filterList exprs
+        | Expr.Delegate (body = expr) -> findAndDiscardElse predicate expr
+        | Expr.Emit (info = { CallInfo = { Args = exprs } }) -> filterList exprs
+        | Expr.ForLoop (start = start; body = body; limit = limit) ->
+            [ start; body; limit ]
+            |> filterList
+        | Expr.Get (expr = expr; kind = getKind) ->
+            let maybeResult = findAndDiscardElse predicate expr
+
+            if
+                maybeResult.IsEmpty
+                |> not
+            then
+                maybeResult
+            else
+                match getKind with
+                | ExprGet expr -> findAndDiscardElse predicate expr
+                | _ -> maybeResult
+        | Expr.IfThenElse (guardExpr = guardExpr; elseExpr = elseExpr; thenExpr = thenExpr) ->
+            [ guardExpr; elseExpr; thenExpr ]
+            |> filterList
+        | Expr.Lambda (body = expr) -> findAndDiscardElse predicate expr
+        | Expr.Let (body = body; value = value) -> filterList [ body; value ]
+        | Expr.LetRec (bindings = bindings; body = body) ->
+            body
+            :: List.map snd bindings
+            |> filterList
+        | Expr.ObjectExpr (baseCall = exprMaybe; members = members) ->
+            members
+            |> List.map _.Body
+            |> List.append
+                [ if exprMaybe.IsSome then
+                      exprMaybe.Value ]
+            |> filterList
+        | Expr.Operation (kind = OperationKind.Binary (left = left; right = right))
+        | Expr.Operation (kind = OperationKind.Logical (left = left; right = right)) ->
+            [ left; right ]
+            |> filterList
+        | Expr.Operation (kind = OperationKind.Unary (operand = expr)) -> findAndDiscardElse predicate expr
+        | Expr.Sequential exprs -> filterList exprs
+        | Expr.Set (expr = expr; value = value; kind = kind) ->
+            match kind with
+            | ExprSet exprSet ->
+                [ expr; value; exprSet ]
+                |> filterList
+            | _ ->
+                [ expr; value ]
+                |> filterList
+        | Expr.TryCatch (body = expr; catch = catch; finalizer = finalizer) ->
+            [ expr
+              match catch with
+              | Some (_, value) -> value
+              | _ -> ()
+              match finalizer with
+              | Some value -> value
+              | _ -> () ]
+            |> filterList
+        | Expr.TypeCast (expr = expr) -> findAndDiscardElse predicate expr
+        | Expr.Value (kind = kind) ->
+            match kind with
+            | ValueKind.NewAnonymousRecord (values = exprs) -> filterList exprs
+            | NewArray (newKind = NewArrayKind.ArrayAlloc expr) -> findAndDiscardElse predicate expr
+            | NewArray (newKind = NewArrayKind.ArrayFrom expr) -> findAndDiscardElse predicate expr
+            | NewArray (newKind = NewArrayKind.ArrayValues exprs) -> filterList exprs
+            | NewList (headAndTail = Some (head, tail)) ->
+                [ head; tail ]
+                |> filterList
+            | NewOption (value = Some expr) -> findAndDiscardElse predicate expr
+            | NewTuple (values = exprs)
+            | NewUnion (values = exprs)
+            | StringTemplate (values = exprs; tag = None)
+            | NewRecord (values = exprs) -> filterList exprs
+            | StringTemplate (values = exprs; tag = Some expr) ->
+                expr
+                :: exprs
+                |> filterList
+            | _ -> []
+        | Expr.WhileLoop (body = body; guard = guard) ->
+            [ guard; body ]
+            |> filterList
+        | _ -> []
+
+    let rec (|ExprMatchingFunFeedback|) (func: Expr -> bool) : Expr -> Expr list =
+        function
+        | expr when func expr -> [ expr ]
+        | expr ->
+            match [ expr ] with
+            | ExprMatchingFun func result -> result
+
+    and (|ExprMatchingFun|) (func: Expr -> bool) : Expr list -> Expr list =
+        function
+        | [] -> []
+        | expr :: ExprMatchingFun func rest when func expr ->
+            expr
+            :: rest
+        | Sequential (ExprMatchingFun func values) :: ExprMatchingFun func rest ->
+            values
+            @ rest
+        | expr :: ExprMatchingFun func rest ->
+            match expr with
+            | Value (kind, range) ->
+                match kind with
+                | StringTemplate (tag = tag; values = ExprMatchingFun func values) ->
+                    match tag with
+                    | Some (ExprMatchingFunFeedback func tagValues) ->
+                        tagValues
+                        @ values
+                        @ rest
+                    | _ ->
+                        values
+                        @ rest
+                | NewOption (value = Some (ExprMatchingFunFeedback func values)) ->
+                    values
+                    @ rest
+                | NewArray (newKind = newKind) ->
+                    match newKind with
+                    | ArrayAlloc (ExprMatchingFunFeedback func values)
+                    | ArrayFrom (ExprMatchingFunFeedback func values)
+                    | ArrayValues (ExprMatchingFun func values) ->
+                        values
+                        @ rest
+                | NewList (Some (ExprMatchingFunFeedback func left, ExprMatchingFunFeedback func right), _) ->
+                    left
+                    @ right
+                    @ rest
+                | NewTuple (values = ExprMatchingFun func values)
+                | NewRecord (values = ExprMatchingFun func values)
+                | NewAnonymousRecord (values = ExprMatchingFun func values)
+                | NewUnion (values = ExprMatchingFun func values) ->
+                    values
+                    @ rest
+                | _ -> rest
+            | TypeCast (expr = ExprMatchingFunFeedback func values)
+            | Lambda (body = ExprMatchingFunFeedback func values)
+            | Delegate (body = ExprMatchingFunFeedback func values) ->
+                values
+                @ rest
+            | ObjectExpr (members = members; baseCall = baseCall) ->
+                (members
+                 |> List.collect (
+                     _.Body
+                     >> function
+                         | ExprMatchingFunFeedback func values -> values
+                 ))
+                @ (baseCall
+                   |> Option.map (function
+                       | ExprMatchingFunFeedback func values -> values)
+                   |> Option.defaultValue [])
+                @ rest
+            | Call (callee = ExprMatchingFunFeedback func calleeValues; info = { Args = ExprMatchingFun func infoValues }) ->
+                calleeValues
+                @ infoValues
+                @ rest
+            | CurriedApply (applied = ExprMatchingFunFeedback func values; args = ExprMatchingFun func argValues) ->
+                values
+                @ argValues
+                @ rest
+            | Operation (kind = operationKind) ->
+                match operationKind with
+                | Unary (operand = ExprMatchingFunFeedback func values) ->
+                    values
+                    @ rest
+                | Binary (left = ExprMatchingFunFeedback func left; right = ExprMatchingFunFeedback func right)
+                | Logical (left = ExprMatchingFunFeedback func left; right = ExprMatchingFunFeedback func right) ->
+                    left
+                    @ right
+                    @ rest
+            | Emit (info = { CallInfo = { Args = ExprMatchingFun func values } }) ->
+                values
+                @ rest
+            | DecisionTree (ExprMatchingFunFeedback func values, targets) ->
+                values
+                @ (targets
+                   |> List.collect (
+                       snd
+                       >> function
+                           | ExprMatchingFunFeedback func values -> values
+                   ))
+                @ rest
+            | DecisionTreeSuccess (boundValues = ExprMatchingFun func values) ->
+                values
+                @ rest
+            | Let (_, ExprMatchingFunFeedback func values, ExprMatchingFunFeedback func values2) ->
+                values
+                @ values2
+                @ rest
+            | LetRec (bindings, ExprMatchingFunFeedback func values) ->
+                (bindings
+                 |> List.collect (
+                     snd
+                     >> function
+                         | ExprMatchingFunFeedback func values -> values
+                 ))
+                @ values
+                @ rest
+            | Get (expr = ExprMatchingFunFeedback func values; kind = kind) ->
+                match kind with
+                | ExprGet (ExprMatchingFunFeedback func kindValues) ->
+                    values
+                    @ kindValues
+                    @ rest
+                | _ ->
+                    values
+                    @ rest
+            | Set (expr = (ExprMatchingFunFeedback func values); kind = kind) ->
+                match kind with
+                | ExprSet (ExprMatchingFunFeedback func exprValues) ->
+                    values
+                    @ exprValues
+                    @ rest
+                | _ ->
+                    values
+                    @ rest
+            | WhileLoop (guard = ExprMatchingFunFeedback func guardValues; body = ExprMatchingFunFeedback func bodyValues) ->
+                guardValues
+                @ bodyValues
+                @ rest
+            | ForLoop (
+                start = ExprMatchingFunFeedback func startValues
+                limit = ExprMatchingFunFeedback func limitValues
+                body = ExprMatchingFunFeedback func bodyValues) ->
+                startValues
+                @ limitValues
+                @ bodyValues
+                @ rest
+            | TryCatch (body = ExprMatchingFunFeedback func bodyValues; catch = catch; finalizer = finalizer) ->
+                bodyValues
+                @ (catch
+                   |> Option.map (
+                       snd
+                       >> function
+                           | ExprMatchingFunFeedback func values -> values
+                   )
+                   |> Option.defaultValue [])
+                @ (finalizer
+                   |> Option.map (function
+                       | ExprMatchingFunFeedback func values -> values)
+                   |> Option.defaultValue [])
+                @ rest
+            | IfThenElse (ExprMatchingFunFeedback func values, ExprMatchingFunFeedback func values2, ExprMatchingFunFeedback func values3, _) ->
+                values
+                @ values2
+                @ values3
+                @ rest
+            | _ -> rest
 
 
 type StringUtils =

@@ -25,6 +25,76 @@ module internal rec AST =
     module Utils = Patterns
     [<AutoOpen>]
     module AttributesAndProperties =
+        let private (|MatchValueReplacerFeedback|) (ctx: PluginContext) (ident: Expr): Expr -> Expr list = function
+            | expr ->
+                if ctx.Flags.HasFlag(ComponentFlag.SkipCEOptimisation)
+                then [ expr ]
+                else
+                match [ expr ] with
+                | MatchValueReplacer ctx ident exprs -> exprs
+
+        /// This is essentially a copy pasta of the ValueUnroller. For the sake of preventing double
+        /// node traversal we're mashing that into this until we can start measuring costs in performance.
+        let private (|MatchValueReplacer|) (ctx: PluginContext) (ident: Expr): Expr list -> Expr list = function
+            | [] -> []
+            | Sequential (MatchValueReplacer ctx ident exprs) :: rest ->
+                exprs @ rest
+            | expr :: MatchValueReplacer ctx ident rest ->
+                match expr with
+                | IdentExpr({ Name = Utils.StartsWith "matchValue" }) ->
+                    ident :: rest
+                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, typ, range) ->
+                    Value(NewArray(ArrayValues exprs, Any, ArrayKind.MutableArray), range) :: rest
+                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, typ, range) ->
+                    exprs @ rest
+                | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, MatchValueReplacerFeedback ctx ident exprs, range) ->
+                    exprs @ rest
+                | Call(Import({ Selector = Utils.StartsWith "append" }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, typ, range) ->
+                    exprs @ rest
+                | Call(Import({Selector = Utils.StartsWith "singleton"}, Any, None), { Args = value :: MatchValueReplacer ctx ident exprs }, typ, range) ->
+                    exprs @ (value :: rest)
+                | Call(Import({ Selector = Utils.StartsWith "empty"; Path = Utils.EndsWith "Seq.js" }, Any, None), { Args = []; GenericArgs = typ :: _ }, _, _) ->
+                    Value(ValueKind.Null(typ), None) :: rest
+                | Call(callee, ({ Args = MatchValueReplacer ctx ident exprs } as callInfo), typ, range) ->
+                    Call(callee, { callInfo with Args = exprs }, typ, range) :: rest
+                // If we hit this path, then we are likely matching on a new identifier
+                | Let({ Name = Utils.StartsWith "matchValue" } as identifier, body, value) ->
+                    match body with
+                    // If it is a property, we will preform the replacer with the new identifier
+                    | PropertyGetter ctx prop ->
+                        let newIdent = propGetter prop
+                        match value with
+                        // reduction with new identifier
+                        | MatchValueReplacerFeedback ctx newIdent newValue ->
+                            newValue @ rest
+                    | MatchValueReplacerFeedback ctx ident bodyExprs ->
+                        match value with MatchValueReplacerFeedback ctx ident valueExprs ->
+                            Let(identifier, AstUtils.Sequential bodyExprs, AstUtils.Sequential valueExprs) :: rest
+
+                | Let({ Name = Utils.StartsWith "matchValue" } as ident, MatchValueReplacerFeedback ctx ident body, MatchValueReplacerFeedback ctx ident value) ->
+                    Let(ident, AstUtils.Sequential body, AstUtils.Sequential value) :: rest
+                | TypeCast(MatchValueReplacerFeedback ctx ident exprs, typ) ->
+                    exprs @ rest
+                | IfThenElse(MatchValueReplacerFeedback ctx ident guardExprs, MatchValueReplacerFeedback ctx ident thenExprs, MatchValueReplacerFeedback ctx ident elseExprs, range) ->
+                    IfThenElse(AstUtils.Sequential guardExprs, AstUtils.Sequential thenExprs, AstUtils.Sequential elseExprs, range) :: rest
+                | DecisionTree(MatchValueReplacerFeedback ctx ident expr, targets) ->
+                    let targets =
+                        targets
+                        |> List.map(fun (idents,expr) ->
+                            idents,
+                            match expr with
+                            | MatchValueReplacerFeedback ctx ident result ->
+                                AstUtils.Sequential result
+                            )
+                    DecisionTree(AstUtils.Sequential expr, targets) :: rest
+                | Operation (Binary (binaryOperator, MatchValueReplacerFeedback ctx ident left, MatchValueReplacerFeedback ctx ident right), tags, ``type``, sourceLocationOption) ->
+                    Operation(Binary(binaryOperator, AstUtils.Sequential left, AstUtils.Sequential right), tags, ``type``, sourceLocationOption) :: rest
+                | Operation (OperationKind.Logical (binaryOperator, MatchValueReplacerFeedback ctx ident left, MatchValueReplacerFeedback ctx ident right), tags, ``type``, sourceLocationOption) ->
+                    Operation(Logical(binaryOperator, AstUtils.Sequential left, AstUtils.Sequential right), tags, ``type``, sourceLocationOption) :: rest
+                | Operation (OperationKind.Unary (binaryOperator, MatchValueReplacerFeedback ctx ident unaryExprs), tags, ``type``, sourceLocationOption) ->
+                    Operation(Unary(binaryOperator, AstUtils.Sequential unaryExprs), tags, ``type``, sourceLocationOption) :: rest
+                | expr -> expr :: rest
+
         let (|ValueUnrollerFeedback|) (ctx: PluginContext) (expr: Expr): Expr list =
             if ctx |> PluginContext.hasFlag ComponentFlag.SkipCEOptimisation
             then [ expr ]
@@ -57,10 +127,39 @@ module internal rec AST =
                     Value(ValueKind.Null(typ), None) :: rest
                 | Call(callee, ({ Args = ValueUnroller ctx exprs } as callInfo), typ, range) ->
                     Call(callee, { callInfo with Args = exprs }, typ, range) :: rest
+                | Let({ Name = Utils.StartsWith "matchValue" } as ident, body, value) ->
+                    match body with
+                    | PropertyGetter ctx prop ->
+                        let newIdent = propGetter prop
+                        match value with
+                        | MatchValueReplacerFeedback ctx newIdent newValue ->
+                            newValue @ rest
+                    | ValueUnrollerFeedback ctx bodyExprs ->
+                        match value with ValueUnrollerFeedback ctx valueExprs ->
+                            Let(ident, AstUtils.Sequential bodyExprs, AstUtils.Sequential valueExprs) :: rest
+
+                | Let({ Name = Utils.StartsWith "matchValue" } as ident, ValueUnrollerFeedback ctx body, ValueUnrollerFeedback ctx value) ->
+                    Let(ident, AstUtils.Sequential body, AstUtils.Sequential value) :: rest
                 | TypeCast(ValueUnrollerFeedback ctx exprs, typ) ->
                     exprs @ rest
                 | IfThenElse(ValueUnrollerFeedback ctx guardExprs, ValueUnrollerFeedback ctx thenExprs, ValueUnrollerFeedback ctx elseExprs, range) ->
-                    IfThenElse(Sequential guardExprs, Sequential thenExprs, Sequential elseExprs, range) :: rest
+                    IfThenElse(AstUtils.Sequential guardExprs, AstUtils.Sequential thenExprs, AstUtils.Sequential elseExprs, range) :: rest
+                | DecisionTree(ValueUnrollerFeedback ctx expr, targets) ->
+                    let targets =
+                        targets
+                        |> List.map(fun (idents,expr) ->
+                            idents,
+                            match expr with
+                            | ValueUnrollerFeedback ctx result ->
+                                AstUtils.Sequential result
+                            )
+                    DecisionTree(AstUtils.Sequential expr, targets) :: rest
+                | Operation (Binary (binaryOperator, ValueUnrollerFeedback ctx left, ValueUnrollerFeedback ctx right), tags, ``type``, sourceLocationOption) ->
+                    Operation(Binary(binaryOperator, AstUtils.Sequential left, AstUtils.Sequential right), tags, ``type``, sourceLocationOption) :: rest
+                | Operation (OperationKind.Logical (binaryOperator, ValueUnrollerFeedback ctx left, ValueUnrollerFeedback ctx right), tags, ``type``, sourceLocationOption) ->
+                    Operation(Logical(binaryOperator, AstUtils.Sequential left, AstUtils.Sequential right), tags, ``type``, sourceLocationOption) :: rest
+                | Operation (OperationKind.Unary (binaryOperator, ValueUnrollerFeedback ctx unaryExprs), tags, ``type``, sourceLocationOption) ->
+                    Operation(Unary(binaryOperator, AstUtils.Sequential unaryExprs), tags, ``type``, sourceLocationOption) :: rest
                 | expr -> expr :: rest
 
 
@@ -109,7 +208,7 @@ module internal rec AST =
         /// comes BEFORE the PropertySetter recognizer. The Setter is greedy, and will
         /// nullify expressions that are attribute expressions which involve the props ident
         /// </remarks>
-        let private (|PropertyGetter|_|) (ctx: PluginContext) = function
+        let private (|PropertyGetter|_|) (ctx: PluginContext): Expr -> string option = function
             | Get(
                 expr = (
                     // Defined locally
@@ -755,7 +854,7 @@ module internal rec AST =
         | Value(
                 (
                  NewAnonymousRecord(_)
-                | NewArray(newKind = ArrayValues _)
+                | NewArray _
                 | NewList(headAndTail = Some _)
                 | NewRecord(_)
                 | StringTemplate(_)
@@ -778,6 +877,10 @@ module internal rec AST =
                     NewOption(Some (transform ctx expr), typ, isStruct)
                 | NewArray(ArrayValues values, typ, kind) ->
                     NewArray(ArrayValues (transformValues values), typ, kind)
+                | NewArray(ArrayAlloc expr, typ, kind) ->
+                    NewArray(ArrayAlloc (transform ctx expr), typ, kind)
+                | NewArray(ArrayFrom expr, typ, kind) ->
+                    NewArray(ArrayFrom (transform ctx expr), typ, kind)
                 | NewList(Some(expr1, expr2), typ) ->
                     NewList(Some(transform ctx expr1, transform ctx expr2), typ)
                 | NewRecord(values, ref, genArgs) ->
