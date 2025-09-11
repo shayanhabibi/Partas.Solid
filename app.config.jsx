@@ -28,12 +28,12 @@ export default defineConfig(withSolidBase(
                     ignore: [
                         "**/*.fs",
                         "**/*.fsx"
-                    ]
-                }
+                    ],
+                },
             },
             resolve: {
                 alias: {
-                    "@docsearch/css": resolve(__dirname, "node_modules/@kobalte/solidbase/node_modules/@docsearch/css/dist/style.css"),
+                    "@docsearch/css": resolve(__dirname, "empty.css"),
                 },
             },
         },
