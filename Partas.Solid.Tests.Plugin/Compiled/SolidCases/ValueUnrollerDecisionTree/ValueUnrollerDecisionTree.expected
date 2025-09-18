@@ -8,12 +8,12 @@ export function Lib_cn_Z35CD86D0(classes) {
 }
 
 export function ValueUnrollTest(props) {
-    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["variant"]);
     return <div class={Lib_cn_Z35CD86D0(["bg-primary", (PARTAS_LOCAL.variant === "black") ? "black" : ((PARTAS_LOCAL.variant === "green") ? "green" : "brown")])} />;
 }
 
 export function ValueUnrollNestedTest(props) {
-    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, []);
+    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["variant", "altVariant"]);
     return <div class={Lib_cn_Z35CD86D0(["bg-primary", (PARTAS_LOCAL.variant === "black") ? ((props.altVariant === "blue") ? "black & blue" : "black") : ((PARTAS_LOCAL.variant === "green") ? ((PARTAS_LOCAL.altVariant === "orange") ? "orange & blue" : ((PARTAS_LOCAL.altVariant === "yellow") ? "yellow & blue" : "green & blue")) : "brown")])} />;
 }
 
