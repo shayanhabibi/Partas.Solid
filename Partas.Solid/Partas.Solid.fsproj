@@ -16,8 +16,8 @@
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Version>2.1.0</Version>
-        <PackageVersion>2.1.0</PackageVersion>
+        <Version>2.1.1</Version>
+        <PackageVersion>2.1.1</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>

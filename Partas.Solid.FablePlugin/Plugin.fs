@@ -130,6 +130,7 @@ module internal rec AST =
                 | Let({ Name = Utils.StartsWith "matchValue" } as ident, body, value) ->
                     match body with
                     | PropertyGetter ctx prop ->
+                        PluginContext.addGetter ctx prop
                         let newIdent = propGetter prop
                         match value with
                         | MatchValueReplacerFeedback ctx newIdent newValue ->
