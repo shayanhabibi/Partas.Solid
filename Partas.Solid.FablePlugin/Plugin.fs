@@ -62,6 +62,7 @@ module internal rec AST =
                     match body with
                     // If it is a property, we will preform the replacer with the new identifier
                     | PropertyGetter ctx prop ->
+                        PluginContext.addGetter ctx prop
                         let newIdent = propGetter prop
                         match value with
                         // reduction with new identifier
