@@ -1,0 +1,116 @@
+﻿---
+title: Solid Primitives
+---
+
+# Storage
+
+## `SyncStorage`
+
+Type: `interface`
+
+- getItem: `key: string -> string option`
+- setItem: `key: string * value: string -> unit`
+- removeItem: `key: string -> unit`
+
+## `AsyncStorage`
+
+Type: `interface`
+
+- getItem: `key: string -> Promise<string option>`
+- setItem: `key: string * value: string -> Promise<obj>`
+- removeItem: `key: string -> Promise<unit>`
+
+## `SyncStorageWithOptions`
+
+Type: `interface`
+
+Type Parameter: `'Options`
+
+- getItem: `key: string * ?options: 'Options -> string option`
+- setItem: `key: string * value: string * ?options: 'Options -> unit`
+- removeItem: `key: string * ?options: 'Options -> unit`
+
+## `AsyncStorageWithOptions`
+
+Type: `interface`
+
+Type Parameter: `'Options`
+
+- getItem: `key: string * ?options: 'Options -> Promise<string option>`
+- setItem: `key: string * value: string * ?options: 'Options -> Promise<obj>`
+- removeItem: `key: string * ?options: 'Options -> Promise<unit>`
+
+## `PersistenceSyncData`
+
+Type: `interface`
+
+- key: `string`
+- newValue: `string option`
+- timeStamp: `float`
+- url: `string option`
+
+## `PersistenceSyncCallback`
+
+```fsharp
+PersistenceSyncData -> unit
+```
+
+## `PersistenceSyncSubscribe`
+
+```fsharp
+PersistenceSyncCallback -> unit
+```
+
+## `PersistenceSyncUpdate`
+
+```fsharp
+key: string * value: string option -> unit
+```
+
+## `PersistenceSyncAPI`
+
+```fsharp
+PersistenceSyncSubscribe * PersistenceSyncUpdate
+```
+
+## `PersistenceOptions`
+
+Type: `POJO`
+
+Type Params: `'T`, `'Options`
+
+- name: `string`
+- serialize: `'T -> string`
+- deserialize: `string -> 'T`
+- sync: `PersistenceSyncAPI`
+- storage: One of the 4 storages described above `U4`
+- storageOptions: `'Options`
+
+## `PersistedState`
+
+Type Param: `'T`
+
+```fsharp
+Accessor<'T> * Setter<'T> * obj
+```
+
+## Bindings
+
+:::details
+```fsharp
+[<Erase; AutoOpen>]
+type Storage =
+    [<ImportMember(Spec.path)>]
+    static member makePersisted<'T>(signal: Signal<'T>, ?options: PersistenceOptions<'T, _>): PersistedState<'T> = jsNative
+    [<ImportMember(Spec.path)>]
+    static member storageSync: PersistenceSyncAPI = jsNative
+    // TODO broadcast channel overload
+    [<ImportMember(Spec.path)>]
+    static member messageSync(?channel: Browser.Types.Window): PersistenceSyncAPI = jsNative
+    // TODO
+    // [<ImportMember(Spec.path)>]
+    // static member wsSync(ws: WebSocket, ?warnOnError: bool): PersistenceSyncAPI = jsNative
+    [<ImportMember(Spec.path)>]
+    static member multiplexSync([<ParamArray>] syncAPIs: PersistenceSyncAPI[]): PersistenceSyncAPI = jsNative
+```
+:::

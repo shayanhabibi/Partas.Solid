@@ -1,0 +1,50 @@
+﻿---
+title: Solid Primitives
+---
+
+# Permission
+
+## `PermissionName`
+
+Type: `StringEnum`
+
+- Geolocation
+- Midi
+- Notifications
+- PersistentStorage
+- Push
+- ScreenWakeLock
+- StorageAccess
+- Microphone
+- Camera
+
+## `PermissionState`
+
+Type: `StringEnum`
+
+- Granted
+- Denied
+- Prompt
+- Unknown
+
+## `PermissionDescriptor`
+
+Type: `interface`
+
+- name: `PermissionName`
+
+## Bindings
+
+:::details
+```fsharp
+[<Erase; AutoOpen>]
+type Permission =
+    /// <summary>
+    /// Queries the permission API
+    /// </summary>
+    /// <param name="name"></param>
+    [<ImportMember(Spec.path)>]
+    static member createPermission(name: U2<PermissionDescriptor, PermissionName>): unit -> PermissionState = jsNative
+```
+:::
+    

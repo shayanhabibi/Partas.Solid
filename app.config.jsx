@@ -331,17 +331,14 @@ export default defineConfig(withSolidBase(
                                     {
                                         title: "Clipboard",
                                         link: "/primitives/clipboard",
-                                        status: "updated"
                                     },
                                     {
                                         title: "Devices",
                                         link: "/primitives/devices",
-                                        status: "new"
                                     },
                                     {
                                         title: "Event Listener",
                                         link: "/primitives/event-listener",
-                                        status: "new"
                                     },
                                     {
                                         title: "EventBus",
@@ -352,6 +349,16 @@ export default defineConfig(withSolidBase(
                                         link: "/primitives/idle"
                                     },
                                     {
+                                        title: "Input Mask",
+                                        link: "/primitives/input-mask",
+                                        status: "new"
+                                    },
+                                    {
+                                        title: "JSX Tokenizer",
+                                        link: "/primitives/jsx-tokenizer",
+                                        status: "new"
+                                    },
+                                    {
                                         title: "Keyboard",
                                         link: "/primitives/keyboard"
                                     },
@@ -360,8 +367,18 @@ export default defineConfig(withSolidBase(
                                         link: "/primitives/media"
                                     },
                                     {
+                                        title: "Permission",
+                                        link: "/primitives/permission",
+                                        status: "new"
+                                    },
+                                    {
                                         title: "RAF",
                                         link: "/primitives/raf"
+                                    },
+                                    {
+                                        title: "Rootless",
+                                        link: "/primitives/rootless",
+                                        status: "new"
                                     },
                                     {
                                         title: "Scheduled",
@@ -374,6 +391,11 @@ export default defineConfig(withSolidBase(
                                     {
                                         title: "Spring",
                                         link: "/primitives/spring"
+                                    },
+                                    {
+                                        title: "Storage",
+                                        link: "/primitives/storage",
+                                        status: "new"
                                     },
                                     {
                                         title: "Timer",
@@ -401,7 +423,7 @@ export default defineConfig(withSolidBase(
                                         title: "Kobalte",
                                         link: "/kobalte",
                                         status: {
-                                            text: "0.3.0",
+                                            text: "0.4.0",
                                             color: "purple"
                                         }
                                     },
@@ -409,7 +431,7 @@ export default defineConfig(withSolidBase(
                                         title: "Motion",
                                         link: "/motion",
                                         status: {
-                                            text: "0.2.1",
+                                            text: "0.2.2",
                                             color: "purple"
                                         }
                                     },
@@ -417,7 +439,7 @@ export default defineConfig(withSolidBase(
                                         title: "ApexCharts",
                                         link: "/apexcharts",
                                         status: {
-                                            text: "0.2.0",
+                                            text: "0.2.2",
                                             color: "purple"
                                         }
                                     },
@@ -425,7 +447,7 @@ export default defineConfig(withSolidBase(
                                         title: "Cmdk",
                                         link: "/cmdk",
                                         status: {
-                                            text: "0.2.0",
+                                            text: "0.2.3",
                                             color: "purple"
                                         }
                                     },
@@ -433,7 +455,7 @@ export default defineConfig(withSolidBase(
                                         title: "Lucide",
                                         link: "/lucide",
                                         status: {
-                                            text: "0.514.0",
+                                            text: "0.514.1",
                                             color: "purple"
                                         }
                                     },
@@ -441,7 +463,7 @@ export default defineConfig(withSolidBase(
                                         title: "ModularForms",
                                         link: "/modular-forms",
                                         status: {
-                                            text: "0.2.0",
+                                            text: "0.2.2",
                                             color: "purple"
                                         }
                                     },
@@ -449,7 +471,7 @@ export default defineConfig(withSolidBase(
                                         title: "NeoDrag",
                                         link: "/neodrag",
                                         status: {
-                                            text: "0.2.0",
+                                            text: "0.2.1",
                                             color: "purple"
                                         }
                                     },
@@ -457,7 +479,7 @@ export default defineConfig(withSolidBase(
                                         title: "TanStack.Table",
                                         link: "/tan-stack-table",
                                         status: {
-                                            text: "0.2.0",
+                                            text: "0.2.1",
                                             color: "purple"
                                         }
                                     },
@@ -465,7 +487,7 @@ export default defineConfig(withSolidBase(
                                         title: "Storybook",
                                         link: "/storybook",
                                         status: {
-                                            text: "0.1.2",
+                                            text: "DEPR",
                                             color: "purple"
                                         }
                                     }

@@ -68,7 +68,6 @@
         <Content Include="routes\ecosystem\bindings.mdx" />
         <Content Include="routes\ecosystem\primitives\index.mdx" />
         <Content Include="routes\ecosystem\primitives\active-element.mdx" />
-        <Content Include="routes\ecosystem\primitives\mouse.mdx" />
         <Content Include="routes\ecosystem\primitives\autofocus.mdx" />
         <Content Include="routes\ecosystem\primitives\bounds.mdx" />
         <Content Include="routes\ecosystem\primitives\broadcast-channel.mdx" />
@@ -77,12 +76,18 @@
         <Content Include="routes\ecosystem\primitives\event-listener.mdx" />
         <Content Include="routes\ecosystem\primitives\event-bus.mdx" />
         <Content Include="routes\ecosystem\primitives\idle.mdx" />
+        <Content Include="routes\ecosystem\primitives\input-mask.mdx" />
+        <Content Include="routes\ecosystem\primitives\jsx-tokenizer.mdx" />
         <Content Include="routes\ecosystem\primitives\keyboard.mdx" />
         <Content Include="routes\ecosystem\primitives\media.mdx" />
+        <Content Include="routes\ecosystem\primitives\mouse.mdx" />
+        <Content Include="routes\ecosystem\primitives\permission.mdx" />
         <Content Include="routes\ecosystem\primitives\raf.mdx" />
+        <Content Include="routes\ecosystem\primitives\rootless.mdx" />
         <Content Include="routes\ecosystem\primitives\scheduled.mdx" />
         <Content Include="routes\ecosystem\primitives\scroll.mdx" />
         <Content Include="routes\ecosystem\primitives\spring.mdx" />
+        <Content Include="routes\ecosystem\primitives\storage.mdx" />
         <Content Include="routes\ecosystem\primitives\timer.mdx" />
         <Content Include="routes\ecosystem\primitives\trigger.mdx" />
         <Content Include="routes\ecosystem\primitives\tween.mdx" />

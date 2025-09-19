@@ -1,0 +1,192 @@
+﻿---
+title: Solid Primitives
+---
+
+# JsxTokenizer
+
+:::warning
+See the `@solid-primitives` docs for usage. Described below are the
+type APIs.
+:::
+
+## `JSXTokenizer`
+
+Type: `interface`
+
+```fsharp
+type JSXTokenizer<'Data>
+```
+
+- $TOKENIZER: `obj`
+- $TYPE: `'Data`
+
+A tokenizer can be used to create multiple token components with the same id and resolve
+their data from the JSX element structure.
+
+## `TokenElement`
+
+Type: `interface`
+
+```fsharp
+type TokenElement<'Data>
+```
+
+- data: `'Data`
+- $TOKENIZER: `obj`
+
+Resolved token returned by `resolveTokens`. Access the `data` property for
+the enclosed data.
+
+## `TokenComponent`
+
+Type: `interface`
+
+```fsharp
+type TokenComponent<'Props, 'Data> =
+    inherit HtmlElement
+    inherit JSXTokenizer<'Data>
+type TokenComponent<'Props> = TokenComponent<'Props, 'Props>
+```
+
+This type is returned by the `createToken` functions; it is an interface with which
+a class can interface with to induce the plugin to compile it as a JSX tag.
+
+The intention is for the `'Props` type to be your implemented class type.
+
+## Bindings
+
+:::details
+```fsharp
+[<AutoOpen; Erase>]
+type JsxTokenizer =
+    /// <summary>
+    /// Creates a JSX Tokenizer that can be used to create multiple token components
+    /// with the same id and resolve their data from the JSX Element structure.
+    /// </summary>
+    /// <param name="name">The name of the parser used for debugging.</param>
+    [<ImportMember(Spec.path); ParamObject(0)>]
+    static member createTokenizer<'Data>(name: string): JSXTokenizer<'Data> = jsNative
+    /// <summary>
+    /// Creates a JSX Tokenizer that can be used to create multiple token components
+    /// with the same id and resolve their data from the JSX Element structure.
+    /// </summary>
+    [<ImportMember(Spec.path)>]
+    static member createTokenizer<'Data>(): JSXTokenizer<'Data> = jsNative
+    /// <summary>
+    /// Creates a token component for passing custom data through JSX structure.
+    /// The token component can be used as a normal component in JSX. When resolved
+    /// by <c>resolveTokens</c> it will return the data passed to it. But when resolved
+    /// normally (eg using the <c>children()</c> helper) it will return the fallback JSX Element.
+    /// </summary>
+    /// <remarks>
+    /// From a <c>Partas.Solid</c> perspective, the advantage here is leveraging the
+    /// plugins robust tag construction mechanisms to improve bindings. This is primarily
+    /// because we do not have to concern ourselves with writing POJOs with parameters in
+    /// both the constructor and as properties.<br/><br/>
+    /// Further to this, we can also use interfaces more intuitively.
+    /// </remarks>
+    /// <param name="tokenizer">Identity object returned by <c>createTokenizer</c> or other
+    /// <c>TokenComponent</c> (if not passed, a new tokenizer id will be created)</param>
+    /// <param name="tokenData">Function that returns the data of the token. (if one isn't passed, props will be used as data)</param>
+    /// <param name="render">Function that returns the fallback JSX Element to render. (if not passed, the token will
+    /// render nothing and warn in development)</param>
+    /// <returns>A <c>TokenComponent</c> that can be used as a normal component in JSX.</returns>
+    [<ImportMember(Spec.path)>]
+    static member createToken<'Props, 'Data>(tokenizer: JSXTokenizer<'Data>, tokenData: 'Props -> 'Data, ?render: 'Props -> HtmlElement): TokenComponent<'Props, 'Data> = jsNative
+    /// <summary>
+    /// Creates a token component for passing custom data through JSX structure.
+    /// The token component can be used as a normal component in JSX. When resolved
+    /// by <c>resolveTokens</c> it will return the data passed to it. But when resolved
+    /// normally (eg using the <c>children()</c> helper) it will return the fallback JSX Element.
+    /// </summary>
+    /// <remarks>
+    /// From a <c>Partas.Solid</c> perspective, the advantage here is leveraging the
+    /// plugins robust tag construction mechanisms to improve bindings. This is primarily
+    /// because we do not have to concern ourselves with writing POJOs with parameters in
+    /// both the constructor and as properties.<br/><br/>
+    /// Further to this, we can also use interfaces more intuitively.
+    /// </remarks>
+    /// <param name="tokenizer">Identity object returned by <c>createTokenizer</c> or other
+    /// <c>TokenComponent</c> (if not passed, a new tokenizer id will be created)</param>
+    /// <param name="render">Function that returns the fallback JSX Element to render. (if not passed, the token will
+    /// render nothing and warn in development)</param>
+    /// <returns>A <c>TokenComponent</c> that can be used as a normal component in JSX.</returns>
+    static member inline createToken<'Data>(tokenizer: JSXTokenizer<'Data>, ?render: 'Data -> HtmlElement): TokenComponent<'Data> =
+        JsxTokenizer.createToken<'Data, 'Data>(tokenizer, undefined, ?render = render)
+    /// <summary>
+    /// Creates a token component for passing custom data through JSX structure.
+    /// The token component can be used as a normal component in JSX. When resolved
+    /// by <c>resolveTokens</c> it will return the data passed to it. But when resolved
+    /// normally (eg using the <c>children()</c> helper) it will return the fallback JSX Element.
+    /// </summary>
+    /// <remarks>
+    /// From a <c>Partas.Solid</c> perspective, the advantage here is leveraging the
+    /// plugins robust tag construction mechanisms to improve bindings. This is primarily
+    /// because we do not have to concern ourselves with writing POJOs with parameters in
+    /// both the constructor and as properties.<br/><br/>
+    /// Further to this, we can also use interfaces more intuitively.
+    /// </remarks>
+    /// <param name="tokenData">Function that returns the data of the token. (if one isn't passed, props will be used as data)</param>
+    /// <param name="render">Function that returns the fallback JSX Element to render. (if not passed, the token will
+    /// render nothing and warn in development)</param>
+    /// <returns>A <c>TokenComponent</c> that can be used as a normal component in JSX.</returns>
+    static member inline createToken<'Props, 'Data>(tokenData: 'Props -> 'Data, ?render: 'Props -> HtmlElement): TokenComponent<'Props, 'Data> =
+        JsxTokenizer.createToken<'Props, 'Data>(undefined, tokenData, ?render = render)
+    /// <summary>
+    /// Creates a token component for passing custom data through JSX structure.
+    /// The token component can be used as a normal component in JSX. When resolved
+    /// by <c>resolveTokens</c> it will return the data passed to it. But when resolved
+    /// normally (eg using the <c>children()</c> helper) it will return the fallback JSX Element.
+    /// </summary>
+    /// <remarks>
+    /// From a <c>Partas.Solid</c> perspective, the advantage here is leveraging the
+    /// plugins robust tag construction mechanisms to improve bindings. This is primarily
+    /// because we do not have to concern ourselves with writing POJOs with parameters in
+    /// both the constructor and as properties.<br/><br/>
+    /// Further to this, we can also use interfaces more intuitively.
+    /// </remarks>
+    /// <param name="render">Function that returns the fallback JSX Element to render. (if not passed, the token will
+    /// render nothing and warn in development)</param>
+    /// <returns>A <c>TokenComponent</c> that can be used as a normal component in JSX.</returns>
+    static member inline createToken<'Data>(?render: 'Data -> HtmlElement): TokenComponent<'Data, 'Data> =
+        JsxTokenizer.createToken<'Data, 'Data>(undefined, ?render = render)
+    /// <summary>
+    /// A function similar to Solid's <c>children()</c>. Resolves passed JSX structure, searching for tokens
+    /// with the given tokenizer id.
+    /// </summary>
+    /// <param name="tokenizer">identity object returned by <c>createTokenizer</c> or a <c>TokenComponent</c>. An array of multiple tokenizers can be passed.</param>
+    /// <param name="fn">Accessor that returns a JSX element structure (eg: <c>fun () -> props.children</c>)</param>
+    /// <param name="includeJSXElements">If <c>true</c>, other JSX Elements will be included in the result array (default: <c>false</c>)</param>
+    /// <returns>Accessor that returns an array of resolved tokens (and JSX Elements if option is enabled)</returns>
+    [<ImportMember(Spec.path); ParamObject(2)>]
+    static member resolveTokens<'Data>(tokenizer: JSXTokenizer<'Data>, fn: Accessor<HtmlElement>, ?includeJSXElements: bool): Accessor<TokenElement<'Data>[]> = jsNative
+    /// <summary>
+    /// A function similar to Solid's <c>children()</c>. Resolves passed JSX structure, searching for tokens
+    /// with the given tokenizer id.
+    /// </summary>
+    /// <param name="tokenizer">identity object returned by <c>createTokenizer</c> or a <c>TokenComponent</c>. An array of multiple tokenizers can be passed.</param>
+    /// <param name="fn">Accessor that returns a JSX element structure (eg: <c>fun () -> props.children</c>)</param>
+    /// <param name="includeJSXElements">If <c>true</c>, other JSX Elements will be included in the result array (default: <c>false</c>)</param>
+    /// <returns>Accessor that returns an array of resolved tokens (and JSX Elements if option is enabled)</returns>
+    [<ImportMember(Spec.path); ParamObject(2)>]
+    static member resolveTokens<'Data>(tokenizer: JSXTokenizer<'Data>[], fn: Accessor<HtmlElement>, ?includeJSXElements: bool): Accessor<TokenElement<'Data>[]> = jsNative
+    /// <summary>
+    /// Checks if passed value is a <c>TokenElement</c> created by the corresponding jsx-tokenizer.
+    /// </summary>
+    /// <param name="tokenizer">Identity object returned by <c>createTokenizer</c> or a <c>TokenComponent</c>. An
+    /// array of multiple tokenizers can be passed.</param>
+    /// <param name="value">Value to check</param>
+    /// <returns><c>true</c> if value is a <c>TokenElement</c></returns>
+    [<ImportMember(Spec.path)>]
+    static member isToken<'Data>(tokenizer: JSXTokenizer<'Data>, value: obj): bool = jsNative
+    /// <summary>
+    /// Checks if passed value is a <c>TokenElement</c> created by the corresponding jsx-tokenizer.
+    /// </summary>
+    /// <param name="tokenizer">Identity object returned by <c>createTokenizer</c> or a <c>TokenComponent</c>. An
+    /// array of multiple tokenizers can be passed.</param>
+    /// <param name="value">Value to check</param>
+    /// <returns><c>true</c> if value is a <c>TokenElement</c></returns>
+    [<ImportMember(Spec.path)>]
+    static member isToken<'Data>(tokenizer: JSXTokenizer<'Data>[], value: obj): bool = jsNative
+```
+:::
