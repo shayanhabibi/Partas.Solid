@@ -123,6 +123,12 @@ module Builder =
 
                 PARTAS_FIRST PARTAS_BUILDER
 
+        [<CustomOperation "tags">]
+        member inline _.Tags([<InlineIfLambdaAttribute>] PARTAS_FIRST: StorybookFun<'T>, PARTAS_TAGS: string array) : StorybookFun<'T> =
+            fun PARTAS_BUILDER ->
+                ignore PARTAS_TAGS
+                PARTAS_FIRST PARTAS_BUILDER
+
     type StorybookArgs<'T> with
         member inline _.Combine
             ([<InlineIfLambda>] PARTAS_FIRST: StorybookArgsFun<'T>, [<InlineIfLambda>] PARTAS_SECOND: StorybookArgsFun<'T>)

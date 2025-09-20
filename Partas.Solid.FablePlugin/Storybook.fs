@@ -534,6 +534,30 @@ module internal rec StorybookCases =
                     matches
                     |> List.distinct })
 
+module internal rec StorybookTags =
+    let getTags (ctx: PluginContext) (expr: Expr) =
+        let predicate =
+            function
+            | Let (ident = { Name = StartsWith "PARTAS_TAGS" }) -> true
+            | _ -> false
+
+        let tagExpressions =
+            match expr with
+            | ExprMatchingFunFeedback predicate values -> values
+
+        let tagExpr =
+            tagExpressions
+            |> List.collect (function
+                | Let (value = Value (kind = NewArray (newKind = ArrayValues values))) -> values
+                | _ -> failwith "unreachable")
+            |> function
+                | [] -> None
+                | values ->
+                    AstUtils.ValueArray values
+                    |> Some
+
+        tagExpr
+
 module internal rec StorybookDecorator =
     let getDecorator (ctx: PluginContext) (expr: Expr) =
         let predicate =
@@ -949,6 +973,8 @@ module internal StorybookAST =
                 List.singleton
                 >> AstUtils.ValueArray
             )
+        // the tags custom op
+        let tags = StorybookTags.getTags ctx expr
         // Creating the field data
         let fieldData =
             properties
@@ -1350,6 +1376,8 @@ module internal StorybookAST =
               "decorators", decorator.Value
           if render.IsSome then
               "render", render.Value
+          if tags.IsSome then
+              "tags", tags.Value
           "component", compExpr ]
         |> AstUtils.Object
         |> fun expr ->
