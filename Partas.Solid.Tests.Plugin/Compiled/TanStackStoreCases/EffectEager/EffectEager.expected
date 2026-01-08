@@ -1,0 +1,19 @@
+
+import { Effect, Store } from "@tanstack/solid-store";
+import { some } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Option.js";
+
+export const store = new Store(0);
+
+export const eagerEffect = (() => {
+    const opts = {
+        fn: () => {
+            console.log(some("Immediate effect:"), store.state);
+        },
+        deps: [store],
+    };
+    opts.eager = true;
+    return new Effect(opts);
+})();
+
+export const unmount = eagerEffect.mount();
+

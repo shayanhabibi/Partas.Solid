@@ -1,0 +1,14 @@
+
+import { Store } from "@tanstack/solid-store";
+import { some } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Option.js";
+
+export const store = new Store(0);
+
+export const unsub = store.subscribe(() => {
+    console.log(some("State changed:"), store.state);
+});
+
+export function cleanup() {
+    unsub();
+}
+

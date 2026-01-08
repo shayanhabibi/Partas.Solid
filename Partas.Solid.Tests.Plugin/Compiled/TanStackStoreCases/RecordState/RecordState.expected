@@ -1,0 +1,38 @@
+
+import { Record } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Types.js";
+import { record_type, string_type, int32_type } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Reflection.js";
+import { useStore, Store } from "@tanstack/solid-store";
+import { int32ToString } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Util.js";
+
+export class AppState extends Record {
+    constructor(count, name) {
+        super();
+        this.count = (count | 0);
+        this.name = name;
+    }
+}
+
+export function AppState_$reflection() {
+    return record_type("RecordState.AppState", [], AppState, () => [["count", int32_type], ["name", string_type]]);
+}
+
+export const store = new Store(new AppState(0, "Test"));
+
+export function Component() {
+    const count = useStore(store, (s) => (s.count | 0));
+    const name = useStore(store, (s_1) => s_1.name);
+    return <div>
+        <span>
+            {name()}
+        </span>
+        <span>
+            {int32ToString(count())}
+        </span>
+        <button on:click={(_arg) => {
+                store.setState((s_2) => (new AppState(s_2.count + 1, s_2.name)));
+            }}>
+            Increment
+        </button>
+    </div>;
+}
+

@@ -1,0 +1,30 @@
+
+import { useStore, Effect, Store } from "@tanstack/solid-store";
+import { some } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Option.js";
+import { int32ToString } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Util.js";
+
+export const store = new Store(0);
+
+export const effectOptions = {
+    fn: () => {
+        console.log(some("Store changed:"), store.state);
+    },
+    deps: [store],
+};
+
+export const storeEffect = new Effect(effectOptions);
+
+export function Component() {
+    const count = useStore(store, (s) => (s | 0));
+    return <div>
+        <span>
+            {int32ToString(count())}
+        </span>
+        <button on:click={(_arg) => {
+                store.setState((s_1) => ((s_1 + 1) | 0));
+            }}>
+            Increment
+        </button>
+    </div>;
+}
+

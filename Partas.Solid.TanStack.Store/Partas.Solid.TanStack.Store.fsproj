@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <FablePackageType>library</FablePackageType>
+        <TargetFramework>net6.0</TargetFramework>
+        <PackageId>Partas.Solid.TanStack.Store</PackageId>
+        <Title>Partas.Solid.TanStack.Store</Title>
+        <RootNamespace>Partas.Solid.TanStack.Store</RootNamespace>
+        <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>Partas;Solid;TanStack;Store;Fable</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Include="Spec.fs" />
+      <Compile Include="Store.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Fable.Core" Version="5.0.0-beta.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Partas.Solid\Partas.Solid.fsproj" />
+    </ItemGroup>
+
+</Project>

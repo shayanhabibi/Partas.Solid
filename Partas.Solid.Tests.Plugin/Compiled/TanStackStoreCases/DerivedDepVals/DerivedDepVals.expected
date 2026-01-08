@@ -1,0 +1,14 @@
+
+import { Derived, Store } from "@tanstack/solid-store";
+import { map, defaultArg } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Option.js";
+import { item } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Array.js";
+
+export const count = new Store(1);
+
+export const sumWithPrev = new Derived({
+    fn: (props) => ((defaultArg(map((arr) => (item(0, arr) | 0), props.prevDepVals), 0) + item(0, props.currDepVals)) | 0),
+    deps: [count],
+});
+
+export const unmount = sumWithPrev.mount();
+

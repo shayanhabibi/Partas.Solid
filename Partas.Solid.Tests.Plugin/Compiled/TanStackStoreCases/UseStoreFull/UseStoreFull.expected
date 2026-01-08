@@ -1,0 +1,13 @@
+
+import { useStoreFull, Store } from "@tanstack/solid-store";
+import { int32ToString } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Util.js";
+
+export const store = new Store(42);
+
+export function Component() {
+    const state = useStoreFull(store);
+    return <div>
+        {int32ToString(state())}
+    </div>;
+}
+

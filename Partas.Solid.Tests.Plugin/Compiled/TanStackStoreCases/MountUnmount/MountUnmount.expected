@@ -1,0 +1,32 @@
+
+import { Effect, Derived, Store } from "@tanstack/solid-store";
+import { some } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Option.js";
+import { onCleanup } from "solid-js";
+import { int32ToString } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Util.js";
+
+export const store = new Store(0);
+
+export const derived = new Derived({
+    fn: (_arg) => ((store.state * 2) | 0),
+    deps: [store],
+});
+
+export const effect = new Effect({
+    fn: () => {
+        console.log(some(store.state));
+    },
+    deps: [store],
+});
+
+export function Component() {
+    const derivedUnmount = derived.mount();
+    const effectUnmount = effect.mount();
+    onCleanup(() => {
+        derivedUnmount();
+        effectUnmount();
+    });
+    return <div>
+        {int32ToString(derived.state)}
+    </div>;
+}
+

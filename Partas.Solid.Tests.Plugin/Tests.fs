@@ -106,3 +106,42 @@ let AttributeCases =
           |> runAttributeCase "PartasImport Attribute"
           "Pojo"
           |> runAttributeCase "Pojo Optimisation" ]
+
+let runTanStackStoreCase name caseName =
+    let runTanStackStoreCase' caseName =
+        fun _ ->
+            built.Value
+            let folderName = "TanStackStoreCases"
+            runCase folderName caseName
+
+    testCase name
+    <| runTanStackStoreCase' caseName
+
+[<Tests>]
+let TanStackStoreCases =
+    testList
+        "TanStackStoreCases"
+        [ "BasicStore"
+          |> runTanStackStoreCase "Basic Store Usage"
+          "UseStoreFull"
+          |> runTanStackStoreCase "useStoreFull hook"
+          "RecordState"
+          |> runTanStackStoreCase "Record type state"
+          "DerivedStore"
+          |> runTanStackStoreCase "Derived store"
+          "EffectStore"
+          |> runTanStackStoreCase "Effect store"
+          "Subscribe"
+          |> runTanStackStoreCase "Store subscribe/unsubscribe"
+          "StoreOptions"
+          |> runTanStackStoreCase "Store with updateFn and onUpdate options"
+          "BatchUpdates"
+          |> runTanStackStoreCase "Batch updates"
+          "DerivedPrevVal"
+          |> runTanStackStoreCase "Derived with prevVal"
+          "DerivedDepVals"
+          |> runTanStackStoreCase "Derived with prevDepVals/currDepVals"
+          "EffectEager"
+          |> runTanStackStoreCase "Effect with eager option"
+          "MountUnmount"
+          |> runTanStackStoreCase "Mount/unmount with cleanup" ]

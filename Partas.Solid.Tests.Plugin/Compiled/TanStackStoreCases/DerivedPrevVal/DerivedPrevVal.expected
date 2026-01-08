@@ -1,0 +1,16 @@
+
+import { Derived, Store } from "@tanstack/solid-store";
+import { defaultArg } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Option.js";
+
+export const count = new Store(1);
+
+export const runningTotal = new Derived({
+    fn: (props) => {
+        const prev = defaultArg(props.prevVal, 0) | 0;
+        return (count.state + prev) | 0;
+    },
+    deps: [count],
+});
+
+export const unmount = runningTotal.mount();
+

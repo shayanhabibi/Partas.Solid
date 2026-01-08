@@ -1,0 +1,13 @@
+
+import { batch, Store } from "@tanstack/solid-store";
+
+export const store = new Store(0);
+
+export function performBatchUpdate() {
+    batch(() => {
+        store.setState((_arg) => 1);
+        store.setState((_arg_1) => 2);
+        store.setState((s) => ((s + 1) | 0));
+    });
+}
+

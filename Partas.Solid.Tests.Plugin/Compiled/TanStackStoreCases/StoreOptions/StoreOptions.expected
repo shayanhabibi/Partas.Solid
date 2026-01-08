@@ -1,0 +1,14 @@
+
+import { Store } from "@tanstack/solid-store";
+import { some } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Option.js";
+
+export const store = new Store(12, {
+    updateFn: (prev, updater) => ((updater(prev) + prev) | 0),
+});
+
+export const storeWithOnUpdate = new Store(0, {
+    onUpdate: () => {
+        console.log(some("Updated!"));
+    },
+});
+

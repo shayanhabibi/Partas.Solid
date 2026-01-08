@@ -1,0 +1,15 @@
+
+import { useStore, Store } from "@tanstack/solid-store";
+import { int32ToString } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Util.js";
+
+export const store = new Store(0);
+
+export function Component() {
+    const count = useStore(store, (state) => (state | 0));
+    return <div on:click={(_arg) => {
+            store.setState((s) => ((s + 1) | 0));
+        }}>
+        {int32ToString(count())}
+    </div>;
+}
+
