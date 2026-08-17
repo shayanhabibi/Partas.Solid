@@ -22,8 +22,8 @@ module internal FableRequirements =
 
     let (|FileExtension|_|) (input: PluginHelper) =
         match input.Options.FileExtension with
-        | Utils.EndsWith (".js")
-        | Utils.EndsWith (".jsx") -> true
+        | Utils.EndsWith ".js"
+        | Utils.EndsWith ".jsx" -> true
         | _ -> false
 
 /// Patterns which specify whether certain members are valid for the attribute to
@@ -42,24 +42,23 @@ module internal SchemaRules =
     /// </remarks>
     let (|ValidMemberRef|_|) (ctx: PluginContext) (memberDecl: MemberDecl) =
         match memberDecl with
-        | { MemberRef = MemberRef (({ FullName = Utils.StartsWith "Partas.Solid" } as declaringEntity),
+        | { MemberRef = MemberRef ({ FullName = Utils.StartsWith "Partas.Solid" } as declaringEntity,
                                    ({ IsInstance = true
-                                      NonCurriedArgTypes = Some ([ Type.Unit ]) } as entityRef)) } ->
+                                      NonCurriedArgTypes = Some [ Type.Unit ] })) } ->
             match memberDecl.Args with
-            | [ { Name = "props"
+            | [ { Name = name
                   IsThisArgument = true }
                 { Name = Utils.StartsWith "unitVar" } ] ->
-                declaringEntity.DisplayName
+                struct {| DisplayName =  declaringEntity.DisplayName; SelfIdentifier = name |}
                 |> Some
             | _ ->
                 PluginContext.helper ctx
                 |> _.LogWarning(
-                    "The self identifier must be named `props`, and no arguments must be provided",
+                    "No arguments must be provided",
                     memberDecl.Args
                     |> List.randomChoice
                     |> _.Range.Value
                 )
-
                 None
         | _ ->
             PluginContext.helper ctx
@@ -69,37 +68,32 @@ module internal SchemaRules =
                 |> List.randomChoice
                 |> _.Range.Value
             )
-
             None
 
 /// Prebaked expression constructors. Most
 /// reused or verbose Expr constructors should
 /// be lifted into this module.
 module internal Baked =
-    let private importMergeProps = AstUtils.Import ("mergeProps", "solid-js")
-    let private importSplitProps = AstUtils.Import ("splitProps", "solid-js")
-    let jsxElementType = JsxUtils.ElementType
-    let spreadPropertyExpression = AstUtils.IdentExpr ("PARTAS_OTHERS")
+    let private importMergeProps = AstUtils.Import ("merge", "solid-js")
+    let private importSplitProps = AstUtils.Import ("omit", "solid-js")
 
     /// Converts property setters into a sugar for setting their defaults by
     /// converting them into a mergeProps, which merges an object with the key,value pairs
     /// against the given props (ie overwritting any double ups).
-    let convertSettersToObject (values: (string * Expr) list) (rest: Expr) =
+    let convertSettersToObject (selfIdentifier: string) (values: (string * Expr) list) (rest: Expr) =
         match values with
         | [] -> rest
         | _ ->
             AstUtils.Sequential (
                 AstUtils.SetProp (
-                    AstUtils.IdentExpr ("props"),
+                    AstUtils.IdentExpr selfIdentifier,
                     AstUtils.Call (
                         importMergeProps,
                         AstUtils.CallInfo (
                             args =
-                                [ let trimReservedIdentifier =
-                                      fun (name, expr) -> StringUtils.TrimReservedIdentifiers name, expr
-
+                                [ let trimReservedIdentifier = fun (name, expr) -> StringUtils.TrimReservedIdentifiers name, expr
                                   AstUtils.Object (List.map trimReservedIdentifier values)
-                                  AstUtils.IdentExpr ("props") ]
+                                  AstUtils.IdentExpr selfIdentifier ]
                         )
                     )
                 ),
@@ -108,35 +102,31 @@ module internal Baked =
 
     /// It renders the JSX splitProps, with the given values split into PARTAS_LOCAL, and the rest
     /// into PARTAS_OTHERS
-    let convertGettersToObject (values: string list) (rest: Expr) =
+    let convertGettersToObject (selfIdentifier: string) (values: string list) (rest: Expr) =
+        let omitParams =
+            AstUtils.IdentExpr selfIdentifier
+            :: (values |> List.map AstUtils.Value)
         Expr.Let (
-            ident = AstUtils.Ident ("[PARTAS_LOCAL, PARTAS_OTHERS]"),
-            value =
-                AstUtils.Call (
-                    importSplitProps,
-                    AstUtils.CallInfo (
-                        args =
-                            [ AstUtils.IdentExpr ("props")
-                              AstUtils.ValueArray (
-                                  values
-                                  |> List.map AstUtils.Value
-                              ) ]
-                    )
-                ),
-            body = rest
+            ident = AstUtils.Ident "PARTAS_OTHERS"
+            , value = (
+                match omitParams with
+                | [ selfIdentifierExpr ] -> selfIdentifierExpr
+                | paras ->
+                    AstUtils.Call (
+                        importSplitProps,
+                        AstUtils.CallInfo (args = paras)
+                        )
+            ), body = rest
         )
-
-    let propGetter (getTarget: string) =
-        AstUtils.GetProp ("PARTAS_LOCAL", StringUtils.TrimReservedIdentifiers getTarget)
 
     /// Renders an ElementBuilder into the final Expr. Performs ONE final transformation; it will
     /// pattern match the tagname "Fragment" and remove it to render `<> </>`.
-    let renderElement (ctx: PluginContext) (builder: ElementBuilder) =
+    let renderElement (_: PluginContext) (builder: ElementBuilder) =
         let renderTagName =
             function
-            | TagSource.AutoImport "Fragment" -> AstUtils.Value ("")
+            | TagSource.AutoImport "Fragment" -> AstUtils.Value ""
             | TagSource.LibraryImport imp -> imp
-            | TagSource.AutoImport name -> AstUtils.Value (name)
+            | TagSource.AutoImport name -> AstUtils.Value name
 
         JsxUtils.CreateElement (
             renderTagName builder.TagSource,
@@ -157,10 +147,10 @@ module internal MemberRef =
             elif mref.IsSetter then MemberRefType.Setter
             elif mref.IsGetter then MemberRefType.Getter
             else MemberRefType.None
-        | GeneratedMemberRef (_) -> MemberRefType.Generated
+        | GeneratedMemberRef _ -> MemberRefType.Generated
         | _ -> MemberRefType.None
 
-    let (|PartasName|_|) (ctx: PluginContext) : MemberRef -> string option =
+    let (|PartasName|_|) (_: PluginContext) : MemberRef -> string option =
         function
         | MemberRef (_, { CompiledName = compiledName }) ->
             compiledName
@@ -175,7 +165,7 @@ module internal MemberRef =
                     memberName
                     |> StringUtils.TrimReservedIdentifiers
                     |> Some
-        | GeneratedMemberRef (_) -> None
+        | GeneratedMemberRef _ -> None
 
     /// <summary>
     /// Used for POJO constructors to extract the prop names from the constructor
@@ -237,7 +227,7 @@ module internal Expr =
     let (|ImportedExtensionName|_|) (ctx: PluginContext) =
         function
         | Import ({ Selector = Utils.StartsWith "HtmlElementExtensions_"
-                    Kind = MemberImport ((MemberRef.MemberRefIs ctx MemberRefType.Setter & MemberRef (_, { CompiledName = compiledName }))) },
+                    Kind = MemberImport (MemberRef.MemberRefIs ctx MemberRefType.Setter & MemberRef (_, { CompiledName = compiledName })) },
                   _,
                   _) -> Some compiledName
         | _ -> None
@@ -259,7 +249,7 @@ module internal Expr =
 module internal Type =
     let rec private (|GetDeclaredType|_|) (ctx: PluginContext) : Type -> Type option =
         function
-        | Type.DeclaredType (_) as typ -> Some typ
+        | Type.DeclaredType _ as typ -> Some typ
         | Type.Array (GetDeclaredType ctx typ, _) -> Some typ
         | Type.List (GetDeclaredType ctx typ) -> Some typ
         | Type.Option (GetDeclaredType ctx typ, _) -> Some typ
@@ -269,7 +259,7 @@ module internal Type =
         | _ -> None
 
     /// Recursively explores a `Type` AST node until either returning the tail part of a DeclaredType fullname,
-    /// or none. It can therefor also be used to ensure the type starts with `Partas.Solid`
+    /// or none. It can therefore also be used to ensure the type starts with `Partas.Solid`
     let rec (|PartasName|_|) (ctx: PluginContext) : Type -> string option =
         function
         | GetDeclaredType ctx (Type.DeclaredType ({ FullName = Utils.StartsWith "Partas.Solid" as fullName }, _)) ->
@@ -307,7 +297,7 @@ module internal Type =
             |> Some
         | _ -> None
 
-    /// Digs into a type to see if it can find a DeclaredType node; if so, it extracts the attribute key,selector,path for
+    /// Digs into a type to see if it can find a DeclaredType node; if so, it extracts the attribute key, selector, path for
     /// PartasProxyImportAttribute if it is present and returns them
     let (|HasPartasProxyImport|_|) (ctx: PluginContext) : Type -> (string * string * string) option =
         function
@@ -348,19 +338,19 @@ module internal Ident =
     /// where we can, we use ridiculous names in computations so that the chance of user AST
     /// accidentally being transformed as one of these patterns is almost nil. It also simplifies
     /// debugging the resulting JSX since they are easy to identify.
-    /// Unfortunately, this is incompatible with builders for types that have the Import attribute
-    // The Import attribute causes the builders to produce default names for functions and just generally
-    // ruins the vibe. If this causes issue with native bindings etc, then either the plugin will have to
-    // take all cases and inject them manually, or tackle matching the generated names and identifiers.
+    /// Unfortunately, this is incompatible with builders for types that have the Import attribute.
+    /// The Import attribute causes the builders to produce default names for functions and just generally
+    /// ruins the vibe. If this causes issue with native bindings etc, then either the plugin will have to
+    /// take all cases and inject them manually, or tackle matching the generated names and identifiers.
     let (|IdentIs|) (ctx: PluginContext) : Ident -> IdentType =
         function
         | { Name = Utils.StartsWith "returnVal"
             Type = Type.PartasName ctx _ } -> IdentType.ReturnVal
         | { Name = Utils.EndsWith "_$ctor"
             Type = Type.PartasName ctx _ } -> IdentType.Constructor
-        | { Name = "props"
+        | { Name = name
             IsThisArgument = true
-            Type = Type.PartasName ctx _ } -> IdentType.Props
+            Type = Type.PartasName ctx _ } when name = ctx.SelfIdentifier -> IdentType.Props
         // | { Name = "enumerator"; IsCompilerGenerated = true } -> IdentType.Enumerator(EnumType.Enumerator)
         // | { Name = (
         //         Helpers.StartsWithTrimmed "System.Collections.Generic.IEnumerator`1." value

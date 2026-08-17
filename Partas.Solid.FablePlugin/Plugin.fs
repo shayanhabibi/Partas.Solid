@@ -16,7 +16,6 @@ open System
 open Fable
 open Fable.AST
 open Fable.AST.Fable
-open Partas.Solid.Baked
 
 [<assembly: ScanForPlugins>]
 do ()
@@ -43,15 +42,15 @@ module internal rec AST =
                 match expr with
                 | IdentExpr({ Name = Utils.StartsWith "matchValue" }) ->
                     ident :: rest
-                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, typ, range) ->
+                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, _typ, range) ->
                     Value(NewArray(ArrayValues exprs, Any, ArrayKind.MutableArray), range) :: rest
-                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, typ, range) ->
+                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, _typ, _range) ->
                     exprs @ rest
-                | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, MatchValueReplacerFeedback ctx ident exprs, range) ->
+                | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, MatchValueReplacerFeedback ctx ident exprs, _range) ->
                     exprs @ rest
-                | Call(Import({ Selector = Utils.StartsWith "append" }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, typ, range) ->
+                | Call(Import({ Selector = Utils.StartsWith "append" }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, _typ, _range) ->
                     exprs @ rest
-                | Call(Import({Selector = Utils.StartsWith "singleton"}, Any, None), { Args = value :: MatchValueReplacer ctx ident exprs }, typ, range) ->
+                | Call(Import({Selector = Utils.StartsWith "singleton"}, Any, None), { Args = value :: MatchValueReplacer ctx ident exprs }, _typ, _range) ->
                     exprs @ (value :: rest)
                 | Call(Import({ Selector = Utils.StartsWith "empty"; Path = Utils.EndsWith "Seq.js" }, Any, None), { Args = []; GenericArgs = typ :: _ }, _, _) ->
                     Value(ValueKind.Null(typ), None) :: rest
@@ -63,7 +62,7 @@ module internal rec AST =
                     // If it is a property, we will preform the replacer with the new identifier
                     | PropertyGetter ctx prop ->
                         PluginContext.addGetter ctx prop
-                        let newIdent = propGetter prop
+                        let newIdent = AstUtils.GetProp(ctx.SelfIdentifier, StringUtils.TrimReservedIdentifiers prop)
                         match value with
                         // reduction with new identifier
                         | MatchValueReplacerFeedback ctx newIdent newValue ->
@@ -74,7 +73,7 @@ module internal rec AST =
 
                 | Let({ Name = Utils.StartsWith "matchValue" } as ident, MatchValueReplacerFeedback ctx ident body, MatchValueReplacerFeedback ctx ident value) ->
                     Let(ident, AstUtils.Sequential body, AstUtils.Sequential value) :: rest
-                | TypeCast(MatchValueReplacerFeedback ctx ident exprs, typ) ->
+                | TypeCast(MatchValueReplacerFeedback ctx ident exprs, _typ) ->
                     exprs @ rest
                 | IfThenElse(MatchValueReplacerFeedback ctx ident guardExprs, MatchValueReplacerFeedback ctx ident thenExprs, MatchValueReplacerFeedback ctx ident elseExprs, range) ->
                     IfThenElse(AstUtils.Sequential guardExprs, AstUtils.Sequential thenExprs, AstUtils.Sequential elseExprs, range) :: rest
@@ -114,15 +113,15 @@ module internal rec AST =
                 exprs @ rest
             | expr :: ValueUnroller ctx rest ->
                 match expr with
-                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = ValueUnroller ctx exprs }, typ, range) ->
+                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = ValueUnroller ctx exprs }, _typ, range) ->
                     Value(NewArray(ArrayValues exprs, Any, ArrayKind.MutableArray), range) :: rest
-                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = ValueUnroller ctx exprs }, typ, range) ->
+                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = ValueUnroller ctx exprs }, _typ, _range) ->
                     exprs @ rest
-                | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, ValueUnrollerFeedback ctx exprs, range) ->
+                | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, ValueUnrollerFeedback ctx exprs, _range) ->
                     exprs @ rest
-                | Call(Import({ Selector = Utils.StartsWith "append" }, Any, None), { Args = ValueUnroller ctx exprs }, typ, range) ->
+                | Call(Import({ Selector = Utils.StartsWith "append" }, Any, None), { Args = ValueUnroller ctx exprs }, _typ, _range) ->
                     exprs @ rest
-                | Call(Import({Selector = Utils.StartsWith "singleton"}, Any, None), { Args = value :: ValueUnroller ctx exprs }, typ, range) ->
+                | Call(Import({Selector = Utils.StartsWith "singleton"}, Any, None), { Args = value :: ValueUnroller ctx exprs }, _typ, _range) ->
                     exprs @ (value :: rest)
                 | Call(Import({ Selector = Utils.StartsWith "empty"; Path = Utils.EndsWith "Seq.js" }, Any, None), { Args = []; GenericArgs = typ :: _ }, _, _) ->
                     Value(ValueKind.Null(typ), None) :: rest
@@ -132,7 +131,7 @@ module internal rec AST =
                     match body with
                     | PropertyGetter ctx prop ->
                         PluginContext.addGetter ctx prop
-                        let newIdent = propGetter prop
+                        let newIdent = AstUtils.GetProp(ctx.SelfIdentifier, StringUtils.TrimReservedIdentifiers prop)
                         match value with
                         | MatchValueReplacerFeedback ctx newIdent newValue ->
                             newValue @ rest
@@ -142,7 +141,7 @@ module internal rec AST =
 
                 | Let({ Name = Utils.StartsWith "matchValue" } as ident, ValueUnrollerFeedback ctx body, ValueUnrollerFeedback ctx value) ->
                     Let(ident, AstUtils.Sequential body, AstUtils.Sequential value) :: rest
-                | TypeCast(ValueUnrollerFeedback ctx exprs, typ) ->
+                | TypeCast(ValueUnrollerFeedback ctx exprs, _typ) ->
                     exprs @ rest
                 | IfThenElse(ValueUnrollerFeedback ctx guardExprs, ValueUnrollerFeedback ctx thenExprs, ValueUnrollerFeedback ctx elseExprs, range) ->
                     IfThenElse(AstUtils.Sequential guardExprs, AstUtils.Sequential thenExprs, AstUtils.Sequential elseExprs, range) :: rest
@@ -234,7 +233,7 @@ module internal rec AST =
             | PropertyGetter ctx prop ->
                 PluginContext.addGetter ctx prop
                 AstUtils.GetProp(
-                    "PARTAS_LOCAL",
+                    ctx.SelfIdentifier,
                     StringUtils.TrimReservedIdentifiers prop
                     )
                 |> Some
@@ -296,28 +295,30 @@ module internal rec AST =
                 let fable4 = ctx |> PluginContext.helper |> _.Options |> _.Define |> List.contains "FABLE_COMPILER_4"
                 let fable5 = ctx |> PluginContext.helper |> _.Options |> _.Define |> List.contains "FABLE_COMPILER_5"
                 match extensionName, exprs with
-                | (
-                    "on" | "bool" | "data" | "attr" | "use" | "prop"
-                    ), [ Value(StringConstant prop, _); value ] ->
+                | ("bool" | "data" | "attr"), [ Value(StringConstant prop, _); value ] ->
                     let propName =
                         match extensionName with
-                        | "bool" | "on" | "use" | "prop" -> $"{extensionName}:{prop}"
                         | "data" -> $"data-{prop}"
-                        | "attr" -> prop
+                        | "attr" | "bool" -> prop
                         | _ -> failwith "Unreachable"
                     Some(propName, transform ctx value)
-                | ("ref" | "style'" | "classList"), [ identExpr ] ->
+                | ("ref" | "style'" | "class'"), [ identExpr ] ->
                     Some(extensionName |> StringUtils.TrimReservedIdentifiers, transform ctx identExpr)
                 | "spread", _ when fable4 ->
-                    $"Spread is not supported in fable4"
+                    "Spread is not supported in fable4"
                     |> PluginContext.logError ctx
                     None
                 | "spread", [ IdentExpr(Ident.IdentIs ctx IdentType.Props) | TypeCast(IdentExpr(Ident.IdentIs ctx IdentType.Props), _) ]
                     when fable5 ->
-                    Some("{...PARTAS_OTHERS} bool:n$", Value(ValueKind.BoolConstant(false), None))
+                    let identifier =
+                        if ctx.HasFlag(ComponentFlag.SkipOmit) || ctx.HasFlag(ComponentFlag.SpreadProps)
+                        then ctx.SelfIdentifier
+                        else "PARTAS_OTHERS"
+                        |> sprintf "{...%s} n$"
+                    Some(identifier, Value(ValueKind.BoolConstant(false), None))
                 | "spread", [ (TypeCast(IdentExpr({ Name = ident }), _) | IdentExpr({ Name = ident })) ]
                     when fable5 ->
-                    Some("{..." + ident + "} bool:n$", AstUtils.Value(false))
+                    Some("{..." + ident + "} n$", AstUtils.Value(false))
                 // handles tupled getters `div().spread(someEnumerable[0])`
                 | "spread", [ (
                     TypeCast(
@@ -329,7 +330,7 @@ module internal rec AST =
                             kind = TupleIndex indx
                         )
                     ) ] ->
-                    Some("{..." + ident + "[" + string indx + "]} bool:n$", AstUtils.Value(false))
+                    Some("{..." + ident + "[" + string indx + "]} n$", AstUtils.Value(false))
                 // handles field getters `div().spread(props.otherProps)`
                 | "spread", [ (TypeCast(
                         expr = Get(
@@ -343,7 +344,7 @@ module internal rec AST =
                             kind = FieldGet { Name = identSuffix }
                         )
                     ) ] ->
-                    Some("{..." + ident + "." + identSuffix + "} bool:n$", AstUtils.Value(false))
+                    Some("{..." + ident + "." + identSuffix + "} n$", AstUtils.Value(false))
                 | "spread", [ expr ]
                     when fable4 ->
                     $"Spread does not support this as a value in Fable 4 or below:\n{expr}"
@@ -371,7 +372,7 @@ module internal rec AST =
                                         tagName;
                                         Value(
                                             NewList(Some(
-                                                JsxUtils.Prop("{...PARTAS_POLYPROPS} on:n$", AstUtils.Value(false))
+                                                JsxUtils.Prop("{...PARTAS_POLYPROPS} n$", AstUtils.Value(false))
                                                 , internalCollection
                                             ), Any),
                                             None
@@ -441,8 +442,9 @@ module internal rec AST =
         // Non LibraryImports that require LibraryImport injection via the attribute PartasImportAttribute
         | Call(
             callee = (
-                (Expr.ImportedConstructor ctx & Import(_, t, r)) // Captures constructors from other modules with PartasImportAttribute
-              | (IdentExpr(Ident.IdentIs ctx IdentType.Constructor) & IdentExpr({ Type = t; Range = r })) // Captures constructors defined in the same module with PartasImportAttribute
+                Expr.ImportedConstructor ctx & Import(_, t, r) // Captures constructors from other modules with PartasImportAttribute
+              | IdentExpr(Ident.IdentIs ctx IdentType.Constructor) & IdentExpr({ Type = t; Range = r })
+            // Captures constructors defined in the same module with PartasImportAttribute
             )
             info = {   (* CallInfo *)
                 Args = PropCollector ctx props
@@ -462,8 +464,9 @@ module internal rec AST =
         // Non LibraryImports that require LibraryImport injection via the attribute PartasProxyImportAttribute
         | Call(
             callee = (
-                (Expr.ImportedConstructor ctx & Import(_, t, r)) // Captures constructors from other modules with PartasImportAttribute
-              | (IdentExpr(Ident.IdentIs ctx IdentType.Constructor) & IdentExpr({ Type = t; Range = r })) // Captures constructors defined in the same module with PartasImportAttribute
+                Expr.ImportedConstructor ctx & Import(_, t, r) // Captures constructors from other modules with PartasImportAttribute
+              | IdentExpr(Ident.IdentIs ctx IdentType.Constructor) & IdentExpr({ Type = t; Range = r })
+            // Captures constructors defined in the same module with PartasImportAttribute
             )
             info = {
                 Args = PropCollector ctx props
@@ -483,32 +486,32 @@ module internal rec AST =
             |> Some
         // Local tag
         | Call(
-            (IdentExpr(Ident.IdentIs ctx IdentType.Constructor)),
+            IdentExpr(Ident.IdentIs ctx IdentType.Constructor),
             (CallInfo.Constructor ctx & {
                 Args = PropCollector ctx props
             }),
-            ((Type.PartasName ctx (Utils.EndsWithTrimmed "_$ctor" typeName)) | (Type.PartasName ctx typeName)),
+            (Type.PartasName ctx (Utils.EndsWithTrimmed "_$ctor" typeName) | Type.PartasName ctx typeName),
             range) ->
             ElementBuilder.create (TagSource.AutoImport typeName) props range
             |> Some
         // Native import
         | Call(
-            (Expr.NativeImportedConstructor ctx),
+            Expr.NativeImportedConstructor ctx,
             {
                 Args = PropCollector ctx props
             },
-            (Type.PartasName ctx typeName),
+            Type.PartasName ctx typeName,
             range) ->
             ElementBuilder.create (TagSource.AutoImport typeName) props range
             |> Some
         // Library Imports
         | Call(
-            (Expr.ImportedConstructor ctx & Import({Kind = UserImport false}, _, _) as imp),
+            Expr.ImportedConstructor ctx & Import({Kind = UserImport false}, _, _) as imp,
             {
                 Args = PropCollector ctx props
                 MemberRef  = Some(MemberRef(_, { CompiledName = ".ctor" }))
             },
-            (Type.PartasName ctx typeName),
+            Type.PartasName ctx _typeName,
             range) ->
             ElementBuilder.create (TagSource.LibraryImport imp) props range
             |> Some
@@ -519,7 +522,7 @@ module internal rec AST =
                 Args = PropCollector ctx props
                 MemberRef = Some(MemberRef(_, { CompiledName = ".ctor" }))
             },
-            (Type.PartasName ctx typeName),
+            Type.PartasName ctx typeName,
             range) ->
             let importExpr = Import({identee with Selector = typeName}, t, r)
             ElementBuilder.create (TagSource.LibraryImport importExpr) props range
@@ -533,7 +536,7 @@ module internal rec AST =
             { tagInfo with Properties = bodyProps @ tagInfo.Properties }
             |> Some
         // WITH PROPS & EXTENSION
-        | Call(Import({ Kind = MemberImport(MemberRef({ FullName = Utils.EndsWith "HtmlElementExtensions" | Utils.EndsWith "PolymorphicExtensions" }, _)) }, _, _) as callee, ({
+        | Call(Import({ Kind = MemberImport(MemberRef({ FullName = Utils.EndsWith "HtmlElementExtensions" | Utils.EndsWith "PolymorphicExtensions" }, _)) }, _, _) as _callee, ({
                 Args = TagConstructor ctx tagInfo :: rest
             } as callInfo), _, _) ->
             // We compile all the information of the extension call into the callinfo and make the rest almost impossible to mistake
@@ -660,7 +663,7 @@ module internal rec AST =
             | TypeCast(Value(StringConstant _, _) as text, Unit) ->
                  text :: restBuilds
             // Ensure typecasts are transformed
-            | TypeCast(BuilderCollectorFeedback ctx expr, typ) ->
+            | TypeCast(BuilderCollectorFeedback ctx expr, _typ) ->
                 expr @ restBuilds
             // Ensure conditionals are transformed
             | IfThenElse(
@@ -710,7 +713,7 @@ module internal rec AST =
             | IdentExpr(Ident.IdentIs ctx IdentType.Other) ->
                 expr :: restBuilds
             // This is one of our builder identifiers; no reason it should be rendered.
-            | IdentExpr(_)
+            | IdentExpr _
             | Value(UnitConstant, None) -> restBuilds // You have been judged unworthy
             // Trust the F# compiler to not allow invalid elements within the builder.
             | _ ->
@@ -855,14 +858,14 @@ module internal rec AST =
         // Transform nested values
         | Value(
                 (
-                 NewAnonymousRecord(_)
+                 NewAnonymousRecord _
                 | NewArray _
                 | NewList(headAndTail = Some _)
-                | NewRecord(_)
-                | StringTemplate(_)
+                | NewRecord _
+                | StringTemplate _
                 | NewOption(value = Some _)
-                | NewTuple(_)
-                | NewUnion(_)
+                | NewTuple _
+                | NewUnion _
                 ) as valueKind,
                 range
             ) ->
@@ -905,7 +908,7 @@ module internal rec AST =
                 range
             )
         // Capture and include index access
-        | Get(expr, ExprGet(getExpr) & ExprGet(Call(_)), typ, range) ->
+        | Get(expr, ExprGet(getExpr) & ExprGet(Call _), _typ, _range) ->
             match transform ctx getExpr with
             | Value(UnitConstant, None) | Value(Null(Any), None) -> transform ctx expr
             | getExpr ->
@@ -930,7 +933,7 @@ module internal rec AST =
             |> fun exprMembers ->
                 ObjectExpr(exprMembers, typ, exprOption |> Option.map (transform ctx))
         // No further first pass transformations applicable
-        | _ as expr -> expr
+        | expr -> expr
 
     /// Plugin support for extending Polymorphic attributes
     module Polymorphism =
@@ -992,8 +995,8 @@ module internal rec AST =
                 // prevent import of native tags
                 | Expr.NativeImportedConstructor ctx
                     & Import(
-                        typ = typ & Type.PartasName ctx typeName
-                        range = range
+                        typ = Type.PartasName ctx typeName
+                        range = _
                     ) ->
                     AstUtils.IdentExpr(typeName)
                     |> Some
@@ -1040,7 +1043,7 @@ module internal rec AST =
                     | Some(PropsGetterOrSetter ctx expr) ->
                         { eleBuilder with TagSource = TagSource.LibraryImport expr }
                     | _ -> eleBuilder
-                |> renderElement ctx |> Some
+                |> Baked.renderElement ctx |> Some
             // a call to render a tagvalue with an anon record
             // todo - support key,value pair list
             | Call(
@@ -1055,7 +1058,7 @@ module internal rec AST =
                     match thisArg with
                     | Some(PropsGetterOrSetter ctx expr) ->
                         expr
-                    | Some(IdentExpr(_) as ident) ->
+                    | Some(IdentExpr _ as ident) ->
                         ident
                     | Some expr -> expr
                     | _ ->
@@ -1064,7 +1067,7 @@ module internal rec AST =
                   Properties = props
                   Children = []
                   Range = range }
-                |> renderElement ctx
+                |> Baked.renderElement ctx
                 |> Some
             | _ -> None
 
@@ -1084,17 +1087,18 @@ type SolidTypeComponentAttribute(flag: int) =
         if ctx.HasFlag ComponentFlag.DebugMode then debug memberDecl
         match memberDecl with
         // Check that the memberDecl has the correct self identifier of `props`
-        | SchemaRules.ValidMemberRef ctx finalName ->
+        | SchemaRules.ValidMemberRef ctx info ->
+            PluginContext.setSelfIdentifier ctx info.SelfIdentifier
             let newExpr =
                 memberDecl.Body
                 |> AST.transform ctx // initiate transformation
                 // Create and append the splitProps expression
-                |> Baked.convertGettersToObject (PluginContext.getGetters ctx |> List.distinct)
+                |> if ctx.HasFlag(ComponentFlag.SkipOmit) then id else Baked.convertGettersToObject ctx.SelfIdentifier (PluginContext.getGetters ctx |> List.distinct)
                 // Create and append the mergeProps expression if we have any setters
-                |> Baked.convertSettersToObject (PluginContext.getSetters ctx)
-            { memberDecl with Body = newExpr; Name = finalName }
+                |> Baked.convertSettersToObject ctx.SelfIdentifier (PluginContext.getSetters ctx)
+            { memberDecl with Body = newExpr; Name = info.DisplayName }
         | _ ->
-            $"Unsupported definitions under this attribute are not recommended. Please use `[<SolidComponent>]` instead"
+            "Unsupported definitions under this attribute are not recommended. Please use `[<SolidComponent>]` instead"
             |> PluginContext.logWarning ctx
             {
                 memberDecl with
