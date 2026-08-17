@@ -23,7 +23,7 @@ let Compponent (show: bool) =
 
         "I show always!"
 
-        For (
+        For.Component (
             each =
                 !![ 1
                     2

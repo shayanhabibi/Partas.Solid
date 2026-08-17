@@ -22,4 +22,4 @@ type TagWithProps() =
     interface RegularNode
 
     [<SolidTypeComponent>]
-    member props.typeDef = div (class' = "SomeClass", draggable = "drag")
+    member this.typeDef = div (class' = "SomeClass", draggable = "true")

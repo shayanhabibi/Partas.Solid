@@ -1,7 +1,7 @@
 ﻿
 import { omit, merge } from "solid-js";
 import { FakeImportedTag } from "fakeLibrary";
-import { ModuleTag } from "./A-TagsAsValuesSimpleTypes.fs.jsx";
+import { ModuleTag } from "./A-SolidComponentAsTagValuesTypes.fs.jsx";
 
 export function CustomTag(props) {
     props = merge({

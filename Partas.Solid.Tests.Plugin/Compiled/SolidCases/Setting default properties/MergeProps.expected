@@ -1,0 +1,85 @@
+
+import { merge } from "solid-js";
+
+export function SimpleMerge(props) {
+    props = merge({
+        class: "DefaultClass",
+    }, props);
+    const PARTAS_OTHERS = props;
+    return <div />;
+}
+
+export function MultipleMerges(props) {
+    props = merge({
+        class: "DefaultClass",
+        draggable: "stub",
+        dir: "ltr",
+    }, props);
+    const PARTAS_OTHERS = props;
+    return <div />;
+}
+
+export function ComplexPropMerge(props) {
+    props = merge({
+        onKeyPress: (_arg) => {
+            console.log("Key pressed");
+        },
+    }, props);
+    const PARTAS_OTHERS = props;
+    return <div />;
+}
+
+export function SimpleNestedMerge(props) {
+    props = merge({
+        class: "defaultClass",
+    }, props);
+    const PARTAS_OTHERS = props;
+    return <div>
+        <button />
+    </div>;
+}
+
+export function NestedMerge(props) {
+    props = merge({
+        draggable: "stub",
+        class: "DefaultClass",
+        dir: "ltr",
+    }, props);
+    const PARTAS_OTHERS = props;
+    return <div>
+        <div />
+        <button />
+    </div>;
+}
+
+export function NestedMergeWithChildren(props) {
+    props = merge({
+        draggable: "stub",
+        class: "DefaultClass",
+        dir: "ltr",
+    }, props);
+    const PARTAS_OTHERS = props;
+    return <div>
+        <div />
+        <button>
+            Button
+        </button>
+    </div>;
+}
+
+export function ValMutableMerge(this$) {
+    this$ = merge({
+        index: 5,
+    }, this$);
+    const PARTAS_OTHERS = this$;
+    return <div />;
+}
+
+export function ValMutableMergeInherited(props) {
+    props = merge({
+        index: 5,
+    }, props);
+    const PARTAS_OTHERS = props;
+    return <div />;
+}
+

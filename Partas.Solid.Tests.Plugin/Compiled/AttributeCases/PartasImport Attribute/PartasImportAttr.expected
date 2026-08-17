@@ -1,0 +1,10 @@
+﻿
+import { Route, Router } from "@solidjs/router";
+
+export function PartasImportAttr(props) {
+    const PARTAS_OTHERS = props;
+    return <Router>
+        <Route />
+    </Router>;
+}
+
