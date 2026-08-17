@@ -95,7 +95,7 @@ module Builder =
         member this.render() : RegularNode = jsNative
 
         static member inline (%)(left: TagValue, right: obj) =
-            left.render (right)
+            left.render right
 
     /// <summary>
     /// Explicit plugin declaration that the identifier that this

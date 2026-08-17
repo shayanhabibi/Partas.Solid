@@ -36,23 +36,9 @@ module Tags =
     /// Set of html extensions that keep original type
     [<Erase>]
     type HtmlElementExtensions =
-
         /// Add an attribute to the element
         [<Extension; Erase>]
         static member attr(this: #HtmlTag, name: string, value: obj) = this
-
-        /// Forces the prop to be treated as a property instead of an attribute.
-        [<Extension; Erase>]
-        static member prop(this: #HtmlTag, name: string, value: obj) = this
-
-        /// Add event handler to the element through the corresponding attribute
-        [<Extension; Erase>]
-        static member on(this: #HtmlTag, eventName: string, eventHandler: Event -> unit) = this
-
-        /// Add event handler to the element with the v1.9 syntax that is an intersection
-        /// of EventListenerObject and AddEventListenerOptions
-        [<Extension; Erase>]
-        static member on(this: #HtmlTag, eventName: string, eventHandler: OnHandler) = this
 
         /// Add data attribute to the element
         [<Extension; Erase>]
@@ -79,7 +65,7 @@ module Tags =
 
         /// Usage `elem.classList(createObj ["active", true; "disabled", state.disabled ])`
         [<Extension; Erase>]
-        static member classList(this: #HtmlTag, classListObj: obj) = this
+        static member class'(this: #HtmlTag, classListObj: obj) = this
 
         /// Adds or removes attribute without value
         [<Extension; Erase>]
@@ -87,11 +73,7 @@ module Tags =
 
         /// Spreads the passed identifier within the Tag
         [<Extension; Erase>]
-        static member spread(this: #HtmlTag, value: obj) = this
-
-        /// Directive usage
-        [<Extension; Erase>]
-        static member use'(this: #HtmlTag, name: string, value: obj) = this
+        static member spread(this: #HtmlElement, value: obj) = this
 
     [<Erase>]
     type a() =

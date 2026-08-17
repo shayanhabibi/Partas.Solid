@@ -1,15 +1,21 @@
 namespace Partas.Solid
 
 open System.Runtime.CompilerServices
-open Browser.Types
 open Fable.Core
 open System
+open Fable.Core.JsInterop
 
 #nowarn 49
+#nowarn 1182
 
-type ComparisonFunc<'T> = delegate of prev: 'T * next: 'T -> bool
-/// Alias for a unit call signature which disposes of resources when run.
+/// <summary>A function that compares two values for equality. Failing this, reactive effects downstream are pushed with the next value.</summary>
+/// <param name="prev">Previous value</param>
+/// <param name="next">Next value</param>
+type EqualityFunc<'T> = delegate of prev: 'T * next: 'T -> bool
+/// <summary>Alias for a unit call signature which disposes of resources when run.</summary>
 type DisposalFunc = unit -> unit
+/// <summary>Alias for a unit call signature which resets some state run.</summary>
+type ResetFunc = unit -> unit
 
 [<AutoOpen>]
 module Bindings =
@@ -30,6 +36,37 @@ module Bindings =
     type Accessor<'T> = unit -> 'T
     type Signal<'T> = Accessor<'T> * Setter<'T>
 
+    [<Erase>]
+    type Store<'T> = private Store of 'T with
+        [<Emit "$0">]
+        member inline this.Value = unbox<'T> this
+        static member inline op_Implicit(store: Store<'T>): 'T = store.Value
+
+    [<Erase>]
+    type StoreSetter<'T> = 'T -> 'T
+    type StoreReturn<'T> = Store<'T> * StoreSetter<'T>
+
+    [<Erase>]
+    type Refreshable<'T> = private Refreshable of 'T with
+        [<Emit "$0">]
+        member inline this.Value = unbox<'T> this
+        static member inline op_Implicit(refreshable: Refreshable<'T>): 'T = refreshable.Value
+        static member inline op_Implicit(refreshable: Refreshable<Store<'T>>): 'T = refreshable.Value.Value
+
+    [<Erase>]
+    type RefreshableStore<'T> = private RefreshableStore of 'T with
+        [<Emit "$0">]
+        member inline this.Value = unbox<'T> this
+        [<Emit "$0">]
+        member inline this.AsStore: Store<'T> = unbox this
+        [<Emit "$0">]
+        member inline this.AsRefreshable: Refreshable<'T> = unbox this
+        static member inline op_Implicit(refreshable: RefreshableStore<'T>): Store<'T> = refreshable.AsStore
+        static member inline op_Implicit(refreshable: RefreshableStore<'T>): 'T = refreshable.Value
+        static member inline op_Implicit(refreshable: RefreshableStore<'T>): Refreshable<'T> = refreshable.AsRefreshable
+
+    type RefreshableStoreReturn<'T> = RefreshableStore<'T> * StoreSetter<'T>
+
     type ContextProvider =
         inherit HtmlContainer
 
@@ -39,200 +76,143 @@ module Bindings =
     /// The plugin transpiles the identifier with a <c>.Provider</c> suffix in the tag as per the SolidJS documentation.
     /// </summary>
     type Context<'T> = 'T -> ContextProvider
+    type ContextNotFoundError() = inherit exn()
 
-
-
-    [<PartasImport("Dynamic", "solid-js/web")>]
-    type Dynamic<'T>() =
-        interface HtmlElement
-
-        [<DefaultValue; Erase>]
-        val mutable component': TagValue
-
-        [<Erase>]
-        member this.componentAsString
-            with inline set (value: string) = this.component' <- unbox value
-            and inline get () = unbox<string> this.component'
-
-        [<Obsolete(message = "Not implemented yet", error = true)>]
-        [<CustomOperation "dynamicAttr">]
-        member inline _.DynamicAttrOp([<InlineIfLambda>] PARTAS_FIRST, PARTAS_DYN_MAP: 'T -> 'U, PARTAS_DYN_VAL: 'U) : HtmlContainerFun =
-            ignore PARTAS_DYN_MAP
-            ignore PARTAS_DYN_VAL
-            PARTAS_FIRST
-
-        [<Erase>]
-        member inline _.Zero() : HtmlContainerFun = ignore
-
-        [<Erase>]
-        member inline _.Yield(PARTAS_CONT: unit) : HtmlContainerFun = ignore
-
-        [<Erase>]
-        member inline _.Yield(PARTAS_ELEMENT: #HtmlElement) : HtmlContainerFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
-
-        [<Erase>]
-        member inline _.Yield(PARTAS_TEXT: string) : HtmlContainerFun =
-            fun PARTAS_CONT -> ignore PARTAS_TEXT
-
-        [<Erase>]
-        member inline _.Yield(PARTAS_VALUE: int) : HtmlContainerFun =
-            fun PARTAS_CONT -> ignore PARTAS_VALUE
-
-        [<Erase>]
-        member inline _.Yield(PARTAS_VALUE: float) : HtmlContainerFun =
-            fun PARTAS_CONT -> ignore PARTAS_VALUE
-
-        [<Erase>]
-        member inline _.Combine
-            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
-            : HtmlContainerFun =
-            fun PARTAS_BUILDER ->
-                PARTAS_FIRST PARTAS_BUILDER
-                PARTAS_SECOND PARTAS_BUILDER
-
-        [<Erase>]
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) =
-            PARTAS_DELAY ()
-
-        [<Erase>]
-        member inline _.For
-            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: unit -> HtmlContainerFun)
-            : HtmlContainerFun =
-            fun PARTAS_BUILDER ->
-                PARTAS_FIRST PARTAS_BUILDER
-                PARTAS_SECOND () PARTAS_BUILDER
 
     module ErrorBoundary =
-        type Fallback = delegate of err: obj * reset: (unit -> unit) -> HtmlElement
+        type Fallback = delegate of err: Accessor<obj> * reset: (unit -> unit) -> HtmlElement
 
-    [<Import("ErrorBoundary", "solid-js")>]
+    [<Import("Errored", "solid-js")>]
     [<Erase>]
-    type ErrorBoundary() =
+    type Errored() =
         interface HtmlContainer
 
         [<Erase; DefaultValue>]
-        val mutable fallback: ErrorBoundary.Fallback
+        val mutable fallback: U2<HtmlElement, ErrorBoundary.Fallback>
 
         [<Erase>]
-        member inline this.plainFallback
-            with inline set (value: HtmlElement) = this.fallback <- unbox value
+        member inline this.fallbackEle
+            with inline set (value: HtmlElement) = this.fallback <- !^value
+        [<Erase>]
+        member inline this.fallbackFn
+            with inline set (value: ErrorBoundary.Fallback) = this.fallback <- !^value
+    module For =
+        [<Import("For", "solid-js")>]
+        [<Erase>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        type ForComponent() =
+            interface HtmlElement
 
-    [<Import("For", "solid-js")>]
+            [<Erase; DefaultValue>]
+            val mutable keyed: U2<bool, obj -> objnull>
+
+            [<Erase; DefaultValue>]
+            val mutable each: obj[]
+
+            /// Fallback element to render while the list is loading.
+            [<DefaultValue; Erase>]
+            val mutable fallback: HtmlElement
+
+        [<Erase; CompiledName("KeyedFor")>]
+        type Keyed<'T>() =
+            interface HtmlElement
+            interface ChildLambdaProvider2<'T, Accessor<int>>
+            [<Erase; DefaultValue>]
+            val mutable each: 'T[]
+            /// Fallback element to render while the list is loading.
+            [<DefaultValue; Erase>]
+            val mutable fallback: HtmlElement
+            [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps)>]
+            member props.comp = ForComponent(keyed = !^true).spread(props)
+
+        type Component<'T> = Keyed<'T>
+
+        [<Erase; CompiledName("NonKeyedFor")>]
+        type NonKeyed<'T>() =
+            interface HtmlElement
+            interface ChildLambdaProvider2<Accessor<'T>, int>
+            [<Erase; DefaultValue>]
+            val mutable each: 'T[]
+            /// Fallback element to render while the list is loading.
+            [<DefaultValue; Erase>]
+            val mutable fallback: HtmlElement
+            [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps)>]
+            member props.comp = ForComponent(keyed = !^false).spread(props)
+
+        [<Erase; CompiledName("KeyedFnFor")>]
+        type KeyedFn<'T>() =
+            interface HtmlElement
+            interface ChildLambdaProvider2<Accessor<'T>, Accessor<int>>
+            [<Erase; DefaultValue>]
+            val mutable keyed: 'T -> obj
+            [<Erase; DefaultValue>]
+            val mutable each: 'T[]
+            /// Fallback element to render while the list is loading.
+            [<DefaultValue; Erase>]
+            val mutable fallback: HtmlElement
+            [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps)>]
+            member props.comp = ForComponent().spread(props)
+
+    [<Import("Loading", "solid-js")>]
     [<Erase>]
-    type For<'T>() =
-        interface HtmlElement
-        interface ChildLambdaProvider2<'T, Accessor<int>>
-
-        [<Erase; DefaultValue>]
-        val mutable each: 'T[]
-
-        /// Fallback element to render while the list is loading.
-        [<DefaultValue; Erase>]
-        val mutable fallback: HtmlElement
-
-    [<Import("Index", "solid-js")>]
-    [<Erase>]
-    type Index<'T>() =
-        interface HtmlElement
-        interface ChildLambdaProvider2<Accessor<'T>, int>
-
-        [<Erase; DefaultValue>]
-        val mutable each: 'T[]
-
-        [<Erase; DefaultValue>]
-        val mutable fallback: HtmlElement
-
-    [<Import("NoHydration", "solid-js/web")>]
-    type NoHydration() =
-        interface FragmentNode
-
-    [<Import("Portal", "solid-js/web")>]
-    [<Erase>]
-    type Portal() =
+    type Loading() =
         interface HtmlContainer
-
-        [<DefaultValue; Erase>]
-        val mutable mount: Element
-
-        [<DefaultValue; Erase>]
-        val mutable useShadow: bool
-
-        [<DefaultValue; Erase>]
-        val mutable isSVG: bool
-
-
-    [<Import("Show", "solid-js")>]
-    type Show() =
-        interface HtmlContainer
-
-        [<Erase; DefaultValue>]
-        val mutable when': bool
-
         [<Erase; DefaultValue>]
         val mutable fallback: HtmlElement
-
         [<Erase; DefaultValue>]
-        val mutable keyed: bool
+        val mutable on: objnull
 
-    [<Import("Show", "solid-js")>]
+    [<Import("Repeat", "solid-js")>]
     [<Erase>]
-    type Show<'T>() =
+    type Repeat<'T when 'T :> HtmlElement>() =
         interface HtmlElement
-        interface ChildLambdaProvider<'T>
-
-        [<Erase; DefaultValue>]
-        val mutable when': 'T
-
-        [<Erase; DefaultValue>]
-        val mutable fallback: HtmlElement
-
-        [<Erase; DefaultValue>]
-        val mutable keyed: bool
-
-    [<Import("Suspense", "solid-js")>]
-    [<Erase>]
-    type Suspense() =
         interface HtmlContainer
+        interface ChildLambdaProviderStrict<int, 'T>
+        [<Erase; DefaultValue>] val mutable count: int
+        [<Erase; DefaultValue>] val mutable from: int
+        [<Erase; DefaultValue>] val mutable fallback: HtmlElement
 
-        [<Erase; DefaultValue>]
-        val mutable fallback: HtmlElement
-
-    module SuspenseList =
+    module Reveal =
         [<StringEnum; RequireQualifiedAccess>]
-        type RevealOrder =
-            /// <summary>
-            /// Reveals each item in the list once the previous item has finished
-            /// rendering. This is the default
-            /// </summary>
-            | Forwards
-            /// <summary>
-            /// Reveals each item once the next item has finished rendering
-            /// </summary>
-            | Backwards
-            /// <summary>
-            /// Reveals all items in the list at the same time
-            /// </summary>
+        type Order =
+            | Sequential
             | Together
+            | Natural
 
-        [<StringEnum; RequireQualifiedAccess>]
-        type Tail =
-            | Collapsed
-            | Hidden
-
-    [<Import("SuspenseList", "solid-js")>]
-    [<Erase>]
-    type SuspenseList() =
+    [<Import("Reveal", "solid-js")>]
+    type Reveal() =
         interface HtmlContainer
+        [<Erase; DefaultValue>] val mutable order: Reveal.Order
+        [<Erase; DefaultValue>] val mutable collapsed: bool
 
-        [<Erase; DefaultValue>]
-        val mutable revealOrder: SuspenseList.RevealOrder
+    module Show =
+        [<Import("Show", "solid-js")>]
+        type Base() =
+            interface HtmlContainer
 
-        [<Erase; DefaultValue>]
-        val mutable tail: SuspenseList.Tail
+            [<Erase; DefaultValue>]
+            val mutable when': bool
 
-        [<Erase; DefaultValue>]
-        val mutable fallback: HtmlElement
+            [<Erase; DefaultValue>]
+            val mutable fallback: HtmlElement
+
+            [<Erase; DefaultValue>]
+            val mutable keyed: bool
+
+        [<Import("Show", "solid-js")>]
+        [<Erase>]
+        type Base<'T, 'A>() =
+            interface HtmlElement
+            interface ChildLambdaProvider<'A>
+
+            [<Erase; DefaultValue>]
+            val mutable when': 'T
+
+            [<Erase; DefaultValue>]
+            val mutable fallback: HtmlElement
+
+            [<Erase; DefaultValue>]
+            val mutable keyed: bool
 
     [<Import("Match", "solid-js")>]
     [<Erase>]
@@ -276,11 +256,6 @@ module Bindings =
             PARTAS_RUNEXPR Unchecked.defaultof<_>
             PARTAS_THIS
 
-        [<Extension; Erase>]
-        static member Run(PARTAS_THIS: Dynamic<'T>, PARTAS_RUNEXPR: HtmlContainerFun) =
-            PARTAS_RUNEXPR Unchecked.defaultof<_>
-            PARTAS_THIS
-
         /// <summary>
         /// Replace a signals value. This is synonymous with using the Setters as normal.
         /// </summary>
@@ -288,7 +263,8 @@ module Bindings =
         /// <param name="value">The next value</param>
         [<Extension; Erase>]
         static member inline Invoke(setter: Setter<'T>, value: 'T) : unit =
-            setter (value)
+            setter value
+
         // In the case of calling Invoke on a setter, we want the alternate behaviour to be suggested first.
         /// <summary>
         /// Modify a signal value by performing computation on its previous value
@@ -307,7 +283,7 @@ module Bindings =
         /// <returns>The new value</returns>
         [<Extension; Erase>]
         static member inline InvokeAndGet(setter: Setter<'T>, value: 'T) : 'T =
-            setter (value)
+            setter value
             |> unbox<'T>
 
         /// <summary>
@@ -320,463 +296,498 @@ module Bindings =
         static member inline InvokeAndGet(setter: Setter<'T>, handler: 'T -> 'T) : 'T =
             setter (unbox<'T> handler)
             |> unbox<'T>
+    type LazyComponent<'T when 'T :> HtmlElement> =
+        inherit HtmlElement
+        abstract preload: unit -> JS.Promise<'T>
+        abstract moduleUrl: string option
 
-    [<Interface; AllowNullLiteral>]
-    type ResourceFetcherInfo<'T> =
-        /// Previous value
-        abstract value: 'T
-        /// <summary>
-        /// Is true when the <c>fetcher</c> was triggered using the refetch function.
-        /// </summary>
-        /// <remarks>
-        /// If <c>refetch</c> is called with an argument, that argument is supplied instead.
-        /// You can use the <c>_.refetchingWith</c> helper which takes a type argument and returns
-        /// an erased union of the type and bool.
-        /// </remarks>
-        abstract refetching: bool
+    type LazyComponent<'T when 'T :> HtmlElement> with
+        static member inline op_Implicit(lazyComponent: LazyComponent<'T>): 'T = unbox lazyComponent
+        member inline this.Value: 'T = unbox this
+
+    [<Import("Hydration", "solid-js")>]
+    [<Erase>]
+    type Hydration() =
+        interface HtmlContainer
+        [<Erase; DefaultValue>]
+        val mutable id: string
+
+    [<Import("NoHydration", "solid-js")>]
+    [<Erase>]
+    type NoHydration() =
+        interface HtmlContainer
+
+[<JS.Pojo; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+type EffectOptions(
+    ?defer: bool,
+    ?schedule: bool,
+    ?sync: bool,
+    ?transparent: bool
+    ) =
+    [<Erase>] member val defer = defer with get,set
+    [<Erase>] member val schedule = schedule with get,set
+    [<Erase>] member val sync = sync with get,set
+    [<Erase>] member val transparent = transparent with get,set
+
+[<JS.Pojo; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+type MemoOptions<'T>(
+    ?id: string,
+    ?name: string,
+    ?transparent: bool,
+    ?equals: EqualityFunc<'T>,
+    ?unobserved: unit -> unit,
+    ?``lazy``: bool,
+    ?sync: bool,
+    ?loadingValue: 'T
+    ) =
+    [<Erase>] member val id = id with get,set
+    [<Erase>] member val name = name with get,set
+    [<Erase>] member val transparent = transparent with get,set
+    [<Erase>] member val equals = equals with get,set
+    [<Erase>] member val unobserved = unobserved with get,set
+    [<Erase>] member val ``lazy`` = ``lazy`` with get,set
+    [<Erase>] member val sync = sync with get,set
+    [<Erase>] member val loadingValue = loadingValue with get,set
+
+[<JS.Pojo; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+type SignalOptions<'T>(
+    ?name: string,
+    ?equals: EqualityFunc<'T>,
+    ?ownedWrite: bool,
+    ?unobserved: unit -> unit
+    ) =
+    [<Erase>] member val name = name with get,set
+    [<Erase>] member val equals = equals with get,set
+    [<Erase>] member val ownedWrite = ownedWrite with get,set
+    [<Erase>] member val unobserved = unobserved with get,set
+
+[<JS.Pojo; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+type MixedSignalMemoOptions<'T>(
+    ?id: string,
+    ?name: string,
+    ?transparent: bool,
+    ?equals: EqualityFunc<'T>,
+    ?unobserved: unit -> unit,
+    ?``lazy``: bool,
+    ?sync: bool,
+    ?loadingValue: 'T,
+    ?ownedWrite: bool
+    ) =
+    [<Erase>] member val id = id with get,set
+    [<Erase>] member val name = name with get,set
+    [<Erase>] member val transparent = transparent with get,set
+    [<Erase>] member val equals = equals with get,set
+    [<Erase>] member val unobserved = unobserved with get,set
+    [<Erase>] member val ``lazy`` = ``lazy`` with get,set
+    [<Erase>] member val sync = sync with get,set
+    [<Erase>] member val loadingValue = loadingValue with get,set
+    [<Erase>] member val ownedWrite = ownedWrite with get,set
 
 
-    /// <summary>
-    /// Arguments that are available to consume within the handler. The first is the source signal
-    /// if any was provided (else null), and the second is an object with two properties, the previous
-    /// value via <c>_.value</c>, and whether the fetcher was initiated by a <c>refetch</c> via <c>_.refetching</c>.
-    /// </summary>
-    type ResourceFetcher<'U, 'T> = 'U -> ResourceFetcherInfo<'T> -> JS.Promise<'T>
+[<JS.Pojo; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+type StoreOptions(?name: string) =
+    [<Erase>] member val name = name with get,set
 
-    [<RequireQualifiedAccess; StringEnum>]
-    type SolidResourceState =
-        /// Hasn't started loading, no value yet
-        | Unresolved
-        /// It's loading, no value yet
-        | Pending
-        /// Finished loading, has value
-        | Ready
-        /// It's re-loading, `latest` has value
-        | Refreshing
-        /// Finished loading with an error, no value
-        | Errored
+[<JS.Pojo; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+type ProjectionOptions<'T>(
+    ?name: string,
+    ?key: U3<string, 'T -> obj, unit>,
+    ?shallow: bool,
+    ?seedLoadingValue: bool
+    ) =
+    [<Erase>] member val name = name with get,set
+    [<Erase>] member val key = key with get,set
+    [<Erase>] member val shallow = shallow with get,set
+    [<Erase>] member val seedLoadingValue = seedLoadingValue with get,set
 
-    type SolidResource<'T> =
-        /// Attention, will be undefined while loading
-        [<Emit("$0()")>]
-        abstract current: 'T
+type ChildrenReturn<'T when 'T :> HtmlElement> =
+    [<Emit("$0()")>]
+    abstract Invoke: unit -> 'T when 'T :> HtmlElement
+    [<Emit("$0.toArray()")>]
+    abstract toArray: unit -> 'T[] when 'T :> HtmlElement
 
-        abstract state: SolidResourceState
-        abstract loading: bool
-        abstract error: exn option
-        /// Unlike `current`, it keeps the latest value while re-loading
-        /// Attention, will be undefined until first value has been loaded
-        abstract latest: 'T
+type Owner =
+    abstract member owner: Owner option
+    abstract member context: obj option
+    abstract member owned: Owner[] option
+    abstract member cleanups: (unit -> unit)[] option
 
-    type SolidResourceManager<'T> =
-        abstract mutate: 'T -> 'T
-        abstract refetch: unit -> JS.Promise<'T>
+type ExternalSource =
+    abstract track: (obj -> obj) with get,set
+    abstract dispose: (unit -> unit) with get,set
 
-    [<Erase; AutoOpen; Extension>]
-    type ResourceExtensions =
-        /// <summary>
-        /// Alias for the second property of the second argument provided in a resource fetching function
-        /// to be provided as an erased union of a provided type and bool instead of just bool.
-        /// </summary>
-        [<Extension; Erase>]
-        static member inline refetchingWith<'T>(this: ResourceFetcherInfo<_>) : U2<'T, bool> =
-            unbox<U2<'T, bool>> this.refetching
+type ExternalSourceFactory = delegate of fn: (obj -> obj) * trigger: (unit -> unit) -> ExternalSource
 
-        [<Extension; Erase>]
-        static member inline refetchingWith<'T, 'U>(this: ResourceFetcherInfo<'U>) : U2<'T, bool> =
-            unbox<U2<'T, bool>> this.refetching
+type ExternalSourceConfig =
+    abstract factory: ExternalSourceFactory with get,set
+    abstract untrack: ((unit -> obj) -> obj) with get,set
 
-        [<Emit("$0.refetch($1)")>]
-        [<Extension; Erase>]
-        static member inline refetchWith<'U>(this: SolidResourceManager<obj>, input: 'U) : JS.Promise<obj> = jsNative
+module Dev =
+    type OnStoreNodeUpdateDelegate = delegate of state: obj * property: string * value: obj * prev: obj -> unit
 
-        [<Emit("$0.refetch($1)")>]
-        [<Extension; Erase>]
-        static member inline refetchWith<'U, 'T>(this: SolidResourceManager<'T>, input: 'U) : JS.Promise<'T> = jsNative
+    [<JS.Pojo>]
+    type DevHooks(
+        ?onOwner: Owner -> unit,
+        ?onGraph: objnull * Owner option -> unit,
+        ?onUpdate: unit -> unit,
+        ?onStoreNodeUpdate: OnStoreNodeUpdateDelegate
+        ) =
+        [<Erase>] member val onOwner = onOwner with get,set
+        [<Erase>] member val onGraph = onGraph with get,set
+        [<Erase>] member val onUpdate = onUpdate with get,set
+        [<Erase>] member val onStoreNodeUpdate = onStoreNodeUpdate with get,set
 
-    type SolidStoreSetter<'T> =
-        /// Replace old store value with new
-        [<Emit("$0($1)")>]
-        abstract Update: newValue: 'T -> unit
+    [<StringEnum(CaseRules.SnakeCaseAllCaps); RequireQualifiedAccess>]
+    type DiagnosticCode =
+        | StrictReadUntracked
+        | PendingAsyncUntrackedRead
+        | PendingAsyncForbiddenScope
+        | ReactiveWriteInOwnedScope
+        | ActionCalledInOwnedScope
+        | RunWithDisposedOwner
+        | NoOwnerCleanup
+        | CleanupInForbiddenScope
+        | SettledCleanupUnowned
+        | PrimitiveInForbiddenScope
+        | NoOwnerEffect
+        | NoOwnerBoundary
+        | AsyncOutsideLoadingBoundary
+        | InvalidRefreshTarget
+        | InvalidAffectsTarget
+        | MissingEffectFn
+        | SyncNodeReceivedAsync
+        | ReactivityHalted
+        | InvariantViolation
+    [<StringEnum(CaseRules.KebabCase); RequireQualifiedAccess>]
+    type DiagnosticKind =
+        | StrictRead
+        | Async
+        | Write
+        | Lifecycle
+        | Owner
+        | Error
 
-        /// Update store specifying updater function from old value to new value
-        [<Emit("$0($1)")>]
-        abstract Update: updater: ('T -> 'T) -> unit
+    [<StringEnum>]
+    type DiagnosticSeverity =
+        | Warn
+        | Error
 
-        /// Update store using native solid path syntax
-        [<Emit("$0(...$1)")>]
-        abstract UpdatePath: pathArgs: obj[] -> unit
+    type DiagnosticEvent =
+        abstract sequence: int
+        abstract code: DiagnosticCode
+        abstract kind: DiagnosticKind
+        abstract severity: DiagnosticSeverity
+        abstract message: string
+        abstract ownerId: string option
+        abstract ownerName: string option
+        abstract nodeName: string option
+        abstract data: Map<string, obj> option
 
-    type SolidStorePath<'T, 'Value>(setter: SolidStoreSetter<'T>, path: obj[]) =
-        member _.Setter = setter
-        member _.Path = path
+    type DiagnosticCapture =
+        abstract events: DiagnosticEvent[]
+        abstract clear: unit -> unit
+        abstract stop: unit -> DiagnosticEvent[]
 
-        /// Choose the store item that should be updated
-        member inline this.Map(map: 'Value -> 'Value2) =
-            SolidStorePath<'T, 'Value2> (
-                this.Setter,
-                Experimental.namesofLambda map
-                |> Array.map box
-                |> Array.append this.Path
-            )
-
-        /// Update store item using new value
-        member this.Update(value: 'Value) : unit =
-            this.Setter.UpdatePath (Array.append this.Path [| value |])
-
-        /// Update store item specifying updater function from old value to new value
-        member this.Update(updater: 'Value -> 'Value) : unit =
-            this.Setter.UpdatePath (Array.append this.Path [| updater |])
-
-    [<AutoOpen>]
-    module SolidExtensions =
-
-        type SolidStoreSetter<'T> with
-            /// Access more convenient way of updating store items
-            member this.Path = SolidStorePath<'T, 'T> (this, [||])
-
-    [<Extension; Erase>]
-    type SolidStorePathExtensions =
-
-        /// Select store item by index
-        [<Extension; Erase>]
-        static member inline Item(this: SolidStorePath<'T, 'Value array>, index: int) =
-            SolidStorePath<'T, 'Value> (this.Setter, Array.append this.Path [| index |])
-
-        /// Select store item by predicate
-        [<Extension; Erase>]
-        static member inline Find(this: SolidStorePath<'T, 'Value array>, predicate: 'Value -> bool) =
-            SolidStorePath<'T, 'Value> (this.Setter, Array.append this.Path [| predicate |])
-
-    type Owner =
-        abstract member owner: Owner option
-        abstract member context: obj option
-        abstract member owned: Owner[] option
-        abstract member cleanups: (unit -> unit)[] option
+type Dev =
+    abstract hooks: Dev.DevHooks with get,set
 
 [<AutoOpen>]
 [<Erase>]
 type Bindings =
-    /// Returns a memo evaluating to the resolved children which updates whenever the children change.
-    [<ImportMember("solid-js")>]
-    static member children(value: unit -> #HtmlElement) : unit -> #HtmlElement = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member mergeProps([<ParamList>] values: 'T[]) : 'T = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member splitProps(o: 'T, properties: string array, otherProperties: string array) : 'T * 'T = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member splitProps(o: 'T, properties: string array) : 'T * 'T = jsNative
-
-    [<ImportMember("solid-js/web")>]
-    static member render(code: unit -> #HtmlElement, element: #Element) : unit = jsNative
-
-    [<ImportMember("solid-js/web")>]
-    static member renderToString(fn: unit -> #HtmlElement) : string = jsNative
-
-    /// <remarks>
-    /// Note: to store a function, you will have to keep in mind that subsequent 'setting' of the signal will
-    /// have to be in function form (except during initial assignment):
-    /// <code>
-    /// let myFunc () = console.log("myFunc")
-    /// let accessor, setter = createSignal(unbox&lt;unit -> (unit -> unit)> myFunc)
-    /// let myNewFunc () = console.log("newFunc")
-    /// setter &lt;| fun () -> myNewFunc
-    /// </code>
-    /// </remarks>>
-    [<ImportMember("solid-js")>]
-    static member createSignal(value: 'T) : Signal<'T> = jsNative
-
-    [<ImportMember("solid-js"); ParamObject(1)>]
-    static member createSignal(value: 'T, ?equals: ComparisonFunc<'T>, ?name: string, ?``internal``: bool) : Signal<'T> = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member createMemo(value: unit -> 'T) : (unit -> 'T) = jsNative
-
+    (*
+    Create effect can return a cleanup function in the effect fn.
+    The compute function receives the previous value of the effect.
+    When the create effect returns a cleanup function, the error branch will receive this cleanup function.
+    *)
     [<ImportMember("solid-js"); ParamObject(2)>]
-    static member createMemo(memo: 'T -> 'T, initialValue: 'T, ?equals: ComparisonFunc<'T>) = jsNative
-
-    /// <summary>
-    /// Runs whenever a signal which is accessed within the null func is modified. Also runs on mounting.
-    /// </summary>
-    /// <remarks>
-    /// Effects are a general way to make arbitrary code ("side effects") run whenever dependencies change,
-    /// e.g., to modify the DOM manually. createEffect creates a new computation that runs the given function
-    /// in a tracking scope, thus automatically tracking its dependencies, and automatically reruns the function
-    /// whenever the dependencies update.<br/><br/>
-    /// The effect will also run once, immediately after it is created, to initialize the DOM to the
-    /// correct state. This is called the "mounting" phase. However, we recommend using onMount instead,
-    /// which is a more explicit way to express this.
-    /// <br/>
-    /// The effect callback can return a value, which will be passed as the prev argument to the next
-    /// invocation of the effect. This is useful for memoizing values that are expensive to compute.<br/><br/>
-    /// <para>Effects are meant primarily for side effects that read but don't write to the reactive system:
-    /// it's best to avoid setting signals in effects, which without care can cause additional rendering
-    /// or even infinite effect loops. Instead, prefer using createMemo to compute new values that depend
-    /// on other reactive values, so the reactive system knows what depends on what, and can optimize accordingly.
-    /// If you do end up setting a signal within an effect, computations subscribed to that signal will be executed
-    /// only once the effect completes; see batch for more detail.</para>
-    /// <para>The first execution of the effect function is not immediate; it's scheduled to run after the
-    /// current rendering phase (e.g., after calling the function passed to render, createRoot, or runWithOwner).
-    /// If you want to wait for the first execution to occur, use queueMicrotask (which runs before the browser
-    /// renders the DOM) or await Promise.resolve() or setTimeout(..., 0) (which runs after browser rendering).</para>
-    /// </remarks>
+    static member createEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> unit, ?defer: bool, ?schedule: bool, ?sync: bool, ?transparent: bool): unit = jsNative
     [<ImportMember("solid-js")>]
-    static member createEffect(effect: unit -> unit) : unit = jsNative
-
-    /// <summary>
-    /// Runs whenever a signal which is accessed within the null func is modified. Also runs on mounting.
-    /// </summary>
-    /// <remarks>
-    /// Effects are a general way to make arbitrary code ("side effects") run whenever dependencies change,
-    /// e.g., to modify the DOM manually. createEffect creates a new computation that runs the given function
-    /// in a tracking scope, thus automatically tracking its dependencies, and automatically reruns the function
-    /// whenever the dependencies update.<br/><br/>
-    /// The effect will also run once, immediately after it is created, to initialize the DOM to the
-    /// correct state. This is called the "mounting" phase. However, we recommend using onMount instead,
-    /// which is a more explicit way to express this.
-    /// <br/>
-    /// The effect callback can return a value, which will be passed as the prev argument to the next
-    /// invocation of the effect. This is useful for memoizing values that are expensive to compute.<br/><br/>
-    /// <para>Effects are meant primarily for side effects that read but don't write to the reactive system:
-    /// it's best to avoid setting signals in effects, which without care can cause additional rendering
-    /// or even infinite effect loops. Instead, prefer using createMemo to compute new values that depend
-    /// on other reactive values, so the reactive system knows what depends on what, and can optimize accordingly.
-    /// If you do end up setting a signal within an effect, computations subscribed to that signal will be executed
-    /// only once the effect completes; see batch for more detail.</para>
-    /// <para>The first execution of the effect function is not immediate; it's scheduled to run after the
-    /// current rendering phase (e.g., after calling the function passed to render, createRoot, or runWithOwner).
-    /// If you want to wait for the first execution to occur, use queueMicrotask (which runs before the browser
-    /// renders the DOM) or await Promise.resolve() or setTimeout(..., 0) (which runs after browser rendering).</para>
-    /// </remarks>
+    static member createEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> unit): unit = jsNative
     [<ImportMember("solid-js")>]
-    static member createEffect(effect: 'T -> 'T, initialValue: 'T) : unit = jsNative
-
+    static member createEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> unit, options: EffectOptions): unit = jsNative
+    [<ImportMember("solid-js"); ParamObject(2)>]
+    static member createEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> DisposalFunc, ?defer: bool, ?schedule: bool, ?sync: bool, ?transparent: bool): unit = jsNative
     [<ImportMember("solid-js")>]
-    static member createContext<'T>(?value: 'T) : Context<'T> = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member useContext(context: Context<'T>) : 'T = jsNative
-
-    [<ImportMember("solid-js"); ParamObject(fromIndex = 2)>]
-    static member createResource
-        (
-            source: unit -> 'U option,
-            fetcher: ResourceFetcher<'U option, 'T>,
-            ?initialValue: 'T,
-            ?name: string,
-            ?deferStream: bool,
-            ?onHydrated: (unit -> unit),
-            ?ssrLoadFrom: string,
-            ?storage: Signal<'T>
-        ) : SolidResource<'T> * SolidResourceManager<'T> =
-        jsNative
-
-    [<ImportMember("solid-js"); ParamObject(fromIndex = 1)>]
-    static member createResource
-        (
-            fetcher: ResourceFetcher<unit, 'T>,
-            ?initialValue: 'T,
-            ?name: string,
-            ?deferStream: bool,
-            ?onHydrated: (unit -> unit),
-            ?ssrLoadFrom: string,
-            ?storage: Signal<'T>
-        ) : SolidResource<'T> * SolidResourceManager<'T> =
-        jsNative
-
-    [<ImportMember("solid-js")>]
-    static member createResource(fetcher: ResourceFetcher<unit, 'T>) : SolidResource<'T> * SolidResourceManager<'T> = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member createResource(source: unit -> 'U option, fetcher: ResourceFetcher<'U option, 'T>) : SolidResource<'T> * SolidResourceManager<'T> =
-        jsNative
-
-    /// Fetcher will be called immediately
-    [<ImportMember("solid-js"); ParamObject(fromIndex = 1)>]
-    static member createResource(fetcher: unit -> JS.Promise<'T>, ?initialValue: 'T) : SolidResource<'T> * SolidResourceManager<'T> = jsNative
-
-    /// Injects Async.StartAsPromise to the fetcher
-    static member inline createResource(fetcher: unit -> Async<'T>, ?initialValue: 'T) : SolidResource<'T> * SolidResourceManager<'T> =
-        createResource (
-            fetcher
-            >> Async.StartAsPromise,
-            ?initialValue = initialValue
-        )
-
-    /// Fetcher will be called only when source signal returns `Some('U)`
-    [<ImportMember("solid-js"); ParamObject(fromIndex = 2)>]
-    static member createResource
-        (source: unit -> 'U option, fetcher: 'U -> JS.Promise<'T>, ?initialValue: 'T)
-        : SolidResource<'T> * SolidResourceManager<'T> =
-        jsNative
-
-    /// Injects Async.StartAsPromise to the fetcher
-    static member inline createResource
-        (source: unit -> 'U option, fetcher: 'U -> Async<'T>, ?initialValue: 'T)
-        : SolidResource<'T> * SolidResourceManager<'T> =
-        createResource (
-            source,
-            fetcher
-            >> Async.StartAsPromise,
-            ?initialValue = initialValue
-        )
-
-
-    [<ImportMember("solid-js")>]
-    static member createRoot(fn (* dispose *) : Action -> 'T) : 'T = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member getOwner() : Owner option = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member inline runWithOwner<'ReturnType>(o: Owner, fn: unit -> 'ReturnType) : 'ReturnType option = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member createUniqueId() : string = jsNative
-
-    [<ImportMember("solid-js/store")>]
-    static member createStore(store: 'T) : 'T * SolidStoreSetter<'T> = jsNative
-
-    [<ImportMember("solid-js/store")>]
-    static member reconcile<'T, 'U>(value: 'T) : ('U -> 'T) = jsNative
-
-    [<ImportMember("solid-js/store")>]
-    static member produce<'T>(fn: 'T -> unit) : ('T -> 'T) = jsNative
-
-    [<ImportMember("solid-js/store")>]
-    static member unwrap<'T>(item: 'T) : 'T = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member batch<'T>(fn: unit -> 'T) : 'T = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member catchError<'T>(tryFn: unit -> 'T, onError: obj -> unit) : 'T = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member onCleanup(fn: unit -> unit) : unit = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member onMount(fn: unit -> unit) : unit = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member useTransition() : (unit -> bool) * ((unit -> unit) -> JS.Promise<unit>) = jsNative
-
-    /// <summary>
-    /// <para>On the client, Solid provides (via conditional exports) different builds depending on whether the development
-    /// condition is set. Development mode provides some additional checking - eg. detecting accidental use
-    /// of multiple instances of Solid - which are removed in production builds.</para>
-    /// <para>If you want code to only run in development mode (most useful in libraries), you can check whether the
-    /// DEV export is defined.</para>
-    /// </summary>
-    /// <remarks>
-    /// It is always defined on the server, so it is recommended to combine with <c>isServer</c>.<br/><br/>
-    /// It provides a bool for easy use in F#, but be aware the return type is <c>object | unidentified</c>.
-    /// </remarks>
-    [<ImportMember("solid-js")>]
-    static member DEV: bool = jsNative
-
-    /// <summary>
-    /// Indicates that code is being run as the server or browser bundle. As the underlying runtimes export
-    /// this as a constant boolean it allows bundlers to eliminate the code and their used imports from the
-    /// respective bundles.
-    /// </summary>
-    /// <remarks>
-    /// Shouldn't have much use in Fable unless you are just making some static sites with SolidStart or something.
-    /// </remarks>
-    [<ImportMember("solid-js/web")>]
-    static member isServer: bool = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member startTransition() : ((unit -> unit) -> JS.Promise<unit>) = jsNative
-
-    [<ImportMember("solid-js")>]
-    static member untrack<'T>(fn: Accessor<'T>) : 'T = jsNative
-
-    /// Component should be decorated by `ExportDefaultAttribute`. Use in combination with `lazy'`.
-    [<Emit("import($0)")>]
-    static member importComponent(path: string) : JS.Promise<HtmlElement> = jsNative
-
-    /// Component lazy loading. Use in combination with `importComponent`
-    [<Import("lazy", "solid-js")>]
-    static member lazy'(import: unit -> JS.Promise<HtmlElement>) : HtmlElement = jsNative
-
-    /// <summary>
-    /// <c>createComputed</c> creates a new computation that immediately runs the given function in a tracking,
-    /// thus automatically tracking its dependencies, and automatically reruns the function whenever the dependencies
-    /// changes. The function gets called with an argument equal to the value returned from the function's last
-    /// execution, or on the first call, equal to the optional second argument. Note that the return value of the
-    /// function is not otherwise exposed; in particular, createComputed has no return value.<br/><br/>
-    /// <c>createComputed</c> is the most immediate form of reactivity in Solid, and is most useful for building
-    /// other reactive primitives. For example, some other Solid primitives are built from <c>createComputed</c>.
-    /// However, it should be used with care, as <c>createComputed</c> can easily cause more unnecessary updates
-    /// than other reactive primitives. Before using it, consider the closely related primitives <c>createMemo</c>
-    /// and <c>createRenderEffect</c>.
-    /// </summary>
-    /// <param name="fn">The function to run in a tracking scope.</param>
-    /// <param name="value">The initial value to pass to the function.</param>
-    [<ImportMember("solid-js")>]
-    static member createComputed<'T>(fn: 'T -> 'T, ?value: 'T) : unit = jsNative
-
-    /// <summary>
-    /// Creates a readonly that only notifies downstream changes when the browser is idle. <c>timeoutMs</c> is the
-    /// maximum time to wait before forcing the update.
-    /// </summary>
+    static member createEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> DisposalFunc, options: EffectOptions): unit = jsNative
     [<ImportMember("solid-js"); ParamObject(1)>]
-    static member createDeferred<'T>(source: unit -> 'T, ?timeoutMs: int, ?equals: 'T -> 'T -> bool, ?name: string) : unit -> 'T = jsNative
+    static member createEffect<'T>(compute: 'T option -> 'T, effect: 'T -> unit, error: obj -> unit): unit = jsNative
 
-    /// <summary>
-    /// Sometimes it is useful to separate tracking from re-execution. This primitive registers a side-effect
-    /// that is run the first time the expression wrapped by the returned tracking is notified of a change.
-    /// </summary>
     [<ImportMember("solid-js")>]
-    static member createReaction(onInvalidate: unit -> unit) : (unit -> unit) -> unit = jsNative
+    static member createEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> DisposalFunc): unit = jsNative
+    [<ImportMember("solid-js"); ParamObject(1)>]
+    static member createEffect<'T>(compute: 'T option -> 'T, effect: 'T -> DisposalFunc, error: obj * ResetFunc -> unit): unit = jsNative
 
-    /// <summary>
-    /// A render effect is a computation similar to a regular effect, but differs in when Solid schedules
-    /// the first execution of the effect function. While createEffect waits for the current rendering
-    /// phase to be complete, createRenderEffect immediately calls the function. Thus the effect runs as
-    /// DOM elements are being created and updated, but possibly before specific elements of interest have
-    /// been created, and probably before those elements have been connected to the document. In particular, refs
-    /// will not be set before the initial effect call. Indeed, Solid uses <c>createRenderEffect</c> to implement
-    /// the rendering phase of itself, including setting of <b>refs</b>
-    /// </summary>
-    [<ImportMember("solid-js")>]
-    static member createRenderEffect<'T>(fn: 'T -> 'T, ?value: 'T) : unit = jsNative
+    (*
+    Create Memo
+    *)
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createMemo<'T>(compute: 'T -> 'T, loadingValue: 'T): Accessor<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createMemo<'T>(compute: 'T option -> 'T, options: MemoOptions<'T>): Accessor<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createMemo<'T>(compute: 'T option -> 'T, ?name: string, ?transparent: bool, ?equals: EqualityFunc<'T>, ?unobserved: unit -> unit, ?``lazy``: bool, ?sync: bool, ?loadingValue: 'T): Accessor<'T> = jsNative
 
-    /// <summary>
-    /// Creates a parameterised derived boolean signal <c>selector(key)</c> that indicates whether <c>key</c>
-    /// is equal to the current value of the <c>source</c> signal. These signals are optimised to notify
-    /// each subscriber only when their <c>key</c> starts or stops matching the reactive <c>source</c> value
-    /// (instead of every time <c>key</c> changes). If you have <i>n</i> different subscribers with different
-    /// keys, and the <c>source</c> value changes from <c>a</c> to <c>b</c>, then instead of all <i>n</i> subscribers
-    /// updating, at most two subscribers will update: the signal with key <c>a</c> will change to <c>false</c>, and
-    /// the signal with key <c>b</c> will change to <c>true</c>. Thus it reduces from <i>n</i> updates to 2 updates.<br/>
-    /// <br/>Useful for defining the selection state of several selectable elements.
-    /// </summary>
-    /// <param name="source">The source signal to get the value from and compare with keys.</param>
-    /// <param name="fn">A function to compare the key and the value, returning whether they should be treated as equal. Default: <c>=</c></param>
-    [<ImportMember("solid-js")>]
-    static member createSelector<'T, 'U>(source: unit -> 'T, ?fn: 'U -> 'T -> bool) : 'U -> bool = jsNative
+    (*
+    Create Optimistic
+    *)
+    [<ImportMember "solid-js">]
+    static member createOptimistic<'T>(): Signal<'T option> = jsNative
+    [<ImportMember "solid-js">]
+    static member createOptimistic<'T>(value: 'T): Signal<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createOptimistic<'T>(value: 'T, options: SignalOptions<'T>): Signal<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createOptimistic<'T>(value: 'T, ?name: string, ?equals: EqualityFunc<'T>, ?ownedWrite: bool, ?unobserved: unit -> unit): Signal<'T> = jsNative
+    // Creates a memo like optimistic signal
+    [<ImportMember "solid-js">]
+    static member createOptimistic<'T>(fn: unit -> 'T): Signal<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createOptimistic<'T>(fn: unit -> 'T, options: MixedSignalMemoOptions<'T>): Signal<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createOptimistic<'T>(fn: unit -> 'T, ?id: string, ?name: string, ?transparent: bool, ?equals: EqualityFunc<'T>, ?unobserved: unit -> unit, ?``lazy``: bool, ?sync: bool, ?loadingValue: 'T, ?ownedWrite: bool): Signal<'T> = jsNative
 
-    /// <summary>
-    /// Reactive map helper that caches each item by reference to avoid unnecessary recomputations.
-    /// It only runs the mapping function once per value, and then moves or removes it as needed.
-    /// The index argument is a signal. The map function itself is not tracking.
-    /// <br/><br/>
-    /// This is the underlying helper for the <c>For</c> component, which is used to render lists of items.
-    /// </summary>
-    [<ImportMember("solid-js")>]
-    static member mapArray<'T, 'U>(source: Accessor<'T[]>, fn: 'T -> Accessor<int> -> 'U) : Accessor<'U[]> = jsNative
+    (*
+    Create signal
+    *)
+    [<ImportMember "solid-js">]
+    static member createSignal<'T>(): Signal<'T option> = jsNative
+    [<ImportMember "solid-js">]
+    static member createSignal<'T>(value: 'T): Signal<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createSignal<'T>(fn: unit -> 'T): Signal<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createSignal<'T>(value: 'T, options: SignalOptions<'T>): Signal<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createSignal<'T>(fn: unit -> 'T, options: MixedSignalMemoOptions<'T>): Signal<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createSignal<'T>(value: 'T, ?name: string, ?equals: EqualityFunc<'T>, ?ownedWrite: bool, ?unobserved: unit -> unit): Signal<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createSignal<'T>(fn: unit -> 'T, ?id: string, ?name: string, ?transparent: bool, ?equals: EqualityFunc<'T>, ?unobserved: unit -> unit, ?``lazy``: bool, ?sync: bool, ?loadingValue: 'T, ?ownedWrite: bool): Signal<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member flush(): unit = jsNative
+    [<ImportMember "solid-js">]
+    static member flush<'T>(fn: unit -> 'T): 'T = jsNative
+    [<ImportMember "solid-js">]
+    static member isPending(fn: unit -> objnull): bool = jsNative
+    [<ImportMember "solid-js">]
+    static member latest<'T>(fn: unit -> 'T): 'T = jsNative
+    [<ImportMember "solid-js">]
+    static member untrack<'T>(fn: unit -> 'T, ?strictReadLabel: string): 'T = jsNative
+    [<ImportMember "solid-js">]
+    static member inline createOptimisticStore<'T, 'I when 'T:(member id: 'I)>(store: 'T): StoreReturn<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createOptimisticStore<'T>(store: 'T, options: ProjectionOptions<'T>): StoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member inline createOptimisticStore<'T, 'I when 'T:(member id: 'I)>(store: 'T, ?name: string, ?shallow: bool, ?seedLoadingValue: bool): StoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member inline createOptimisticStore<'T>(store: 'T, key: 'T -> objnull, ?name: string, ?shallow: bool, ?seedLoadingValue: bool): StoreReturn<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createOptimisticStore<'T>(fn: 'T -> U3<'T, JS.Promise<'T>, JS.Promise<unit>>, store: 'T): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createOptimisticStore<'T>(fn: 'T -> U3<'T, JS.Promise<'T>, JS.Promise<unit>>, store: 'T, options: ProjectionOptions<'T>): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member inline createOptimisticStore<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U3<'T, JS.Promise<'T>, JS.Promise<unit>>, store: 'T, ?name: string, ?shallow: bool, ?seedLoadingValue: bool): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member inline createOptimisticStore<'T>(fn: 'T -> U3<'T, JS.Promise<'T>, JS.Promise<unit>>, store: 'T, key: 'T -> objnull, ?name: string, ?shallow: bool, ?seedLoadingValue: bool): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, key: 'T -> objnull): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, key: 'T -> objnull): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, options: ProjectionOptions<'T>): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, options: ProjectionOptions<'T>): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, key: 'T -> objnull, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, key: 'T -> objnull, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStoreReturn<'T> = jsNative
 
-    /// <summary>
-    /// Reactive helper that maps by index, similar to <c>mapArray</c>, but uses the index of the item in the array
-    /// as the key for the mapping function. This is useful when you want to map over an array and use the index
-    /// as a key for each item, such as when rendering a list of items with unique keys.
-    /// <br/><br/>
-    /// This is the underlying helper for the <c>Index</c> component, which is used to render lists of items
-    /// </summary>
-    [<ImportMember("solid-js")>]
-    static member indexArray<'T, 'U>(source: Accessor<'T[]>, fn: Accessor<'T> -> int -> 'U) : Accessor<'U[]> = jsNative
+    [<ImportMember "solid-js">]
+    static member inline createStore<'T>(store: 'T): StoreReturn<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member inline createStore<'T>(store: Store<'T>): StoreReturn<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member inline createStore<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member inline createStore<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, key: 'T -> objnull): RefreshableStoreReturn<'T> = jsNative
+
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member inline createStore<'T>(store: 'T, ?name: string, ?shallow: bool): StoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member inline createStore<'T>(store: Store<'T>, ?name: string, ?shallow: bool): StoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member inline createStore<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, ?name: string, ?shallow: bool, ?seedLoadingValue: bool, ?key: 'T -> objnull): RefreshableStoreReturn<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member inline createStore<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, key: 'T -> objnull, ?name: string, ?shallow: bool, ?seedLoadingValue: bool): RefreshableStoreReturn<'T> = jsNative
+
+    [<ImportMember "solid-js">]
+    static member merge<'T>([<ParamArray>] sources: obj[]): 'T = jsNative
+    [<ImportMember "solid-js">]
+    static member omit<'T>(obj: 'T, [<ParamArray>] props: string[]): 'T = jsNative
+
+    [<ImportMember "solid-js">]
+    static member reconcile<'T>(value: 'T): StoreSetter<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member reconcile<'T>(value: 'T, key: 'T -> objnull): StoreSetter<'T> = jsNative
+
+    [<ImportMember "solid-js">]
+    static member action<'Args, 'R>(genFn: 'Args -> 'R): JS.Promise<'R> = jsNative
+    [<ImportMember "solid-js">]
+    static member action<'Args, 'R>(genFn: 'Args -> JS.Promise<'R>): JS.Promise<'R> = jsNative
+
+    [<ImportMember "solid-js">]
+    static member affects<'T>(target: Accessor<'T>): unit = jsNative
+    [<ImportMember "solid-js">]
+    static member affects<'T>(target: Store<'T>, ?key: string): unit = jsNative
+    static member inline affects<'T>(target: Store<'T>, path: 'T -> objnull): unit = affects(target, Experimental.nameofLambda path)
+
+    [<ImportMember "solid-js">]
+    static member onSettled(callback: unit -> unit): unit = jsNative
+    [<ImportMember "solid-js">]
+    static member onSettled(callback: unit -> DisposalFunc): unit = jsNative
+
+    [<ImportMember "solid-js">]
+    static member refresh<'T>(target: Refreshable<'T>): unit = jsNative
+
+    [<ImportMember "solid-js">]
+    static member children(fn: Accessor<#HtmlElement>): ChildrenReturn<#HtmlElement> = jsNative
+
+    // todo - need to change how context works; its a fn atm from solid 1.*
+    [<ImportMember "solid-js">]
+    static member createContext<'T>(): Context<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createContext<'T>(defaultValue: 'T): Context<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createContext<'T>(defaultValue: 'T, options: EffectOptions): Context<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createContext<'T>(defaultValue: 'T, ?defer: bool, ?schedule: bool, ?sync: bool, ?transparent: bool, ?name: string): Context<'T> = jsNative
+
+    [<ImportMember "solid-js">]
+    static member createUniqueId(): string = jsNative
+    [<Import("lazy", "solid-js")>]
+    static member lazy'<'T when 'T :> HtmlElement>(fn: unit -> JS.Promise<'T>, ?moduleUrl: string): LazyComponent<'T> = jsNative
+
+    [<ImportMember "solid-js">]
+    static member useContext<'T>(context: Context<'T>): 'T = jsNative
+    static member inline tryUseContext<'T>(context: Context<'T>): Result<'T, ContextNotFoundError> =
+        try useContext context |> Ok with e -> unbox<ContextNotFoundError> e |> Error
+    static member inline Show(when': bool): Show.Base = Show.Base(when' = when')
+    static member inline Show(when': bool, keyed: bool): Show.Base = Show.Base(when' = when', keyed = keyed)
+    static member inline Show(when': bool, fallback: HtmlElement, ?keyed: bool): Show.Base = Show.Base(when' = when', keyed = defaultArg keyed false, fallback = fallback)
+    static member inline Show<'T>(when': 'T): Show.Base<'T, Accessor<'T>> = Show.Base<_, _>(when' = when')
+    static member inline Show<'T>(when': 'T, keyed: bool): Show.Base<'T, 'T> = Show.Base<_, _>(when' = when', keyed = true)
+    static member inline Show<'T>(when': 'T, fallback: HtmlElement): Show.Base<'T, Accessor<'T>> = Show.Base<_, _>(when' = when', fallback = fallback)
+    static member inline Show<'T>(when': 'T, fallback: HtmlElement, keyed: bool): Show.Base<'T, 'T> = Show.Base<_, _>(when' = when', fallback = fallback, keyed = true)
+    // TODO - Switch & Match
+
+    [<ImportMember "solid-js">]
+    static member createRoot<'T>(init: unit -> 'T): 'T = jsNative
+    [<ImportMember "solid-js">]
+    static member createRoot<'T>(init: DisposalFunc -> 'T): 'T = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createRoot<'T>(init: unit -> 'T, ?id: string, ?transparent: bool): 'T = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createRoot<'T>(init: DisposalFunc -> 'T, ?id: string, ?transparent: bool): 'T = jsNative
+
+    // todo - Owner type
+    [<ImportMember "solid-js">]
+    static member getObserver(): Owner option = jsNative
+    [<ImportMember "solid-js">]
+    static member getOwner(): Owner option = jsNative
+    [<ImportMember "solid-js">]
+    static member isDisposed(node: Owner): bool = jsNative
+
+    [<ImportMember "solid-js">]
+    static member runWithOwner<'T>(owner: Owner, fn: unit -> 'T): 'T = jsNative
+    [<ImportMember "solid-js">]
+    static member runWithOwner<'T>(owner: Owner option, fn: unit -> 'T): 'T = jsNative
+
+    [<ImportMember "solid-js">]
+    static member createReaction(effectFn: unit -> unit): (unit -> objnull) -> unit = jsNative
+    [<ImportMember "solid-js">]
+    static member createReaction(effectFn: unit -> DisposalFunc): (unit -> objnull) -> unit = jsNative
+    [<ImportMember "solid-js"; ParamObject(0)>]
+    static member createReaction(effect: unit -> unit, error: Accessor<obj> -> unit): (unit -> objnull) -> unit = jsNative
+    [<ImportMember "solid-js"; ParamObject(0)>]
+    static member createReaction(effect: unit -> DisposalFunc, error: Accessor<obj> * DisposalFunc -> unit): (unit -> objnull) -> unit = jsNative
+
+    [<ImportMember "solid-js">]
+    static member createRenderEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> unit): unit = jsNative
+    [<ImportMember "solid-js">]
+    static member createRenderEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> DisposalFunc): unit = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member createRenderEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> unit, ?defer: bool, ?schedule: bool, ?sync: bool, ?transparent: bool): unit = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member createRenderEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> DisposalFunc, ?defer: bool, ?schedule: bool, ?sync: bool, ?transparent: bool): unit = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createRenderEffect<'T>(compute: 'T option -> 'T, effect: 'T -> unit, error: Accessor<obj> -> unit): unit = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createRenderEffect<'T>(compute: 'T option -> 'T, effect: 'T -> DisposalFunc, error: Accessor<obj> * DisposalFunc -> unit): unit = jsNative
+
+    [<ImportMember "solid-js">]
+    static member createTrackedEffect(compute: unit -> unit): unit = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createTrackedEffect(compute: unit -> unit, ?name: string): unit = jsNative
+    [<ImportMember "solid-js">]
+    static member createTrackedEffect(compute: unit -> DisposalFunc): unit = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createTrackedEffect(compute: unit -> DisposalFunc, ?name: string): unit = jsNative
+
+    [<ImportMember "solid-js">]
+    static member onCleanup(fn: unit -> unit): unit = jsNative
+
+    [<ImportMember "solid-js">]
+    static member deep<'T>(store: Store<'T>): 'T = jsNative
+    // todo - isWrappable
+
+    [<ImportMember "solid-js">]
+    static member snapshot<'T>(item: Store<'T>): 'T = jsNative
+    [<ImportMember "solid-js">]
+    static member snapshot<'T>(item: Store<'T>, ?map: System.Collections.IDictionary, ?lookup: System.Collections.IDictionary): 'T = jsNative
+
+    [<ImportMember "solid-js">]
+    static member createErrorBoundary<'T, 'U>(fn: unit -> 'T, fallback: Accessor<objnull> * DisposalFunc -> 'U): Accessor<U2<'T, 'U>> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member createLoadingBoundary<'T, 'U>(fn: unit -> 'T, fallback: unit -> 'U, ?on: unit -> objnull): Accessor<U2<'T, 'U>> = jsNative
+    [<ImportMember "solid-js">]
+    static member createRevealOrder<'T>(fn: unit -> 'T): 'T = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createRevealOrder<'T>(fn: unit -> 'T, ?order: Accessor<Reveal.Order>, ?collapsed: Accessor<bool>): 'T = jsNative
+    [<Import("mapArray","solid-js"); ParamObject(2)>]
+    static member mapArray'<'Item, 'MappedItem>(list: Accessor<'Item array>, map: U3<'Item * Accessor<int>, Accessor<'Item> * int, Accessor<'Item> * Accessor<int>> -> 'MappedItem, ?keyed: U2<bool, 'Item -> objnull>, ?fallback: Accessor<objnull>, ?name: string): Accessor<'MappedItem[]> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member mapArray<'Item, 'MappedItem>(list: Accessor<'Item array>, map: 'Item * Accessor<int> -> 'MappedItem, ?fallback: Accessor<objnull>, ?name: string): Accessor<'MappedItem[]> = jsNative
+    static member inline mapArrayKeyed<'Item, 'MappedItem>(list: Accessor<'Item array>, map: 'Item * Accessor<int> -> 'MappedItem, ?fallback: Accessor<objnull>, ?name: string): Accessor<'MappedItem[]> =
+        mapArray'(list, unbox map, ?fallback = fallback, ?name = name)
+    static member inline mapArrayUnkeyed<'Item, 'MappedItem>(list: Accessor<'Item array>, map: Accessor<'Item> * int -> 'MappedItem, ?fallback: Accessor<objnull>, ?name: string): Accessor<'MappedItem[]> =
+        mapArray'(list, unbox map, keyed = !^false, ?fallback = fallback, ?name = name)
+    static member inline mapArrayKeyedFn<'Item, 'MappedItem>(list: Accessor<'Item array>, map: Accessor<'Item> * Accessor<int> -> 'MappedItem, keyed: 'Item -> objnull, ?fallback: Accessor<objnull>, ?name: string): Accessor<'MappedItem[]> =
+        mapArray'(list, unbox map, keyed = !^keyed, ?fallback = fallback, ?name = name)
+    static member inline mapArrayKeyed<'Item, 'MappedItem>(list: Accessor<'Item array>, map: 'Item * Accessor<int> -> 'MappedItem): Accessor<'MappedItem[]> =
+        mapArray'(list, unbox map)
+    static member inline mapArrayUnkeyed<'Item, 'MappedItem>(list: Accessor<'Item array>, map: Accessor<'Item> * int -> 'MappedItem): Accessor<'MappedItem[]> =
+        mapArray'(list, unbox map, keyed = !^false)
+    static member inline mapArrayKeyedFn<'Item, 'MappedItem>(list: Accessor<'Item array>, map: Accessor<'Item> * Accessor<int> -> 'MappedItem, keyed: 'Item -> objnull): Accessor<'MappedItem[]> =
+        mapArray'(list, unbox map, keyed = !^keyed)
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member repeat(count: Accessor<int>, map: int -> obj, ?from: Accessor<int option>, ?fallback: Accessor<objnull>, ?name: string): Accessor<obj[]> = jsNative
+    [<ImportMember "solid-js"; ParamObject(2)>]
+    static member repeat<'T>(count: Accessor<int>, map: int -> 'T, ?from: Accessor<int option>, ?fallback: Accessor<U3<objnull, 'T, 'T[]>>, ?name: string): Accessor<'T[]> = jsNative
+
+    [<ImportMember "solid-js">]
+    static member enableExternalSource(config: ExternalSourceConfig): unit = jsNative
+
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member flatten(children: obj, ?skipNonRendered: bool, ?doNotUnwrap: bool): obj = jsNative
+    [<ImportMember "solid-js">]
+    static member resolve(fn: unit -> 'T): JS.Promise<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member DEV: Dev option = jsNative
