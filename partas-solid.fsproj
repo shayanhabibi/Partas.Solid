@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <RootNamespace>Build</RootNamespace>
+        <NoWarn>NU1608;NU1901;NU1904</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Build\TargetOperators.fs" />
+        <Compile Include="Build\Spec.fs" />
+        <Compile Include="Build\Program.fs" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <!-- Bump the F# SDK's implicit FSharp.Core reference from 10.0.101
+             to 10.0.102. Without this, the build emits NU1605 ×3 because
+             Partas.GitNet 3.0.0 wants FSharp.Core (>= 10.0.102) while the
+             implicit reference pins 10.0.101. `Update` modifies the
+             existing implicit reference instead of adding a duplicate
+             (which would trigger NU1504). -->
+        <PackageReference Update="FSharp.Core" Version="10.0.102" />
+        <PackageReference Include="EasyBuild.FileSystemProvider" Version="1.1.0" />
+        <PackageReference Include="Fake.Core.ReleaseNotes" Version="6.1.4" />
+        <PackageReference Include="Fake.Core.Target" Version="6.1.4" />
+        <PackageReference Include="Fake.Core.UserInput" Version="6.1.4" />
+        <PackageReference Include="Fake.DotNet.Cli" Version="6.1.4" />
+        <PackageReference Include="Fake.DotNet.Testing.Expecto" Version="6.1.4" />
+        <PackageReference Include="Fake.JavaScript.Npm" Version="6.1.4" />
+        <PackageReference Include="Fake.Tools.Git" Version="6.1.4" />
+        <PackageReference Include="FSharp.SystemCommandLine" Version="2.1.0" />
+        <PackageReference Include="FsToolkit.ErrorHandling" Version="5.2.0" />
+        <PackageReference Include="Partas.GitNet" Version="3.0.0" />
+    </ItemGroup>
+</Project>
