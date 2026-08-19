@@ -15,6 +15,12 @@ module HtmlAttributes =
             with set (value: HtmlElement) = JS.undefined
             and get (): HtmlElement = JS.undefined
 
+    type FlowContainer<'A> with
+        [<Erase>]
+        member _.children
+            with set(value: 'A) = JS.undefined
+            and get (): 'A = JS.undefined
+
     type HTMLAttributes with
         [<LanguageInjection(InjectedLanguage.HTML)>]
         [<Erase>]

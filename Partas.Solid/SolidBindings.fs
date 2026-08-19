@@ -100,14 +100,30 @@ module Bindings =
         [<Import("For", "solid-js")>]
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        type ForComponent() =
+        type For() =
             interface HtmlElement
-
+            interface ChildLambdaProvider2<U2<obj, Accessor<obj>>, U2<int, Accessor<int>>>
             [<Erase; DefaultValue>]
             val mutable keyed: U2<bool, obj -> objnull>
 
             [<Erase; DefaultValue>]
             val mutable each: obj[]
+
+            /// Fallback element to render while the list is loading.
+            [<DefaultValue; Erase>]
+            val mutable fallback: HtmlElement
+
+        [<Import("For", "solid-js")>]
+        [<Erase>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        type For<'T>() =
+            interface HtmlElement
+            interface ChildLambdaProvider2<U2<'T, Accessor<'T>>, U2<int, Accessor<int>>>
+            [<Erase; DefaultValue>]
+            val mutable keyed: U2<bool, 'T -> objnull>
+
+            [<Erase; DefaultValue>]
+            val mutable each: 'T[]
 
             /// Fallback element to render while the list is loading.
             [<DefaultValue; Erase>]
@@ -122,8 +138,8 @@ module Bindings =
             /// Fallback element to render while the list is loading.
             [<DefaultValue; Erase>]
             val mutable fallback: HtmlElement
-            [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps)>]
-            member props.comp = ForComponent(keyed = !^true).spread(props)
+            [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps); EditorBrowsable(EditorBrowsableState.Never)>]
+            member props.comp = For(keyed = !^true).spread(props)
 
         type Component<'T> = Keyed<'T>
 
@@ -137,7 +153,7 @@ module Bindings =
             [<DefaultValue; Erase>]
             val mutable fallback: HtmlElement
             [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps)>]
-            member props.comp = ForComponent(keyed = !^false).spread(props)
+            member props.comp = For(keyed = !^false).spread(props)
 
         [<Erase; CompiledName("KeyedFnFor")>]
         type KeyedFn<'T>() =
@@ -151,7 +167,7 @@ module Bindings =
             [<DefaultValue; Erase>]
             val mutable fallback: HtmlElement
             [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps)>]
-            member props.comp = ForComponent().spread(props)
+            member props.comp = For().spread(props)
 
     [<Import("Loading", "solid-js")>]
     [<Erase>]
@@ -166,7 +182,7 @@ module Bindings =
     [<Erase>]
     type Repeat<'T when 'T :> HtmlElement>() =
         interface HtmlElement
-        interface HtmlContainer
+        interface FlowContainer<'T>
         interface ChildLambdaProviderStrict<int, 'T>
         [<Erase; DefaultValue>] val mutable count: int
         [<Erase; DefaultValue>] val mutable from: int
@@ -185,77 +201,114 @@ module Bindings =
         [<Erase; DefaultValue>] val mutable order: Reveal.Order
         [<Erase; DefaultValue>] val mutable collapsed: bool
 
-    module Show =
-        [<Import("Show", "solid-js")>]
-        type Base() =
-            interface HtmlContainer
-
-            [<Erase; DefaultValue>]
-            val mutable when': bool
-
-            [<Erase; DefaultValue>]
-            val mutable fallback: HtmlElement
-
-            [<Erase; DefaultValue>]
-            val mutable keyed: bool
-
-        [<Import("Show", "solid-js")>]
-        [<Erase>]
-        type Base<'T, 'A>() =
-            interface HtmlElement
-            interface ChildLambdaProvider<'A>
-
-            [<Erase; DefaultValue>]
-            val mutable when': 'T
-
-            [<Erase; DefaultValue>]
-            val mutable fallback: HtmlElement
-
-            [<Erase; DefaultValue>]
-            val mutable keyed: bool
-
-    [<Import("Match", "solid-js")>]
-    [<Erase>]
-    type Match() =
+    [<Import("Show", "solid-js")>]
+    type Show() =
         interface HtmlContainer
 
         [<Erase; DefaultValue>]
         val mutable when': bool
 
-    [<PartasImport("Switch", "solid-js")>]
+        [<Erase; DefaultValue>]
+        val mutable fallback: HtmlElement
+
+        [<Erase; DefaultValue>]
+        val mutable keyed: bool
+
+    /// <summary>
+    /// See Show.Keyed and Show.NonKeyed for stronger typed versions
+    /// </summary>
+    [<Import("Show", "solid-js")>]
     [<Erase>]
-    type Switch() =
+    type Show<'T>() =
         interface HtmlElement
+        interface ChildLambdaProvider<U2<'T, Accessor<'T>>>
+
+        [<Erase; DefaultValue>]
+        val mutable when': 'T
 
         [<Erase; DefaultValue>]
         val mutable fallback: HtmlElement
 
-        [<Erase>]
-        member inline _.Combine
-            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
-            : HtmlContainerFun =
-            fun PARTAS_BUILDER ->
-                PARTAS_FIRST PARTAS_BUILDER
-                PARTAS_SECOND PARTAS_BUILDER
+        /// <summary>
+        /// When keyed is false, the child is wrapped in an accessor
+        /// </summary>
+        [<Erase; DefaultValue>]
+        val mutable keyed: bool
 
+    module Show =
         [<Erase>]
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
-            PARTAS_DELAY ()
+        type Keyed<'T>() =
+            interface HtmlElement
+            interface ChildLambdaProvider<'T>
+            [<Erase; DefaultValue>] val mutable when': 'T
+            [<Erase; DefaultValue>] val mutable fallback: HtmlElement
+            [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps); EditorBrowsable(EditorBrowsableState.Never);>]
+            member props.comp = Show<'T>(keyed = true).spread(props)
+        [<Erase>]
+        type NonKeyed<'T>() =
+            interface HtmlElement
+            interface ChildLambdaProvider<Accessor<'T>>
+            [<Erase; DefaultValue>] val mutable when': 'T
+            [<Erase; DefaultValue>] val mutable fallback: HtmlElement
+            [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps); EditorBrowsable(EditorBrowsableState.Never)>]
+            member props.comp = Show<'T>(keyed = false).spread(props)
 
-        [<Erase>]
-        member inline _.Zero() : HtmlContainerFun = ignore
+    [<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+    type IMatch = inherit HtmlElement
 
+
+    [<Import("Match", "solid-js")>]
+    [<Erase>]
+    type Match() =
+        interface IMatch
+        interface HtmlContainer
+
+        [<Erase; DefaultValue>]
+        val mutable when': bool
+    [<Import("Match", "solid-js")>]
+    [<Erase>]
+    type Match<'T>() =
+        interface IMatch
+        interface HtmlContainer
+        interface ChildLambdaProvider<U2<'T, Accessor<'T>>>
+        [<Erase; DefaultValue>]
+        val mutable when': 'T
         [<Erase>]
-        member inline _.Yield(PARTAS_ELEMENT: Match) : HtmlContainerFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline this.when'option with set(value: 'T option) = this.when' <- unbox value
+        [<Erase; DefaultValue>]
+        val mutable keyed: bool
+
+    module Match =
+        [<CompiledName("KeyedMatch"); Erase>]
+        type Keyed<'T>() =
+            interface IMatch
+            interface ChildLambdaProvider<'T>
+            [<Erase; DefaultValue>] val mutable when': 'T
+            [<Erase>]
+            member inline this.when'option with set(value: 'T option) = this.when' <- unbox value
+            [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps); EditorBrowsable(EditorBrowsableState.Never)>]
+            member props.comp = Match<'T>(keyed = true).spread(props)
+        [<CompiledName("NonKeyedMatch"); Erase>]
+        type NonKeyed<'T>() =
+            interface IMatch
+            interface ChildLambdaProvider<Accessor<'T>>
+            [<Erase; DefaultValue>] val mutable when': 'T
+            [<Erase>]
+            member inline this.when'option with set(value: 'T option) = this.when' <- unbox value
+            [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps); EditorBrowsable(EditorBrowsableState.Never)>]
+            member props.comp = Match<'T>(keyed = false).spread(props)
+
+
+    [<PartasImport("Switch", "solid-js")>]
+    [<Erase>]
+    type Switch() =
+        interface HtmlElement
+        interface FlowContainer<IMatch>
+        [<Erase; DefaultValue>]
+        val mutable fallback: HtmlElement
 
     [<Erase>]
     type Extensions =
-        [<Extension; Erase>]
-        static member Run(PARTAS_THIS: Switch, PARTAS_RUNEXPR: HtmlContainerFun) =
-            PARTAS_RUNEXPR Unchecked.defaultof<_>
-            PARTAS_THIS
-
         /// <summary>
         /// Replace a signals value. This is synonymous with using the Setters as normal.
         /// </summary>
@@ -316,6 +369,26 @@ module Bindings =
     [<Erase>]
     type NoHydration() =
         interface HtmlContainer
+
+    type Owner =
+        abstract id: string option
+        abstract _parent: Owner option
+        abstract _childCount: int
+        abstract _firstChild: Owner option
+        abstract _nextSibling: Owner option
+        abstract _prevSibling: Owner option
+
+    type Root =
+        inherit Owner
+        abstract dispose: bool option -> unit
+
+    type Root with
+        static member inline FromOwner(owner: Owner) =
+            if owner?_root
+            then owner :?> Root |> Some
+            else None
+    type Owner with
+        member inline this.ToRoot() = Root.FromOwner this
 
 [<JS.Pojo; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type EffectOptions(
@@ -406,11 +479,7 @@ type ChildrenReturn<'T when 'T :> HtmlElement> =
     [<Emit("$0.toArray()")>]
     abstract toArray: unit -> 'T[] when 'T :> HtmlElement
 
-type Owner =
-    abstract member owner: Owner option
-    abstract member context: obj option
-    abstract member owned: Owner[] option
-    abstract member cleanups: (unit -> unit)[] option
+
 
 type ExternalSource =
     abstract track: (obj -> obj) with get,set
@@ -679,13 +748,6 @@ type Bindings =
     static member useContext<'T>(context: Context<'T>): 'T = jsNative
     static member inline tryUseContext<'T>(context: Context<'T>): Result<'T, ContextNotFoundError> =
         try useContext context |> Ok with e -> unbox<ContextNotFoundError> e |> Error
-    static member inline Show(when': bool): Show.Base = Show.Base(when' = when')
-    static member inline Show(when': bool, keyed: bool): Show.Base = Show.Base(when' = when', keyed = keyed)
-    static member inline Show(when': bool, fallback: HtmlElement, ?keyed: bool): Show.Base = Show.Base(when' = when', keyed = defaultArg keyed false, fallback = fallback)
-    static member inline Show<'T>(when': 'T): Show.Base<'T, Accessor<'T>> = Show.Base<_, _>(when' = when')
-    static member inline Show<'T>(when': 'T, keyed: bool): Show.Base<'T, 'T> = Show.Base<_, _>(when' = when', keyed = true)
-    static member inline Show<'T>(when': 'T, fallback: HtmlElement): Show.Base<'T, Accessor<'T>> = Show.Base<_, _>(when' = when', fallback = fallback)
-    static member inline Show<'T>(when': 'T, fallback: HtmlElement, keyed: bool): Show.Base<'T, 'T> = Show.Base<_, _>(when' = when', fallback = fallback, keyed = true)
     // TODO - Switch & Match
 
     [<ImportMember "solid-js">]
@@ -791,3 +853,40 @@ type Bindings =
     static member resolve(fn: unit -> 'T): JS.Promise<'T> = jsNative
     [<ImportMember "solid-js">]
     static member DEV: Dev option = jsNative
+
+    [<ImportMember "solid-js"; ParamObject(0)>]
+    static member createOwner(?id: string, ?transparent: bool): Root = jsNative
+
+    /// <summary>
+    /// Invokes a component, wrapping the call in <c>untrack</c> so that reactive reads
+    /// inside the component body don't subscribe the parent computation. Compiled JSX uses this
+    /// internally; manual calls are rarely needed unless authoring a custom JSX factory or renderer.
+    /// </summary>
+    [<ImportMember "solid-js">]
+    static member createComponent(fn: FSharpFunc<_, #HtmlElement>, props: obj): #HtmlElement = jsNative
+
+    /// <summary>
+    /// Homebrew helper that boiler plates the typical Solid directive pattern.
+    /// <example><code lang="fsharp">
+    /// let listen (typ: string) (listener: EventListener) (options: obj) =
+    ///     createDirective &lt;| fun el ->
+    ///         el.addEventListener(typ, listener, options)
+    ///         fun () -> target.removeEventListener(typ, listener, options)
+    /// // ...
+    /// div().ref(listen "click" listener {||})
+    /// </code></example>
+    /// </summary>
+    /// <remarks>
+    /// This is a basic utility wrapper which sets up a mutable variable, which is handed to the directive
+    /// function within <c>onSettled</c> (after pattern matching for nullability).
+    /// We then return a ref callback which sets the element for the settled work, and creates a <c>Ref.Callback</c>.
+    /// </remarks>
+    /// <param name="directive">A lambda which performs the actions on the target element, and returns a disposal/cleanup function</param>
+    static member inline createDirectiveFactory<^DomType when ^DomType :> Browser.Types.HTMLElement>([<InlineIfLambda>] directive: ^DomType -> DisposalFunc): Ref<^DomType> =
+        let mutable el: ^DomType option = None
+        onSettled(fun () ->
+            match el with
+            | None -> unbox<DisposalFunc> ()
+            | Some target -> directive target)
+        fun (element: ^DomType) -> el <- Some element
+        |> Ref.Callback

@@ -9,8 +9,7 @@ type Select() =
 
     [<SolidTypeComponent>]
     member props.__ =
-        failwith "REMAKE"
-        // let rootProps, selectProps =
-            // omit(props, [| "name"; "placeholder"; "required"; "disabled" |], [| "placeholder"; "ref"; "onInput"; "onChange"; "onBlur" |])
+        let rootProps, selectProps =
+            {||}, omit(props, "name", "placeholder", "required", "disabled", "placeholder", "ref", "onInput", "onChange", "onBlur")
 
-        // div().spread rootProps { select().spread selectProps }
+        div().spread rootProps { select().spread selectProps }

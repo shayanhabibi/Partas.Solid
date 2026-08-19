@@ -1,0 +1,8 @@
+[submodule "solid"]
+	path = solid
+	url = https://github.com/solidjs/solid.git
+	branch = next
+[submodule "dom-expressions"]
+	path = dom-expressions
+	url = https://github.com/ryansolid/dom-expressions.git
+	branch = next

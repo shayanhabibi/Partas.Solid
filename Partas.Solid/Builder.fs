@@ -8,35 +8,76 @@ open Fable.Core
 
 [<AutoOpen>]
 module Builder =
+    // todo - global htmlattributes interface
+    // todo - intrinsic htmlattributes interface
+
     [<AllowNullLiteral>]
     [<Interface>]
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     type HTMLAttributes = interface end
 
+    /// Minimal interface type that renders to a JSX element and is accepted as a child of a JSX element.
     [<AllowNullLiteral; Interface>]
     type HtmlElement = interface end
+    [<AllowNullLiteral; Interface>]
+    type RefAttributeExtension = interface end
 
+    [<AllowNullLiteral; Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+    type IntrinsicDOMElement =
+        inherit HtmlElement
+
+    /// Extension of HtmlElement with all standard attributes used in standard HTML elements.
+    /// Includes events etc.
     [<AllowNullLiteral; Interface>]
     type HtmlTag =
         inherit HTMLAttributes
         inherit HtmlElement
-
+    /// Interface which allows you to pass children to a JSX element; also adds the 'children' property.
     [<AllowNullLiteral; Interface>]
     type HtmlContainer =
         inherit HtmlElement
-
+    /// User facing inheritor which combines HtmlTag and HtmlContainer (ParentComponent)
     [<AllowNullLiteral; Interface>]
     type RegularNode =
         inherit HtmlTag
         inherit HtmlContainer
 
+    /// Special interface which renders to a JSX fragment when picked up by the compiler plugin.
     [<AllowNullLiteral; Interface>]
     type FragmentNode =
         inherit HtmlContainer
-
+    /// User facing inheritor which inherits from HtmlTag.
     [<AllowNullLiteral; Interface>]
     type VoidNode =
         inherit HtmlTag
+
+    /// Alternative for HtmlContainer which restricts the children to be of type 'A.
+    [<AllowNullLiteral; Interface>]
+    type FlowContainer<'A> =
+        inherit HtmlElement
+
+    [<AllowNullLiteral; Interface>]
+    type FlowNode<'A> =
+        inherit HtmlTag
+        inherit FlowContainer<'A>
+
+    [<AllowNullLiteral; Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+    type IntrinsicNode =
+        inherit IntrinsicDOMElement
+        inherit HtmlTag
+    [<AllowNullLiteral; Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+    type IntrinsicParentNode =
+        inherit IntrinsicNode
+        inherit RegularNode
+    [<AllowNullLiteral; Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+    type IntrinsicFlowNode<'T> =
+        inherit IntrinsicNode
+        inherit FlowContainer<'T>
+
+    [<AllowNullLiteral; Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+    type IntrinsicVoidNode =
+        inherit IntrinsicNode
+        inherit VoidNode
 
 
     /// <summary>
@@ -68,7 +109,7 @@ module Builder =
         /// tag % div(class' = "hello")
         /// </code></example>
         [<Erase>]
-        member this.render(PARTAS_CONSTRUCTOR: 'T) : 'T = jsNative
+        member this.render( (* do not change *) PARTAS_CONSTRUCTOR: 'T) : 'T = jsNative
 
         /// <summary>
         /// Directs the plugin to build the call site as a Tag
@@ -89,7 +130,7 @@ module Builder =
             left.render (right)
 
         [<Erase>]
-        member this.render(PARTAS_PROPERTIES: obj) : RegularNode = jsNative
+        member this.render( (* do not change *) PARTAS_PROPERTIES: obj) : RegularNode = jsNative
 
         [<Erase>]
         member this.render() : RegularNode = jsNative
@@ -115,13 +156,42 @@ module Builder =
     /// Alias used in the provided builder
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     type HtmlContainerFun = HtmlContainer -> unit
+    /// Alias used in the provided builder
+    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    type FlowContainerFun<'A> = FlowContainer<'A> -> unit
+
+    type FlowContainer<'A> with
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        member inline _.Combine
+            ([<InlineIfLambda>] (* do not change *) PARTAS_FIRST: FlowContainerFun<'A>,
+             [<InlineIfLambda>] (* do not change *) PARTAS_SECOND: FlowContainerFun<'A>)
+            : FlowContainerFun<'A> =
+            fun (* do not change *) PARTAS_BUILDER ->
+                PARTAS_FIRST PARTAS_BUILDER
+                PARTAS_SECOND PARTAS_BUILDER
+
+        [<Erase>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        member inline _.Zero() : FlowContainerFun<'A> = ignore
+
+        [<Erase>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        member inline _.Delay([<InlineIfLambda>] (* do not change *) PARTAS_DELAY: unit -> FlowContainerFun<'A>) : FlowContainerFun<'A> =
+            PARTAS_DELAY ()
+
+        [<Erase>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'A) : FlowContainerFun<'A> =
+            fun (* do not change *) PARTAS_YIELD -> ignore PARTAS_ELEMENT
+
 
     type HtmlContainer with
         [<EditorBrowsable(EditorBrowsableState.Never)>]
         member inline _.Combine
-            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
+            ([<InlineIfLambda>] (* do not change *) PARTAS_FIRST: HtmlContainerFun,
+             [<InlineIfLambda>] (* do not change *) PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
-            fun PARTAS_BUILDER ->
+            fun (* do not change *) PARTAS_BUILDER ->
                 PARTAS_FIRST PARTAS_BUILDER
                 PARTAS_SECOND PARTAS_BUILDER
 
@@ -131,28 +201,28 @@ module Builder =
 
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
+        member inline _.Delay([<InlineIfLambda>] (* do not change *) PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
             PARTAS_DELAY ()
 
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: #HtmlElement) : HtmlContainerFun =
-            fun PARTAS_YIELD -> ignore PARTAS_ELEMENT
+        member inline _.Yield((* do not change *) PARTAS_ELEMENT: #HtmlElement) : HtmlContainerFun =
+            fun (* do not change *) PARTAS_YIELD -> ignore PARTAS_ELEMENT
 
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_TEXT: string) : HtmlContainerFun =
-            fun PARTAS_YIELD -> ignore PARTAS_TEXT
+        member inline _.Yield((* do not change *) PARTAS_TEXT: string) : HtmlContainerFun =
+            fun (* do not change *) PARTAS_YIELD -> ignore PARTAS_TEXT
 
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_TEXT: int) : HtmlContainerFun =
-            fun PARTAS_YIELD -> ignore PARTAS_TEXT
+        member inline _.Yield((* do not change *) PARTAS_TEXT: int) : HtmlContainerFun =
+            fun (* do not change *) PARTAS_YIELD -> ignore PARTAS_TEXT
 
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_TEXT: float) : HtmlContainerFun =
-            fun PARTAS_YIELD -> ignore PARTAS_TEXT
+        member inline _.Yield((* do not change *) PARTAS_TEXT: float) : HtmlContainerFun =
+            fun (* do not change *) PARTAS_YIELD -> ignore PARTAS_TEXT
 
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     type IChildLambdaProvider =
@@ -253,7 +323,7 @@ module Builder =
     type IChildLambdaProvider with
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> ChildProviderFun) : ChildProviderFun =
+        member inline _.Delay([<InlineIfLambda>] (* do not change *) PARTAS_DELAY: unit -> ChildProviderFun) : ChildProviderFun =
             PARTAS_DELAY ()
 
         [<Erase>]
@@ -263,62 +333,68 @@ module Builder =
     type ChildLambdaProviderStrict<'Param1, 'Children> with
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Children) : ChildProviderFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Children) : ChildProviderFun =
+            fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProviderStrict2<'Param1, 'Param2, 'Children> with
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Children) : ChildProviderFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Children) : ChildProviderFun =
+            fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProviderStrict3<'Param1, 'Param2, 'Param3, 'Children> with
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Children) : ChildProviderFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Children) : ChildProviderFun =
+            fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProviderStrict4<'Param1, 'Param2, 'Param3, 'Param4, 'Children> with
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Param4 -> #'Children) : ChildProviderFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Param4 -> #'Children) : ChildProviderFun =
+            fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProvider<'Param1> with
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #HtmlElement) : ChildProviderFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #HtmlElement) : ChildProviderFun =
+            fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProvider2<'Param1, 'Param2> with
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #HtmlElement) : ChildProviderFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #HtmlElement) : ChildProviderFun =
+            fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProvider3<'Param1, 'Param2, 'Param3> with
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #HtmlElement) : ChildProviderFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #HtmlElement) : ChildProviderFun =
+            fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProvider4<'Param1, 'Param2, 'Param3, 'Param4> with
         [<Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Param4 -> #HtmlElement) : ChildProviderFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Param4 -> #HtmlElement) : ChildProviderFun =
+            fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     [<Erase>]
     type HtmlContainerExtensions =
         [<Extension; Erase>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        static member Run(PARTAS_THIS: #HtmlContainer, PARTAS_RUN: HtmlContainerFun) =
+        static member Run((* do not change *) PARTAS_THIS: #HtmlContainer, (* do not change *) PARTAS_RUN: HtmlContainerFun) =
             PARTAS_RUN PARTAS_THIS
             PARTAS_THIS
 
         [<Erase; Extension>]
         [<EditorBrowsable(EditorBrowsableState.Never)>]
-        static member Run(PARTAS_THIS: #IChildLambdaProvider, PARTAS_RUN: ChildProviderFun) =
+        static member Run((* do not change *) PARTAS_THIS: #IChildLambdaProvider, (* do not change *) PARTAS_RUN: ChildProviderFun) =
+            PARTAS_RUN PARTAS_THIS
+            PARTAS_THIS
+
+        [<Extension; Erase>]
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        static member Run((* do not change *) PARTAS_THIS: #FlowContainer<'A>, (* do not change *) PARTAS_RUN: FlowContainerFun<'A>) =
             PARTAS_RUN PARTAS_THIS
             PARTAS_THIS
 
@@ -563,3 +639,53 @@ module Builder =
     [<Interface>]
     type VideoHTMLAttributes =
         inherit MediaHTMLAttributes
+
+    module HTMLProperties =
+        type Media = MediaHTMLAttributes
+        type Anchor = AnchorHTMLAttributes
+        type Audio = AudioHTMLAttributes
+        type Area = AreaHTMLAttributes
+        type Base = BaseHTMLAttributes
+        type Blockquote = BlockquoteHTMLAttributes
+        type Button = ButtonHTMLAttributes
+        type Canvas = CanvasHTMLAttributes
+        type Col = ColHTMLAttributes
+        type Colgroup = ColgroupHTMLAttributes
+        type Data = DataHTMLAttributes
+        type Details = DetailsHtmlAttributes
+        type Dialog = DialogHtmlAttributes
+        type Embed = EmbedHTMLAttributes
+        type Fieldset = FieldsetHTMLAttributes
+        type Form = FormHTMLAttributes
+        type Iframe = IframeHTMLAttributes
+        type Img = ImgHTMLAttributes
+        type Input = InputHTMLAttributes
+        type Ins = InsHTMLAttributes
+        type Keygen = KeygenHTMLAttributes
+        type Label = LabelHTMLAttributes
+        type Li = LiHTMLAttributes
+        type Link = LinkHTMLAttributes
+        type Map = MapHTMLAttributes
+        type Menu = MenuHTMLAttributes
+        type Meta = MetaHTMLAttributes
+        type Meter = MeterHTMLAttributes
+        type Quote = QuoteHTMLAttributes
+        type Object = ObjectHTMLAttributes
+        type Ol = OlHTMLAttributes
+        type Optgroup = OptgroupHTMLAttributes
+        type Option = OptionHTMLAttributes
+        type Output = OutputHTMLAttributes
+        type Param = ParamHTMLAttributes
+        type Progress = ProgressHTMLAttributes
+        type Script = ScriptHTMLAttributes
+        type Select = SelectHTMLAttributes
+        type SlotElement= HTMLSlotElementAttributes
+        type Source = SourceHTMLAttributes
+        type Style = StyleHTMLAttributes
+        type Td = TdHTMLAttributes
+        type Template = TemplateHTMLAttributes
+        type Textarea = TextareaHTMLAttributes
+        type Th = ThHTMLAttributes
+        type Time = TimeHTMLAttributes
+        type Track = TrackHTMLAttributes
+        type Video = VideoHTMLAttributes

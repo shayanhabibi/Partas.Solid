@@ -11,13 +11,13 @@ type TransformGetterExtensions() =
     [<Erase>]
     member val data: int[] = unbox null with get, set
 
-    [<SolidTypeComponentAttribute>]
+    [<SolidTypeComponent(ComponentFlag.DebugMode)>]
     member props.constructor =
         let table = createTable<int> (TableOptions (data = props.data))
 
         div () {
             Show (when' = unbox (table.getRowModel().rows.Length), fallback = (div ())) {
-                For.Component (each = table.getRowModel().rows) {
+                For.Component(each = table.getRowModel().rows) {
                     yield
                         fun row index ->
                             div()
