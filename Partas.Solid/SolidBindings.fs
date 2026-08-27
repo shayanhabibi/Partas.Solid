@@ -585,16 +585,40 @@ type Bindings =
     static member createEffect<'T>(compute: 'T option -> 'T, effectFn: 'T -> DisposalFunc): unit = jsNative
     [<ImportMember("solid-js"); ParamObject(1)>]
     static member createEffect<'T>(compute: 'T option -> 'T, effect: 'T -> DisposalFunc, error: obj * ResetFunc -> unit): unit = jsNative
+    // ---
+    [<ImportMember("solid-js"); ParamObject(2)>]
+    static member createEffect<'T>(compute: 'T option -> JS.Promise<'T>, effectFn: 'T -> unit, ?defer: bool, ?schedule: bool, ?sync: bool, ?transparent: bool): unit = jsNative
+    [<ImportMember("solid-js")>]
+    static member createEffect<'T>(compute: 'T option -> JS.Promise<'T>, effectFn: 'T -> unit): unit = jsNative
+    [<ImportMember("solid-js")>]
+    static member createEffect<'T>(compute: 'T option -> JS.Promise<'T>, effectFn: 'T -> unit, options: EffectOptions): unit = jsNative
+    [<ImportMember("solid-js"); ParamObject(2)>]
+    static member createEffect<'T>(compute: 'T option -> JS.Promise<'T>, effectFn: 'T -> DisposalFunc, ?defer: bool, ?schedule: bool, ?sync: bool, ?transparent: bool): unit = jsNative
+    [<ImportMember("solid-js")>]
+    static member createEffect<'T>(compute: 'T option -> JS.Promise<'T>, effectFn: 'T -> DisposalFunc, options: EffectOptions): unit = jsNative
+    [<ImportMember("solid-js"); ParamObject(1)>]
+    static member createEffect<'T>(compute: 'T option -> JS.Promise<'T>, effect: 'T -> unit, error: obj -> unit): unit = jsNative
+
+    [<ImportMember("solid-js")>]
+    static member createEffect<'T>(compute: 'T option -> JS.Promise<'T>, effectFn: 'T -> DisposalFunc): unit = jsNative
+    [<ImportMember("solid-js"); ParamObject(1)>]
+    static member createEffect<'T>(compute: 'T option -> JS.Promise<'T>, effect: 'T -> DisposalFunc, error: obj * ResetFunc -> unit): unit = jsNative
 
     (*
     Create Memo
     *)
     [<ImportMember "solid-js"; ParamObject(1)>]
     static member createMemo<'T>(compute: 'T -> 'T, loadingValue: 'T): Accessor<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createMemo<'T>(compute: 'T -> JS.Promise<'T>, loadingValue: 'T): Accessor<'T> = jsNative
     [<ImportMember "solid-js">]
     static member createMemo<'T>(compute: 'T option -> 'T, options: MemoOptions<'T>): Accessor<'T> = jsNative
     [<ImportMember "solid-js"; ParamObject(1)>]
     static member createMemo<'T>(compute: 'T option -> 'T, ?name: string, ?transparent: bool, ?equals: EqualityFunc<'T>, ?unobserved: unit -> unit, ?``lazy``: bool, ?sync: bool, ?loadingValue: 'T): Accessor<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createMemo<'T>(compute: 'T option -> JS.Promise<'T>, options: MemoOptions<'T>): Accessor<'T> = jsNative
+    [<ImportMember "solid-js"; ParamObject(1)>]
+    static member createMemo<'T>(compute: 'T option -> JS.Promise<'T>, ?name: string, ?transparent: bool, ?equals: EqualityFunc<'T>, ?unobserved: unit -> unit, ?``lazy``: bool, ?sync: bool, ?loadingValue: 'T): Accessor<'T> = jsNative
 
     (*
     Create Optimistic
@@ -890,3 +914,5 @@ type Bindings =
             | Some target -> directive target)
         fun (element: ^DomType) -> el <- Some element
         |> Ref.Callback
+
+    static member x = {| ``[Symbol.iterator]`` = () |}

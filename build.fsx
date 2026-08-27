@@ -1,267 +1,280 @@
-﻿#r "nuget: Fake.Core.Target"
-#r "nuget: Fake.Core.Process"
-#r "nuget: Fake.Core.ReleaseNotes"
+﻿#r "nuget: Partas.Build, 0.2.3"
+#r "nuget: Partas.TypeProvider.BuildHelper, 0.2.5"
 #r "nuget: Fake.IO.FileSystem"
-#r "nuget: Fake.DotNet.Cli"
-#r "nuget: Fake.DotNet.MSBuild"
 #r "nuget: Fake.DotNet.AssemblyInfoFile"
-#r "nuget: Fake.Tools.Git"
-#r "nuget: Fake.Api.GitHub"
-#r "nuget: Fake.DotNet.Testing.Expecto"
-
-System.Environment.GetCommandLineArgs ()
-|> Array.skip 2
-|> Array.toList
-|> Fake.Core.Context.FakeExecutionContext.Create false __SOURCE_FILE__
-|> Fake.Core.Context.RuntimeContext.Fake
-|> Fake.Core.Context.setExecutionContext
-
-open Fake
-open Fake.Core.TargetOperators
-open Fake.Core
-open Fake.IO
-open Fake.IO.FileSystemOperators
+open Partas.Build
+open Partas.TypeProvider.BuildHelper
 open Fake.IO.Globbing.Operators
-open Fake.DotNet
-open Fake.DotNet.Testing
-open Fake.Tools
-open System.IO
+open Fake.IO
 
-Target.initEnvironment ()
+[<Literal>]
+let root = __SOURCE_DIRECTORY__
 
-module Ops =
-    [<Literal>]
-    let Clean = "Clean"
+type Repo = BuildHelperProvider<
+    root,
+    "bin/",
+    capabilityFullOverride = true
+    >
 
-    [<Literal>]
-    let RestoreTools = "RestoreTools"
+module Project =
+    let all = [
+        Repo.Project.``Partas.Solid``.Path
+        Repo.Project.``Partas.Solid.FablePlugin``.Path
+    ]
+    let tests = [
+        Repo.Project.``Partas.Solid.Tests.Plugin``.Path
+        Repo.Project.``Partas.Solid.Tests.Core``.Path
+    ]
 
-    [<Literal>]
-    let Nuget = "NuGet"
+module Options =
+    let extension =
+        Input.option<string> "--extension"
+        |> Input.alias "-e"
+        |> Input.desc "The extension to use for fable compiled files."
+        |> Input.def ".fs.jsx"
+        |> Input.helpName "EXT"
+    let quick =
+        Input.option<bool> "--quick"
+        |> Input.alias "-q"
+        |> Input.desc "Skips installations, linting, and other checks"
+    let skipTests =
+        Input.option<bool> "--skip-tests"
+        |> Input.desc "Skips running tests"
+    let watch =
+        Input.option<bool> "--watch"
+        |> Input.alias "-w"
+        |> Input.desc "Runs the operation in watch mode."
+    let config =
+        Baked.Input.DotNet.configString
+        |> InputSpec.ofInput
+        |> InputSpec.map (Option.defaultValue "Release")
+    let format =
+        Input.option<bool> "--format"
+        |> Input.alias "-f"
+        |> Input.desc "Formats the code"
+    let dryFormat =
+        Input.option<bool> "--dry-format"
+        |> Input.desc "Checks style for errors"
 
-    [<Literal>]
-    let Publish = "Publish"
 
-    [<Literal>]
-    let Build = "Build"
 
-    [<Literal>]
-    let AssemblyInfo = "AssemblyInfo"
+let restore = input {
+    let! quick = Options.quick
+    return stage "restore" {
+        when' (not quick)
+        quiet
+        parallel'
+        run "dotnet tool restore -v q"
+        run $"dotnet restore {Repo.Project.SolutionFile} -v q"
+    }
+}
+let clean = input {
+    let! quick = Options.quick
+    return stage "clean" {
+        when' (not quick)
+        run (fun _ ->
+            !! "**/**/bin"
+            ++ "bin"
+            ++ "temp"
+            |> Shell.cleanDirs
+            )
+    }
+}
+let fableClean = input {
+    let! quick = Options.quick
+    and! skipTests = Options.skipTests
+    and! extension = Options.extension
+    return stage "fable-clean" {
+        when' (not (quick || skipTests))
+        Project.tests @ Project.all
+        |> List.map (
+            System.IO.FileInfo
+            >> _.Directory.FullName
+            >> fun project ->
+                stage $"clean-{project}" { run $"dotnet fable clean --cwd {project} -e {extension} --yes" }
+            )
+    }
+}
+let formatOption (format: Internal.InputSpec<bool>) (dryFormat: Internal.InputSpec<bool>) = input {
+    let! dryFormat = dryFormat
+    and! format = format
+    return (
+        let formatSuffix = if dryFormat then "--check" else ""
+        let sourceFiles =
+            !! "**/*.fs"
+            ++ "**/*.fsx"
+            -- "packages/**/*.*"
+            -- "**/obj/**/*.*"
+            -- "**/IndexAccess/IndexAccess.fs"
+            -- "Partas.Solid.FablePlugin/Plugin.fs"
+            |> Seq.map (sprintf "\"%s\"")
+            |> String.concat " "
+        stage "format" {
+            when' (format || dryFormat)
+            quiet
+            captureOutput
+            run $"dotnet fantomas {sourceFiles} {formatSuffix}"
+        }
+        )
+}
 
-    [<Literal>]
-    let Test = "RunTests"
+let buildTarget (target: string) (config: string) = stage $"build-{target}" {
+    quiet
+    run $"dotnet build {target} -c {config} -v q"
+}
 
-    [<Literal>]
-    let GitCliff = "GitCliff"
+let build = input {
+    let! config = Options.config
+    return stage "build" {
+        quiet
+        parallel'
+        buildTarget Repo.Project.``Partas.Solid``.Path config
+        buildTarget Repo.Project.``Partas.Solid.FablePlugin``.Path config
+    }
+}
 
-    [<Literal>]
-    let PublishLocal = "PublishLocal"
+let tests = input {
+    let! config = Options.config
+    and! skipTests = Options.skipTests
+    and! ci = Baked.Input.CI.isCI
+    and! fableClean = fableClean
+    return stage "run-tests" {
+        when' (not skipTests)
+        continueStepsOnFailure
+        stage "run-tests" {
+            parallel'
+            for test in Project.tests do
+                buildTarget test config
+                stage "run-target" {
+                    if ci then
+                        stage "run" {
+                            quiet
+                            run $"dotnet run --project {test} -c {config} -- --colours 256 --summary"
+                        }
+                    else
+                        stage "run" {
+                            quiet
+                            run $"dotnet run --project {test} -c {config} -- --colours 256"
+                        }
+                }
+        }
+        fableClean
+    }
+}
 
-    [<Literal>]
-    let Format = "Format"
+let pack = input {
+    let! config = Options.config
+    return stage "pack" {
+        quiet
+        for project in Project.all do
+        stage "pack" {
+            run $"dotnet pack {project} -c {config} -o {Repo.VirtualFileSystem.bin.ToString()}"
+        }
+    }
+}
 
-    [<Literal>]
-    let CheckFormat = "CheckFormat"
-
-    [<Literal>]
-    let ReleaseNotes = "ReleaseNotes"
-
-let description =
-    "F# Fable front-end framework; derived from Oxpecker.Solid; built on top of Solid.js"
-
-let gitOwner = "shayanhabibi"
-let gitName = "Partas.Solid"
-let release = lazy ReleaseNotes.load "docs/RELEASE_NOTES.md"
-
-let apiKey =
-    Target.getArguments ()
-    |> Option.bind (fun args ->
-        let idx =
-            args
-            |> (Array.tryFindIndex ((=) "--nuget-api-key")
-                >> Option.map ((+) 1))
-
-        idx
-        |> Option.map (Array.get args))
-
-let sourceFiles =
-    !!"**/*.fs"
-    ++ "**/*.fsx"
-    -- "packages/**/*.*"
-    -- "paket-files/**/*.*"
-    -- ".fake/**/*.*"
-    -- "**/obj/**/*.*"
-    -- "**/AssemblyInfo.fs"
-    -- "**/IndexAccess/IndexAccess.fs"
-    -- "Partas.Solid.FablePlugin/Plugin.fs"
-
-Target.create Ops.Format (fun _ ->
-    let result =
-        sourceFiles
-        |> Seq.map (sprintf "\"%s\"")
-        |> String.concat " "
-        |> DotNet.exec id "fantomas"
-
-    if not result.OK then
-        Trace.log $"Errors while formatting all files: %A{result.Messages}")
-
-Target.create Ops.CheckFormat (fun _ ->
-    let errorAction =
-        if Git.Information.getBranchName "." = "master" then
-            Trace.traceImportant
-        else
-            failwith
-
-    let result =
-        sourceFiles
-        |> Seq.map (sprintf "\"%s\"")
-        |> String.concat " "
-        |> sprintf "%s --check"
-        |> DotNet.exec id "fantomas"
-
-    if result.ExitCode = 0 then
-        Trace.log "No files need formatting"
-    elif result.ExitCode = 99 then
-        errorAction "Some files need formatting, run `dotnet fsi build.fsx target Format` to format them."
-    else
-        Trace.logf $"Errors while formatting: %A{result.Errors}"
-        errorAction "Unknown errors while formatting")
-
-Target.create Ops.GitCliff (fun _ ->
-    { ExecParams.Empty with
-        Program = "git-cliff" }
-    |> Process.shellExec
-    |> function
-        | 0 -> ()
-        | code -> failwith $"Git-cliff failed with code: {code}")
-
-// Generate assembly info file with versioning and up-to-date info
-Target.create Ops.AssemblyInfo (fun _ ->
-    let fileName = "Common/AssemblyInfo.fs"
-
-    AssemblyInfoFile.createFSharp
-        fileName
-        [ AssemblyInfo.Title gitName
-          AssemblyInfo.Product gitName
-          AssemblyInfo.Version release.Value.AssemblyVersion
-          AssemblyInfo.FileVersion release.Value.AssemblyVersion ])
-
-Target.create Ops.Clean (fun _ ->
-    !!"**/**/bin"
-    |> Shell.cleanDirs
-
-    Shell.cleanDirs [ "bin"; "temp" ])
-
-let makeArgs: string seq -> string = String.concat " "
-
-let dotnet cmd args =
-    match DotNet.exec id cmd (makeArgs args) with
-    | result when not result.OK -> failwith $"Failed: {result.Errors}"
-    | _ -> ()
-
-Target.create Ops.Build (fun _ ->
-    "Partas.Solid.sln"
-    |> DotNet.build (fun p ->
-        { p with
-            Configuration = DotNet.BuildConfiguration.Release
-            DotNet.BuildOptions.MSBuildParams.DisableInternalBinLog = true
-            DotNet.BuildOptions.MSBuildParams.Properties =
-                [ "PackageVersion", release.Value.AssemblyVersion
-                  "Version", release.Value.AssemblyVersion ] }))
-
-Target.create Ops.Test (fun _ ->
-    !!"**/bin/**/*.Tests.Plugin.dll"
-    |> Testing.Expecto.run (fun p ->
-        { p with
-            Summary = true
-            CustomArgs =
-                [ "--colours 256" ]
-                @ p.CustomArgs }))
-
-Target.create Ops.RestoreTools (fun _ ->
-    let result = DotNet.exec id "tool" "restore"
-
-    result.Messages
-    |> Trace.logItems "Tool Restore"
-
-    if not result.OK then
-        failwith "Failed to restore dotnet tools")
-
-Target.create Ops.Nuget (fun _ ->
-    [ "Partas.Solid"; "Partas.Solid.FablePlugin" ]
-    |> List.iter (
-        DotNet.pack (fun p ->
-            { p with
-                NoRestore = true
-                OutputPath = Some "bin"
-                DotNet.PackOptions.MSBuildParams.DisableInternalBinLog = true
-                DotNet.PackOptions.MSBuildParams.Properties =
-                    [ "PackageVersion", release.Value.AssemblyVersion
-                      "Version", release.Value.AssemblyVersion ] })
-    ))
-
-Target.create Ops.Publish (fun _ ->
-    !!"bin/*.nupkg"
-    |> Seq.iter (
-        DotNet.nugetPush (fun p ->
-            { p with
-                DotNet.NuGetPushOptions.PushParams.ApiKey = apiKey
-                DotNet.NuGetPushOptions.PushParams.Source = Some "https://api.nuget.org/v3/index.json"
-                DotNet.NuGetPushOptions.Common.CustomParams = Some "--skip-duplicate" })
-    ))
-
-Target.create Ops.PublishLocal (fun _ ->
-    !!"bin/*.nupkg"
-    |> Seq.iter (
-        DotNet.nugetPush (fun p ->
-            { p with
-                DotNet.NuGetPushOptions.PushParams.Source = Some "local"
-                DotNet.NuGetPushOptions.PushParams.PushTrials = 1 })
-    ))
-
-Target.create Ops.ReleaseNotes (fun _ ->
-    Git.Staging.stageFile "./docs" "RELEASE_NOTES.md"
-    |> function
-        | true, _, _ ->
-            Git.FileStatus.getAllFiles "./docs"
-            |> Seq.iter (function
-                | _, "RELEASE_NOTES.md" ->
-                    Git.CommandHelper.directRunGitCommandAndFail
-                        "."
-                        "config --local user.email \"41898282+github-actions[bot]@users.noreply.github.com\""
-
-                    Git.CommandHelper.directRunGitCommandAndFail "." "config --local user.name \"GitHub Action\""
-                    Git.Commit.execExtended "./docs" "[skip ci]" "docs: Update RELEASE_NOTES.md"
-                    Git.Branches.push "."
-                | _ -> ())
-        | _, _, msg -> Trace.traceImportant msg)
-
-Ops.GitCliff
-==> Ops.AssemblyInfo
-?=> Ops.Build
-
-Ops.AssemblyInfo
-==> Ops.Nuget
-
-Ops.Test
-==> Ops.Nuget
-==> Ops.Publish
-
-Ops.GitCliff
-==> Ops.ReleaseNotes
-
-Ops.Test
-==> Ops.Nuget
-==> Ops.PublishLocal
-
-Ops.Clean
-==> Ops.Build
-==> Ops.Test
-
-Ops.RestoreTools
-==> Ops.Test
-
-Ops.CheckFormat
-==> Ops.Build
-
-Target.runOrDefaultWithArguments Ops.Test
+let publish = input {
+    let! apiKey = Baked.Input.NuGet.apiKeyOrEnv
+    let path =
+        System.IO.Path.Combine(
+            Repo.VirtualFileSystem.bin.ToString(),
+            "*.nupkg"
+            )
+    return stage "publish" {
+        when' apiKey.IsSome
+        failIfIgnored
+        run $"dotnet nuget push {path} --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key {Cmd.sensitive apiKey.Value}"
+    }
+}
+rootCommand fsi.CommandLineArgs[1..] {
+    description "Partas.Solid build scripts"
+    command "build" {
+        description "Builds the project"
+        Command.pipeline {
+            noPrefixForStep
+            restore
+            formatOption (InputSpec.ofInput Options.format) (InputSpec.ofInput Options.dryFormat)
+            build
+        }
+    }
+    command "test" {
+        description "Runs tests."
+        command "scratch" {
+            description "Run the scratch project."
+            restore
+            input {
+                let! quick = Options.quick
+                and! extension = Options.extension
+                return stage "clean scratch" {
+                    when' (not quick)
+                    run $"dotnet fable clean -e {extension} --yes --cwd {Repo.Project.ScratchTests.Directory}"
+                }
+            }
+            input {
+                let! watch = Options.watch
+                and! extension = Options.extension
+                return stage "run scratch" {
+                    if watch then
+                        stage "watch" {
+                            run $"dotnet fable watch -o output --optimize -c Release -e {extension} --cwd {Repo.Project.ScratchTests.Directory} --exclude Partas.Solid.FablePlugin"
+                        }
+                    else
+                        stage "run" {
+                            run $"dotnet fable -o output --optimize -c Release -e {extension} --cwd {Repo.Project.ScratchTests.Directory} --exclude Partas.Solid.FablePlugin"
+                        }
+                }
+            }
+        }
+        Command.pipeline {
+            noPrefixForStep
+            restore
+            fableClean
+            build
+            tests
+        }
+    }
+    command "publish" {
+        description "Publishes the project."
+        Command.pipeline {
+            noPrefixForStep
+            restore
+            fableClean
+            formatOption (InputSpec.ofInput Options.format) (InputSpec.ofInput Options.dryFormat)
+            build
+            tests
+            pack
+            publish
+        }
+    }
+    command "format" {
+        description "Formats the code."
+        restore
+        formatOption (InputSpec.ret true) (InputSpec.ofInput Options.dryFormat)
+    }
+    command "bump" {
+        description "Bumps the version."
+        restore
+        Baked.Pipelines.bumpArgument Project.all (InputSpec.ret Project.all)
+    }
+    command "clean" {
+        description "Cleans the build."
+        restore
+        clean
+        fableClean
+    }
+    command "changelog" {
+        description "Generates the changelog"
+        stage "git-cliff" {
+            run "git-cliff"
+            run "git add -u"
+        }
+        let commitMessage = "[skip ci]\n\nUpdate changelog."
+        let commitAuthor = "GitHub Action <41898282+github-actions[bot]@users.noreply.github.com>"
+        stage "commit" {
+            when' (Repo.Git.IsDirty())
+            whenBranch "master"
+            run (cmd $"git commit -m {commitMessage} --author={commitAuthor}")
+            run (cmd $"git push origin HEAD:master")
+        }
+    }
+}

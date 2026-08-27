@@ -2,6 +2,7 @@
 
 open Browser.Types
 open Fable.Core
+open Partas.Solid.Aria
 
 [<Erase>]
 type TransformGetterExtensions() =
@@ -15,7 +16,7 @@ type TransformGetterExtensions() =
         let mutable element = JS.undefined<HTMLElement>
         let cbref = Ref<HTMLElement>.Callback(fun x -> ())
         let cb = fun (ele: HTMLElement) -> ()
-        div() {
+        div(ariaCurrent = "time") {
             div().ref([| Ref.cast cbref |])
             div().ref(cb)
         }

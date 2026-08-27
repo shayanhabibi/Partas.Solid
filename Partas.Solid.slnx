@@ -4,6 +4,7 @@
     <File Path=".config/dotnet-tools.json" />
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
+    <File Path=".gitmodules" />
     <File Path="cliff.toml" />
     <File Path="docs/RELEASE_NOTES.md" />
     <File Path="LICENSE.txt" />
@@ -14,9 +15,6 @@
     <File Path=".github/workflows/dotnet.yml" />
     <File Path=".github/workflows/package.yml" />
     <File Path=".github/workflows/releasenotes.yml" />
-  </Folder>
-  <Folder Name="/Build/">
-    <Project Path="partas-solid.fsproj" />
   </Folder>
   <Folder Name="/Scripts/">
     <File Path="build.fsx" />
