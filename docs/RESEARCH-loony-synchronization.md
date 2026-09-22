@@ -9,9 +9,13 @@
 > external write, feeding a single serial consumer. Loony is an unbounded MPMC queue whose headline contribution
 > is deterministic node reclamation *without a garbage collector*, tuned for hundreds of contending threads. On
 > .NET the GC gives that contribution away for free, `ConcurrentQueue<T>` already is a segmented lock-free MPMC
-> queue, and the boundary's actual bottleneck is the serial consumer, not the queue. Use
-> `System.Threading.Channels` (or a `ConcurrentQueue` + one `Interlocked` flag), measure it against
-> `MailboxProcessor.Post`, and close §D.1 of the suspension research with a number.
+> queue, and the boundary's actual bottleneck is the serial consumer, not the queue.
+>
+> **Measured since first writing ([§4.3](#43-the-measurement-that-closes-d1--run-the-prediction-was-half-wrong)).**
+> The queue choice does not matter, and this document's own recommendation was the slowest of the four
+> candidates end-to-end. Producer enqueue spans 25–96 ns; the settle → flush round trip spans 2.35–3.32 µs
+> whichever primitive is used, because it is dominated by the consumer wake-up. The design lesson is not
+> "pick a queue" but "do not cross a thread" — a hop costs about what a throw costs.
 
 Conventions: ⚠️ marks a claim I could not verify from source and am labelling speculation. Everything else is
 cited to a file, line, or URL.
@@ -354,25 +358,46 @@ type needed at all, because there is one thread. This is the construction-time-p
 [RESEARCH-async-reactive-graph-dotnet.md §4.2](RESEARCH-async-reactive-graph-dotnet.md) already prescribes; no
 `#if FABLE_COMPILER` in core.
 
-### 4.3 The measurement that closes §D.1
+### 4.3 The measurement that closes §D.1 — **run; the prediction was half wrong**
 
-[RESEARCH-suspension-mechanism.md §D.1](RESEARCH-suspension-mechanism.md) leaves "whether Channels beats
-MailboxProcessor at the boundary" unmeasured. Extend the existing harness (`scratchpad/reactive-spike/ThrowCost.fs`,
-same rig: Ryzen 9 9900X, Release, no debugger, 200-iteration warmup, forced GC per row) with four rows, each
-measuring **producer-side cost of one `Post` from a pool thread and end-to-end latency to the consumer running the
-closure**, at 1 producer and at 8 producers:
+Measured on .NET 11.0.0, Release, no debugger, 200-iteration warmup, forced GC per row
+(`scratchpad/reactive-spike/Boundary.fs`, alongside the existing `ThrowCost.fs` rig). Two costs, because
+they are bound by different things: **(a)** producer enqueue with no consumer — what a settling `Task`
+pays before returning to the pool; **(b)** settle → flush round trip with exactly one message in flight —
+what a suspended read actually waits for.
 
-| Row | Primitive |
-| --- | --- |
-| 1 | `MailboxProcessor.Post` (existing 71.7 ns / 138.2 ns figure, re-run as control) |
-| 2 | `Channel.CreateUnbounded(SingleReader = true)` `TryWrite` |
-| 3 | `ConcurrentQueue.Enqueue` + `Interlocked` latch + `UnsafeQueueUserWorkItem` (§4.1 b) |
-| 4 | `SynchronizationContext.Post` on a trivial single-thread context (§4.1 a control) |
+| Primitive | (a) enqueue ns/op | (a) B/op | (b) round trip ns/op |
+| --- | --- | --- | --- |
+| `ConcurrentQueue` + `Interlocked` latch + `UnsafeQueueUserWorkItem` | **25.5** | **1** | 3 316.3 |
+| `Channel.CreateUnbounded(SingleReader = true)`, `TryWrite` | 27.3 | 8 | 2 664.2 |
+| `Channel.CreateUnbounded()`, `TryWrite` | 32.4 | 17 | 2 679.4 |
+| `MailboxProcessor.Post` | 95.9 | 17 | **2 350.5** |
 
-Report ns/op and B/op on .NET 10 and .NET 11 RC. ⚠️ Prediction, to be falsified: row 3 < row 2 < row 1 on both,
-with all three under 200 ns and all three irrelevant next to a flush of ≥ 100 nodes. If row 3 is not the cheapest
-at 8 producers, that is the one result that would justify reading the FAA-queue literature again — and the
-correct next step would still be `ConcurrentQueue`'s own segment tuning, not a port.
+The predicted ordering (latch < Channels < mailbox) **holds for (a) and inverts for (b)**. The primitive
+that is slowest to enqueue is fastest end-to-end, and the design this document recommended in §4.1 is the
+slowest of the four.
+
+The reason is that enqueue cost is noise. The consumer wake-up is 2.35–3.32 µs — roughly **100× the
+enqueue** — and it is the same thread-wake for all four. §2.4's lock-vs-lock-free finding is real and
+irrelevant at this depth: an uncontended lock is ~5 ns, i.e. 0.2% of the round trip. Optimising the
+producer side optimises 3% of the number.
+
+What this changes: the interesting figure is that **a cross-thread hop (2.4 µs) is the same order as a
+throw through ten frames (3.2 µs)** — marshalling is as expensive as suspension itself. So
+`IGraphDispatcher`'s job is not to select a fast queue but to *avoid the hop*: an inline fast path when the
+continuation already runs on the graph's thread, with a queue only on genuine cross-thread arrival. Pick
+whichever primitive is most convenient for the queue that remains; at 1 message per settle the choice is
+within noise of itself.
+
+⚠️ Single run, single producer, uncontended, .NET 11.0.0 only. Contended multi-producer enqueue and the
+.NET 10 comparison were not run. Contention is the one regime that could revive the queue-choice question —
+and even then §3.1's conclusion stands: the next step would be `ConcurrentQueue`'s segment tuning, not a
+port.
+
+One process-level note, since it cost time: the first run of this benchmark hung. The cause was the harness,
+not any primitive — phase (b) reused the `MailboxProcessor` that phase (a) had left holding a two-million
+message backlog. Fresh instances per phase, and a 5 s watchdog that reports a missed wake-up instead of
+blocking forever, are both now in the rig.
 
 ### 4.4 Things not to do
 

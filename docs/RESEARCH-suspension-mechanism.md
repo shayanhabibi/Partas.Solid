@@ -744,10 +744,17 @@ you find a case where it does not, write it down and drop the idea.
 
 ## §D. What I could not settle
 
-1. **Whether `System.Threading.Channels` beats `MailboxProcessor` at the boundary.** I measured
-   `MailboxProcessor` only. My preference for `Channels` in §3.3 is ⚠️ speculation based on its
-   allocation profile, not measurement. The 71.7 ns `Post` figure (.NET 10) is still fast enough that
-   this may not matter — though the .NET 11 RC's 138.2 ns halves that margin.
+1. ~~**Whether `System.Threading.Channels` beats `MailboxProcessor` at the boundary.**~~ **Settled, and
+   the question turned out to be the wrong one** — measured on .NET 11.0.0, same rig, in
+   [RESEARCH-loony-synchronization.md §4.3](RESEARCH-loony-synchronization.md). `Channels` does beat
+   `MailboxProcessor` on the producer side (27.3 ns vs 95.9 ns), so §3.3's preference was right on the
+   stated grounds. But producer cost is ~3% of the number that matters: the settle → flush round trip
+   costs 2.35–3.32 µs whichever primitive is used, because it is dominated by the consumer *wake-up*,
+   which is identical for all four. `MailboxProcessor` — slowest to enqueue — is the *fastest*
+   end-to-end. The design consequence is not "pick a queue" but "do not cross a thread": a hop costs
+   2.4 µs against a throw's 3.2 µs, so `IGraphDispatcher` needs an inline fast path for settles that
+   already arrive on the graph's thread. ⚠️ Still unmeasured: contended multi-producer enqueue, which
+   is the only regime where the queue choice could start to matter.
 2. ~~**Whether .NET 10/11 changed exception cost.**~~ **Settled** — re-measured on .NET 10.0.12 and
    11.0.0-rc.1 (§3.1). Throws are ~30% cheaper than on .NET 9; every relative conclusion survives. The
    one surprise was a `MailboxProcessor` regression on the .NET 11 RC (§3.1 reading 5).
