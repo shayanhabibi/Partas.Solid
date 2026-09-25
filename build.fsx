@@ -173,6 +173,15 @@ let pack = input {
     }
 }
 
+let docs = input {
+    let! watch = Options.watch
+    and! config = Options.config
+    let mode = if watch then "watch" else "build"
+    return stage "docs" {
+        run $"dotnet run --project docs/site/docs.fsproj -c {config} -- {mode}"
+    }
+}
+
 let publish = input {
     let! apiKey = Baked.Input.NuGet.apiKeyOrEnv
     let path =
@@ -245,6 +254,10 @@ rootCommand fsi.CommandLineArgs[1..] {
             pack
             publish
         }
+    }
+    command "docs" {
+        description "Builds the documentation site in docs/site (--watch to serve it)"
+        docs
     }
     command "format" {
         description "Formats the code."

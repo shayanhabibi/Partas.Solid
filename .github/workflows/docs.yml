@@ -38,7 +38,7 @@ jobs:
       # Partas.Solid 3.0 and the Partas.Nacara packages come from the committed feed in
       # docs/site/feed until they are on NuGet; docs/site/nuget.config maps them there.
       - name: Build the site
-        run: dotnet run --project docs/site/docs.fsproj -c Release -- build
+        run: dotnet fsi build.fsx -- docs
       - name: Upload the site
         uses: actions/upload-pages-artifact@v5
         with:

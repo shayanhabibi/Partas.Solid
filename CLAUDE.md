@@ -103,6 +103,10 @@ directly, and compile ScratchTests with `dotnet fable --exclude Partas.Solid.Fab
 its `Build` target targets `Partas.Solid.sln`, which no longer exists — the solution is now `Partas.Solid.slnx`. Prefer
 the build CLI locally.
 
+The documentation site is a Nacara project in `docs/site/`. Build it with `dotnet fsi build.fsx -- docs`, or add
+`--watch` to serve it. The same command runs in `.github/workflows/docs.yml`, which publishes to GitHub Pages on pushes to
+`master`.
+
 Tools are pinned in `.config/dotnet-tools.json` (`fantomas` 7.0.5, `fable` 5.13.0) — run `dotnet tool restore` first if
 invoking `dotnet fable` directly.
 
