@@ -1,0 +1,56 @@
+name: Docs
+
+# Builds docs/site with Nacara and publishes it to GitHub Pages.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - 'docs/site/**'
+      - '.github/workflows/docs.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; a newer push supersedes a queued one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # No submodules: solid/ is upstream reference material the site does not use.
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      # The live examples run Fable, the Solid compiler and rolldown, which need Node 22.12 or later.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Partas.Solid 3.0 and the Partas.Nacara packages come from the committed feed in
+      # docs/site/feed until they are on NuGet; docs/site/nuget.config maps them there.
+      - name: Build the site
+        run: dotnet run --project docs/site/docs.fsproj -c Release -- build
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./docs/site/output
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
