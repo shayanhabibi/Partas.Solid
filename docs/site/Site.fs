@@ -8,6 +8,8 @@ let versions = [ SiteVersion.root "3.0" ]
 
 let theme =
     Theme.defaults
+    |> Theme.brandIcon (BrandIcon.Image "logo.png")
+    |> Theme.favIcon "favicon.ico"
     |> Theme.navbar
         [
             NavbarSection("Guide", "guide", "/guide/")
@@ -188,6 +190,7 @@ let site =
     |> Site.baseUrl "/Partas.Solid/"
     |> Site.origin "https://shayanhabibi.github.io"
     |> Site.output "output"
+    |> Site.staticFiles "static"
     |> Markdown.register
     |> TreeSitter.register
     |> Sitemap.register

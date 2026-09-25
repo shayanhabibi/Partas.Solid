@@ -22,7 +22,7 @@
     <!-- Built from Partas.Nacara.Plugins (feat/solid-examples) and committed under feed/,
          until those packages are published. -->
     <ItemGroup>
-        <PackageReference Include="Partas.Nacara.Theme" Version="0.2.0-local.12f0bfc"/>
-        <PackageReference Include="Partas.Nacara.Plugins.Solid" Version="0.1.0-local.12f0bfc"/>
+        <PackageReference Include="Partas.Nacara.Theme" Version="0.2.0-local.44d0693"/>
+        <PackageReference Include="Partas.Nacara.Plugins.Solid" Version="0.1.0-local.44d0693"/>
     </ItemGroup>
 </Project>
