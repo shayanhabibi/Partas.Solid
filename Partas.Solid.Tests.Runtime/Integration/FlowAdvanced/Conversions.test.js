@@ -18,38 +18,31 @@ describe("FlowAdvanced: For over a list converted to an array", () => {
         expect(rows(mount(ArrayMapped).container)).toEqual(["a", "b", "c"]);
     });
 
-    // BUG: ValueUnroller rewrites every imported toArray/toList call into an array literal of its argument.
-    it.fails("List.toArray", () => {
+    it("List.toArray", () => {
         expect(rows(mount(ListToArray).container)).toEqual(["a", "b", "c"]);
     });
 
-    // BUG: ValueUnroller rewrites every imported toArray/toList call into an array literal of its argument.
-    it.fails("Array.ofList", () => {
+    it("Array.ofList", () => {
         expect(rows(mount(ArrayOfList).container)).toEqual(["a", "b", "c"]);
     });
 
-    // BUG: ValueUnroller rewrites every imported toArray/toList call into an array literal of its argument.
-    it.fails("Seq.toArray", () => {
+    it("Seq.toArray", () => {
         expect(rows(mount(SeqToArray).container)).toEqual(["a", "b", "c"]);
     });
 
-    // BUG: ValueUnroller rewrites every imported toArray/toList call into an array literal of its argument.
-    it.fails("piped into List.toArray", () => {
+    it("piped into List.toArray", () => {
         expect(rows(mount(PipedToArray).container)).toEqual(["a", "b", "c"]);
     });
 
-    // BUG: ValueUnroller rewrites every imported toArray/toList call into an array literal of its argument.
-    it.fails("List.toArray over a list literal", () => {
+    it("List.toArray over a list literal", () => {
         expect(rows(mount(ListToArrayLiteral).container)).toEqual(["a", "b", "c"]);
     });
 
-    // BUG: ValueUnroller rewrites every imported toArray/toList call into an array literal of its argument.
-    it.fails("List.map then List.toArray", () => {
+    it("List.map then List.toArray", () => {
         expect(rows(mount(ListMappedToArray).container)).toEqual(["a", "b", "c"]);
     });
 
-    // BUG: ValueUnroller rewrites every imported toArray/toList call into an array literal of its argument.
-    it.fails("List.toArray inside a local function", () => {
+    it("List.toArray inside a local function", () => {
         expect(rows(mount(ToArrayInLet).container)).toEqual(["a", "b", "c"]);
     });
 });

@@ -24,6 +24,13 @@ module internal rec AST =
     module Utils = Patterns
     [<AutoOpen>]
     module AttributesAndProperties =
+        /// Matches the `delay(...)` a sequence or array expression compiles to, looking through casts.
+        /// A `toArray`/`toList` call is only unrolled when its argument is one of these: over any other
+        /// value (`List.toArray xs`) it is a real conversion.
+        let private (|DelayedSequence|_|): Expr -> unit option = function
+            | TypeCast(DelayedSequence, _) -> Some ()
+            | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), _, _, _) -> Some ()
+            | _ -> None
         let private (|MatchValueReplacerFeedback|) (ctx: PluginContext) (ident: Expr): Expr -> Expr list = function
             | expr ->
                 if ctx.Flags.HasFlag(ComponentFlag.SkipCEOptimisation)
@@ -42,7 +49,7 @@ module internal rec AST =
                 match expr with
                 | IdentExpr({ Name = Utils.StartsWith "matchValue" }) ->
                     ident :: rest
-                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, _typ, range) ->
+                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = [ DelayedSequence ] & MatchValueReplacer ctx ident exprs }, _typ, range) ->
                     Value(NewArray(ArrayValues exprs, Any, ArrayKind.MutableArray), range) :: rest
                 | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, _typ, _range) ->
                     exprs @ rest
@@ -120,7 +127,7 @@ module internal rec AST =
                 exprs @ rest
             | expr :: ValueUnroller ctx rest ->
                 match expr with
-                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = ValueUnroller ctx exprs }, _typ, range) ->
+                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = [ DelayedSequence ] & ValueUnroller ctx exprs }, _typ, range) ->
                     Value(NewArray(ArrayValues exprs, Any, ArrayKind.MutableArray), range) :: rest
                 | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = ValueUnroller ctx exprs }, _typ, _range) ->
                     exprs @ rest
