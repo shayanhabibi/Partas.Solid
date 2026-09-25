@@ -17,16 +17,19 @@ type WordRotate() =
     [<SolidTypeComponentAttribute>]
     member props.constructor =
         let index, setIndex = createSignal (0)
-        failwith "redo"
-        // createEffect (fun () ->
-        //     let interval =
-        //         setInterval
-        //             (fun () ->
-        //                 setIndex.Invoke (fun prevIndex ->
-        //                     (prevIndex
-        //                      + 1) % (props.words.Length)))
-        //             props.duration
-        //
-        //     onCleanup (fun () -> clearInterval (interval)))
+
+        createEffect (
+            (fun _ -> props.duration),
+            fun duration ->
+                let interval =
+                    setInterval
+                        (fun () ->
+                            setIndex.Invoke (fun prevIndex ->
+                                (prevIndex
+                                 + 1) % props.words.Length))
+                        duration
+
+                fun () -> clearInterval interval
+        )
 
         div ()

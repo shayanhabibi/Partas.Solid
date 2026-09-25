@@ -4,19 +4,19 @@ open Partas.Solid
 open Fable.Core
 open Fable.Core.JsInterop
 
-let cn (listofclasses: string list) =
+let cn (listofclasses: string array) =
     listofclasses
-    |> List.fold ((+) >> id) ""
+    |> Array.fold ((+) >> id) ""
 
 [<SolidComponent(ComponentFlag.DebugMode)>]
 let Compponent (show: bool) =
     div (
         class' =
             cn
-                [ "testcase"
-                  if show then
-                      "showthis"
-                  "i'm always here" ]
+                [| "testcase"
+                   if show then
+                       "showthis"
+                   "i'm always here" |]
     ) {
         if show then
             "I show sometimes!"
@@ -25,12 +25,12 @@ let Compponent (show: bool) =
 
         For.Component (
             each =
-                !![ 1
-                    2
-                    3
-                    if show then
-                        4
-                    5 ]
+                [| 1
+                   2
+                   3
+                   if show then
+                       4
+                   5 |]
         ) {
 
 

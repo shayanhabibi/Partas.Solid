@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <FablePackageType>library</FablePackageType>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <WarningsAsErrors>3239;0025</WarningsAsErrors>
         <PackageId>Partas.Solid</PackageId>
         <Title>Partas.Solid</Title>
@@ -47,6 +47,7 @@
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
       <PackageReference Update="FSharp.Core" Version="10.0.100" />
+      <PackageReference Include="Xantham.Fable.Core.TS" Version="0.1.0-alpha.3" />
     </ItemGroup>
 
     <ItemGroup>

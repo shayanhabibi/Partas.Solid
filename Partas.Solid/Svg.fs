@@ -1,473 +1,474 @@
 ﻿namespace Partas.Solid
 
 open Fable.Core
+open JetBrains.Annotations
 open Partas.Solid.Experimental.U
 
 /// <summary>Providing the attribute <c>``alignment-baseline``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type alignmentbaselineAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``baseline-shift``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type baselineshiftAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>clip</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type clipAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``clip-path``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type clippathAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``clip-rule``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type clipruleAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>color</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type colorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``color-interpolation``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type colorinterpolationAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``color-interpolation-filters``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type colorinterpolationfiltersAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``color-profile``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type colorprofileAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``color-rendering``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type colorrenderingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>cursor</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type cursorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>direction</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type directionAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>display</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type displayAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``dominant-baseline``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type dominantbaselineAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``enable-background``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type enablebackgroundAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>fill</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type fillAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``fill-opacity``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type fillopacityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``fill-rule``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type fillruleAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>filter</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type filterAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``flood-color``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type floodcolorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``flood-opacity``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type floodOpacityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-family``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type fontFamilyAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-size``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type fontSizeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-size-adjust``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type fontSizeAdjustAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-stretch``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type fontStretchAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-style``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type fontStyleAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-variant``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type fontVariantAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``font-weight``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type fontWeightAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``glyph-orientation-horizontal``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type glyphOrientationHorizontalAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``glyph-orientation-vertical``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type glyphOrientationVerticalAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``image-rendering``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type imageRenderingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>kerning</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type kerningAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``letter-spacing``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type letterSpacingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``marker-end``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type markerEndAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``marker-mid``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type markerMidAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``marker-start``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type markerStartAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>mask</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type maskAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>opacity</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type opacityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>overflow</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type overflowAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>pathLength</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type pathLengthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``pointer-events``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type pointerEventsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``shape-rendering``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type shapeRenderingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stop-color``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type stopColorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stop-opacity``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type stopOpacityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>stroke</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type strokeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-dasharray``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type strokeDasharrayAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-dashoffset``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type strokeDashoffsetAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-linecap``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type strokeLinecapAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-linejoin``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type strokeLinejoinAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-miterlimit``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type strokeMiterlimitAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-opacity``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type strokeOpacityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``stroke-width``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type strokeWidthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``text-anchor``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type textAnchorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``text-decoration``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type textDecorationAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``text-rendering``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type textRenderingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``unicode-bidi``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type unicodeBidiAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>visibility</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type visibilityAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``word-spacing``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type wordSpacingAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``writing-mode``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type writingModeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>version</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type versionAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>baseProfile</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type baseProfileAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>x</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type xAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>y</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type yAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>width</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type widthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>height</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type heightAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>contentScriptType</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type contentScriptTypeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>contentStyleType</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type contentStyleTypeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>xmlns</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type xmlnsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>href</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type hrefAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>markerUnits</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type markerUnitsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>refX</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type refXAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>refY</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type refYAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>markerWidth</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type markerWidthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>markerHeight</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type markerHeightAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>orient</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type orientAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>maskUnits</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type maskUnitsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>maskContentUnits</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type maskContentUnitsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>patternUnits</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type patternUnitsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>patternContentUnits</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type patternContentUnitsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>patternTransform</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type patternTransformAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>preserveAspectRatio</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type preserveAspectRatioAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>viewBox</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type viewBoxAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>type'</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type typeAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>operator</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type operatorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>kernelUnitLength</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type kernelUnitLengthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>surfaceScale</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type surfaceScaleAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>``lightning-color``</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type lightningColorAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>dx</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type dxAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>dy</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type dyAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>stdDeviation</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type stdDeviationAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>specularExponent</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type specularExponentAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>x1</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type x1AttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>x2</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type x2AttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>y1</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type y1AttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>y2</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type y2AttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>cx</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type cxAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>cy</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type cyAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>r</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type rAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>rx</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type rxAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>ry</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type ryAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>d</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type dAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>points</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type pointsAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>rotate</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type rotateAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>textLength</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type textLengthAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>lengthAdjust</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type lengthAdjustAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>z</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type zAttributeInterfaceProvider = interface end
 
 /// <summary>Providing the attribute <c>offset</c> to interfaces to prevent collisions</summary>
-[<AllowNullLiteral; EditorBrowsable(EditorBrowsableState.Never)>]
+[<AllowNullLiteral; EB(EBState.Never)>]
 type offsetAttributeInterfaceProvider = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type TransformableSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type ConditionalProcessingSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type ExternalResourceSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type AnimationTimingSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type AnimationValueSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type AnimationAdditionSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type AnimationAttributeTargetSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type AnimationElementSVGAttributes =
     inherit ExternalResourceSVGAttributes
     inherit ConditionalProcessingSVGAttributes
 
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type PresentationSVGAttributes =
     inherit ExternalResourceSVGAttributes
     inherit ConditionalProcessingSVGAttributes
@@ -532,7 +533,7 @@ type PresentationSVGAttributes =
     inherit writingModeAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FilterPrimitiveElementSVGAttributes =
     inherit colorinterpolationfiltersAttributeInterfaceProvider
     inherit xAttributeInterfaceProvider
@@ -541,27 +542,27 @@ type FilterPrimitiveElementSVGAttributes =
     inherit heightAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type SingleInputFilterSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type DoubleInputFilterSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FitToViewBoxSVGAttributes =
     inherit preserveAspectRatioAttributeInterfaceProvider
     inherit viewBoxAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type GradientElementSVGAttributes =
     inherit ExternalResourceSVGAttributes
     inherit hrefAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type GraphicsElementSVGAttributes =
     inherit clipruleAttributeInterfaceProvider
     inherit colorinterpolationAttributeInterfaceProvider
@@ -575,18 +576,18 @@ type GraphicsElementSVGAttributes =
     inherit visibilityAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type LightSourceElementSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type NewViewportSVGAttributes =
     inherit clipAttributeInterfaceProvider
     inherit overflowAttributeInterfaceProvider
     inherit viewBoxAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type ShapeElementSVGAttributes =
     inherit colorAttributeInterfaceProvider
     inherit fillAttributeInterfaceProvider
@@ -604,7 +605,7 @@ type ShapeElementSVGAttributes =
     inherit strokeWidthAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type ContainerElementSVGAttributes =
     inherit ShapeElementSVGAttributes
     inherit clippathAttributeInterfaceProvider
@@ -617,7 +618,7 @@ type ContainerElementSVGAttributes =
     inherit opacityAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type TextContentElementSVGAttributes =
     inherit alignmentbaselineAttributeInterfaceProvider
     inherit baselineshiftAttributeInterfaceProvider
@@ -654,11 +655,11 @@ type TextContentElementSVGAttributes =
     inherit wordSpacingAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type ZoomAndPanSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type AnimateSVGAttributes =
     inherit AnimationElementSVGAttributes
     inherit AnimationAttributeTargetSVGAttributes
@@ -667,7 +668,7 @@ type AnimateSVGAttributes =
     inherit AnimationAdditionSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type AnimateMotionSVGAttributes =
     inherit AnimationElementSVGAttributes
     inherit AnimationTimingSVGAttributes
@@ -675,7 +676,7 @@ type AnimateMotionSVGAttributes =
     inherit AnimationAdditionSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type AnimateTransformSVGAttributes =
     inherit AnimationElementSVGAttributes
     inherit AnimationAttributeTargetSVGAttributes
@@ -684,7 +685,7 @@ type AnimateTransformSVGAttributes =
     inherit AnimationAdditionSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type CircleSVGAttributes =
     inherit GraphicsElementSVGAttributes
     inherit ShapeElementSVGAttributes
@@ -695,7 +696,7 @@ type CircleSVGAttributes =
     inherit rAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type ClipPathSVGAttributes =
     inherit ConditionalProcessingSVGAttributes
     inherit ExternalResourceSVGAttributes
@@ -703,7 +704,7 @@ type ClipPathSVGAttributes =
     inherit clippathAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type DefsSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
@@ -711,11 +712,11 @@ type DefsSVGAttributes =
     inherit TransformableSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type DescSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type EllipseSVGAttributes =
     inherit GraphicsElementSVGAttributes
     inherit ShapeElementSVGAttributes
@@ -728,40 +729,40 @@ type EllipseSVGAttributes =
     inherit ryAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeBlendSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit DoubleInputFilterSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeColorMatrixSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
     inherit typeAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeComponentTransferSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeCompositeSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit DoubleInputFilterSVGAttributes
     inherit operatorAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeConvolveMatrixSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
     inherit kernelUnitLengthAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeDiffuseLightingSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
@@ -771,18 +772,18 @@ type FeDiffuseLightingSVGAttributes =
     inherit lightningColorAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeDisplacementMapSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit DoubleInputFilterSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeDistantLightSVGAttributes =
     inherit LightSourceElementSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeDropShadowSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit colorAttributeInterfaceProvider
@@ -793,7 +794,7 @@ type FeDropShadowSVGAttributes =
     inherit stdDeviationAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeFloodSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit colorAttributeInterfaceProvider
@@ -801,20 +802,20 @@ type FeFloodSVGAttributes =
     inherit floodOpacityAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeFuncSVGAttributes =
     inherit typeAttributeInterfaceProvider
     inherit offsetAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeGaussianBlurSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
     inherit stdDeviationAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeImageSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit ExternalResourceSVGAttributes
@@ -822,24 +823,24 @@ type FeImageSVGAttributes =
     inherit preserveAspectRatioAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeMergeSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeMergeNodeSVGAttributes =
     inherit SingleInputFilterSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeMorphologySVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
     inherit operatorAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeOffsetSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
@@ -847,7 +848,7 @@ type FeOffsetSVGAttributes =
     inherit dyAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FePointLightSVGAttributes =
     inherit LightSourceElementSVGAttributes
     inherit xAttributeInterfaceProvider
@@ -855,7 +856,7 @@ type FePointLightSVGAttributes =
     inherit zAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeSpecularLightingSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
@@ -866,7 +867,7 @@ type FeSpecularLightingSVGAttributes =
     inherit specularExponentAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeSpotLightSVGAttributes =
     inherit LightSourceElementSVGAttributes
     inherit xAttributeInterfaceProvider
@@ -875,19 +876,19 @@ type FeSpotLightSVGAttributes =
     inherit zAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeTileSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit SingleInputFilterSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FeTurbulanceSVGAttributes =
     inherit FilterPrimitiveElementSVGAttributes
     inherit typeAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type FilterSVGAttributes =
     inherit ExternalResourceSVGAttributes
     inherit xAttributeInterfaceProvider
@@ -896,7 +897,7 @@ type FilterSVGAttributes =
     inherit heightAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type ForeignObjectSVGAttributes =
     inherit NewViewportSVGAttributes
     inherit ConditionalProcessingSVGAttributes
@@ -910,7 +911,7 @@ type ForeignObjectSVGAttributes =
     inherit heightAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type GSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
@@ -920,7 +921,7 @@ type GSVGAttributes =
     inherit visibilityAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type ImageSVGAttributes =
     inherit NewViewportSVGAttributes
     inherit GraphicsElementSVGAttributes
@@ -936,7 +937,7 @@ type ImageSVGAttributes =
     inherit preserveAspectRatioAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type LineSVGAttributes =
     inherit GraphicsElementSVGAttributes
     inherit ShapeElementSVGAttributes
@@ -952,7 +953,7 @@ type LineSVGAttributes =
     inherit y2AttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type LinearGradientSVGAttributes =
     inherit GradientElementSVGAttributes
     inherit x1AttributeInterfaceProvider
@@ -961,7 +962,7 @@ type LinearGradientSVGAttributes =
     inherit y2AttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type MarkerSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ExternalResourceSVGAttributes
@@ -976,7 +977,7 @@ type MarkerSVGAttributes =
     inherit orientAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type MaskSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
@@ -989,15 +990,15 @@ type MaskSVGAttributes =
     inherit maskContentUnitsAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type MetadataSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type MPathSVGAttributes = interface end
 
 [<AllowNullLiteral>]
-[<Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type PathSVGAttributes =
     inherit GraphicsElementSVGAttributes
     inherit ShapeElementSVGAttributes
@@ -1011,7 +1012,7 @@ type PathSVGAttributes =
     inherit dAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type PatternSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
@@ -1029,7 +1030,7 @@ type PatternSVGAttributes =
     inherit patternTransformAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type PolygonSVGAttributes =
     inherit GraphicsElementSVGAttributes
     inherit ShapeElementSVGAttributes
@@ -1042,7 +1043,7 @@ type PolygonSVGAttributes =
     inherit pointsAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type PolylineSVGAttributes =
     inherit GraphicsElementSVGAttributes
     inherit ShapeElementSVGAttributes
@@ -1055,7 +1056,7 @@ type PolylineSVGAttributes =
     inherit pointsAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type RadialGradientSVGAttributes =
     inherit GradientElementSVGAttributes
     inherit cxAttributeInterfaceProvider
@@ -1063,7 +1064,7 @@ type RadialGradientSVGAttributes =
     inherit rAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type RectSVGAttributes =
     inherit GraphicsElementSVGAttributes
     inherit ShapeElementSVGAttributes
@@ -1078,12 +1079,12 @@ type RectSVGAttributes =
     inherit ryAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type SetSVGAttributes =
     inherit AnimationTimingSVGAttributes
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type StopSVGAttributes =
     inherit colorAttributeInterfaceProvider
     inherit stopColorAttributeInterfaceProvider
@@ -1091,7 +1092,7 @@ type StopSVGAttributes =
     inherit offsetAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type SvgSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit NewViewportSVGAttributes
@@ -1111,7 +1112,7 @@ type SvgSVGAttributes =
     inherit xmlnsAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type SwitchSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
@@ -1121,7 +1122,7 @@ type SwitchSVGAttributes =
     inherit visibilityAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type SymbolSVGAttributes =
     inherit ContainerElementSVGAttributes
     inherit NewViewportSVGAttributes
@@ -1137,7 +1138,7 @@ type SymbolSVGAttributes =
     inherit viewBoxAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type TextSVGAttributes =
     inherit TextContentElementSVGAttributes
     inherit GraphicsElementSVGAttributes
@@ -1155,7 +1156,7 @@ type TextSVGAttributes =
     inherit lengthAdjustAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type TextPathSVGAttributes =
     inherit TextContentElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
@@ -1166,7 +1167,7 @@ type TextPathSVGAttributes =
     inherit hrefAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type TSpanSVGAttributes =
     inherit TextContentElementSVGAttributes
     inherit ConditionalProcessingSVGAttributes
@@ -1184,7 +1185,7 @@ type TSpanSVGAttributes =
     inherit lengthAdjustAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type UseSVGAttributes =
     inherit ConditionalProcessingSVGAttributes
     inherit GraphicsElementSVGAttributes
@@ -1198,7 +1199,7 @@ type UseSVGAttributes =
     inherit hrefAttributeInterfaceProvider
 
 [<AllowNullLiteral>]
-[<Interface; System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<Interface; EB(EBState.Never)>]
 type ViewSVGAttributes =
     inherit ExternalResourceSVGAttributes
     inherit FitToViewBoxSVGAttributes
@@ -1208,7 +1209,7 @@ type ViewSVGAttributes =
 module AttributeExtensions =
     type alignmentbaselineAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``alignment-baseline``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1220,7 +1221,7 @@ module AttributeExtensions =
 
     type baselineshiftAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``baseline-shift``
             with set (_: U2<float, string>) = ()
             and [<Erase>] get (): U2<float, string> = JS.undefined
@@ -1238,7 +1239,7 @@ module AttributeExtensions =
 
     type clippathAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``clip-path``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1250,7 +1251,7 @@ module AttributeExtensions =
 
     type clipruleAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``clip-rule``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1268,7 +1269,7 @@ module AttributeExtensions =
 
     type colorinterpolationAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``color-interpolation``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1280,7 +1281,7 @@ module AttributeExtensions =
 
     type colorinterpolationfiltersAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``color-interpolation-filters``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1292,7 +1293,7 @@ module AttributeExtensions =
 
     type colorprofileAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``color-profile``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1304,7 +1305,7 @@ module AttributeExtensions =
 
     type colorrenderingAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``color-rendering``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1334,7 +1335,7 @@ module AttributeExtensions =
 
     type dominantbaselineAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``dominant-baseline``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1346,7 +1347,7 @@ module AttributeExtensions =
 
     type enablebackgroundAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``enable-background``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1364,7 +1365,7 @@ module AttributeExtensions =
 
     type fillopacityAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``fill-opacity``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1376,7 +1377,7 @@ module AttributeExtensions =
 
     type fillruleAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``fill-rule``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1394,7 +1395,7 @@ module AttributeExtensions =
 
     type floodcolorAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``flood-color``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1406,7 +1407,7 @@ module AttributeExtensions =
 
     type floodOpacityAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``flood-opacity``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1418,7 +1419,7 @@ module AttributeExtensions =
 
     type fontFamilyAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``font-family``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1430,7 +1431,7 @@ module AttributeExtensions =
 
     type fontSizeAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``font-size``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1442,7 +1443,7 @@ module AttributeExtensions =
 
     type fontSizeAdjustAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``font-size-adjust``
             with set (_: U2<float, string>) = ()
             and [<Erase>] get (): U2<float, string> = JS.undefined
@@ -1454,7 +1455,7 @@ module AttributeExtensions =
 
     type fontStretchAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``font-stretch``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1466,7 +1467,7 @@ module AttributeExtensions =
 
     type fontStyleAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``font-style``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1478,7 +1479,7 @@ module AttributeExtensions =
 
     type fontVariantAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``font-variant``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1490,7 +1491,7 @@ module AttributeExtensions =
 
     type fontWeightAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``font-weight``
             with set (_: U2<float, string>) = ()
             and [<Erase>] get (): U2<float, string> = JS.undefined
@@ -1502,7 +1503,7 @@ module AttributeExtensions =
 
     type glyphOrientationHorizontalAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``glyph-orientation-horizontal``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1514,7 +1515,7 @@ module AttributeExtensions =
 
     type glyphOrientationVerticalAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``glyph-orientation-vertical``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1526,7 +1527,7 @@ module AttributeExtensions =
 
     type imageRenderingAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``image-rendering``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1544,7 +1545,7 @@ module AttributeExtensions =
 
     type letterSpacingAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``letter-spacing``
             with set (_: U2<float, string>) = ()
             and [<Erase>] get (): U2<float, string> = JS.undefined
@@ -1556,7 +1557,7 @@ module AttributeExtensions =
 
     type markerEndAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``marker-end``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1568,7 +1569,7 @@ module AttributeExtensions =
 
     type markerMidAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``marker-mid``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1580,7 +1581,7 @@ module AttributeExtensions =
 
     type markerStartAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``marker-start``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1616,7 +1617,7 @@ module AttributeExtensions =
 
     type pointerEventsAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``pointer-events``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1628,7 +1629,7 @@ module AttributeExtensions =
 
     type shapeRenderingAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``shape-rendering``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1640,7 +1641,7 @@ module AttributeExtensions =
 
     type stopColorAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``stop-color``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1652,7 +1653,7 @@ module AttributeExtensions =
 
     type stopOpacityAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``stop-opacity``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1670,7 +1671,7 @@ module AttributeExtensions =
 
     type strokeDasharrayAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``stroke-dasharray``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1682,7 +1683,7 @@ module AttributeExtensions =
 
     type strokeDashoffsetAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``stroke-dashoffset``
             with set (_: U2<float, string>) = ()
             and [<Erase>] get (): U2<float, string> = JS.undefined
@@ -1694,7 +1695,7 @@ module AttributeExtensions =
 
     type strokeLinecapAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``stroke-linecap``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1706,7 +1707,7 @@ module AttributeExtensions =
 
     type strokeLinejoinAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``stroke-linejoin``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1718,7 +1719,7 @@ module AttributeExtensions =
 
     type strokeMiterlimitAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``stroke-miterlimit``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1730,7 +1731,7 @@ module AttributeExtensions =
 
     type strokeOpacityAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``stroke-opacity``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1742,7 +1743,7 @@ module AttributeExtensions =
 
     type strokeWidthAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``stroke-width``
             with set (_: U2<float, string>) = ()
             and [<Erase>] get (): U2<float, string> = JS.undefined
@@ -1754,7 +1755,7 @@ module AttributeExtensions =
 
     type textAnchorAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``text-anchor``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1766,7 +1767,7 @@ module AttributeExtensions =
 
     type textDecorationAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``text-decoration``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1778,7 +1779,7 @@ module AttributeExtensions =
 
     type textRenderingAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``text-rendering``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1790,7 +1791,7 @@ module AttributeExtensions =
 
     type unicodeBidiAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``unicode-bidi``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1808,7 +1809,7 @@ module AttributeExtensions =
 
     type wordSpacingAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``word-spacing``
             with set (_: U2<float, string>) = ()
             and [<Erase>] get (): U2<float, string> = JS.undefined
@@ -1820,7 +1821,7 @@ module AttributeExtensions =
 
     type writingModeAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``writing-mode``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -1994,7 +1995,7 @@ module AttributeExtensions =
 
     type lightningColorAttributeInterfaceProvider with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``lightning-color``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -2263,7 +2264,7 @@ module AttributeExtensions =
 
     type PresentationSVGAttributes with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``lighting-color``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
@@ -2320,18 +2321,19 @@ module AttributeExtensions =
 
     type AnimateSVGAttributes with
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``color-interpolation``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined
 
         [<Erase>]
+        [<LanguageInjection("jsx", Prefix = "<animate color-interpolation=\"", Suffix = "\"/>")>]
         member this.colorInterpolation
             with inline set (value: string) = this.``color-interpolation`` <- value
             and inline get (): string = this.``color-interpolation``
 
         [<Erase>]
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member _.``color-rendering``
             with set (_: string) = ()
             and [<Erase>] get (): string = JS.undefined

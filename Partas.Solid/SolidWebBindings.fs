@@ -121,7 +121,7 @@ type HeadTag(
 
 [<AutoOpen>]
 module Bindings =
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     module Spec =
         [<Literal>]
         let path = "@solidjs/web"
@@ -216,7 +216,7 @@ type Bindings =
     static member httpStatus(code: System.Net.HttpStatusCode, ?text: string): unit = jsNative
 
     [<ImportMember(Spec.path); ParamObject(2)>]
-    static member hydrate(code: unit -> HtmlElement, element: Browser.Types.Node, ?renderId: string, ?owner: objnull): DisposalFunc = jsNative
+    static member hydrate(code: unit -> HtmlElement, element: Browser.Types.Node, ?renderId: string, ?owner: objnull, ?onError: ClientErrorHook): DisposalFunc = jsNative
 
     [<ImportMember(Spec.path)>]
     static member isDev: bool = jsNative
@@ -254,7 +254,12 @@ type Bindings =
         ): string = jsNative
 
     [<ImportMember(Spec.path)>]
-    static member render(fn: unit -> HtmlElement, element: Browser.Types.Node, ?init: obj, ?options: {| renderId: string option |} -> obj): DisposalFunc = jsNative
+    static member render(fn: unit -> HtmlElement, element: Browser.Types.Node): DisposalFunc = jsNative
+    [<ImportMember(Spec.path)>]
+    static member render(fn: unit -> HtmlElement, element: Browser.Types.Node, init: HtmlElement): DisposalFunc = jsNative
+    /// <c>onError</c> is this root's client error hook, ahead of <c>configureClientErrors</c>'.
+    [<ImportMember(Spec.path); ParamObject(3)>]
+    static member render(fn: unit -> HtmlElement, element: Browser.Types.Node, init: HtmlElement option, ?owner: objnull, ?renderId: string, ?onError: ClientErrorHook): DisposalFunc = jsNative
 
     [<ImportMember(Spec.path)>]
     static member useHead(tag: HeadTag): unit = jsNative
@@ -268,3 +273,8 @@ type Bindings =
     static member dynamic<'T when 'T :> HtmlElement>(source: unit -> 'T): unit -> 'T = jsNative
     [<ImportMember(Spec.path)>]
     static member dynamic<'T when 'T :> HtmlElement>(source: unit -> JS.Promise<'T>): unit -> 'T = jsNative
+    /// <c>deferStream</c> (SSR only) holds the first flush until the source settles; <c>static</c> calls the source once, untracked, and must resolve synchronously.
+    [<ImportMember(Spec.path); ParamObject(1)>]
+    static member dynamic<'T when 'T :> HtmlElement>(source: unit -> 'T, ?deferStream: bool, ?``static``: bool): unit -> 'T = jsNative
+    [<ImportMember(Spec.path); ParamObject(1)>]
+    static member dynamic<'T when 'T :> HtmlElement>(source: unit -> JS.Promise<'T>, ?deferStream: bool): unit -> 'T = jsNative

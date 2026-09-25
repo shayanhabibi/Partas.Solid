@@ -1,22 +1,25 @@
-import { createSelector, batch, createMemo, onMount, onCleanup, children, splitProps, createEffect, createSignal } from "solid-js";
-import { createStore } from "solid-js/store";
 
-export const patternInput$004013 = createSignal(10);
+import { createReaction, createMemo, onSettled, onCleanup, children, omit, lazy, createEffect, createStore, createSignal } from "solid-js";
 
-export const setter = patternInput$004013[1];
+export const patternInput$004014 = createSignal(10);
 
-export const getter = patternInput$004013[0];
+export const setter = patternInput$004014[1];
 
-export const patternInput$004014$002D1 = createStore([]);
+export const getter = patternInput$004014[0];
 
-export const store = patternInput$004014$002D1[1];
+export const patternInput$004015$002D1 = createStore([]);
 
-export const data = patternInput$004014$002D1[0];
+export const store = patternInput$004015$002D1[1];
 
-createEffect(() => {
-    (getter() === 10) ? ((store([]), (value) => {
-    })) : ((setter(10), (value_1) => {
-    }));
+export const data = patternInput$004015$002D1[0];
+
+createEffect((_arg_2) => (getter() | 0), (_arg) => {
+    if (_arg === 10) {
+        store((_arg_1) => []);
+    }
+    else {
+        setter(10);
+    }
 });
 
 export const getGetter = () => {
@@ -37,14 +40,16 @@ export const getSetter = () => {
         }));
         return o;
     });
-    return (data.length > 0) ? setter : ((value) => {
+    return ((data).length > 0) ? setter : ((value) => {
     });
 };
 
+export const LazyTest = lazy(() => import("./ExperimentalBuilders.fs.jsx"));
+
 export function ComponentWrap() {
-    createEffect(() => {
-        if (getter() === 10) {
-            store([]);
+    createEffect((_arg_2) => (getter() | 0), (_arg) => {
+        if (_arg === 10) {
+            store((_arg_1) => []);
         }
         else {
             setter(10);
@@ -78,7 +83,7 @@ export function ComponentWrap() {
                 }));
                 return o;
             });
-            if (data.length > 0) {
+            if ((data).length > 0) {
                 return setter;
             }
             else {
@@ -89,26 +94,24 @@ export function ComponentWrap() {
 }
 
 export function TestComponent(props) {
-    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["children"]);
-    const childs = children(() => PARTAS_LOCAL.children);
-    createEffect(() => {
-        console.log("effect");
+    const PARTAS_OTHERS = omit(props, "children");
+    const childs = children(() => props.children);
+    createEffect((_arg_1) => (() => [getter(), (data).length])(), (_arg) => {
+        console.log("effect", _arg[0], _arg[1]);
     });
     onCleanup(() => {
         console.log("cleanup");
     });
-    onMount(() => {
+    onSettled(() => {
         console.log("mount");
     });
-    const x = createMemo(() => {
+    createMemo((_arg_2) => {
         console.log("memo");
         return "memo";
     });
-    const submission = batch(() => {
-        console.log("");
-        return childs();
-    });
-    const isSelected = createSelector(() => false);
+    createReaction(() => {
+        console.log("reaction");
+    })(() => (getter() | 0));
     return <div>
         {childs()}
     </div>;

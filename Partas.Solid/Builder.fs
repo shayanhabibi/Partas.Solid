@@ -13,7 +13,7 @@ module Builder =
 
     [<AllowNullLiteral>]
     [<Interface>]
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     type HTMLAttributes = interface end
 
     /// Minimal interface type that renders to a JSX element and is accepted as a child of a JSX element.
@@ -22,7 +22,7 @@ module Builder =
     [<AllowNullLiteral; Interface>]
     type RefAttributeExtension = interface end
 
-    [<AllowNullLiteral; Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+    [<AllowNullLiteral; Interface; EB(EBState.Never)>]
     type IntrinsicDOMElement =
         inherit HtmlElement
 
@@ -61,20 +61,20 @@ module Builder =
         inherit HtmlTag
         inherit FlowContainer<'A>
 
-    [<AllowNullLiteral; Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+    [<AllowNullLiteral; Interface; EB(EBState.Never)>]
     type IntrinsicNode =
         inherit IntrinsicDOMElement
         inherit HtmlTag
-    [<AllowNullLiteral; Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+    [<AllowNullLiteral; Interface; EB(EBState.Never)>]
     type IntrinsicParentNode =
         inherit IntrinsicNode
         inherit RegularNode
-    [<AllowNullLiteral; Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+    [<AllowNullLiteral; Interface; EB(EBState.Never)>]
     type IntrinsicFlowNode<'T> =
         inherit IntrinsicNode
         inherit FlowContainer<'T>
 
-    [<AllowNullLiteral; Interface; EditorBrowsable(EditorBrowsableState.Never)>]
+    [<AllowNullLiteral; Interface; EB(EBState.Never)>]
     type IntrinsicVoidNode =
         inherit IntrinsicNode
         inherit VoidNode
@@ -154,14 +154,14 @@ module Builder =
         TagValue (unbox this)
 
     /// Alias used in the provided builder
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     type HtmlContainerFun = HtmlContainer -> unit
     /// Alias used in the provided builder
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     type FlowContainerFun<'A> = FlowContainer<'A> -> unit
 
     type FlowContainer<'A> with
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Combine
             ([<InlineIfLambda>] (* do not change *) PARTAS_FIRST: FlowContainerFun<'A>,
              [<InlineIfLambda>] (* do not change *) PARTAS_SECOND: FlowContainerFun<'A>)
@@ -171,22 +171,22 @@ module Builder =
                 PARTAS_SECOND PARTAS_BUILDER
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Zero() : FlowContainerFun<'A> = ignore
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Delay([<InlineIfLambda>] (* do not change *) PARTAS_DELAY: unit -> FlowContainerFun<'A>) : FlowContainerFun<'A> =
             PARTAS_DELAY ()
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'A) : FlowContainerFun<'A> =
             fun (* do not change *) PARTAS_YIELD -> ignore PARTAS_ELEMENT
 
 
     type HtmlContainer with
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Combine
             ([<InlineIfLambda>] (* do not change *) PARTAS_FIRST: HtmlContainerFun,
              [<InlineIfLambda>] (* do not change *) PARTAS_SECOND: HtmlContainerFun)
@@ -196,35 +196,35 @@ module Builder =
                 PARTAS_SECOND PARTAS_BUILDER
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Zero() : HtmlContainerFun = ignore
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Delay([<InlineIfLambda>] (* do not change *) PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
             PARTAS_DELAY ()
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_ELEMENT: #HtmlElement) : HtmlContainerFun =
             fun (* do not change *) PARTAS_YIELD -> ignore PARTAS_ELEMENT
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_TEXT: string) : HtmlContainerFun =
             fun (* do not change *) PARTAS_YIELD -> ignore PARTAS_TEXT
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_TEXT: int) : HtmlContainerFun =
             fun (* do not change *) PARTAS_YIELD -> ignore PARTAS_TEXT
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_TEXT: float) : HtmlContainerFun =
             fun (* do not change *) PARTAS_YIELD -> ignore PARTAS_TEXT
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     type IChildLambdaProvider =
         inherit HtmlElement
 
@@ -317,324 +317,324 @@ module Builder =
         inherit IChildLambdaProvider
 
     /// Alias used in the provided builder
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     type ChildProviderFun = IChildLambdaProvider -> unit
 
     type IChildLambdaProvider with
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Delay([<InlineIfLambda>] (* do not change *) PARTAS_DELAY: unit -> ChildProviderFun) : ChildProviderFun =
             PARTAS_DELAY ()
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Zero() : ChildProviderFun = ignore
 
     type ChildLambdaProviderStrict<'Param1, 'Children> with
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Children) : ChildProviderFun =
             fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProviderStrict2<'Param1, 'Param2, 'Children> with
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Children) : ChildProviderFun =
             fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProviderStrict3<'Param1, 'Param2, 'Param3, 'Children> with
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Children) : ChildProviderFun =
             fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProviderStrict4<'Param1, 'Param2, 'Param3, 'Param4, 'Children> with
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Param4 -> #'Children) : ChildProviderFun =
             fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProvider<'Param1> with
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #HtmlElement) : ChildProviderFun =
             fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProvider2<'Param1, 'Param2> with
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #HtmlElement) : ChildProviderFun =
             fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProvider3<'Param1, 'Param2, 'Param3> with
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #HtmlElement) : ChildProviderFun =
             fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     type ChildLambdaProvider4<'Param1, 'Param2, 'Param3, 'Param4> with
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield((* do not change *) PARTAS_ELEMENT: #'Param1 -> #'Param2 -> #'Param3 -> #'Param4 -> #HtmlElement) : ChildProviderFun =
             fun (* do not change *) PARTAS_CONT -> ignore PARTAS_ELEMENT
 
     [<Erase>]
     type HtmlContainerExtensions =
         [<Extension; Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         static member Run((* do not change *) PARTAS_THIS: #HtmlContainer, (* do not change *) PARTAS_RUN: HtmlContainerFun) =
             PARTAS_RUN PARTAS_THIS
             PARTAS_THIS
 
         [<Erase; Extension>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         static member Run((* do not change *) PARTAS_THIS: #IChildLambdaProvider, (* do not change *) PARTAS_RUN: ChildProviderFun) =
             PARTAS_RUN PARTAS_THIS
             PARTAS_THIS
 
         [<Extension; Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         static member Run((* do not change *) PARTAS_THIS: #FlowContainer<'A>, (* do not change *) PARTAS_RUN: FlowContainerFun<'A>) =
             PARTAS_RUN PARTAS_THIS
             PARTAS_THIS
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MediaHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AnchorHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AudioHTMLAttributes =
         inherit MediaHTMLAttributes
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type AreaHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type BaseHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type BlockquoteHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ButtonHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type CanvasHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ColHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ColgroupHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type DataHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type DetailsHtmlAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type DialogHtmlAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type EmbedHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FieldsetHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type FormHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type IframeHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ImgHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type InputHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type InsHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type KeygenHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type LabelHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type LiHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type LinkHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MapHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MenuHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MetaHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type MeterHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type QuoteHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ObjectHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type OlHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type OptgroupHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type OptionHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type OutputHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ParamHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ProgressHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ScriptHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type SelectHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type HTMLSlotElementAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type SourceHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type StyleHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TdHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TemplateHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TextareaHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type ThHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TimeHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type TrackHTMLAttributes = interface end
 
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
     type VideoHTMLAttributes =

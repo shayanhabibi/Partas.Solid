@@ -74,11 +74,11 @@ module internal SchemaRules =
 /// reused or verbose Expr constructors should
 /// be lifted into this module.
 module internal Baked =
-    let private importMergeProps = AstUtils.Import ("merge", "solid-js")
-    let private importSplitProps = AstUtils.Import ("omit", "solid-js")
+    let private importMerge = AstUtils.Import ("merge", "solid-js")
+    let private importOmit = AstUtils.Import ("omit", "solid-js")
 
     /// Converts property setters into a sugar for setting their defaults by
-    /// converting them into a mergeProps, which merges an object with the key,value pairs
+    /// converting them into a <c>solid-js</c> <c>merge</c>, which merges an object with the key,value pairs
     /// against the given props (ie overwritting any double ups).
     let convertSettersToObject (selfIdentifier: string) (values: (string * Expr) list) (rest: Expr) =
         match values with
@@ -88,7 +88,7 @@ module internal Baked =
                 AstUtils.SetProp (
                     AstUtils.IdentExpr selfIdentifier,
                     AstUtils.Call (
-                        importMergeProps,
+                        importMerge,
                         AstUtils.CallInfo (
                             args =
                                 [ let trimReservedIdentifier = fun (name, expr) -> StringUtils.TrimReservedIdentifiers name, expr
@@ -100,8 +100,8 @@ module internal Baked =
                 rest
             )
 
-    /// It renders the JSX splitProps, with the given values split into PARTAS_LOCAL, and the rest
-    /// into PARTAS_OTHERS
+    /// Renders a <c>solid-js</c> omit call binding PARTAS_OTHERS to the props with the given
+    /// keys removed. When there are no keys, PARTAS_OTHERS is bound to the props directly.
     let convertGettersToObject (selfIdentifier: string) (values: string list) (rest: Expr) =
         let omitParams =
             AstUtils.IdentExpr selfIdentifier
@@ -113,7 +113,7 @@ module internal Baked =
                 | [ selfIdentifierExpr ] -> selfIdentifierExpr
                 | paras ->
                     AstUtils.Call (
-                        importSplitProps,
+                        importOmit,
                         AstUtils.CallInfo (args = paras)
                         )
             ), body = rest

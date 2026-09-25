@@ -114,18 +114,14 @@ module Context =
 
     let useIsMobile (fallback: bool) =
         let (isMobile, setIsMobile) = createSignal (fallback)
-        failwith "redo"
-        // createEffect (fun () ->
-        //     let mql =
-        //         window?matchMedia (
-        //             $"(max-width:{mobileBreakpoint
-        //                           - 1}px)"
-        //         )
-        //
-        //     let onChange = fun (e) -> setIsMobile (e?matches)
-        //     mql?addEventListener ("change", onChange)
-        //     onChange (mql)
-        //     onCleanup (fun () -> mql?removeEventListener ("change", onChange)))
+        createEffect (
+            (fun _ -> window?matchMedia ($"(max-width:{mobileBreakpoint - 1}px)") : obj),
+            fun mql ->
+                let onChange = fun (e) -> setIsMobile (e?matches)
+                mql?addEventListener ("change", onChange)
+                onChange (mql)
+                fun () -> mql?removeEventListener ("change", onChange)
+        )
 
         isMobile
 

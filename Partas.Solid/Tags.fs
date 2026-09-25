@@ -2,10 +2,8 @@ namespace Partas.Solid
 
 open System.Runtime.CompilerServices
 open Browser.Types
-open JetBrains.Annotations
 open Fable.Core
 open Fable.Core.JsInterop
-open Partas.Solid.Experimental.U
 
 #nowarn 1182
 
@@ -29,9 +27,9 @@ module Decorators =
 
 [<AutoOpen>]
 module Tags =
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     type DomType<^Tag, ^DomType when ^Tag:(member asDomElement: ^DomType)> = ^Tag
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     type IntrinsicDomType<^Tag, ^DomType when ^DomType :> HTMLElement and DomType<^Tag, ^DomType> and ^Tag :> IntrinsicDOMElement> = ^Tag
 
     [<AutoOpen>]
@@ -62,7 +60,7 @@ module Tags =
         [<Extension; Erase>]
         static member data(this: #HtmlTag, name: string, value: string) = this
 
-        [<Extension; Erase; CompiledName("ref"); EditorBrowsable(EditorBrowsableState.Never)>]
+        [<Extension; Erase; CompiledName("ref"); EB(EBState.Never)>]
         static member _refSRTPImplementation(this: #IntrinsicDOMElement, el: obj): #IntrinsicDOMElement = this
         [<Extension; Erase>]
         static member ref(this: #RefAttributeExtension, el: HTMLElement): #RefAttributeExtension = this

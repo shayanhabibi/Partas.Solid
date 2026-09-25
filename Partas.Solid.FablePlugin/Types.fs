@@ -182,7 +182,7 @@ module internal PluginContext =
 
     /// <summary>
     /// Adds an attribute (or more precise to say the element <c>props</c>) property set name and the value
-    /// it is being set to. This is lifted at the end of the transformations to produce a <c>solid-js</c> mergeProps.
+    /// it is being set to. This is lifted at the end of the transformations to produce a <c>solid-js</c> <c>merge</c>.
     /// </summary>
     let addSetter ctx setter =
         checkDuplicateSetter ctx setter
@@ -190,7 +190,7 @@ module internal PluginContext =
 
     /// <summary>
     /// Adds an attribute (or more precise to say the element <c>props</c>) property access selector to the context.
-    /// This is lifted at the end of the transformations to produce a <c>solid-js</c> splitProps.
+    /// This is lifted at the end of the transformations to produce a <c>solid-js</c> <c>omit</c>.
     /// </summary>
     let addGetter = _.GetterCollector
 

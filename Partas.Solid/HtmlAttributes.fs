@@ -1,11 +1,12 @@
 ﻿namespace Partas.Solid
 
 open System.Runtime.CompilerServices
-open Browser.Types
 open JetBrains.Annotations
 open Fable.Core
 open Fable.Core.JsInterop
 open Partas.Solid.Experimental.U
+open Fable.Core.TS
+open Fable.Core.TS.Dom
 
 [<AutoOpen>]
 module HtmlAttributes =
@@ -37,7 +38,6 @@ module HtmlAttributes =
         member _.textContent
             with set (value: string) = ()
             and [<Erase>] get (): string = JS.undefined
-
         [<Erase>]
         member _.onCopy
             with set (value: ClipboardEvent -> unit) = ()
@@ -365,8 +365,8 @@ module HtmlAttributes =
 
         [<Erase>]
         member _.onProgress
-            with set (value: ProgressEvent -> unit) = ()
-            and [<Erase>] get (): ProgressEvent -> unit = unbox ()
+            with set (value: ProgressEvent<EventTarget> -> unit) = ()
+            and [<Erase>] get (): ProgressEvent<EventTarget> -> unit = unbox ()
 
         [<Erase>]
         member _.onRateChange
@@ -556,7 +556,7 @@ module HtmlAttributes =
             with set (_: bool) = ()
             and [<Erase>] get (): bool = unbox ()
 
-        [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never); Erase>]
+        [<EB(EBState.Never); Erase>]
         member _.style''
             with set (_: obj) = ()
             and get (): obj = unbox ()
@@ -770,7 +770,6 @@ module HtmlAttributes =
         member _.inputMode
             with set (_: string) = ()
             and [<Erase>] get (): string = unbox ()
-
     type AnchorHTMLAttributes with
         [<Erase>]
         [<LanguageInjection("jsx", Prefix = "<a download='", Suffix = "' >")>]
@@ -795,7 +794,6 @@ module HtmlAttributes =
         member _.media
             with set (_: string) = ()
             and [<Erase>] get (): string = unbox ()
-
         [<Erase>]
         [<LanguageInjection("jsx", Prefix = "<a ping='", Suffix = "' >")>]
         member _.ping

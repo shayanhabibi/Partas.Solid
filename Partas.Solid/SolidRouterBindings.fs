@@ -115,7 +115,7 @@ module Bindings =
         val mutable preload: RoutePreloadFunc
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Combine
             ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
@@ -124,16 +124,16 @@ module Bindings =
                 PARTAS_SECOND PARTAS_BUILDER
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
             PARTAS_DELAY ()
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Zero() : HtmlContainerFun = ignore
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
@@ -141,7 +141,7 @@ module Bindings =
     type RootConfig(path: string, ``component``: HtmlElement) =
         member val path: string = jsNative with get, set
 
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member val ``component``: HtmlElement = jsNative with get, set
 
         /// <summary> Alias for <c>_.``component``</c></summary>
@@ -172,7 +172,7 @@ module Bindings =
         val mutable url: string
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Combine
             ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
             : HtmlContainerFun =
@@ -181,21 +181,21 @@ module Bindings =
                 PARTAS_SECOND PARTAS_BUILDER
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
             PARTAS_DELAY ()
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Zero() : HtmlContainerFun = ignore
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
         [<Erase>]
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         member inline _.Yield(PARTAS_ELEMENT: RootConfig[]) : HtmlContainerFun =
             fun PARTAS_CONT -> ignore PARTAS_ELEMENT
 
@@ -235,13 +235,13 @@ module Bindings =
 
     [<Erase>]
     type Extensions =
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: Router, PARTAS_RUN: HtmlContainerFun) =
             PARTAS_RUN Unchecked.defaultof<_>
             PARTAS_THIS
 
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         [<Extension; Erase>]
         static member Run(PARTAS_THIS: Route, PARTAS_RUN: HtmlContainerFun) =
             PARTAS_RUN Unchecked.defaultof<_>
@@ -317,17 +317,17 @@ module Bindings =
 
     type Extensions with
 
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         [<Extension>]
         [<Emit "$0.latest">]
         static member latest<'T>(this: unit -> 'T) : 'T = jsNative
 
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         [<Extension>]
         [<Emit "$0.key">]
         static member key(this: FSharpFunc<_, _>) : string = jsNative
 
-        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        [<EB(EBState.Never)>]
         [<Extension>]
         [<Emit "$0.keyFor($1)">]
         static member keyFor(this: FSharpFunc<_, _>, value: string) : string = jsNative

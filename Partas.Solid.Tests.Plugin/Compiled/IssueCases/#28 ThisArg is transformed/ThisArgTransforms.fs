@@ -10,11 +10,10 @@ open Fable.Core.JS
 type PartasTable<'Data>() =
     interface RegularNode
 
-    // [<Erase>]
-    // member val dataStack: DataStack<'Data> = undefined with get, set
+    [<Erase>]
+    member val dataStack: DataStack<'Data> = undefined with get, set
 
     [<SolidTypeComponent>]
     member props.__ =
-        failwith "REMAKE"
-        // let options = TableOptions<'Data>().data (fun () -> props.dataStack.data)
+        let options = TableOptions<'Data>().data (fun () -> props.dataStack.data)
         div ()

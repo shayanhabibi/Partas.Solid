@@ -327,16 +327,10 @@ type JsxUtils =
 
 module Patterns =
     /// Matches strings that start with the provided string
-    let (|StartsWith|_|) (value: string) =
-        function
-        | (s: string) when s.StartsWith value -> Some ()
-        | _ -> None
+    let inline (|StartsWith|_|) (value: string): string -> bool = _.StartsWith(value)
 
     /// Matches string that end with the provided string
-    let (|EndsWith|_|) (value: string) =
-        function
-        | (s: string) when s.EndsWith value -> Some ()
-        | _ -> None
+    let inline (|EndsWith|_|) (value: string): string -> bool = _.EndsWith(value)
 
     /// Matches strings that start with the provided string, and returns the string
     /// with the match trimmed
@@ -352,11 +346,7 @@ module Patterns =
     let (|EndsWithTrimmed|_|) (value: string) =
         function
         | EndsWith value as s ->
-            s.Substring (
-                0,
-                s.Length
-                - value.Length
-            )
+            s.Substring (0, s.Length - value.Length)
             |> Some
         | _ -> None
 
@@ -641,23 +631,11 @@ module Expr =
                 @ rest
             | TryCatch (body = ExprMatchingFunFeedback func bodyValues; catch = catch; finalizer = finalizer) ->
                 bodyValues
-                @ (catch
-                   |> Option.map (
-                       snd
-                       >> function
-                           | ExprMatchingFunFeedback func values -> values
-                   )
-                   |> Option.defaultValue [])
-                @ (finalizer
-                   |> Option.map (function
-                       | ExprMatchingFunFeedback func values -> values)
-                   |> Option.defaultValue [])
+                @ (catch |> Option.map ( snd >> function ExprMatchingFunFeedback func values -> values ) |> Option.defaultValue [])
+                @ (finalizer |> Option.map (function ExprMatchingFunFeedback func values -> values) |> Option.defaultValue [])
                 @ rest
             | IfThenElse (ExprMatchingFunFeedback func values, ExprMatchingFunFeedback func values2, ExprMatchingFunFeedback func values3, _) ->
-                values
-                @ values2
-                @ values3
-                @ rest
+                values @ values2 @ values3 @ rest
             | _ -> rest
 
 
@@ -667,20 +645,7 @@ type StringUtils =
         function
         | Patterns.EndsWithTrimmed "'" s
         | Patterns.EndsWithTrimmed "`1" s -> StringUtils.TrimReservedIdentifiers s
-        | s when
-            s.Length > 2
-            && s
-                .Substring(
-                    s.Length
-                    - 2
-                )
-                .StartsWith
-                '`'
-            ->
-            s.Substring (
-                0,
-                s.Length
-                - 2
-            )
+        | s when s.Length > 2 && s.Substring(s.Length - 2).StartsWith '`' ->
+            s.Substring ( 0, s.Length - 2 )
             |> StringUtils.TrimReservedIdentifiers
         | s -> s

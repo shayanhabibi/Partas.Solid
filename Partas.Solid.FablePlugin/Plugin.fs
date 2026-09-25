@@ -100,6 +100,13 @@ module internal rec AST =
             then [ expr ]
             else [ expr ] |> function
                 | ValueUnroller ctx exprs -> exprs
+        /// Unrolls a single property value, leaving it untouched if unrolling does not yield exactly one expression.
+        /// Used by the field-set (`val mutable`) property paths, which the setter path's pattern form cannot reach.
+        let unrollValue (ctx: PluginContext) (expr: Expr): Expr =
+            match expr with
+            | TagValue.TagValue ctx _ -> expr // Unrolling strips the casts TagValue recognises
+            | ValueUnrollerFeedback ctx [ unrolled ] -> unrolled
+            | _ -> expr
         /// There is a tendency for `toArray` and `delay` to generate in property value scenarios.
         /// As I do not know their purpose outside of this use case, I am hesitant to pervasively
         /// flatten these expressions out. Instead, I choose to only perform this action exclusively
@@ -228,7 +235,7 @@ module internal rec AST =
                 Some(prop)
             | _ -> None
         // Collects and transforms any of our 'special' `props` usage so that we can
-        // later create the splitProps and mergeProps to suit.
+        // later create the omit and merge to suit.
         let (|PropsGetterOrSetter|_|) (ctx: PluginContext) = function
             | PropertyGetter ctx prop ->
                 PluginContext.addGetter ctx prop
@@ -269,7 +276,7 @@ module internal rec AST =
                 kind = FieldSet(prop)
                 value = expr
                 ) ->
-                (prop, transform ctx expr)
+                (prop, transform ctx (unrollValue ctx expr))
                 |> Some
             // Inlined named overloads to `[<DefaultValue>] val mutable` properties/attributes
             | Let(
@@ -281,7 +288,7 @@ module internal rec AST =
                         value = expr
                     )
                 ) ->
-                (prop, transform ctx expr) |> Some
+                (prop, transform ctx (unrollValue ctx expr)) |> Some
             // Captured method/Extension call
             | Call(
                 Value(ValueKind.UnitConstant, None),
@@ -1092,9 +1099,9 @@ type SolidTypeComponentAttribute(flag: int) =
             let newExpr =
                 memberDecl.Body
                 |> AST.transform ctx // initiate transformation
-                // Create and append the splitProps expression
+                // Create and append the omit expression
                 |> if ctx.HasFlag(ComponentFlag.SkipOmit) then id else Baked.convertGettersToObject ctx.SelfIdentifier (PluginContext.getGetters ctx |> List.distinct)
-                // Create and append the mergeProps expression if we have any setters
+                // Create and append the merge expression if we have any setters
                 |> Baked.convertSettersToObject ctx.SelfIdentifier (PluginContext.getSetters ctx)
             { memberDecl with Body = newExpr; Name = info.DisplayName }
         | _ ->
