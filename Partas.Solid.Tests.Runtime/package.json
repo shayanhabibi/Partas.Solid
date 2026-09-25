@@ -6,7 +6,11 @@
     "test": "node run.mjs all",
     "test:primitives": "node run.mjs primitives",
     "test:dom": "node run.mjs dom",
-    "test:integration": "node run.mjs integration"
+    "test:integration": "node run.mjs integration",
+    "watch": "node run.mjs all --watch",
+    "watch:primitives": "node run.mjs primitives --watch",
+    "watch:dom": "node run.mjs dom --watch",
+    "watch:integration": "node run.mjs integration --watch"
   },
   "dependencies": {
     "@solidjs/web": "2.0.0-rc.9",

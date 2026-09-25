@@ -127,6 +127,7 @@ node run.mjs dom                                   # Fable-compile the Dom suite
 node run.mjs integration Apps -t "sorts by name"   # extra args go to vitest: path filter, -t name filter
 node run.mjs primitives --no-compile               # rerun specs without recompiling (fast, when only .test.js changed)
 node run.mjs all                                   # what the build CLI runs
+node run.mjs integration --watch                   # fable watch + vitest watch; plugin edits rebuild the plugin and restart
 ```
 
 ## Test architecture (snapshot tests over generated JSX)

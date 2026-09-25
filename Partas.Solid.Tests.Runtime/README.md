@@ -69,6 +69,35 @@ The build CLI runs this suite after the Expecto plugin tests:
 With `--quick`, an existing `node_modules` is reused. `--skip-tests` skips this stage along with the
 other test stages.
 
+### Watch mode
+
+```sh
+node run.mjs integration --watch        # or: npm run watch:integration
+node run.mjs all --watch                # every suite (npm run watch)
+node run.mjs dom --watch Forms          # vitest args still apply: only specs whose path contains "Forms"
+node run.mjs dom --watch --no-compile   # vitest only, against the existing .fs.jsx
+```
+
+`--watch` (implemented in `watch.mjs`) keeps three things running:
+
+| You edit | What reruns |
+| --- | --- |
+| a fixture `.fs`, or `Partas.Solid/*.fs` bindings | `dotnet fable watch` recompiles that suite, then vitest reruns the specs that import changed `.fs.jsx` |
+| a `.test.js` | vitest reruns that spec |
+| `Partas.Solid.FablePlugin/*.fs` | the plugin is rebuilt (`dotnet build -c Release`) and the Fable watchers restart, because Fable loads the plugin dll only at startup. The restart recompiles every watched suite, so vitest reruns them all |
+
+This is the loop for fixing a bug that an `it.fails` test pins: watch the suite, fix the plugin or
+binding, and wait until vitest reports that test as an **unexpected pass**. Then change it to `it` and
+delete its `// BUG:` line.
+
+Fable output is filtered to compile start and finish lines and errors. After a failed compile, vitest
+keeps running against the last good `.fs.jsx`, so check the `[fable <Suite>]` lines before reading the
+vitest results. vitest's own keys still work: `a` reruns everything, `f` reruns failures, `q` quits and
+stops the watchers.
+
+The compile lock is only held while the watchers start and while the plugin rebuilds. Do not
+`node run.mjs` a suite you are also watching, because both would write its `.fs.jsx`.
+
 ### Concurrency
 
 Several processes can run `run.mjs` at the same time. Every suite references the shared `Partas.Solid`
