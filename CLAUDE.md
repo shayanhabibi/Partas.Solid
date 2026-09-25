@@ -18,13 +18,18 @@ specification**. Behaviour changes are observed by diffing generated JSX, not by
 
 ## `solid/` — vendored upstream, NOT part of this project
 
-`solid/` is a **git submodule** pinned to [`solidjs/solid`](https://github.com/solidjs/solid) branch `next` (Solid
-2.0-rc). It is upstream TypeScript/JavaScript reference material, checked out purely so the Solid 2 API can be consulted
-while porting the bindings. **It is not built, tested, packaged, formatted, or shipped by anything in this repository,
-and no F# source depends on it.**
+`solid/` is a **git submodule** of [`solidjs/solid`](https://github.com/solidjs/solid) (branch `next`), pinned at tag
+`solid-js@2.0.0-rc.9` (`9a29b1a0`). It is upstream TypeScript/JavaScript/Rust reference material, checked out purely so
+the Solid 2 API can be consulted while porting the bindings. **It is not built, tested, packaged, formatted, or shipped
+by anything in this repository, and no F# source depends on it.**
+
+As of rc.9 the monorepo has absorbed dom-expressions: `solid/packages/` holds `solid`, `signals`, `web`, `compiler`,
+`babel-plugin`, `element`, `h`, `html`, `universal` and `diagnostics`. The web runtime is published as `@solidjs/web`
+(`solid/packages/web`), the JSX/DOM types are authored in `solid/packages/web/jsx/`, the JSX compiler is Rust
+(`solid/packages/compiler/src`), and the store API is exported from `solid-js` itself (there is no `solid-js/store`).
 
 **Do not search it by default.** Glob/Grep/find over the repo root will otherwise drown in tens of thousands of
-irrelevant `.ts`, `.js`, `.md` and `node_modules` files. Scope searches to the F# projects — `Partas.Solid/`,
+irrelevant `.ts`, `.js`, `.rs`, `.md` and `node_modules` files. Scope searches to the F# projects — `Partas.Solid/`,
 `Partas.Solid.FablePlugin/`, `Partas.Solid.Tests.*/`, `ScratchTests/`, `docs/` — or pass `--glob '!solid/**'`.
 
 Read from it **only** when the question is explicitly about upstream Solid behaviour that cannot be answered from this
@@ -38,71 +43,57 @@ repo, e.g.:
 surface to our bindings with clickable `file:line` anchors, and records what this checkout *cannot* answer. Most
 binding questions are answered there without opening `solid/` at all.
 
-Anchors when you do need to look (note the package dir is `solid-web`, not `web`):
+Anchors when you do need to look (package dirs are `web` and `signals`, not `solid-web` / `solid-signals`):
 
 | Question | File |
 | --- | --- |
-| What does `solid-js` export? What was **removed** in 2.0 and why? | [`solid/packages/solid/src/index.ts`](solid/packages/solid/src/index.ts) (removals: [`:153-211`](solid/packages/solid/src/index.ts#L153-L211)) |
-| Reactivity + store primitives | [`solid-signals/src/index.ts`](solid/packages/solid-signals/src/index.ts), [`src/store/index.ts`](solid/packages/solid-signals/src/store/index.ts) |
+| What does `solid-js` export? What was **removed** in 2.0 and why? | [`solid/packages/solid/src/index.ts`](solid/packages/solid/src/index.ts) (removals: [`:255-313`](solid/packages/solid/src/index.ts#L255-L313)) |
+| Migration notes | [`solid/documentation/solid-2.0/`](solid/documentation/solid-2.0/) |
+| Reactivity + store primitives | [`signals/src/index.ts`](solid/packages/signals/src/index.ts), [`src/store/index.ts`](solid/packages/signals/src/store/index.ts) |
 | `For`/`Show`/`Switch`/`Match`/`Errored`/`Loading`/`Repeat`/`Reveal` | [`solid/packages/solid/src/client/flow.ts`](solid/packages/solid/src/client/flow.ts) |
 | `createSignal`/`createMemo`/`createEffect`/`createStore` impls | [`solid/packages/solid/src/client/hydration.ts`](solid/packages/solid/src/client/hydration.ts) |
-| `render`/`hydrate`/`Portal`/`Dynamic`/`clientOnly` | [`solid/packages/solid-web/src/index.ts`](solid/packages/solid-web/src/index.ts) |
-| SSR entry points | [`solid-web/src/server-mock.ts`](solid/packages/solid-web/src/server-mock.ts), [`solid/packages/solid/src/server/`](solid/packages/solid/src/server/) |
+| `render`/`hydrate` | [`web/src/client.ts`](solid/packages/web/src/client.ts) (`render` [`:294`](solid/packages/web/src/client.ts#L294), `hydrate` [`:2012`](solid/packages/web/src/client.ts#L2012)) |
+| `Portal`/`Dynamic`/`clientOnly` | [`solid/packages/web/src/index.ts`](solid/packages/web/src/index.ts) |
+| SSR entry points | [`web/src/server-mock.ts`](solid/packages/web/src/server-mock.ts), [`solid/packages/solid/src/server/`](solid/packages/solid/src/server/) |
+| Attribute / event / tag typings | [`web/jsx/jsx.d.ts`](solid/packages/web/jsx/jsx.d.ts) |
+| How `prop:*` keys are derived | [`web/jsx/jsx-properties.d.ts`](solid/packages/web/jsx/jsx-properties.d.ts) |
+| What the compiler actually emits | [`compiler/src/dom/`](solid/packages/compiler/src/dom/) (Rust; SSR in [`compiler/src/ssr/`](solid/packages/compiler/src/ssr/)) |
 
-Not in this checkout, so don't search for them: the **JSX/DOM attribute types** (they live in the uninstalled
-`@dom-expressions/runtime` dep), and **`@solidjs/router` / `@solidjs/meta` / `@solidjs/start`** (separate repos).
+Coverage of the JSX/DOM surface is tracked in [`docs/API-COVERAGE-solid2.md`](docs/API-COVERAGE-solid2.md) §5 — read
+that before re-deriving a diff by hand.
+
+Not in this checkout, so don't search for them: **`@solidjs/router` / `@solidjs/meta` / `@solidjs/start`** (separate
+repos).
 
 Never edit files under `solid/`. Changes there are upstream's, and committing inside the submodule would move the
-gitlink for everyone. To update the pin deliberately: `git -C solid pull origin next`, then commit the changed gitlink
-in this repo.
+gitlink for everyone. To update the pin deliberately: `git -C solid fetch --tags origin`, check out the new
+`solid-js@<version>` tag, then commit the changed gitlink in this repo.
 
-## `dom-expressions/` — vendored upstream, NOT part of this project
-
-`dom-expressions/` is a **git submodule** pinned to [`ryansolid/dom-expressions`](https://github.com/ryansolid/dom-expressions)
-branch `next`. Same rules as `solid/`: **not built, tested, packaged, formatted, or shipped**, no F# source depends
-on it, never edit it, and **do not search it by default** — it carries `node_modules` and a 4000-line `.d.ts` that
-will swamp any repo-wide Glob/Grep. Scope searches to the F# projects, or pass `--glob '!dom-expressions/**'`.
-
-Why it is here: dom-expressions is the **source of truth for the JSX/DOM type surface**. Solid does not author its
-own JSX types — `solid-web`'s `types:copy-jsx` script (`solid/packages/solid-web/package.json:383`) copies
-`jsx.d.ts` verbatim from `@dom-expressions/runtime` and rewrites only the element return type. So any question
-about attributes, events, tags or namespaces is answered *here*, not in `solid/`.
-
-The pin (`f02695a2`, `@dom-expressions/runtime` 0.50.0-next.42) exactly matches the version Solid's pinned commit
-depends on. Keep the two pins in step — a mismatch means you are reading a different JSX surface than Solid ships.
-Note the npm version is **untagged** in git, so the pin tracks the `next` branch rather than a tag.
-
-Read from it only for:
-
-| Question | File |
-| --- | --- |
-| Attribute / event / tag typings | [`packages/runtime/src/jsx.d.ts`](dom-expressions/packages/runtime/src/jsx.d.ts) |
-| How `prop:*` keys are derived | [`packages/runtime/src/jsx-properties.d.ts`](dom-expressions/packages/runtime/src/jsx-properties.d.ts) |
-| What the compiler actually emits | [`packages/compiler/src/dom/`](dom-expressions/packages/compiler/src/dom/) |
-
-Coverage of this surface is tracked in [`docs/API-COVERAGE-solid2.md`](docs/API-COVERAGE-solid2.md) §5 — read that
-before re-deriving a diff by hand.
-
-> **Both submodules are wiped by the build CLI's `clean` target.** If `solid/` or `dom-expressions/` vanishes,
-> restore with `git submodule add --force -b next <url> <path>` — the `.git/modules` cache survives, so this
-> reactivates the local clone at the same SHA without re-downloading.
+> **The build CLI's `clean` target wipes `solid/`.** If it vanishes, restore with
+> `git submodule add --force -b next https://github.com/solidjs/solid.git solid` — the `.git/modules` cache
+> survives, so this reactivates the local clone without re-downloading. Then check out the pinned tag again.
+> (The former `dom-expressions/` submodule was removed after rc.9 absorbed it; use `solid/packages/web/jsx/` and
+> `solid/packages/compiler/` instead.)
 
 ## Build & test
 
 The current entry point is the `partas-solid.fsproj` build CLI (System.CommandLine + FAKE):
 
 ```powershell
-dotnet run --project partas-solid.fsproj -- test      # clean, format, build, run Expecto tests
-dotnet run --project partas-solid.fsproj -- build     # build Partas.Solid + FablePlugin
-dotnet run --project partas-solid.fsproj -- format    # fantomas over all sources
-dotnet run --project partas-solid.fsproj -- lint      # fantomas --check
+dotnet run --project partas-solid.fsproj -- test      # clean, restore, build test projects, run Expecto tests
+dotnet run --project partas-solid.fsproj -- build     # build Partas.Solid + FablePlugin (Release)
 dotnet run --project partas-solid.fsproj -- publish --nuget <APIKEY>
-dotnet run --project partas-solid.fsproj -- scratch [--watch]   # hidden: fable-compile ScratchTests
+dotnet run --project partas-solid.fsproj -- bump <bump>   # bump the version in both .fsproj files (skipped in CI)
 ```
 
-Useful global flags: `-q/--quick` (skip tool restore, clean, solution restore), `--skip-tests`, `-c Debug|Release`.
-`--quick` is the flag to reach for during iteration — a full `test` run cleans every `bin`, runs `fable clean`, and
-re-restores.
+Those four are the only registered commands. Useful flags: `-q/--quick` (skip tool restore, clean, solution restore)
+and `--skip-tests`. Builds are always Release; there is no configuration flag. `--quick` is the flag to reach for during
+iteration — a full `test` run cleans every `bin`, runs `fable clean`, and re-restores.
+
+`Build/Program.fs` still defines a `format` stage and a `runScratch` input, but neither is wired to a command, and
+`Build/Spec.fs` declares `--format`/`--dry-format` options that nothing reads. Format with `dotnet fantomas <files>`
+directly, and compile ScratchTests with `dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx
+--optimize [--watch]` inside `ScratchTests/`.
 
 `build.fsx` is the older FAKE script still invoked by `.github/workflows/dotnet.yml` (`dotnet fsi ./build.fsx`). Note
 its `Build` target targets `Partas.Solid.sln`, which no longer exists — the solution is now `Partas.Solid.slnx`. Prefer
@@ -150,8 +141,8 @@ knowing:
 - The commented-out explicit test lists at the bottom of `Tests.fs` are the pre-discovery scheme; they document the
   intent of each case name and are worth reading when naming a new case.
 
-`ScratchTests/` is an unversioned playground for the same loop (`scratch --watch`) when you want to eyeball JSX for
-input that isn't yet a test case. `Partas.Solid.Tests.Core` is a small unit-test project.
+`ScratchTests/` is an unversioned playground for the same loop (`dotnet fable ... --watch`, see above) when you
+want to eyeball JSX for input that isn't yet a test case. `Partas.Solid.Tests.Core` is a small unit-test project.
 
 ## Plugin architecture
 
@@ -171,7 +162,9 @@ Compilation order in `Partas.Solid.FablePlugin.fsproj` reflects the dependency c
 - `[<SolidTypeComponent>]` — applies to type members (`member props.View = ...`). Requires a strict shape checked by
   `SchemaRules.ValidMemberRef`: instance member, self-identifier literally named `props`, single unit parameter,
   declaring entity under the `Partas.Solid` namespace. On match it renames the member to the declaring type's
-  `DisplayName` and appends generated `splitProps` (from collected getters) and `mergeProps` (from collected setters).
+  `DisplayName` and prepends a `const PARTAS_OTHERS = omit(props, ...)` binding (from collected getters; plain
+  `= props` when none were collected, and omitted entirely under `ComponentFlag.SkipOmit`) and a `props = merge({...}, props)` default-props
+  assignment (from collected setters). Both `omit` and `merge` are imported from `solid-js`.
   On mismatch it warns and falls back to plain transformation.
 
 **`PluginContext` is the spine.** It threads `PluginHelper` (for `LogWarning`/`LogError`/`GetEntity`/`GetMember`)
@@ -190,12 +183,14 @@ compile that component with `PrintDisposals`.
 
 ## Conventions
 
-- **Fantomas is enforced.** `.editorconfig` drives it. `Partas.Solid.FablePlugin/Plugin.fs` and any
-  `**/IndexAccess/IndexAccess.fs` are excluded from formatting — don't run fantomas over them manually.
+- **Fantomas is configured but not currently enforced.** `.editorconfig` drives it. `Partas.Solid.FablePlugin/Plugin.fs`
+  and any `**/IndexAccess/IndexAccess.fs` are excluded from formatting — don't run fantomas over them manually. No build
+  command runs fantomas, and most sources (including `HEAD`'s bindings) do not pass `fantomas --check`, so a repo-wide
+  run produces a large reformatting diff. Format only the files you touch, and match their existing layout.
 - `WarningsAsErrors` includes `3239` and `0025` (incomplete pattern matches) in both shipped projects: an inexhaustive
   match in the plugin is a build failure, not a warning.
-- Target frameworks intentionally differ: shipped packages `net6.0`, plugin test host `net8.0`, the fable test project
-  `net9.0`, build CLI and ScratchTests `net10.0`.
+- Target frameworks intentionally differ: `Partas.Solid` `net8.0`, `Partas.Solid.FablePlugin` `net6.0`, plugin test host
+  `net8.0`, the fable test project and `Partas.Solid.Tests.Core` `net9.0`, build CLI and ScratchTests `net10.0`.
 - Versions are duplicated in both `.fsproj`s and driven from `docs/RELEASE_NOTES.md` at pack time; `docs/RELEASE_NOTES.md`
   is generated by git-cliff (`cliff.toml`, `.cliffignore`), so commit messages should follow conventional-commit style.
 - `.fs.js` / `.fs.jsx` files sitting next to sources in `Partas.Solid/` and the plugin are fable build artifacts, not

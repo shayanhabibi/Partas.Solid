@@ -6,10 +6,10 @@ This branch retargets Partas.Solid from **solid-js 1.x to solid-js 2.0**. Solid 
 restructured a large part of its own runtime API, so most of what follows is that change surfacing through the
 bindings — it is not gratuitous churn. Expect to touch every non-trivial component.
 
-> **Status:** the branch is a release candidate built from `wip:` commits. Several plugin test cases are currently
-> stubbed with `failwith "redo"` (effects/resources in `OperatorsInProps`, `SignalSetterInvoke`,
-> `ThisArgTransforms`, `ExperimentalBuilders`) pending rework against the new API. Treat anything reactive beyond
-> signals/memos as still in flux.
+> **Status:** the branch is a release candidate built from `wip:` commits, tracking `solid-js` 2.0.0-rc.9. The
+> plugin test inputs that were stubbed with `failwith "redo"` / `"REDO"` (`IndexedPropSpreading`,
+> `OperatorsInProps`, `SignalSetterInvoke`, `ThisArgTransforms`, `ExperimentalBuilders`) have been restored against
+> the Solid 2 API and their snapshots regenerated; all 31 plugin cases pass.
 
 ---
 
@@ -177,26 +177,43 @@ New supporting types: `Store<'T>`, `StoreSetter<'T>`, `StoreReturn<'T>`, `Refres
 
 Two specifics worth calling out:
 
-- **`createEffect` changed shape.** Alongside `createEffect(fun () -> ...)` there is now the Solid 2.0
-  compute/effect split: `createEffect(compute: 'T option -> 'T, effectFn: 'T -> unit, ?defer, ?schedule, ?sync,
-  ?transparent)`, also available taking an `EffectOptions`.
+- **`createEffect` changed shape.** The single-callback form is gone; Solid 2.0 splits tracking from the side
+  effect: `createEffect(compute: 'T option -> 'T, effectFn: 'T -> unit, ?defer, ?schedule, ?sync, ?transparent)`,
+  also available taking an `EffectOptions`. `onCleanup` inside the effect is replaced by **returning** the cleanup
+  (`effectFn: 'T -> DisposalFunc`); the cleanup is also handed to the `EffectErrorHandler` of the error overload.
+  The same return-a-cleanup shape applies to `createRenderEffect`, `createTrackedEffect`, `createReaction` and
+  `onSettled`. `createRenderEffect` has no error overload: upstream does not accept `{ effect, error }` there.
 - **`createStore` moved from `solid-js/store` to `solid-js`** and returns the new `Store<'T> * StoreSetter<'T>`.
   `Store<'T>` carries an implicit conversion to `'T`, so reads stay ergonomic. `reconcile` remains.
+- **Store setters take an updater, never a value.** `StoreSetter<'T>` is `('T -> 'T) -> unit`:
+  `setStore (fun _ -> next)`, or mutate the draft and return it. `reconcile value` now returns that `'T -> 'T`
+  updater, so `setStore (reconcile next)` reads as before.
+- **Two-argument callbacks are curried lambdas, not tuples.** `mapArray`'s `map` and `createErrorBoundary`'s
+  `fallback` are `Func<_, _, _>`: write `fun item index -> ...` / `fun err reset -> ...`. The previous tupled
+  signatures compiled to a one-argument JS function, so Solid never passed the index / reset.
+- **`lazy'` follows `lazy(fn, options?, moduleUrl?)`.** `moduleUrl` is now the third argument, after a
+  `LazyOptions(?export)`.
 
-## 8. `Partas.Solid.Experimental` computation expressions removed
+## 8. `Partas.Solid.Experimental` computation expressions re-ported
 
-The entire `Builders` module is gone — `effect`, `mount`, `cleanup`, `memo`, `batch`, `lazyload`, `selector`,
-`children`, `reaction`, and `lambda` no longer exist, along with their builder types. Only the base builder types
-(`NullLambdaBuilder`, `BaseLambdaBuilder`, `LambdaBuilder`) remain; nothing is instantiated for you.
+The `Builders` module was removed while the port was in progress and has been re-ported onto the Solid 2 API. Where
+a builder wrapped a primitive Solid 2.0 kept or replaced, it follows the replacement:
 
-Any `effect { ... }` / `memo { ... }` / `lambda { ... }` blocks must be rewritten as direct calls. Several of these
-depended on primitives that Solid 2.0 itself removed (`batch`, `createSelector`, `onMount`), so they cannot simply
-be reinstated as-is.
+- `effect { ... }` now targets the two-phase `createEffect(compute, effectFn)` rather than the single-callback 1.x form.
+  It **requires exactly one `let!`**: the bound accessor is the tracked compute phase, and the rest of the block is
+  the untracked effect phase receiving its value (`let! a, b = lambda { first (), second () }` tracks several).
+- `mount { ... }` now targets `onSettled` (Solid 2.0 removed `onMount`).
+- `batch` and `selector` are **dropped** — their primitives (`batch`, `createSelector`) no longer exist upstream
+  (`flush` and `createProjection` are the replacements, and neither fits a builder shape).
+
+The base builder types (`NullLambdaBuilder`, `BaseLambdaBuilder`, `LambdaBuilder`) are unchanged. Blocks using
+`batch { ... }` or `selector { ... }` must be rewritten as direct calls; the rest should compile to the new
+primitives, but check the emitted JSX of any effect-heavy component.
 
 ## 9. New `SolidWebBindings` module
 
-`solid-js/web` now has its own file (compiled between `SolidBindings` and `SolidRouterBindings`), holding what was
-previously scattered or missing:
+The web runtime (`@solidjs/web`, formerly `solid-js/web`) now has its own file (compiled between `SolidBindings` and
+`SolidRouterBindings`), holding what was previously scattered or missing:
 
 - `Portal()`, `Dynamic<'T>()` (moved out of `SolidBindings`), `HeadTag()`
 - `render`, `hydrate`, `renderToString`, `renderToStream`
@@ -204,7 +221,7 @@ previously scattered or missing:
 - `clientOnly` (sync and `Promise`-returning overloads)
 - `httpHeader`, `httpStatus` (typed against `System.Net.HttpStatusCode`)
 
-`Bindings.render` / `renderToString` / `isServer` / `DEV` are no longer on the core `Bindings` type — update your
+`Bindings.render` / `renderToString` / `isServer` are no longer on the core `Bindings` type (`DEV` stays there) — update your
 `open`s accordingly.
 
 ## 10. Toolchain
@@ -216,7 +233,7 @@ Relevant if you build from source or pin transitively:
   took a new optional parameter.
 - Solution file replaced: `Partas.Solid.sln` → **`Partas.Solid.slnx`**.
 - New build CLI (`partas-solid.fsproj`) supersedes `build.fsx`:
-  `dotnet run --project partas-solid.fsproj -- test|build|format|lint|publish`.
+  `dotnet run --project partas-solid.fsproj -- test|build|publish|bump`. It has no format/lint command.
 - Test discovery is now directory-driven — cases are found by walking `Compiled/*Cases/**` for `.expected` files
   rather than being listed in `Tests.fs`. Adding a case means adding a folder.
 
@@ -228,10 +245,13 @@ Relevant if you build from source or pin transitively:
 2. Replace `.on(...)`, `.prop(...)`, `.use'(...)` call sites — no direct replacement exists yet.
 3. Rename control-flow components: `ErrorBoundary` → `Errored`, `Suspense` → `Loading`, `SuspenseList` → `Reveal`,
    `For` → `For.Component`/`For.Keyed`/`For.NonKeyed`, drop `Index`.
-4. Rewrite every `Partas.Solid.Experimental` CE block as direct calls.
+4. Rewrite `Partas.Solid.Experimental` `batch { ... }` / `selector { ... }` blocks as direct calls; give every
+   `effect { ... }` a `let!` source, and re-check `mount { ... }` blocks against `onSettled`.
 5. Replace `splitProps`/`mergeProps` calls with `omit`/`merge`.
 6. Rework anything built on `createResource`, `batch`, `onMount`, `createSelector`, `createComputed`,
    `startTransition`, `useTransition`, `produce`, or `unwrap`.
+7. Split each `createEffect` into compute and effect, and return cleanups instead of calling `onCleanup` inside it.
+8. Pass store setters an updater (`setStore (fun s -> ...)`), and curry `mapArray` / `createErrorBoundary` callbacks.
 7. Fix `open`s for `render`/`renderToString`/`isServer` (now `SolidWebBindings`).
 8. Regenerate any committed JSX snapshots — `PARTAS_LOCAL` disappears, `bool:n$` becomes `n$`, and imports change.
 9. Optionally, drop the `props` naming convention on `SolidTypeComponent` members now that `this` (or anything
