@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!--
+        Runtime test suite. Compiled by Fable (not by dotnet build) through ../run.mjs, which runs
+        "dotnet fable" with the same flags as the plugin snapshot tests (exclude plugin, no cache,
+        extension .fs.jsx, Release, optimize) plus "-o ." so referenced-library output stays per suite. Every *.fs below this folder is compiled, in path order.
+        The folder name "Partas.Solid" is reserved: Fable writes the library's own output there (-o .).
+        Put each case in its own subfolder; within a folder, prefix files (A-Types.fs, B-View.fs)
+        when one depends on another.
+    -->
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="**\*.fs" Exclude="bin\**;obj\**;fable_modules\**;node_modules\**;Partas.Solid\**" />
+        <None Include="**\*.test.js;**\*.test.jsx" Exclude="bin\**;obj\**;fable_modules\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Partas.Solid.FablePlugin\Partas.Solid.FablePlugin.fsproj" />
+        <ProjectReference Include="..\..\Partas.Solid\Partas.Solid.fsproj" />
+    </ItemGroup>
+
+</Project>

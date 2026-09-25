@@ -80,7 +80,7 @@ gitlink for everyone. To update the pin deliberately: `git -C solid fetch --tags
 The current entry point is the `partas-solid.fsproj` build CLI (System.CommandLine + FAKE):
 
 ```powershell
-dotnet run --project partas-solid.fsproj -- test      # clean, restore, build test projects, run Expecto tests
+dotnet run --project partas-solid.fsproj -- test      # clean, restore, Expecto tests, then the runtime (vitest) suites
 dotnet run --project partas-solid.fsproj -- build     # build Partas.Solid + FablePlugin (Release)
 dotnet run --project partas-solid.fsproj -- publish --nuget <APIKEY>
 dotnet run --project partas-solid.fsproj -- bump <bump>   # bump the version in both .fsproj files (skipped in CI)
@@ -89,6 +89,10 @@ dotnet run --project partas-solid.fsproj -- bump <bump>   # bump the version in 
 Those four are the only registered commands. Useful flags: `-q/--quick` (skip tool restore, clean, solution restore)
 and `--skip-tests`. Builds are always Release; there is no configuration flag. `--quick` is the flag to reach for during
 iteration — a full `test` run cleans every `bin`, runs `fable clean`, and re-restores.
+
+After Expecto, `test` runs the "runtime tests" stage: `npm ci` in `Partas.Solid.Tests.Runtime/` (skipped under
+`--quick` when `node_modules` already exists), then `node run.mjs all`. It needs Node >= 22.12 on `PATH`. The `bin`
+clean excludes `**/node_modules/**`, because npm packages ship their own `bin/` folders.
 
 `Build/Program.fs` still defines a `format` stage and a `runScratch` input, but neither is wired to a command, and
 `Build/Spec.fs` declares `--format`/`--dry-format` options that nothing reads. Format with `dotnet fantomas <files>`
@@ -116,6 +120,15 @@ The test assembly first runs `buildCases()`, which shells out to
 `dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize` inside
 `Partas.Solid.Tests.Plugin/Compiled/`. That step must succeed or every test fails.
 
+Runtime tests (vitest) are run through `run.mjs` from `Partas.Solid.Tests.Runtime/`:
+
+```powershell
+node run.mjs dom                                   # Fable-compile the Dom suite, then run its specs
+node run.mjs integration Apps -t "sorts by name"   # extra args go to vitest: path filter, -t name filter
+node run.mjs primitives --no-compile               # rerun specs without recompiling (fast, when only .test.js changed)
+node run.mjs all                                   # what the build CLI runs
+```
+
 ## Test architecture (snapshot tests over generated JSX)
 
 `Partas.Solid.Tests.Plugin/Compiled/` is a **separate Fable project** (`Partas.Solid.Tests.Plugin.Compiled.fsproj`,
@@ -140,6 +153,37 @@ knowing:
   case that fails to compile disappears rather than failing loudly. If a test vanishes, check the fable output.
 - The commented-out explicit test lists at the bottom of `Tests.fs` are the pre-discovery scheme; they document the
   intent of each case name and are worth reading when naming a new case.
+
+## Runtime tests (`Partas.Solid.Tests.Runtime/`)
+
+The snapshot tests pin *what* the plugin emits. The runtime tests check *what that output does*. F# fixtures are
+compiled by Fable and the plugin (same flags as the snapshots, plus `-o .`), then compiled again by the real Solid
+2 JSX compiler (`@solidjs/vite-plugin` / `@solidjs/compiler`, pinned to rc.9 with the other Solid packages in
+`package.json`). vitest runs the result in jsdom against the browser development build of `solid-js` and `@solidjs/web`.
+`README.md` there is the full guide. It covers the helpers and rc.9 scheduling: setters only queue a microtask, so
+call `flush()` or use `click`/`input`/`act` before you assert.
+
+Three suites, each its own Fable project (`<Suite>/Partas.Solid.Tests.Runtime.<Suite>.fsproj`, globbing `**\*.fs`):
+`Primitives` (reactivity and stores, no DOM), `Dom` (elements, attributes, events, refs, SVG, `@solidjs/web`), and
+`Integration` (components, control flow, context, async, small apps).
+
+```
+<Suite>/<CaseFolder>/A-Foo.fs        <- F# fixture; module Partas.Solid.Tests.Runtime.<Suite>.<CaseFolder>.<File>
+                     A-Foo.fs.jsx    <- generated, gitignored
+                     Foo.test.js(x)  <- vitest spec importing ./A-Foo.fs.jsx
+```
+
+- **Adding a test = adding a folder** with a fixture and a spec. Module names must be unique within a suite, and
+  files compile in path order (`A-`/`B-` prefixes for dependencies). `Partas.Solid`, `fable_modules`, `bin`, `obj`
+  and `node_modules` are reserved folder names in a suite, because Fable writes its output there.
+- **One broken fixture breaks the whole suite.** A compile error fails the suite's Fable step, so every spec in it
+  fails too. Run `node run.mjs <suite>` before finishing.
+- **Known bugs are `it.fails`.** When runtime behaviour is wrong because of Partas.Solid, keep the correct assertion,
+  mark the test `it.fails(...)`, and put `// BUG: <one line>` next to it. Never weaken the assertion. When the bug is
+  fixed, vitest reports the `it.fails` as failing; change it to `it` then. `grep -rn "BUG:"` over the suites is
+  the current list of known defects.
+- `run.mjs` serialises Fable compiles across processes with `.compile-lock/`. It does not coordinate with a
+  concurrent snapshot-test build, and both of them build `Partas.Solid` and the plugin.
 
 `ScratchTests/` is an unversioned playground for the same loop (`dotnet fable ... --watch`, see above) when you
 want to eyeball JSX for input that isn't yet a test case. `Partas.Solid.Tests.Core` is a small unit-test project.

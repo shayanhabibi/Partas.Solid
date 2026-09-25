@@ -1,0 +1,29 @@
+{
+  "name": "partas-solid-tests-runtime",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node run.mjs all",
+    "test:primitives": "node run.mjs primitives",
+    "test:dom": "node run.mjs dom",
+    "test:integration": "node run.mjs integration"
+  },
+  "dependencies": {
+    "@solidjs/web": "2.0.0-rc.9",
+    "solid-js": "2.0.0-rc.9"
+  },
+  "devDependencies": {
+    "@solidjs/babel-plugin": "2.0.0-rc.9",
+    "@solidjs/compiler": "2.0.0-rc.9",
+    "@solidjs/vite-plugin": "3.0.0-next.44",
+    "jsdom": "30.1.1",
+    "vite": "8.3.1",
+    "vitest": "5.0.1"
+  },
+  "overrides": {
+    "@solidjs/compiler": "2.0.0-rc.9",
+    "@solidjs/babel-plugin": "2.0.0-rc.9",
+    "solid-js": "2.0.0-rc.9",
+    "@solidjs/web": "2.0.0-rc.9"
+  }
+}

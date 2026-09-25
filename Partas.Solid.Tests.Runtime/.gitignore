@@ -1,0 +1,11 @@
+node_modules/
+fable_modules/
+# cross-process compile lock held by run.mjs
+.compile-lock/
+# Fable output (also covered by the root *.fs.jsx rule)
+*.fs.jsx
+*.fs.js
+# Fable writes referenced-project output (Partas.Solid) under each suite with -o .
+/*/Partas.Solid/
+bin/
+obj/

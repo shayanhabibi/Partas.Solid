@@ -126,6 +126,11 @@ module FakeInitializationAndUtilities =
         |> Proc.run
         |> ignore
 
+    let node args dir =
+        createProcess "node" args dir
+        |> Proc.run
+        |> ignore
+
     let private gitCi args dir =
         createProcess gitCiCommand args dir
         |> Proc.run

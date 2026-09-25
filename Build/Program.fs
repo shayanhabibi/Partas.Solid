@@ -22,7 +22,7 @@ let cleanAndRestore = input {
         stage "clean" {
             when' (not quick)
             workingDir root
-            run (fun _ -> !! "**/**/bin" ++ "temp" -- "bin" |> Shell.cleanDirs)
+            run (fun _ -> !! "**/**/bin" ++ "temp" -- "bin" -- "**/node_modules/**" |> Shell.cleanDirs)
         }
         stage "restore" {
             when' (not quick)
@@ -89,8 +89,12 @@ let publish = input {
             }
             }
 }
+/// Vitest runtime suites: compile F# fixtures with Fable, then run them against solid-js in jsdom.
+let private runtimeTestsDir = System.IO.Path.Combine(root, "Partas.Solid.Tests.Runtime")
+
 let runTests = input {
     let! skipTests = Options.skipTests
+    and! quick = Options.quick
     and! fableClean = fableClean
     return pipeline "tests" {
         description "Running tests"
@@ -102,6 +106,16 @@ let runTests = input {
             run (fun _ ->
                 !! "**/bin/**/*.Tests.Plugin.dll"
                 |> Testing.Expecto.run (fun p -> { p with Summary = true; CustomArgs = "--colours 256" :: p.CustomArgs })
+            )
+        }
+        stage "runtime tests" {
+            when' (not skipTests)
+            run (fun _ ->
+                let dir = runtimeTestsDir
+                // --quick reuses an existing install; otherwise reinstall from the lockfile.
+                if not quick || not (Shell.testDir (Path.combine dir "node_modules")) then
+                    Npm.cleanInstall dir
+                node [ "run.mjs"; "all" ] dir
             )
         }
     }

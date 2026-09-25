@@ -27,6 +27,9 @@
     <Project Path="Partas.Solid.Tests.Core/Partas.Solid.Tests.Core.fsproj" />
     <Project Path="Partas.Solid.Tests.Plugin/Compiled/Partas.Solid.Tests.Plugin.Compiled.fsproj" />
     <Project Path="Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.fsproj" />
+    <Project Path="Partas.Solid.Tests.Runtime/Dom/Partas.Solid.Tests.Runtime.Dom.fsproj" />
+    <Project Path="Partas.Solid.Tests.Runtime/Integration/Partas.Solid.Tests.Runtime.Integration.fsproj" />
+    <Project Path="Partas.Solid.Tests.Runtime/Primitives/Partas.Solid.Tests.Runtime.Primitives.fsproj" />
     <Project Path="ScratchTests/ScratchTests.fsproj" />
   </Folder>
 </Solution>
