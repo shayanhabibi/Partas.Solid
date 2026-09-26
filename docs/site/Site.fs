@@ -1,10 +1,31 @@
 module Docs.Site
 
+open System.IO
 open Nacara.Core
 open Nacara.Plugins
 open Partas.Nacara.Theme
 
 let versions = [ SiteVersion.root "3.0" ]
+
+/// A stylesheet from docs/site/theme. Read once at startup, so under `nacara watch` an edit to
+/// one of these files only shows after a restart.
+let private themeCss name =
+    File.ReadAllText(Path.Combine(__SOURCE_DIRECTORY__, "theme", name))
+
+/// Non-colour tokens. Applied to both schemes: the dark record is independent of the light one,
+/// so any value left at its default would be re-emitted under :root[data-theme="dark"].
+let private sizing (t: Tokens) =
+    { t with
+        FontSans = "\"Geist\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"
+        FontMono = "\"Geist Mono\", ui-monospace, \"JetBrains Mono\", SFMono-Regular, Menlo, monospace"
+        Radius = "0.75rem"
+        RadiusSm = "0.375rem"
+        ContentWidth = "46rem"
+        SidebarWidth = "16.5rem"
+        TocWidth = "14rem"
+        NavbarOpacity = "72%"
+        NavbarBlur = "12px"
+    }
 
 let theme =
     Theme.defaults
@@ -163,7 +184,137 @@ let theme =
             NavbarIcon("GitHub", "https://github.com/shayanhabibi/Partas.Solid", Icons.github)
         ]
     |> Theme.editUrl "https://github.com/shayanhabibi/Partas.Solid/edit/master/docs/site"
-    |> Theme.footer (Feliz.ViewEngine.Html.p [ Feliz.ViewEngine.Html.text "Built with Nacara" ])
+    |> Theme.lightTokens (fun t ->
+        { (sizing t) with
+            Bg = "#ffffff"
+            BgSubtle = "#f8f9fb"
+            BgRaised = "#ffffff"
+            Border = "#e6e7ec"
+            Text = "#1c2024"
+            TextMuted = "#5f6570"
+            Heading = "#0f1115"
+            Primary = "#4f5bd5"
+            PrimaryContrast = "#ffffff"
+            PrimarySubtle = "#eef0fe"
+            Note = "#4f5bd5"
+            Tip = "#12805c"
+            Warning = "#a15c07"
+            Danger = "#d1344e"
+            CodeInlineBg = "#f2f3f7"
+            CodeInlineBorder = "#e3e5eb"
+            CodeInlineText = "#23262f"
+            Shadow = "0 1px 2px rgb(16 18 27 / 5%), 0 2px 8px rgb(16 18 27 / 4%)"
+            ShadowFloating = "0 12px 32px -8px rgb(16 18 27 / 16%), 0 2px 6px rgb(16 18 27 / 6%)"
+        }
+    )
+    |> Theme.darkTokens (fun t ->
+        { (sizing t) with
+            Bg = "#0b0c10"
+            BgSubtle = "#111318"
+            BgRaised = "#16181e"
+            Border = "#23262e"
+            Text = "#ecedf0"
+            TextMuted = "#9ba1ad"
+            Heading = "#f7f8fa"
+            Primary = "#8b97ff"
+            PrimaryContrast = "#0b0c10"
+            PrimarySubtle = "#1a1d3a"
+            Note = "#8b97ff"
+            Tip = "#4cc38a"
+            Warning = "#f1a10d"
+            Danger = "#ff6b81"
+            CodeInlineBg = "#1b1e26"
+            CodeInlineBorder = "#2a2e38"
+            CodeInlineText = "#e2e4ea"
+            Shadow = "0 1px 2px rgb(0 0 0 / 50%), 0 4px 16px rgb(0 0 0 / 35%)"
+            ShadowFloating = "0 16px 40px -8px rgb(0 0 0 / 60%), 0 0 0 1px #23262e"
+        }
+    )
+    |> Theme.lightSyntax (fun s ->
+        { s with
+            Comment = "#6e737e"
+            String = "#0f7b5f"
+            Number = "#b35900"
+            Constant = "#b35900"
+            Constructor = "#4f5bd5"
+            Property = "#c2410c"
+            Escape = "#0e7490"
+            Keyword = "#8a3ffc"
+            Operator = "#5f6570"
+            Function = "#1a5fd0"
+            Type = "#4f5bd5"
+            Namespace = "#4f5bd5"
+            Variable = "#1c2024"
+            Parameter = "#1c2024"
+            Punctuation = "#5f6570"
+            Tag = "#0e7490"
+            Attribute = "#c2410c"
+            Preprocessor = "#8a3ffc"
+            Invalid = "#d1344e"
+            Inserted = "#0f7b5f"
+            Deleted = "#d1344e"
+        }
+    )
+    |> Theme.darkSyntax (fun s ->
+        { s with
+            Comment = "#7d838f"
+            String = "#7ee2b8"
+            Number = "#ffb86b"
+            Constant = "#ffb86b"
+            Constructor = "#8b97ff"
+            Property = "#ff9e64"
+            Escape = "#67e8f9"
+            Keyword = "#c4a1ff"
+            Operator = "#9ba1ad"
+            Function = "#79b8ff"
+            Type = "#8b97ff"
+            Namespace = "#8b97ff"
+            Variable = "#ecedf0"
+            Parameter = "#ecedf0"
+            Punctuation = "#9ba1ad"
+            Tag = "#67e8f9"
+            Attribute = "#ff9e64"
+            Preprocessor = "#c4a1ff"
+            Invalid = "#ff6b81"
+            Inserted = "#7ee2b8"
+            Deleted = "#ff6b81"
+        }
+    )
+    |> Theme.layerAfter "responsive" "brand" (themeCss "brand.css")
+    |> Theme.layerAfter "brand" "landing" (themeCss "landing.css")
+    |> Theme.css (themeCss "solid-cells.css")
+    |> Theme.headExtra
+        [
+            Feliz.ViewEngine.Html.link
+                [
+                    Feliz.ViewEngine.prop.rel "preconnect"
+                    Feliz.ViewEngine.prop.href "https://fonts.googleapis.com"
+                ]
+            Feliz.ViewEngine.Html.link
+                [
+                    Feliz.ViewEngine.prop.rel "preconnect"
+                    Feliz.ViewEngine.prop.href "https://fonts.gstatic.com"
+                    Feliz.ViewEngine.prop.custom ("crossorigin", "")
+                ]
+            Feliz.ViewEngine.Html.link
+                [
+                    Feliz.ViewEngine.prop.rel "stylesheet"
+                    Feliz.ViewEngine.prop.href
+                        "https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap"
+                ]
+        ]
+    |> Theme.footer (
+        Feliz.ViewEngine.Html.p
+            [
+                Feliz.ViewEngine.Html.text "Partas.Solid · MIT licensed · "
+                Feliz.ViewEngine.Html.a
+                    [
+                        Feliz.ViewEngine.prop.href "https://github.com/shayanhabibi/Partas.Solid"
+                        Feliz.ViewEngine.prop.text "GitHub"
+                    ]
+                Feliz.ViewEngine.Html.text " · Built with Nacara"
+            ]
+    )
 
 /// The Partas.Solid the live examples compile against. Until Partas.Solid 3 is on NuGet, a
 /// prebuilt pair is committed under docs/site/feed. PARTAS_SOLID_FEED and PARTAS_SOLID_VERSION
@@ -182,7 +333,7 @@ let private solidExamples (options: SolidExamplesOptions) =
     )
     |> SolidExamples.feed (
         fromEnvironment "PARTAS_SOLID_FEED"
-        |> Option.defaultValue (System.IO.Path.Combine(__SOURCE_DIRECTORY__, "feed"))
+        |> Option.defaultValue (Path.Combine(__SOURCE_DIRECTORY__, "feed"))
     )
 
 let site =

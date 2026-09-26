@@ -1,0 +1,191 @@
+/* Landing page (content/index.md, layout: splash). Layer nacara.landing, after nacara.brand.
+   Everything is scoped to the splash layout or to .p-* classes that only index.md uses.
+   The two brand gradients come from the logo: warm (orange -> magenta) and cool (blue -> cyan). */
+
+:root {
+  --p-warm-1: #e8703f; --p-warm-2: #b845fc;
+  --p-cool-1: #1d8fe0; --p-cool-2: #12b5c9;
+  --p-hero-grid: color-mix(in oklab, var(--nacara-text) 7%, transparent);
+  --p-glow-strength: 18%;
+}
+:root[data-theme="dark"] {
+  --p-warm-1: #f28b5b; --p-warm-2: #c77dff;
+  --p-cool-1: #4aa8f0; --p-cool-2: #1fd8e8;
+  --p-hero-grid: color-mix(in oklab, var(--nacara-text) 6%, transparent);
+  --p-glow-strength: 26%;
+}
+
+/* The hero glow and grid are full-bleed; clip the horizontal overflow they would cause. */
+body:has(.nacara-layout--splash) { overflow-x: clip; }
+
+/* ---- Section headings ---- */
+.nacara-layout--splash .nacara-content h2 {
+  border-top: 0; padding-top: 0; margin: 6rem 0 .75rem; text-align: center;
+  font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem); font-weight: 650; letter-spacing: -.035em; }
+.nacara-layout--splash .nacara-content h2 .nacara-heading-anchor { display: none; }
+.nacara-layout--splash .nacara-content h2 + p {
+  text-align: center; color: var(--nacara-text-muted); font-size: 1.0625rem;
+  max-width: 40rem; margin: 0 auto 2.5rem; text-wrap: balance; }
+
+/* ---- Hero ---- */
+.p-hero { position: relative; text-align: center; padding: 5rem 1rem 2rem; isolation: isolate; }
+.p-hero::before, .p-hero::after {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  top: calc(-1 * var(--nacara-navbar-height, 4rem) - 2rem); left: 50%; width: 100vw; translate: -50% 0; }
+/* Soft glow in the logo's colours */
+.p-hero::before {
+  height: 40rem; filter: blur(24px);
+  background:
+    radial-gradient(28% 36% at 50% 34%, color-mix(in oklab, var(--nacara-primary) var(--p-glow-strength), transparent), transparent 70%),
+    radial-gradient(22% 30% at 64% 26%, color-mix(in oklab, var(--p-warm-2) var(--p-glow-strength), transparent), transparent 70%),
+    radial-gradient(22% 30% at 36% 30%, color-mix(in oklab, var(--p-cool-1) var(--p-glow-strength), transparent), transparent 70%),
+    radial-gradient(18% 24% at 58% 46%, color-mix(in oklab, var(--p-warm-1) calc(var(--p-glow-strength) * .6), transparent), transparent 70%); }
+/* Hairline grid, faded out towards the edges */
+.p-hero::after {
+  height: 44rem;
+  background-image:
+    linear-gradient(var(--p-hero-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--p-hero-grid) 1px, transparent 1px);
+  background-size: 56px 56px; background-position: center top;
+  -webkit-mask-image: radial-gradient(ellipse 55% 60% at 50% 30%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 55% 60% at 50% 30%, #000 20%, transparent 75%); }
+
+.nacara-content .p-hero__logo {
+  display: block; width: 5.5rem; height: 5.5rem; margin: 0 auto 1.75rem; border: 0; border-radius: 0;
+  filter: drop-shadow(0 10px 28px color-mix(in oklab, var(--p-warm-2) 35%, transparent)); }
+
+.nacara-content a.p-hero__eyebrow {
+  display: inline-flex; gap: .5rem; align-items: center; margin-bottom: 1.75rem;
+  padding: .25rem .875rem .25rem .25rem; border-radius: 999px;
+  font-size: .8125rem; font-weight: 500; line-height: 1.5; text-decoration: none;
+  color: var(--nacara-text); background: color-mix(in oklab, var(--nacara-bg) 70%, transparent);
+  border: 1px solid var(--nacara-border); backdrop-filter: blur(6px);
+  box-shadow: 0 1px 2px rgb(16 18 27 / 5%);
+  transition: border-color .15s, background-color .15s; }
+.nacara-content a.p-hero__eyebrow:hover { border-color: var(--p-primary-border); background: var(--nacara-primary-subtle); }
+.p-hero__eyebrow-tag {
+  padding: .0625rem .5rem; border-radius: 999px; font-size: .75rem; font-weight: 600;
+  color: var(--nacara-primary-contrast); background: var(--nacara-primary); }
+.p-hero__eyebrow > span[aria-hidden] { color: var(--nacara-text-muted); transition: translate .15s var(--p-ease); }
+.p-hero__eyebrow:hover > span[aria-hidden] { translate: 2px 0; }
+
+.nacara-content .p-hero h1 {
+  font-size: clamp(2.75rem, 1.4rem + 5.2vw, 4.75rem); font-weight: 700; line-height: 1.02; letter-spacing: -.05em;
+  margin: 0 0 1.5rem; padding: 0; border: 0; color: var(--nacara-heading); text-wrap: balance; }
+.p-hero__gradient {
+  /* padding keeps descenders and the italic-free F# glyphs inside the clipped background */
+  padding: 0 .05em .08em;
+  background: linear-gradient(95deg, var(--p-warm-1) 0%, var(--p-warm-2) 38%, var(--nacara-primary) 62%, var(--p-cool-1) 82%, var(--p-cool-2) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+
+.nacara-content .p-hero > p {
+  font-size: clamp(1.0625rem, 1rem + .3vw, 1.25rem); line-height: 1.6; color: var(--nacara-text-muted);
+  max-width: 40rem; margin: 0 auto 2.25rem; text-wrap: balance; }
+
+.p-hero__actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+.p-hero__actions .p-btn svg { flex: none; }
+.nacara-content .p-hero__actions a.p-btn { text-decoration: none; }
+.nacara-content .p-hero__actions a.p-btn--primary { color: var(--nacara-bg); }
+.nacara-content .p-hero__actions a.p-btn--secondary { color: var(--nacara-text); }
+
+.p-install {
+  display: inline-flex; align-items: center; margin-top: 2.5rem; padding: .625rem 1rem;
+  border: 1px solid var(--nacara-border); border-radius: var(--nacara-radius-sm);
+  background: color-mix(in oklab, var(--p-code-bg) 80%, transparent); backdrop-filter: blur(6px);
+  font: .8125rem/1.4 var(--nacara-font-mono); color: var(--nacara-text); }
+.p-install::before { content: "$"; margin-right: .75rem; color: var(--p-text-faint); user-select: none; }
+.p-install__nowrap { white-space: nowrap; }
+.nacara-content .p-install code { padding: 0; border: 0; background: none; color: inherit; font: inherit; }
+.nacara-content .p-hero > p.p-install__note {
+  margin: .75rem auto 0; font-size: .8125rem; color: var(--p-text-faint); }
+
+/* ---- Try it: code and preview side by side on wide screens ---- */
+.p-demo { position: relative; max-width: 64rem; margin: 0 auto; isolation: isolate; }
+.p-demo::before {
+  content: ""; position: absolute; inset: 10% 5% -4%; z-index: -1; pointer-events: none; filter: blur(48px); opacity: .55;
+  background: linear-gradient(100deg, color-mix(in oklab, var(--p-warm-2) 30%, transparent), color-mix(in oklab, var(--p-cool-1) 30%, transparent)); }
+.p-demo > nacara-tabs, .p-demo > figure.nacara-code { background: var(--p-code-bg); box-shadow: var(--nacara-shadow-floating); }
+.p-demo > .partas-solid { background-color: var(--nacara-bg); }
+
+/* The counter the demo renders */
+.p-demo__stage { display: grid; justify-items: center; gap: 1.5rem; }
+.p-demo__count {
+  display: inline-block; min-width: 3ch; text-align: center;
+  font: 650 4rem/1 var(--nacara-font-sans); letter-spacing: -.04em; font-variant-numeric: tabular-nums;
+  color: var(--nacara-heading); }
+.p-demo__bars { display: flex; align-items: center; gap: 5px; height: 3rem; }
+.p-demo__bars > span {
+  width: 6px; height: 14px; border-radius: 3px;
+  background: linear-gradient(180deg, var(--p-warm-2), var(--p-cool-1)); }
+
+/* Side by side. solid-cells.css is unlayered and fuses the preview under the code, so undoing
+   that here needs !important (an important declaration in a layer beats a normal unlayered one). */
+@media (min-width: 64rem) {
+  .p-demo { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); align-items: stretch; }
+  .p-demo > nacara-tabs, .p-demo > figure.nacara-code {
+    margin: 0 !important; border-radius: var(--nacara-radius) 0 0 var(--nacara-radius) !important; }
+  .p-demo > .partas-solid:not(.partas-solid--inline) {
+    margin: 0 !important; min-height: 100%;
+    border-top: 1px solid var(--nacara-border) !important; border-left: 0 !important;
+    border-radius: 0 var(--nacara-radius) var(--nacara-radius) 0 !important;
+    box-shadow: var(--nacara-shadow-floating); }
+}
+
+/* ---- Cards ---- */
+.p-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin: 0 0 2rem; }
+.p-cards--family { grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); }
+.nacara-content a.p-card {
+  position: relative; display: block; padding: 1.5rem; overflow: hidden;
+  border: 1px solid var(--nacara-border); border-radius: var(--nacara-radius);
+  background: var(--nacara-bg-raised); color: var(--nacara-text); text-decoration: none;
+  transition: border-color .2s, box-shadow .2s, transform .2s var(--p-ease); }
+/* A faint top highlight that brightens on hover */
+.p-card::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 1px; opacity: 0; transition: opacity .2s;
+  background: linear-gradient(90deg, transparent, var(--p-warm-2), var(--nacara-primary), var(--p-cool-1), transparent); }
+.nacara-content a.p-card:hover { border-color: var(--p-primary-border); box-shadow: var(--nacara-shadow-floating); transform: translateY(-2px); }
+a.p-card:hover::before { opacity: 1; }
+.p-card__icon {
+  width: 2.25rem; height: 2.25rem; display: grid; place-items: center; border-radius: .5rem;
+  background: var(--nacara-primary-subtle); color: var(--nacara-primary); border: 1px solid var(--p-primary-border); }
+.p-card__icon svg { width: 1.125rem; height: 1.125rem; }
+.p-card__title { display: flex; align-items: center; gap: .375rem; margin: 1rem 0 .375rem;
+  font-size: 1rem; font-weight: 600; letter-spacing: -.01em; color: var(--nacara-heading); }
+a.p-card .p-card__title::after {
+  content: "→"; color: var(--nacara-primary); opacity: 0; translate: -4px 0;
+  transition: opacity .2s, translate .2s var(--p-ease); }
+a.p-card:hover .p-card__title::after { opacity: 1; translate: 0 0; }
+.nacara-content .p-card p { margin: 0; font-size: .875rem; line-height: 1.6; color: var(--nacara-text-muted); }
+.p-card__tag {
+  display: inline-block; margin-top: .875rem; padding: .125rem .5rem; border-radius: 999px;
+  font-size: .6875rem; font-weight: 600; letter-spacing: .02em;
+  background: color-mix(in oklab, var(--nacara-warning) 12%, var(--nacara-bg)); color: var(--nacara-warning);
+  border: 1px solid color-mix(in oklab, var(--nacara-warning) 25%, transparent); }
+
+/* ---- Closing call to action ---- */
+.p-cta {
+  position: relative; margin: 6rem 0 2rem; padding: 3.5rem 1.5rem; text-align: center; overflow: hidden; isolation: isolate;
+  border: 1px solid var(--nacara-border); border-radius: calc(var(--nacara-radius) * 1.5); background: var(--nacara-bg-subtle); }
+.p-cta::before {
+  content: ""; position: absolute; inset: auto 10% -60% ; height: 100%; z-index: -1; filter: blur(40px); opacity: .5;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--nacara-primary) 35%, transparent), transparent); }
+.p-cta__title { display: block; font-size: clamp(1.5rem, 1.2rem + 1vw, 1.875rem); font-weight: 650; letter-spacing: -.03em; color: var(--nacara-heading); }
+.nacara-content .p-cta p { margin: .5rem auto 1.75rem; max-width: 32rem; color: var(--nacara-text-muted); }
+.p-cta .p-btn { text-decoration: none; }
+.nacara-content .p-cta a.p-btn--primary { color: var(--nacara-bg); }
+.nacara-content .p-cta a.p-btn--secondary { color: var(--nacara-text); }
+
+/* ---- Small screens ---- */
+@media (max-width: 40rem) {
+  .p-hero { padding-top: 3rem; }
+  /* Wrap at the spaces rather than clip: the whole command stays visible and copyable. */
+  .p-install { max-width: 100%; align-items: baseline; text-align: left; white-space: normal;
+    padding: .5rem .875rem; font-size: .75rem; }
+  .p-install::before { margin-right: .5rem; }
+  .nacara-layout--splash .nacara-content h2 { margin-top: 4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.p-card:hover, .nacara-content a.p-card:hover { transform: none; }
+  .p-hero__eyebrow:hover > span[aria-hidden] { translate: none; }
+}
