@@ -335,6 +335,16 @@ let private solidExamples (options: SolidExamplesOptions) =
         fromEnvironment "PARTAS_SOLID_FEED"
         |> Option.defaultValue (Path.Combine(__SOURCE_DIRECTORY__, "feed"))
     )
+    // Libraries the live examples import. Each change re-runs npm install in .nacara/partas-solid.
+    |> SolidExamples.npm "animejs" "4.5.0"
+    |> SolidExamples.npm "apexcharts" "7.6.0"
+    |> SolidExamples.npm "motion-dom" "13.4.4"
+    |> SolidExamples.npm "@neodrag/vanilla" "2.3.1"
+    |> SolidExamples.npm "@floating-ui/dom" "1.8.0"
+    |> SolidExamples.npm "canvas-confetti" "1.9.4"
+    |> SolidExamples.npm "fuse.js" "7.5.0"
+    |> SolidExamples.npm "lucide" "1.48.0"
+    |> SolidExamples.npm "@tanstack/table-core" "8.21.3"
 
 let site =
     Site.create "Partas.Solid"

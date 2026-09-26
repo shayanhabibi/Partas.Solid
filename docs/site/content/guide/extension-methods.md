@@ -102,6 +102,76 @@ type Ref<'DomType> =
 
 `Ref.cast` converts a `Ref` to another element type.
 
+### Refs and DOM libraries
+
+Libraries that work on real elements need refs. The tooltip below uses
+[Floating UI](https://floating-ui.com/) from npm. Bind each export with `[<Import>]` and tupled parameters, so
+Fable emits a plain `f(a, b, c)` call:
+
+```fsharp solid show=code
+[<Import("computePosition", "@floating-ui/dom")>]
+let computePosition (reference: obj, floating: obj, options: obj): JS.Promise<obj> = jsNative
+
+[<Import("autoUpdate", "@floating-ui/dom")>]
+let autoUpdate (reference: obj, floating: obj, update: unit -> unit): (unit -> unit) = jsNative
+
+[<Import("offset", "@floating-ui/dom")>]
+let offset (distance: int): obj = jsNative
+
+[<Import("flip", "@floating-ui/dom")>]
+let flip (options: obj): obj = jsNative
+
+[<Import("shift", "@floating-ui/dom")>]
+let shift (options: obj): obj = jsNative
+```
+
+Both refs are set during render, so `onSettled` can pass the two elements to `autoUpdate`. It returns its own
+stop function, and returning that from `onSettled` runs it when the component is disposed. Options are
+anonymous records, which compile to plain objects.
+
+```fsharp solid render=TooltipDemo jsx
+[<SolidComponent>]
+let TooltipDemo () =
+    let mutable anchor: Browser.Types.HTMLButtonElement = JS.undefined
+    let mutable tip: Browser.Types.HTMLDivElement = JS.undefined
+
+    let place () =
+        // padding keeps the tooltip clear of the sticky navbar
+        let middleware = [| offset 10; flip {| padding = 64 |}; shift {| padding = 8 |} |]
+        computePosition(anchor, tip, {| placement = "top"; middleware = middleware |})
+            .``then``(fun pos ->
+                tip?style?left <- $"{pos?x}px"
+                tip?style?top <- $"{pos?y}px")
+        |> ignore
+
+    onSettled (fun () -> autoUpdate (anchor, tip, place))
+
+    let show visible = tip?style?opacity <- (if visible then "1" else "0")
+
+    let tipStyle =
+        "position: absolute; top: 0; left: 0; width: max-content; opacity: 0; "
+        + "transition: opacity .15s; pointer-events: none; padding: .375rem .625rem; "
+        + "border-radius: var(--nacara-radius-sm); font-size: .8125rem; "
+        + "background: var(--nacara-heading); color: var(--nacara-bg)"
+
+    div (style = "display: flex; justify-content: center; padding: 3rem 0 1rem") {
+        button(
+            class' = "p-btn p-btn--secondary",
+            onMouseEnter = (fun _ -> show true),
+            onMouseLeave = (fun _ -> show false),
+            onFocus = (fun _ -> show true),
+            onBlur = (fun _ -> show false)
+        ).attr("aria-describedby", "floating-tip").ref (anchor) { "Hover or focus me" }
+
+        div(style = tipStyle).attr("id", "floating-tip").attr("role", "tooltip").ref (tip) {
+            "Placed by Floating UI"
+        }
+    }
+```
+
+Scroll until the button nears the top of the window. `flip` moves the tooltip below it, and `autoUpdate`
+keeps it attached while the page moves.
+
 ## style'
 
 Sets the `style` attribute from an object, or from a list of name and value pairs. The `Style` module in

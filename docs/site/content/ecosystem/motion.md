@@ -110,6 +110,64 @@ createEffect(
 See [Migrating to Solid 2](../guide/migrating-to-solid-2.md).
 :::
 
+## Live example on Solid 2
+
+The bindings above are not ported yet, but you can still animate from Partas.Solid 3.0 by importing a framework-free
+library. `motion-dom` is the DOM engine underneath Motion. Its `animateElement` takes an element, a keyframes object and
+a transition object. `[<Import>]` binds it as a plain function. The parameters are tupled so Fable emits a normal
+call, and anonymous records compile to the plain objects Motion expects.
+
+```fsharp solid jsx render=WordRotateDemo
+type PlaybackControls =
+    abstract stop: unit -> unit
+
+[<Import("animateElement", "motion-dom")>]
+let animateElement (element: obj, keyframes: obj, transition: obj): PlaybackControls array =
+    jsNative
+
+[<SolidComponent>]
+let WordRotateDemo () =
+    let words = [| "typed"; "reactive"; "fine-grained"; "just F#" |]
+    let index, setIndex = createSignal 0
+    let mutable word: Browser.Types.HTMLSpanElement = JS.undefined
+
+    onSettled (fun () ->
+        let id = JS.setInterval (fun () -> setIndex ((index () + 1) % words.Length)) 2000
+        fun () -> JS.clearInterval id)
+
+    createEffect (
+        (fun (_: int option) -> index ()),
+        fun (_: int) ->
+            let running =
+                animateElement (
+                    word,
+                    {| opacity = ResizeArray [ 0.; 1. ]
+                       y = ResizeArray [ 14; 0 ]
+                       filter = ResizeArray [ "blur(6px)"; "blur(0px)" ] |},
+                    {| duration = 0.45; ease = ResizeArray [ 0.22; 1.; 0.36; 1. ] |}
+                )
+            fun () -> running |> Array.iter (fun a -> a.stop ())
+    )
+
+    div (style = "font-size: 1.75rem; font-weight: 600; color: var(--nacara-heading)") {
+        "Partas.Solid is "
+        span(style = "display: inline-block; color: var(--nacara-primary)").ref (word) {
+            words[index ()]
+        }
+    }
+```
+
+The interval starts in `onSettled` and its cleanup is returned from the same lambda. The effect tracks `index` and
+replays the enter animation on the `span` each time the word changes. `animateElement` returns one set of playback
+controls per animated value, and the effect returns a cleanup that stops them. Return a real cleanup here. Solid 2 calls
+whatever the effect function returns, and `animateElement (...) |> ignore` still compiles to an arrow that returns the
+controls array, which then fails as "not a function". `y` is one of Motion's transform shorthands, so it
+animates `translateY` without touching the layout.
+
+The keyframes use `ResizeArray` rather than `[| ... |]`. Fable compiles an F# `float[]` or `int[]` to a typed array such
+as `Float64Array`, and Motion only treats a real JS array as a list of keyframes or a cubic-bezier `ease`. A
+`ResizeArray` compiles to a plain array.
+
 ## Keyframes
 
 ```fsharp

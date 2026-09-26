@@ -150,6 +150,94 @@ A `lazy` memo does not compute until something reads it.
 options as named arguments instead.
 :::
 
+### Example: fuzzy search with Fuse.js
+
+A memo can wrap any pure computation, including one from an npm package. The binding below
+describes the parts of [Fuse.js](https://www.fusejs.io/) the example uses. `[<ImportDefault("fuse.js")>]`
+on a class makes `Fuse (...)` compile to `new Fuse(...)` on the package's default export, and a
+`jsNative` member becomes a plain method call. The two interfaces type only the result fields
+the example reads.
+
+```fsharp solid
+type FuseMatch =
+    abstract indices: (int * int) array
+
+type FuseResult<'T> =
+    abstract item: 'T
+    abstract matches: FuseMatch array
+
+[<ImportDefault("fuse.js")>]
+type Fuse<'T>(docs: 'T array, options: obj) =
+    member _.search(query: string, options: obj) : FuseResult<'T> array = jsNative
+```
+
+The index is built once, when the module loads. `hits` re-runs only when `query` changes, and
+[`For.Keyed`](#for) renders its result. Try `sgnal`, `stor` or `clean`.
+
+```fsharp solid render=ApiSearch
+type HitPart = { text: string; hit: bool }
+type ApiHit = { name: string; parts: HitPart array }
+
+let solidApiNames =
+    [| "createSignal"; "createMemo"; "createEffect"; "createRenderEffect"; "createTrackedEffect"
+       "createReaction"; "createStore"; "createProjection"; "createOptimistic"; "createContext"
+       "useContext"; "createRoot"; "onSettled"; "onCleanup"; "flush"; "untrack"; "isPending"
+       "latest"; "refresh"; "action"; "mapArray"; "children"; "merge"; "omit"; "createUniqueId"
+       "For"; "Show"; "Switch"; "Match"; "Errored"; "Loading"; "Repeat"; "Reveal" |]
+
+// Split a name into plain and matched runs, from Fuse's inclusive [start, end] ranges.
+let splitMatches (text: string) (ranges: (int * int) array) =
+    let parts = ResizeArray ()
+    let mutable pos = 0
+    for (first, last) in ranges do
+        if first > pos then parts.Add { text = text.Substring (pos, first - pos); hit = false }
+        parts.Add { text = text.Substring (first, last - first + 1); hit = true }
+        pos <- last + 1
+    if pos < text.Length then parts.Add { text = text.Substring pos; hit = false }
+    parts.ToArray ()
+
+// Build the index outside the component. Inside one, the plugin reads `Fuse (...)` as a JSX tag.
+let apiIndex =
+    Fuse (solidApiNames, {| includeMatches = true; ignoreLocation = true; threshold = 0.4; minMatchCharLength = 2 |})
+
+[<SolidComponent>]
+let ApiSearch () =
+    let query, setQuery = createSignal "efect"
+
+    // Re-runs only when query changes.
+    let hits =
+        createMemo (fun (_: ApiHit array option) ->
+            apiIndex.search (query (), {| limit = 6 |})
+            |> Array.map (fun r ->
+                let ranges = if r.matches.Length > 0 then r.matches[0].indices else [||]
+                { name = r.item; parts = splitMatches r.item ranges }))
+
+    div (style = "display: grid; gap: .75rem; width: 100%; max-width: 24rem") {
+        input (
+            type' = "search",
+            value = query (),
+            placeholder = "Search the solid-js API",
+            style = "width: 100%; height: 2.5rem; padding: 0 .75rem",
+            onInput = fun e -> setQuery (!!e.currentTarget?value)
+        )
+        ul (style = "list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem") {
+            For.Keyed(each = hits (), fallback = li (style = "color: var(--nacara-text-muted)") { "No match" }) {
+                yield fun hit _ ->
+                    li (style = "margin: 0") {
+                        code (style = "color: var(--nacara-text-muted)") {
+                            For.Keyed(each = hit.parts) {
+                                yield fun part _ ->
+                                    span (style = if part.hit then "color: var(--nacara-heading); font-weight: 650" else "") {
+                                        part.text
+                                    }
+                            }
+                        }
+                    }
+            }
+        }
+    }
+```
+
 ### Async memos
 
 A memo whose compute returns a `JS.Promise<'T>` gives you an `Accessor<'T>`. Reading it before the
@@ -218,6 +306,68 @@ createEffect (
 `createRenderEffect`, `createTrackedEffect`, `createReaction` and `onSettled` accept a
 cleanup-returning function in the same way. (The primed imports such as `createEffect'` are hidden
 implementation details of these overloads. Do not call them.)
+
+### Example: confetti on milestones
+
+The compute half decides when the effect function runs. Below it returns `count () / 10`, which only
+changes at 10, 20, 30 and so on. Clicks in between produce the same value, so the effect function
+does not run and nothing fires.
+
+The effect calls [canvas-confetti](https://github.com/catdad/canvas-confetti). Its default export is a
+function with a `reset` method attached, so it is bound twice. `[<ImportDefault>]` on a `let` that
+takes parameters compiles to a plain call, and the same import typed as an anonymous record exposes
+`reset`. `onCleanup` in the component body clears any confetti still falling when the example is
+disposed.
+
+```fsharp solid
+[<ImportDefault("canvas-confetti")>]
+let confetti (options: obj) : unit = jsNative
+
+[<ImportDefault("canvas-confetti")>]
+let confettiApi: {| reset: unit -> unit |} = jsNative
+```
+
+```fsharp solid render=ConfettiCounter jsx
+[<SolidComponent>]
+let ConfettiCounter () =
+    let count, setCount = createSignal 0
+    let mutable launcher: Browser.Types.HTMLButtonElement = JS.undefined
+
+    createEffect (
+        (fun (_: int option) -> count () / 10),
+        fun (milestone: int) ->
+            if milestone > 0 then
+                let r = launcher.getBoundingClientRect ()
+                confetti {|
+                    particleCount = 90
+                    spread = 70
+                    startVelocity = 35
+                    origin = {| x = (r.left + r.width / 2.) / Browser.Dom.window.innerWidth
+                                y = (r.top + r.height / 2.) / Browser.Dom.window.innerHeight |}
+                    colors = [| "#f28b5b"; "#b845fc"; "#1d8fe0"; "#1fd8e8"; "#6366f1" |]
+                    disableForReducedMotion = true
+                |}
+    )
+
+    onCleanup (fun () -> confettiApi.reset ())
+
+    div (style = "display: grid; gap: .75rem; justify-items: start") {
+        div (style = "display: flex; gap: .5rem") {
+            button(class' = "p-btn p-btn--accent", onClick = fun _ -> setCount (count () + 1)).ref (launcher) {
+                $"Clicks: {count ()}"
+            }
+            button (class' = "p-btn p-btn--secondary", onClick = fun _ -> setCount 0) { "Reset" }
+        }
+        // The track and its fill are one element: the fill is a sized background layer.
+        div (
+            style =
+                $"width: 14rem; height: .375rem; border-radius: 999px; border: 1px solid var(--nacara-border); background: linear-gradient(90deg, #f28b5b, #b845fc) 0 0 / {count () % 10 * 10}%% 100%% no-repeat, var(--nacara-bg-subtle); transition: background-size .2s"
+        )
+        p (style = "margin: 0; font-size: .875rem; color: var(--nacara-text-muted)") {
+            $"{10 - count () % 10} more to the next burst"
+        }
+    }
+```
 
 ### Options and errors
 
