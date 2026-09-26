@@ -1,11 +1,14 @@
 import { defineConfig } from "@solidjs/start/config";
 import devtools from "solid-devtools/vite";
-import { withSolidBase } from "@kobalte/solidbase/config";
+import { createWithSolidBase } from "@kobalte/solidbase/config";
+import partasTheme from "./theme/index.js";
 import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath } from "url";
 import { dirname, resolve } from "path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const withSolidBase = createWithSolidBase(partasTheme);
 
 export default defineConfig(withSolidBase(
     {
