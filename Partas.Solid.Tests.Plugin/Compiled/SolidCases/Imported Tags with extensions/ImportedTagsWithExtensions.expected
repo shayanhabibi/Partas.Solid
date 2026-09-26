@@ -1,0 +1,31 @@
+
+import { FakeImport } from "FakeLibrary";
+import { CustomTag } from "./A-Shared.fs.jsx";
+
+export function NoPropsOneExtension(props) {
+    const PARTAS_OTHERS = props;
+    return <FakeImport key="value" />;
+}
+
+export function PropsWithExtension(props) {
+    const PARTAS_OTHERS = props;
+    return <CustomTag class="testClass"
+        key="value" />;
+}
+
+export function NoPropsExtensionChain(props) {
+    const PARTAS_OTHERS = props;
+    return <CustomTag key="value"
+        key2="value2" />;
+}
+
+export function PropsWithExtensionChain(props) {
+    const PARTAS_OTHERS = props;
+    return <FakeImport class="Tester"
+        draggable="drag"
+        key="value"
+        key2="value2"
+        key3="value3"
+        key4="value4" />;
+}
+

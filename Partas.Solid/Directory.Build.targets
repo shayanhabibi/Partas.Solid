@@ -1,0 +1,107 @@
+<Project>
+
+  <!--
+    ReSharper / Rider External Annotations.
+
+    Places <AssemblyName>.ExternalAnnotations.xml alongside the assembly inside the package
+    (lib/<tfm>/), which is where ReSharper looks for it. Annotations declared in an assembly's
+    own metadata are not reliably honoured across a binary reference; this sidecar is.
+
+    Normally written to the repository root as Directory.Build.targets by
+
+        partas-annotations init
+
+    and committed. It can also be injected without touching any project file:
+
+        dotnet pack -p:CustomAfterMicrosoftCommonTargets=<absolute path to this file>
+
+    Both routes may be active at once without producing duplicate-import warnings.
+
+    Properties:
+      PartasExternalAnnotationsFile  Path of the annotations file. Defaults to a per-TFM path
+                                     under obj\ when generating, and to
+                                     ExternalAnnotations\$(AssemblyName).ExternalAnnotations.xml
+                                     when packing a file that already exists.
+      PartasExternalAnnotationsTool  Command that generates it, e.g. `dotnet partas-annotations`.
+                                     When empty, an existing file is packed as-is and nothing
+                                     is generated.
+  -->
+
+  <!--
+    Creating a Directory.Build.targets shadows any parent one, because MSBuild stops at the first
+    file it finds walking up. Re-import the parent so we do not silently disable it. Only relevant
+    when this file *is* the Directory.Build.targets; when injected by path it shadows nothing, and
+    chain-importing would double-import the parent (MSB4011).
+
+    GetPathOfFileAbove cannot be inlined into the Condition - its nested quotes fail the condition
+    parser with MSB4092 - so it goes through an intermediate property.
+  -->
+  <PropertyGroup Condition="'$(MSBuildThisFileName)' == 'Directory.Build'">
+    <_PartasParentTargets>$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)..'))</_PartasParentTargets>
+  </PropertyGroup>
+  <Import Project="$(_PartasParentTargets)" Condition="'$(_PartasParentTargets)' != ''" />
+
+  <!-- Sentinel: configure once, however many times this file is imported. -->
+  <PropertyGroup Condition="'$(PartasExternalAnnotationsImported)' != 'true'">
+    <PartasExternalAnnotationsImported>true</PartasExternalAnnotationsImported>
+
+    <!--
+      Runs once per inner build, so $(TargetFramework) is the real TFM even when multi-targeting.
+      A plain <None Pack="true" PackagePath="lib\$(TargetFramework)\"> does not work: None items
+      are evaluated in the outer build, where $(TargetFramework) is empty.
+    -->
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PartasPackExternalAnnotations</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <!--
+    Generate from the assembly that was just built. ContinueOnError is deliberate: a missing or
+    unrestored tool degrades to packing whatever file is already committed rather than failing the
+    build.
+  -->
+  <Target Name="PartasGenerateExternalAnnotations"
+          Condition="'$(PartasExternalAnnotationsTool)' != '' AND '$(TargetPath)' != ''">
+    <!--
+      Default into the intermediate directory, which is per-TFM: every inner build of a
+      multi-targeted project generates from its own assembly. A single project-level path would
+      have each TFM overwrite the last, shipping one TFM's annotations under every lib/ folder.
+      Defaults are set here rather than at evaluation time because IntermediateOutputPath is not
+      final until the SDK targets have been imported.
+    -->
+    <PropertyGroup>
+      <_PartasGeneratedAnnotations Condition="'$(PartasExternalAnnotationsFile)' != ''">$(PartasExternalAnnotationsFile)</_PartasGeneratedAnnotations>
+      <_PartasGeneratedAnnotations Condition="'$(_PartasGeneratedAnnotations)' == ''">$(IntermediateOutputPath)$(AssemblyName).ExternalAnnotations.xml</_PartasGeneratedAnnotations>
+    </PropertyGroup>
+
+    <!--
+      Delete the previous run's output first, so a generation that fails cannot ship the last
+      successful build's file. Only safe for our own obj/ path - if the caller pointed
+      PartasExternalAnnotationsFile at a committed file, deleting it would destroy their input.
+    -->
+    <Delete Files="$(_PartasGeneratedAnnotations)" Condition="'$(PartasExternalAnnotationsFile)' == ''" />
+
+    <Exec Command="$(PartasExternalAnnotationsTool) generate --assembly &quot;$(TargetPath)&quot; --output &quot;$(_PartasGeneratedAnnotations)&quot;"
+          ContinueOnError="WarnAndContinue"
+          StandardOutputImportance="normal">
+      <Output TaskParameter="ExitCode" PropertyName="_PartasGenerateExitCode" />
+    </Exec>
+  </Target>
+
+  <Target Name="PartasPackExternalAnnotations" DependsOnTargets="PartasGenerateExternalAnnotations">
+    <PropertyGroup>
+      <!-- A freshly generated file, but only if generation actually succeeded. -->
+      <PartasExternalAnnotationsFile Condition="'$(PartasExternalAnnotationsFile)' == '' AND '$(_PartasGenerateExitCode)' == '0'">$(_PartasGeneratedAnnotations)</PartasExternalAnnotationsFile>
+      <!-- Otherwise a committed file next to the project. -->
+      <PartasExternalAnnotationsFile Condition="'$(PartasExternalAnnotationsFile)' == ''">$(MSBuildProjectDirectory)\ExternalAnnotations\$(AssemblyName).ExternalAnnotations.xml</PartasExternalAnnotationsFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(PartasExternalAnnotationsFile)"
+                              Condition="Exists('$(PartasExternalAnnotationsFile)')"
+                              PackagePath="lib\$(TargetFramework)\" />
+    </ItemGroup>
+
+    <Warning Condition="!Exists('$(PartasExternalAnnotationsFile)')"
+             Text="External annotations were not packed for $(TargetFramework): no file at '$(PartasExternalAnnotationsFile)' and no PartasExternalAnnotationsTool to generate one. Consumers will get no annotations from this package." />
+  </Target>
+
+</Project>

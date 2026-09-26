@@ -1,0 +1,4 @@
+[submodule "solid"]
+	path = solid
+	url = https://github.com/solidjs/solid.git
+	branch = next

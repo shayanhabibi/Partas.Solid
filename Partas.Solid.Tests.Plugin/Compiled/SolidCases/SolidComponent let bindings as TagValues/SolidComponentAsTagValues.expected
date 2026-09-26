@@ -1,0 +1,27 @@
+﻿
+import { omit, merge } from "solid-js";
+import { FakeImportedTag } from "fakeLibrary";
+import { ModuleTag } from "./A-SolidComponentAsTagValuesTypes.fs.jsx";
+
+export function CustomTag(props) {
+    props = merge({
+        icon: button,
+    }, props);
+    const PARTAS_OTHERS = omit(props, "icon");
+    return <div>
+        <props.icon class="KeyVal" />
+        <props.icon class="KeyVal2" />
+        <props.icon class="constructor">
+            <button>
+                internal
+            </button>
+        </props.icon>
+    </div>;
+}
+
+export function Rock() {
+    const Comp = FakeImportedTag;
+    return <CustomTag icon={a}>
+        <Comp other={ModuleTag} />
+    </CustomTag>;
+}

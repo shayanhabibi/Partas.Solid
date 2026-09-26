@@ -1,0 +1,468 @@
+/*
+    Partas.Solid brand layer (nacara.brand, after nacara.responsive).
+    Loaded by Site.fs through Theme.layerAfter. Plain CSS: it is not bundled, so no @import here.
+    Every selector below matches markup the theme emits (or the .p-* classes the content uses).
+*/
+
+/* ---- Extra palette (read by brand, landing and solid-cells) ---- */
+:root {
+    --p-border-strong: #d3d5dc;
+    --p-text-faint: #6e737e;
+    --p-primary-border: #c9cdfa;
+    --p-primary-hover: #4350c7;
+    --p-code-bg: #fafbfc;
+    --p-code-title-bg: #f4f5f8;
+    --p-canvas-dot: #d9dbe3;
+    --p-ease: cubic-bezier(.2, .8, .2, 1);
+}
+:root[data-theme="dark"] {
+    --p-border-strong: #323641;
+    --p-text-faint: #7d838f;
+    --p-primary-border: #34397a;
+    --p-primary-hover: #a3adff;
+    --p-code-bg: #0f1116;
+    --p-code-title-bg: #14161c;
+    --p-canvas-dot: #262a34;
+}
+
+/* The theme's responsive layer widens content to 88ch at >= 1600px. Keep a reading measure. */
+@media (min-width: 1600px) {
+    :root {
+        --nacara-content-width: 50rem;
+    }
+}
+
+/* ---- Base ---- */
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-padding-top: calc(var(--nacara-navbar-height) + 1.5rem);
+}
+body {
+    line-height: 1.7;
+}
+::selection {
+    background: color-mix(in oklab, var(--nacara-primary) 22%, transparent);
+}
+:focus-visible {
+    outline: 2px solid var(--nacara-primary);
+    outline-offset: 2px;
+}
+
+/* ---- Navbar ---- */
+.nacara-navbar {
+    background: color-mix(in oklab, var(--nacara-bg) var(--nacara-navbar-opacity), transparent);
+    backdrop-filter: saturate(180%) blur(var(--nacara-navbar-blur));
+    -webkit-backdrop-filter: saturate(180%) blur(var(--nacara-navbar-blur));
+    border-bottom: 1px solid var(--nacara-border);
+    box-shadow: none;
+}
+.nacara-navbar__brand {
+    font-weight: 650;
+    letter-spacing: -.02em;
+}
+.nacara-navbar__link {
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--nacara-text-muted);
+    padding: .375rem .625rem;
+    border-radius: 999px;
+    transition: color .15s, background-color .15s;
+}
+.nacara-navbar__link:hover {
+    color: var(--nacara-text);
+    background: var(--nacara-bg-subtle);
+}
+/* The active link carries a BARE data-active attribute, which the theme's [data-active="true"] never matches. */
+.nacara-navbar__link[data-active]:not([data-active="false"]),
+.nacara-navbar__link[aria-current="page"] {
+    color: var(--nacara-text);
+    background: var(--nacara-bg-subtle);
+}
+.nacara-sidebar__sections a[aria-current]:not([aria-current="false"]) {
+    color: var(--nacara-primary);
+    font-weight: 550;
+}
+
+/* ---- Sidebar ---- */
+.nacara-sidebar__title {
+    font-size: .6875rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--p-text-faint);
+    margin: 1.75rem 0 .375rem;
+    padding-inline: .625rem;
+}
+.nacara-sidebar__list > li:first-child > .nacara-sidebar__section > .nacara-sidebar__title {
+    margin-top: 0;
+}
+.nacara-sidebar__section {
+    margin-bottom: 0;
+}
+.nacara-sidebar__sections {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.nacara-sidebar__link,
+.nacara-sidebar__group-link {
+    font-size: .875rem;
+    line-height: 1.45;
+    color: var(--nacara-text-muted);
+    padding: .3125rem .625rem;
+    border-radius: var(--nacara-radius-sm);
+    transition: color .15s, background-color .15s;
+}
+.nacara-sidebar__link:hover,
+.nacara-sidebar__group-link:hover {
+    color: var(--nacara-text);
+    background: var(--nacara-bg-subtle);
+}
+.nacara-sidebar__link[aria-current="page"],
+.nacara-sidebar__group-link[aria-current="page"] {
+    color: var(--nacara-primary);
+    background: var(--nacara-primary-subtle);
+    font-weight: 550;
+}
+.nacara-sidebar__filter {
+    border: 1px solid var(--nacara-border);
+    border-radius: var(--nacara-radius-sm);
+    background: var(--nacara-bg-subtle);
+    font-size: .8125rem;
+}
+.nacara-badge {
+    border-radius: 999px;
+    font-size: .625rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    padding: .125rem .4375rem;
+}
+
+/* ---- TOC ---- */
+.nacara-toc__title {
+    font-size: .6875rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--p-text-faint);
+}
+.nacara-toc__list {
+    border-left: 1px solid var(--nacara-border);
+}
+.nacara-toc__link {
+    font-size: .8125rem;
+    color: var(--nacara-text-muted);
+    line-height: 1.45;
+    padding: .3125rem 0 .3125rem .875rem;
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    transition: color .15s, border-color .15s;
+}
+.nacara-toc__link[data-active="true"] {
+    color: var(--nacara-primary);
+    border-left-color: var(--nacara-primary);
+}
+
+/* ---- Content typography ---- */
+/* Page markup: main.nacara-content > h1 + div > (page body). */
+.nacara-content h1 {
+    font-size: clamp(2rem, 1.6rem + 1.6vw, 2.5rem);
+    font-weight: 650;
+    line-height: 1.15;
+    letter-spacing: -.035em;
+    color: var(--nacara-heading);
+    text-rendering: optimizeLegibility;
+}
+.nacara-content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -.025em;
+    margin-top: 2.75rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--nacara-border);
+}
+/* No rule above a heading that opens the page body. */
+.nacara-content > div > h2:first-child {
+    border-top: 0;
+    padding-top: 0;
+    margin-top: 1.5rem;
+}
+.nacara-content h3 {
+    font-size: 1.1875rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -.015em;
+    margin-top: 2rem;
+}
+.nacara-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -.005em;
+}
+/* Colour only: keep the theme's mask icon and positioning. */
+.nacara-content .nacara-heading-anchor {
+    color: var(--p-text-faint);
+}
+.nacara-content .nacara-heading-anchor:hover {
+    color: var(--nacara-primary);
+}
+/* Lead paragraph: the first paragraph of the page body. */
+.nacara-content > h1 + div > p:first-child {
+    font-size: 1.125rem;
+    line-height: 1.65;
+    color: var(--nacara-text-muted);
+}
+.nacara-content a:not([class]) {
+    color: var(--nacara-primary);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--nacara-primary) 35%, transparent);
+    text-underline-offset: .2em;
+    text-decoration-thickness: 1px;
+    transition: text-decoration-color .15s;
+}
+.nacara-content a:not([class]):hover {
+    text-decoration-color: currentColor;
+}
+/* Inline code reads as body text on a quiet chip, so it never competes with (indigo) links. */
+.nacara-content :not(pre) > code {
+    font-size: .85em;
+    padding: .1em .35em;
+    border-radius: .3125rem;
+    background: var(--nacara-code-inline-bg);
+    border: 1px solid var(--nacara-code-inline-border);
+    color: var(--nacara-code-inline-text);
+    font-weight: 450;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+}
+.nacara-content :is(h1, h2, h3, h4) > code {
+    font-size: .9em;
+    font-weight: inherit;
+}
+.nacara-content a:not([class]) > code {
+    color: inherit;
+}
+
+/* ---- Callouts: reuse the theme's per-kind --callout-color ---- */
+.nacara-callout {
+    margin: 1.5rem 0;
+    padding: .875rem 1rem .875rem 1.125rem;
+    font-size: .9375rem;
+    border: 1px solid color-mix(in oklab, var(--callout-color) 28%, var(--nacara-border));
+    border-left: 3px solid var(--callout-color);
+    border-radius: var(--nacara-radius-sm) var(--nacara-radius) var(--nacara-radius) var(--nacara-radius-sm);
+    background: color-mix(in oklab, var(--callout-color) 7%, var(--nacara-bg));
+}
+.nacara-callout[data-title]::before {
+    color: var(--callout-color);
+    font-weight: 600;
+    font-size: .8125rem;
+}
+
+/* ---- Details (:::details) ---- */
+.nacara-details {
+    margin: 1.5rem 0;
+    background: var(--nacara-bg);
+    border-radius: var(--nacara-radius);
+}
+.nacara-details > summary {
+    font-weight: 550;
+    font-size: .9375rem;
+    padding: .625rem 1rem;
+    transition: background-color .15s;
+}
+.nacara-details > summary:hover {
+    background: var(--nacara-bg-subtle);
+}
+
+/* ---- Tables (the theme sets display:block + overflow-x:auto; keep that) ---- */
+.nacara-content table {
+    width: fit-content;
+    max-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: .875rem;
+    border: 1px solid var(--nacara-border);
+    border-radius: var(--nacara-radius);
+}
+.nacara-content th,
+.nacara-content td {
+    border-width: 0 0 1px;
+    border-style: solid;
+    border-color: var(--nacara-border);
+    padding: .625rem .875rem;
+}
+.nacara-content th {
+    background: var(--nacara-bg-subtle);
+    font-weight: 600;
+    font-size: .8125rem;
+    text-align: left;
+}
+.nacara-content tr:last-child td {
+    border-bottom: 0;
+}
+
+/* ---- Code blocks ---- */
+.nacara-code {
+    border: 1px solid var(--nacara-border);
+    border-radius: var(--nacara-radius);
+    background: var(--p-code-bg);
+    box-shadow: 0 1px 2px rgb(16 18 27 / 4%);
+    margin: 1.5rem 0;
+}
+.nacara-code[data-frame="none"] {
+    box-shadow: none;
+}
+.nacara-code__title {
+    background: var(--p-code-title-bg);
+    font-size: .75rem;
+    color: var(--nacara-text-muted);
+}
+.nacara-code pre,
+.nacara-code code {
+    font-size: .8125rem;
+    line-height: 1.7;
+}
+.nacara-code__line[data-marker="mark"] {
+    background: color-mix(in oklab, var(--nacara-primary) 9%, transparent);
+    box-shadow: inset 2px 0 var(--nacara-primary);
+}
+.nacara-code__copy {
+    border: 1px solid var(--nacara-border);
+    background: var(--nacara-bg-raised);
+    border-radius: var(--nacara-radius-sm);
+}
+.tok-comment {
+    font-style: italic;
+}
+
+/* ---- Tabs: underline tabs inside a code card ---- */
+nacara-tabs {
+    background: var(--p-code-bg);
+    margin: 1.5rem 0;
+}
+.nacara-tabs__list {
+    gap: 0;
+    padding: 0 .5rem;
+    background: var(--p-code-title-bg);
+}
+.nacara-tabs__tab {
+    font-size: .8125rem;
+    font-weight: 500;
+    padding: .625rem .75rem;
+    border-radius: 0;
+    box-shadow: inset 0 -2px transparent;
+    transition: color .15s, box-shadow .15s;
+}
+.nacara-tabs__tab:hover {
+    color: var(--nacara-text);
+}
+.nacara-tabs__tab[aria-selected="true"] {
+    background: none;
+    font-weight: 500;
+    color: var(--nacara-text);
+    box-shadow: inset 0 -2px var(--nacara-primary);
+}
+/* A tab holding only a code block (every `solid jsx` fence) sits flush with the card. */
+nacara-tab:has(> .nacara-code:only-child) {
+    padding: 0;
+}
+nacara-tab > .nacara-code:only-child {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* ---- Theme preview directive: the same dotted canvas as the Solid cells ---- */
+.nacara-preview__result {
+    background-image: radial-gradient(var(--p-canvas-dot) 1px, transparent 1px);
+    background-size: 16px 16px;
+}
+
+/* ---- Page nav, edit link, footer ---- */
+.nacara-page-nav__link {
+    border: 1px solid var(--nacara-border);
+    border-radius: var(--nacara-radius);
+    padding: 1rem 1.25rem;
+    transition: border-color .15s;
+}
+.nacara-page-nav__link:hover {
+    border-color: var(--nacara-primary);
+}
+.nacara-page-nav__label {
+    font-size: .75rem;
+    color: var(--p-text-faint);
+}
+.nacara-edit-link {
+    font-size: .8125rem;
+    color: var(--nacara-text-muted);
+}
+.nacara-footer {
+    border-top: 1px solid var(--nacara-border);
+    color: var(--p-text-faint);
+    font-size: .8125rem;
+    padding: 2.5rem 1.5rem;
+}
+.nacara-footer a {
+    color: var(--nacara-text-muted);
+}
+.nacara-footer a:hover {
+    color: var(--nacara-text);
+}
+
+/* ---- Buttons: global, so live examples can use class' = "p-btn ..." ---- */
+.p-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    height: 2.5rem;
+    padding: 0 1.125rem;
+    border-radius: 999px;
+    font: inherit;
+    font-size: .9375rem;
+    font-weight: 550;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color .15s, border-color .15s, transform .15s var(--p-ease);
+}
+.p-btn:hover {
+    text-decoration: none;
+}
+.p-btn--primary {
+    background: var(--nacara-heading);
+    color: var(--nacara-bg);
+}
+.p-btn--primary:hover {
+    background: color-mix(in oklab, var(--nacara-heading) 85%, var(--nacara-bg));
+}
+.p-btn--accent {
+    background: var(--nacara-primary);
+    color: var(--nacara-primary-contrast);
+}
+.p-btn--accent:hover {
+    background: var(--p-primary-hover);
+}
+.p-btn--secondary {
+    background: var(--nacara-bg);
+    color: var(--nacara-text);
+    border-color: var(--nacara-border);
+}
+.p-btn--secondary:hover {
+    background: var(--nacara-bg-subtle);
+    border-color: var(--p-border-strong);
+}
+.p-btn:active {
+    transform: translateY(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0s !important;
+        animation-duration: 0s !important;
+    }
+}

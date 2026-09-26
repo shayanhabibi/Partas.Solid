@@ -1,0 +1,10 @@
+
+import { omit } from "solid-js";
+import { KeyedFor } from "../../../../Partas.Solid/SolidBindings.fs.jsx";
+import { map } from "../../fable_modules/fable-library-js.5.13.0/Array.js";
+
+export function WordRotate(props) {
+    const PARTAS_OTHERS = omit(props, "words");
+    return <KeyedFor each={map((value) => value, props.words.split(""))} />;
+}
+

@@ -1,0 +1,14 @@
+
+import { createSignal, omit } from "solid-js";
+import { KeyedFor } from "../../../../Partas.Solid/SolidBindings.fs.jsx";
+import { split } from "../../fable_modules/fable-library-js.5.13.0/String.js";
+
+export function WordRotate(props) {
+    const PARTAS_OTHERS = omit(props, "duration", "words");
+    const patternInput = createSignal(0);
+    ({
+        delay: props.duration * patternInput[0](),
+    });
+    return <KeyedFor each={split(props.words, [" "], undefined, 0)} />;
+}
+

@@ -1,7 +1,7 @@
 ﻿/// <summary>
 /// <b>WARNING</b><br/>
 /// This module contains syntax sugars that are not yet battle tested.<br/><br/>
-/// Contains the following builders:<br/>effect<br/>memo<br/>mount<br/>cleanup<br/>batch<br/>lazyload<br/>selector<br/>children
+/// Contains the following builders:<br/>lambda<br/>effect<br/>memo<br/>mount<br/>cleanup<br/>lazyload<br/>children<br/>reaction
 /// </summary>
 namespace Partas.Solid.Experimental
 
@@ -14,7 +14,7 @@ open Fable.Core
 /// Lambdas that are of the signature <c>unit -> unit</c> are common enough that we can
 /// build this as a base for things like <c>createEffect</c> to inherit
 /// </summary>
-[<EditorBrowsable(EditorBrowsableState.Never)>]
+[<EB(EBState.Never)>]
 [<Erase>]
 type NullLambdaBuilder() =
     member inline _.Return(x) =
@@ -35,7 +35,7 @@ type NullLambdaBuilder() =
 /// Lambdas that take null parameters and return a type are common enough to build
 /// a sugar wrapper that things like <c>createMemo</c> can inherit
 /// </summary>
-[<EditorBrowsable(EditorBrowsableState.Never)>]
+[<EB(EBState.Never)>]
 [<Erase>]
 type BaseLambdaBuilder() =
     member inline _.Return(x) =
@@ -53,7 +53,7 @@ type BaseLambdaBuilder() =
     member inline _.Yield(PARTAS_VALUE) =
         PARTAS_VALUE
 
-[<EditorBrowsable(EditorBrowsableState.Never)>]
+[<EB(EBState.Never)>]
 [<Erase>]
 type LambdaBuilder() =
     inherit BaseLambdaBuilder()
@@ -62,35 +62,46 @@ type LambdaBuilder() =
     member inline _.Run(code: unit -> 'T) : unit -> 'T =
         fun () -> code ()
 
-[<EditorBrowsable(EditorBrowsableState.Never)>]
-[<Erase>]
-type BatchBuilder() =
-    inherit BaseLambdaBuilder()
+/// <summary>
+/// Returned by the <c>let!</c> inside an <c>effect { }</c>. Forces that computation to name
+/// its tracked source, since Solid 2 no longer has a single-phase <c>createEffect</c>.
+/// </summary>
+[<EB(EBState.Never)>]
+type EffectDeclaration = interface end
 
-    member inline _.Run(code: unit -> 'T) : 'T =
-        batch (fun () -> code ())
-
-[<EditorBrowsable(EditorBrowsableState.Never)>]
+/// <summary>
+/// Splits the computation into Solid 2's two phases: the <c>let!</c> source is the tracked compute
+/// phase, and everything after it is the untracked effect phase.
+/// </summary>
+[<EB(EBState.Never)>]
 [<Erase>]
 type CreateEffectBuilder() =
-    inherit NullLambdaBuilder()
+    member inline _.Zero() = ()
+    member inline _.Delay(f: unit -> EffectDeclaration) = f
 
-    member inline _.Run(effect) =
-        createEffect (fun () ->
-            effect ()
-            |> ignore)
+    /// <c>createEffect</c> typed to return the declaration, so the builder never has to unbox a
+    /// <c>unit</c> call (which Fable emits as <c>(createEffect(...), undefined)</c> at module level).
+    [<Import("createEffect", "solid-js"); EB(EBState.Never)>]
+    static member Declare<'T>(compute: 'T option -> 'T, effectFn: 'T -> unit) : EffectDeclaration = jsNative
 
-[<EditorBrowsable(EditorBrowsableState.Never)>]
+    member inline _.Bind(compute: Accessor<'T>, effectFn: 'T -> unit) : EffectDeclaration =
+        CreateEffectBuilder.Declare ((fun (_: 'T option) -> compute ()), effectFn)
+
+    member inline _.Run(effect: unit -> EffectDeclaration) : unit =
+        effect ()
+        |> ignore
+
+[<EB(EBState.Never)>]
 [<Erase>]
-type OnMountBuilder() =
+type OnSettledBuilder() =
     inherit NullLambdaBuilder()
 
     member inline _.Run(effect) =
-        onMount (fun () ->
+        onSettled (fun () ->
             effect ()
             |> ignore)
 
-[<EditorBrowsable(EditorBrowsableState.Never)>]
+[<EB(EBState.Never)>]
 [<Erase>]
 type OnCleanupBuilder() =
     inherit NullLambdaBuilder()
@@ -100,47 +111,39 @@ type OnCleanupBuilder() =
             effect ()
             |> ignore)
 
-[<EditorBrowsable(EditorBrowsableState.Never)>]
+[<EB(EBState.Never)>]
 [<Erase>]
 type CreateMemoBuilder() =
     inherit BaseLambdaBuilder()
 
-    member inline _.Run(computation: unit -> 'T) : unit -> 'T =
-        createMemo (fun () -> computation ())
+    member inline _.Run(computation: unit -> 'T) : Accessor<'T> =
+        createMemo (fun (_: 'T option) -> computation ())
 
-[<EditorBrowsable(EditorBrowsableState.Never)>]
-[<Erase>]
-type CreateSelectorBuilder() =
-    inherit BaseLambdaBuilder()
-
-    member inline _.Run(computation: unit -> 'T) : 'U -> bool =
-        createSelector (fun () -> computation ())
-
-[<EditorBrowsable(EditorBrowsableState.Never)>]
+[<EB(EBState.Never)>]
 [<Erase>]
 type CreateReactionBuilder() =
     inherit BaseLambdaBuilder()
 
-    member inline _.Run(computation: unit -> unit) : (unit -> unit) -> unit =
+    member inline _.Run(computation: unit -> unit) : (unit -> objnull) -> unit =
         createReaction (fun () -> computation ())
 
     member inline _.Zero(value: unit) =
         ignore value
 
-[<EditorBrowsable(EditorBrowsableState.Never)>]
+[<EB(EBState.Never)>]
 [<Erase>]
 type ChildrenBuilder() =
     inherit BaseLambdaBuilder()
 
-    member inline _.Run(computation: unit -> #HtmlElement) : unit -> #HtmlElement =
+    member inline _.Run<'T when 'T :> HtmlElement>(computation: unit -> 'T) : ChildrenReturn<'T> =
         children (fun () -> computation ())
 
-[<EditorBrowsable(EditorBrowsableState.Never)>]
+[<EB(EBState.Never)>]
 [<Erase>]
 type LazyBuilder() =
     inherit BaseLambdaBuilder()
 
-    member inline _.Run(computation: unit -> 'T) : 'C =
+    member inline _.Run<'T when 'T :> HtmlElement>(computation: unit -> JS.Promise<'T>) : LazyComponent<'T> =
         lazy' (fun () -> computation ())
 
 [<AutoOpen; Erase>]
@@ -156,14 +159,19 @@ module Builders =
     let lambda = LambdaBuilder ()
 
     /// <summary>
-    /// Wraps the computation in <c>createEffect(fun () -> ...)</c>
+    /// Wraps the computation in <c>createEffect(compute, effectFn)</c>. The <c>let!</c> binds the
+    /// tracked compute phase; the rest of the body is the untracked effect phase, and receives its value.
     /// </summary>
+    /// <remarks>
+    /// Exactly one <c>let!</c> is required. Track several sources by binding one accessor that reads them all,
+    /// e.g. <c>let! a, b = lambda { first (), second () }</c>. Anything written before the <c>let!</c> runs
+    /// immediately, not as part of the effect.
+    /// </remarks>
     /// <example><code>
     /// effect {
-    ///     match Data.Onboarding.accessor() with
-    ///     | Some result ->
-    ///         Data.Navigation.store
-    ///             .Update(navigation result.config.IsOk)
+    ///     let! result = Data.Onboarding.accessor
+    ///     match result with
+    ///     | Some result -> setNavigation (navigation result.config.IsOk)
     ///     | _ -> ()
     /// }
     /// </code></example>
@@ -171,7 +179,7 @@ module Builders =
     let effect = CreateEffectBuilder ()
 
     /// <summary>
-    /// Wraps the computation in <c>onMount(fun () -> ...)</c>
+    /// Wraps the computation in <c>onSettled(fun () -> ...)</c>
     /// </summary>
     /// <example><code>
     /// mount {
@@ -179,7 +187,7 @@ module Builders =
     /// }
     /// </code></example>
     [<Erase>]
-    let mount = OnMountBuilder ()
+    let mount = OnSettledBuilder ()
 
     /// <summary>
     /// Wraps the computation in <c>onCleanup(fun () -> ...)</c>
@@ -193,7 +201,7 @@ module Builders =
     let cleanup = OnCleanupBuilder ()
 
     /// <summary>
-    /// Wraps the computation in <c>createMemo(fun () -> ...)</c>
+    /// Wraps the computation in <c>createMemo(fun _ -> ...)</c>
     /// </summary>
     /// <example><code>
     /// memo {
@@ -205,38 +213,15 @@ module Builders =
     let memo = CreateMemoBuilder ()
 
     /// <summary>
-    /// Wraps the computation in <c>batch(fun () -> ...)</c>
-    /// </summary>
-    /// <example><code>
-    /// let submissionResult = batch {
-    ///     // ... some reactive tasks here
-    /// }
-    /// </code></example>
-    [<Erase>]
-    let batch = BatchBuilder ()
-
-    /// <summary>
-    /// Wraps the computation in <c>lazy'(fun () -> ...)</c>
+    /// Wraps the computation in <c>lazy(fun () -> ...)</c>
     /// </summary>
     /// <example><code>
     /// let comp = lazyload {
-    ///     importComponent "./MyComponent.fs.jsx"
+    ///     importDynamic "./MyComponent.fs.jsx"
     /// }
     /// </code></example>
     [<Erase>]
     let lazyload = LazyBuilder ()
-
-    /// <summary>
-    /// Wraps the computation in <c>createSelect(fun () -> ...)</c>
-    /// </summary>
-    /// <example><code>
-    /// let isSelected = selector {
-    ///     // ...
-    /// }
-    /// console.log (isSelected item)
-    /// </code></example>
-    [<Erase>]
-    let selector = CreateSelectorBuilder ()
 
     /// <summary>
     /// Wraps the computation in <c>children(fun () -> ...)</c>
@@ -245,13 +230,9 @@ module Builders =
     /// A common pattern to optimise conditional child expressions:
     /// <code>
     /// let resolvedChildren = children { props.children }
-    /// let hasChildren = lambda {
-    ///     resolvedChildren
-    ///     |> JS.Constructors.Array.from
-    ///     |> fun a -> a.Length > 0
-    /// }
+    /// let hasChildren = lambda { resolvedChildren.toArray().Length > 0 }
     /// // ...
-    /// if hasChildren() then resolvedChildren()
+    /// if hasChildren() then resolvedChildren.Invoke()
     /// </code></example>
     [<Erase>]
     let children = ChildrenBuilder ()
@@ -262,7 +243,7 @@ module Builders =
     /// <example><code>
     /// let isOpen,setOpen = createSignal false
     /// let onFirstOpen = reaction {
-    ///   // ... do something on first time
+    ///   // ... do something the first time
     ///   // ... isOpen changes
     /// }
     /// onFirstOpen (fun () -> isOpen())

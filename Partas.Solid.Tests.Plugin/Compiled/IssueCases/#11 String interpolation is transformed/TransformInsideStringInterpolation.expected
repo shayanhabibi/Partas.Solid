@@ -1,0 +1,17 @@
+
+import { omit } from "solid-js";
+
+export function TestStringInterpolation(props) {
+    const PARTAS_OTHERS = omit(props, "index");
+    return <div style={{
+            paddingLeft: `${props.index}px`,
+        }}>
+        <div style={{
+                paddingLeft: `${props.index}px`,
+            }}>
+            <div style={{
+                    paddingLeft: `${~~(props.index / 2)}px`,
+                }} />
+        </div>
+    </div>;
+}

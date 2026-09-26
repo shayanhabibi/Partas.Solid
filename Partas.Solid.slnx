@@ -1,0 +1,35 @@
+<Solution>
+  <Folder Name="/.environment/">
+    <File Path=".cliffignore" />
+    <File Path=".config/dotnet-tools.json" />
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path=".gitmodules" />
+    <File Path="cliff.toml" />
+    <File Path="docs/RELEASE_NOTES.md" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/.github/">
+    <File Path=".github/ISSUE_TEMPLATE/bug-report---plugin-compilation.md" />
+    <File Path=".github/workflows/dotnet.yml" />
+    <File Path=".github/workflows/package.yml" />
+    <File Path=".github/workflows/releasenotes.yml" />
+  </Folder>
+  <Folder Name="/Scripts/">
+    <File Path="build.fsx" />
+  </Folder>
+  <Folder Name="/Src/">
+    <Project Path="Partas.Solid.FablePlugin/Partas.Solid.FablePlugin.fsproj" />
+    <Project Path="Partas.Solid/Partas.Solid.fsproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Partas.Solid.Tests.Core/Partas.Solid.Tests.Core.fsproj" />
+    <Project Path="Partas.Solid.Tests.Plugin/Compiled/Partas.Solid.Tests.Plugin.Compiled.fsproj" />
+    <Project Path="Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.fsproj" />
+    <Project Path="Partas.Solid.Tests.Runtime/Dom/Partas.Solid.Tests.Runtime.Dom.fsproj" />
+    <Project Path="Partas.Solid.Tests.Runtime/Integration/Partas.Solid.Tests.Runtime.Integration.fsproj" />
+    <Project Path="Partas.Solid.Tests.Runtime/Primitives/Partas.Solid.Tests.Runtime.Primitives.fsproj" />
+    <Project Path="ScratchTests/ScratchTests.fsproj" />
+  </Folder>
+</Solution>

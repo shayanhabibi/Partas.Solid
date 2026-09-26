@@ -1,16 +1,18 @@
-import { fold } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/List.js";
-import { uncurry2 } from "../../fable_modules/fable-library-js.5.0.0-alpha.14/Util.js";
-import { For } from "solid-js";
+
+import { fold } from "../../fable_modules/fable-library-js.5.13.0/Array.js";
+import { uncurry2 } from "../../fable_modules/fable-library-js.5.13.0/Util.js";
+import { KeyedFor } from "../../../../Partas.Solid/SolidBindings.fs.jsx";
 
 export function cn(listofclasses) {
     return fold(uncurry2((arg) => ((y) => (arg + y))), "", listofclasses);
 }
 
 export function Compponent(show) {
-    return <div class={cn(["testcase", (show) ? ("showthis") : (null), "i\'m always here"])}>
+    return <div class={cn(["testcase", show ? "showthis" : null, "i\'m always here"])}>
         {show ? ("I show sometimes!") : (undefined)}
         I show always!
-        <For each={[1, 2, 3, (show) ? (4) : (null), 5]}>
-        </For>
+        <KeyedFor each={[1, 2, 3, show ? 4 : null, 5]}>
+        </KeyedFor>
     </div>;
 }
+

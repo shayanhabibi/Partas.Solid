@@ -1,0 +1,119 @@
+
+import { createReaction, createMemo, onSettled, onCleanup, children, omit, lazy, createEffect, createStore, createSignal } from "solid-js";
+
+export const patternInput$004014 = createSignal(10);
+
+export const setter = patternInput$004014[1];
+
+export const getter = patternInput$004014[0];
+
+export const patternInput$004015$002D1 = createStore([]);
+
+export const store = patternInput$004015$002D1[1];
+
+export const data = patternInput$004015$002D1[0];
+
+createEffect((_arg_2) => (getter() | 0), (_arg) => {
+    if (_arg === 10) {
+        store((_arg_1) => []);
+    }
+    else {
+        setter(10);
+    }
+});
+
+export const getGetter = () => {
+    let matchValue;
+    let check = 10;
+    (matchValue = (getter() | 0), (matchValue === 5) ? ((check = 10, (value_1) => {
+    })) : ((matchValue === 10) ? ((check = 5, (value) => {
+    })) : ((value_2) => {
+    })));
+    return check | 0;
+};
+
+export const getSetter = () => {
+    store((o) => {
+        void (o.push({
+            value: 5,
+            label: "Test",
+        }));
+        return o;
+    });
+    return ((data).length > 0) ? setter : ((value) => {
+    });
+};
+
+export const LazyTest = lazy(() => import("./ExperimentalBuilders.fs.jsx"));
+
+export function ComponentWrap() {
+    createEffect((_arg_2) => (getter() | 0), (_arg) => {
+        if (_arg === 10) {
+            store((_arg_1) => []);
+        }
+        else {
+            setter(10);
+        }
+    });
+    if (getter() === 0) {
+        return () => {
+            let check = 10;
+            const matchValue = getter() | 0;
+            switch (matchValue) {
+                case 5: {
+                    check = 10;
+                    break;
+                }
+                case 10: {
+                    check = 5;
+                    break;
+                }
+                default: {
+                }
+            }
+            return check | 0;
+        };
+    }
+    else {
+        return () => ((() => {
+            store((o) => {
+                void (o.push({
+                    value: 5,
+                    label: "Test",
+                }));
+                return o;
+            });
+            if ((data).length > 0) {
+                return setter;
+            }
+            else {
+                return undefined;
+            }
+        })() | 0);
+    }
+}
+
+export function TestComponent(props) {
+    const PARTAS_OTHERS = omit(props, "children");
+    const childs = children(() => props.children);
+    createEffect((_arg_1) => (() => [getter(), (data).length])(), (_arg) => {
+        console.log("effect", _arg[0], _arg[1]);
+    });
+    onCleanup(() => {
+        console.log("cleanup");
+    });
+    onSettled(() => {
+        console.log("mount");
+    });
+    createMemo((_arg_2) => {
+        console.log("memo");
+        return "memo";
+    });
+    createReaction(() => {
+        console.log("reaction");
+    })(() => (getter() | 0));
+    return <div>
+        {childs()}
+    </div>;
+}
+

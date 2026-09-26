@@ -1,0 +1,22 @@
+
+import { createSignal } from "solid-js";
+import { toArray, ofArray } from "../../fable_modules/fable-library-js.5.13.0/List.js";
+import { KeyedFor } from "../../../../Partas.Solid/SolidBindings.fs.jsx";
+
+export function ListToArray() {
+    const patternInput = createSignal(ofArray(["a", "b"]));
+    return <KeyedFor each={toArray(patternInput[0]())}>
+        {(x, _arg) => <li>
+            {x}
+        </li>}
+    </KeyedFor>;
+}
+
+export function ArrayCollection() {
+    return <KeyedFor each={["a", "b"]}>
+        {(x, _arg) => <li>
+            {x}
+        </li>}
+    </KeyedFor>;
+}
+

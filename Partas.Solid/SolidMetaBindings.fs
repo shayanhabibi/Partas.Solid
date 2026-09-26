@@ -5,7 +5,7 @@ open Partas.Solid
 
 [<AutoOpen>]
 module Bindings =
-    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<EB(EBState.Never)>]
     module Spec =
         [<Literal>]
         let path = "@solidjs/meta"

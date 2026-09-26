@@ -1,20 +1,21 @@
-﻿import { splitProps, mergeProps } from "solid-js";
+﻿
+import { omit, merge } from "solid-js";
 import { FakeImportedTag } from "fakeLibrary";
-import { ModuleTag } from "./TagsAsValuesSimpleTypes.fs.jsx";
+import { ModuleTag } from "./A-TagsAsValuesSimpleTypes.fs.jsx";
 
 export function CustomTag(props) {
-    props = mergeProps({
+    props = merge({
         icon: button,
     }, props);
-    const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["icon"]);
+    const PARTAS_OTHERS = omit(props, "icon");
     return <div>
-        <PARTAS_LOCAL.icon class="KeyVal" />
-        <PARTAS_LOCAL.icon class="KeyVal2" />
-        <PARTAS_LOCAL.icon class="constructor">
+        <props.icon class="KeyVal" />
+        <props.icon class="KeyVal2" />
+        <props.icon class="constructor">
             <button>
                 internal
             </button>
-        </PARTAS_LOCAL.icon>
+        </props.icon>
     </div>;
 }
 

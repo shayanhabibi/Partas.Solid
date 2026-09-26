@@ -1,0 +1,23 @@
+
+import { FakeImport } from "FakeLibrary";
+import { CustomTag } from "./A-Shared.fs.jsx";
+
+export function MyTag(props) {
+    const PARTAS_OTHERS = props;
+    return <FakeImport />;
+}
+
+export function MyOtherTag(props) {
+    const PARTAS_OTHERS = props;
+    return <CustomTag />;
+}
+
+export function ImportedTagWithProps(props) {
+    const PARTAS_OTHERS = props;
+    return <FakeImport class="Test props" />;
+}
+
+export function UserTagWithProps(props) {
+    const PARTAS_OTHERS = props;
+    return <CustomTag class="test bops" />;
+}

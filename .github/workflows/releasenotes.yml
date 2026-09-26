@@ -29,7 +29,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Publish Release Notes
-        run: dotnet fsi ./build.fsx target releasenotes
+        run: dotnet fsi ./build.fsx -- changelog
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -1,0 +1,18 @@
+import { Match, createSignal } from "solid-js";
+import { fakeTag } from "fakeLibrary";
+import { FakeImport } from "FakeLibrary";
+
+export function App_App() {
+    const patternInput = createSignal([{
+        title: "Home",
+        url: "#",
+        icon: <div />,
+    }]);
+    createSignal();
+    return <div>
+        <fakeTag items={patternInput[0]()} />
+        <FakeImport />
+        <Match />
+    </div>;
+}
+

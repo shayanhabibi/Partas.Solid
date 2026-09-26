@@ -72,6 +72,8 @@ type ComponentFlag =
     /// SolidComponents optimise out computation expressions, particularly of
     /// lists etc. In Fable 5, this should be handled by the compiler.
     | SkipCEOptimisation = 0b1000
+    | SkipOmit = 0b0001_0000
+    | SpreadProps = 0b0010_0000
 
 [<RequireQualifiedAccess>]
 module ComponentFlag =
@@ -96,7 +98,8 @@ type internal PluginContext =
       GetterArray: ResizeArray<string>
       SetterCollector: (string * Expr) -> unit
       GetterCollector: string -> unit
-      Flags: ComponentFlag }
+      Flags: ComponentFlag
+      mutable SelfIdentifier: string }
 
     member this.HasFlag flag =
         this.Flags.HasFlag flag
@@ -126,7 +129,8 @@ module internal PluginContext =
               GetterArray = new ResizeArray<string> [||]
               SetterCollector = fun _ -> ()
               GetterCollector = fun _ -> ()
-              Flags = flags }
+              Flags = flags
+              SelfIdentifier = null }
 
         { ctx with
             SetterCollector = ctx.SetterArray.Add
@@ -178,7 +182,7 @@ module internal PluginContext =
 
     /// <summary>
     /// Adds an attribute (or more precise to say the element <c>props</c>) property set name and the value
-    /// it is being set to. This is lifted at the end of the transformations to produce a <c>solid-js</c> mergeProps.
+    /// it is being set to. This is lifted at the end of the transformations to produce a <c>solid-js</c> <c>merge</c>.
     /// </summary>
     let addSetter ctx setter =
         checkDuplicateSetter ctx setter
@@ -186,7 +190,7 @@ module internal PluginContext =
 
     /// <summary>
     /// Adds an attribute (or more precise to say the element <c>props</c>) property access selector to the context.
-    /// This is lifted at the end of the transformations to produce a <c>solid-js</c> splitProps.
+    /// This is lifted at the end of the transformations to produce a <c>solid-js</c> <c>omit</c>.
     /// </summary>
     let addGetter = _.GetterCollector
 
@@ -236,6 +240,9 @@ module internal PluginContext =
                 match expr.Range with
                 | Some range -> helper.LogWarning (msg, range)
                 | _ -> helper.LogWarning (msg)
+
+    let setSelfIdentifier (ctx: PluginContext) (ident: string) =
+        ctx.SelfIdentifier <- ident
 
 /// DU which holds a string of the name for the Tag, or an expression containing the name of the tag, and where it
 /// should be imported from on compilation.

@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <FablePackageType>library</FablePackageType>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <WarningsAsErrors>3239;0025</WarningsAsErrors>
         <PackageId>Partas.Solid</PackageId>
         <Title>Partas.Solid</Title>
@@ -16,9 +16,8 @@
         <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Version>2.1.2</Version>
-        <PackageVersion>2.1.2</PackageVersion>
-    </PropertyGroup>
+        <Version>3.0.0</Version>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion></PropertyGroup>
 
     <ItemGroup>
       <None Include="../README.md" Pack="true" PackagePath="\" />
@@ -31,6 +30,7 @@
       <Compile Include="Tags.fs" />
       <Compile Include="Svg.fs" />
       <Compile Include="SolidBindings.fs" />
+      <Compile Include="SolidWebBindings.fs" />
       <Compile Include="SolidRouterBindings.fs" />
       <Compile Include="SolidMetaBindings.fs" />
       <Compile Include="SolidStartBindings.fs" />
@@ -41,11 +41,13 @@
 
     <ItemGroup>
       <PackageReference Include="Fable.Browser.Dom" Version="2.20.0" />
-      <PackageReference Include="Fable.Core" Version="5.0.0-beta.1" />
+      <PackageReference Include="Fable.Core" Version="5.2.0" />
       <PackageReference Include="Fable.Package.SDK" Version="1.3.2">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
+      <PackageReference Update="FSharp.Core" Version="10.0.100" />
+      <PackageReference Include="Xantham.Fable.Core.TS" Version="0.1.0-alpha.3" />
     </ItemGroup>
 
     <ItemGroup>

@@ -99,9 +99,9 @@ type AstUtils =
         )
 
     /// Creates an ident expr with the given name
-    static member inline IdentExpr(name: string, ?isThisArg: bool, ?isMutable: bool, ?isCompilerGenerated: bool) =
-        let isMutable, isCompilerGenerated, isThisArg =
-            defaultArg isMutable true, defaultArg isCompilerGenerated true, defaultArg isThisArg false
+    static member inline IdentExpr(name: string, ?isThisArg: bool, ?isMutable: bool, ?isCompilerGenerated: bool, ?isInlineIfLambda: bool) =
+        let isMutable, isCompilerGenerated, isThisArg, isInlineIfLambda =
+            defaultArg isMutable true, defaultArg isCompilerGenerated true, defaultArg isThisArg false, defaultArg isInlineIfLambda false
 
         Expr.IdentExpr (
             { Type = any
@@ -109,7 +109,8 @@ type AstUtils =
               IsMutable = isMutable
               IsThisArgument = isThisArg
               Name = name
-              Range = range }
+              Range = range
+              IsInlineIfLambda = isInlineIfLambda }
         )
 
     /// Creates an emit statement macro function with the given macro
@@ -216,18 +217,20 @@ type AstUtils =
         (emptyList, exprs)
         ||> List.fold (fun acc prop -> Value (kind = NewList (headAndTail = Some (prop, acc), typ = listItemType), range = range))
 
-    static member inline Ident(name: string, ?isThisArg: bool, ?typ: Type, ?isMutable: bool, ?isCompilerGenerated: bool, ?range: SourceLocation) =
+    static member inline Ident(name: string, ?isThisArg: bool, ?typ: Type, ?isMutable: bool, ?isCompilerGenerated: bool, ?range: SourceLocation, ?isInlineIfLambda: bool) =
         let typ = defaultArg typ any
         let isThisArg = defaultArg isThisArg false
         let isMutable = defaultArg isMutable false
         let isCompilerGenerated = defaultArg isCompilerGenerated true
+        let isInlineIfLambda = defaultArg isInlineIfLambda false
 
         { Name = name
           Type = typ
           IsCompilerGenerated = isCompilerGenerated
           IsMutable = isMutable
           IsThisArgument = isThisArg
-          Range = range }
+          Range = range
+          IsInlineIfLambda = isInlineIfLambda }
 
     static member inline CallInfo
         (?thisArg: Expr, ?args: Expr list, ?genArgs: Type list, ?sigArgTypes: Type list, ?memberRef: MemberRef, ?isCons: bool, ?tag: string)
@@ -264,7 +267,7 @@ type JsxUtils =
 
     /// Creates a keyvalue tuple from the given string and expression
     static member inline KeyValue(key: string, valueExpr: Expr) =
-        Expr.Value (ValueKind.NewTuple ([ AstUtils.Value (key); valueExpr ], false), range)
+        Expr.Value (ValueKind.NewTuple ([ AstUtils.Value key; valueExpr ], false), range)
 
     /// Creates a keyvalue tuple from the given string and expression
     static member inline KeyValue(key: string, value: string) =
@@ -296,12 +299,12 @@ type JsxUtils =
 
     /// Creates a child prop from the given list of expressions
     static member inline ChildrenProp(children: Expr list) =
-        JsxUtils.Prop ("children", AstUtils.Flatten (children))
+        JsxUtils.Prop ("children", AstUtils.Flatten children)
 
     /// Creates a JSX element with the given tag name expr, properties, and children
     static member inline CreateElement(tagNameExpr: Expr, properties: (string * Expr) list, children: Expr list) =
         let internalCollection =
-            JsxUtils.ChildrenProp (children)
+            JsxUtils.ChildrenProp children
             :: (properties
                 |> List.map JsxUtils.Prop)
             |> AstUtils.Flatten
@@ -320,27 +323,21 @@ type JsxUtils =
 
     /// Creates a JSX element with the given tag name, properties, and children
     static member inline CreateElement(tagName: string, properties: (string * Expr) list, children: Expr list) =
-        JsxUtils.CreateElement (AstUtils.Value (tagName), properties, children)
+        JsxUtils.CreateElement (AstUtils.Value tagName, properties, children)
 
 module Patterns =
     /// Matches strings that start with the provided string
-    let (|StartsWith|_|) (value: string) =
-        function
-        | (s: string) when s.StartsWith (value) -> Some ()
-        | _ -> None
+    let inline (|StartsWith|_|) (value: string): string -> bool = _.StartsWith(value)
 
     /// Matches string that end with the provided string
-    let (|EndsWith|_|) (value: string) =
-        function
-        | (s: string) when s.EndsWith (value) -> Some ()
-        | _ -> None
+    let inline (|EndsWith|_|) (value: string): string -> bool = _.EndsWith(value)
 
     /// Matches strings that start with the provided string, and returns the string
     /// with the match trimmed
     let (|StartsWithTrimmed|_|) (value: string) =
         function
         | StartsWith value as s ->
-            s.Substring (value.Length)
+            s.Substring value.Length
             |> Some
         | _ -> None
 
@@ -349,11 +346,7 @@ module Patterns =
     let (|EndsWithTrimmed|_|) (value: string) =
         function
         | EndsWith value as s ->
-            s.Substring (
-                0,
-                s.Length
-                - value.Length
-            )
+            s.Substring (0, s.Length - value.Length)
             |> Some
         | _ -> None
 
@@ -371,7 +364,7 @@ module Patterns =
         | Type.Option (GetDeclaredType typ, _)
         | Type.List (GetDeclaredType typ)
         | Type.Array (GetDeclaredType typ, _) -> Some typ
-        | Type.DeclaredType (_) as typ -> Some typ
+        | Type.DeclaredType _ as typ -> Some typ
         | _ -> None
 
     /// Matches an entityref that has the given attribute full name. This requires the PluginHelper to be
@@ -511,7 +504,7 @@ module Expr =
             @ rest
         | expr :: ExprMatchingFun func rest ->
             match expr with
-            | Value (kind, range) ->
+            | Value (kind, _range) ->
                 match kind with
                 | StringTemplate (tag = tag; values = ExprMatchingFun func values) ->
                     match tag with
@@ -638,23 +631,11 @@ module Expr =
                 @ rest
             | TryCatch (body = ExprMatchingFunFeedback func bodyValues; catch = catch; finalizer = finalizer) ->
                 bodyValues
-                @ (catch
-                   |> Option.map (
-                       snd
-                       >> function
-                           | ExprMatchingFunFeedback func values -> values
-                   )
-                   |> Option.defaultValue [])
-                @ (finalizer
-                   |> Option.map (function
-                       | ExprMatchingFunFeedback func values -> values)
-                   |> Option.defaultValue [])
+                @ (catch |> Option.map ( snd >> function ExprMatchingFunFeedback func values -> values ) |> Option.defaultValue [])
+                @ (finalizer |> Option.map (function ExprMatchingFunFeedback func values -> values) |> Option.defaultValue [])
                 @ rest
             | IfThenElse (ExprMatchingFunFeedback func values, ExprMatchingFunFeedback func values2, ExprMatchingFunFeedback func values3, _) ->
-                values
-                @ values2
-                @ values3
-                @ rest
+                values @ values2 @ values3 @ rest
             | _ -> rest
 
 
@@ -664,20 +645,7 @@ type StringUtils =
         function
         | Patterns.EndsWithTrimmed "'" s
         | Patterns.EndsWithTrimmed "`1" s -> StringUtils.TrimReservedIdentifiers s
-        | s when
-            s.Length > 2
-            && s
-                .Substring(
-                    s.Length
-                    - 2
-                )
-                .StartsWith
-                '`'
-            ->
-            s.Substring (
-                0,
-                s.Length
-                - 2
-            )
+        | s when s.Length > 2 && s.Substring(s.Length - 2).StartsWith '`' ->
+            s.Substring ( 0, s.Length - 2 )
             |> StringUtils.TrimReservedIdentifiers
         | s -> s

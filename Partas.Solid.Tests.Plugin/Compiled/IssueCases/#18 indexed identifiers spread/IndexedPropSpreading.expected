@@ -1,0 +1,11 @@
+
+import { partitionProps } from "./partitionProps.js";
+
+export function Select(props) {
+    const PARTAS_OTHERS = props;
+    const patternInput = partitionProps(props, ["name", "placeholder", "required", "disabled"], ["ref", "onInput", "onChange", "onBlur"]);
+    return <div {...patternInput[0]} n$={false}>
+        <select {...patternInput[1]} n$={false} />
+    </div>;
+}
+

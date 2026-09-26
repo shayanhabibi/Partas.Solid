@@ -1,8 +1,6 @@
 ﻿namespace Partas.Solid.Style
 
 open Fable.Core
-open Fable.Core.JS
-open Fable.Core.JsInterop
 open Partas.Solid.Experimental.U
 open Partas.Solid
 
@@ -10,7 +8,7 @@ open Partas.Solid
 module Types =
     [<RequireQualifiedAccess>]
     [<StringEnum(CaseRules.KebabCase)>]
-    [<EditorBrowsable(EditorBrowsableState.Advanced)>]
+    [<EB(EBState.Advanced)>]
     type AtRules =
         | [<CompiledName("@charset")>] CharSet
         | [<CompiledName("@counter-style")>] CounterStyle
@@ -32,7 +30,7 @@ module Types =
         | [<CompiledName("@viewport")>] Viewport
 
     [<RequireQualifiedAccess>]
-    [<EditorBrowsable(EditorBrowsableState.Advanced)>]
+    [<EB(EBState.Advanced)>]
     [<StringEnum(CaseRules.KebabCase)>]
     type Globals =
         | [<CompiledName("-moz-initial")>] MozInitial
@@ -43,7 +41,7 @@ module Types =
         | Unset
 
     [<RequireQualifiedAccess>]
-    [<EditorBrowsable(EditorBrowsableState.Advanced)>]
+    [<EB(EBState.Advanced)>]
     [<StringEnum(CaseRules.KebabCase)>]
     type AccentColor =
         | [<CompiledName("-moz-initial")>] MozInitial
@@ -10325,7 +10323,7 @@ module Types =
         | NonScalingStroke
         | None
 
-    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
+    [<EB(EBState.Advanced)>]
     module AtRule =
         [<RequireQualifiedAccess>]
         [<StringEnum(CaseRules.KebabCase)>]
@@ -10462,7 +10460,7 @@ module Types =
             | Portrait
 
 
-    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)>]
+    [<EB(EBState.Advanced)>]
     module DataType =
 
         [<RequireQualifiedAccess>]

@@ -1,0 +1,17 @@
+
+import { createEffect, createSignal, omit } from "solid-js";
+
+export function WordRotate(props) {
+    const PARTAS_OTHERS = omit(props, "duration", "words");
+    const patternInput = createSignal(0);
+    createEffect((_arg) => props.duration, (duration) => {
+        const interval = setInterval(() => {
+            patternInput[1]((prevIndex) => (((prevIndex + 1) % props.words.length) | 0));
+        }, duration) | 0;
+        return () => {
+            clearInterval(interval);
+        };
+    });
+    return <div />;
+}
+

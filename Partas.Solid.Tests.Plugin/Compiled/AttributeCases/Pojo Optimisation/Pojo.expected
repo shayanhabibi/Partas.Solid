@@ -1,0 +1,15 @@
+﻿export function Bock() {
+    return [{
+        testAttr: "chok",
+        testBok: "bok",
+        testGrok: "test",
+    }, {
+        testAttr: "tes",
+    }, {
+        otherAttr: "sdf",
+        testGrok: "dfs",
+    }, {
+        otherAttr: "sdf",
+        testGrok: "dfs",
+    }];
+}

@@ -3,16 +3,23 @@
   "isRoot": true,
   "tools": {
     "fantomas": {
-      "version": "7.0.3",
+      "version": "7.0.5",
       "commands": [
         "fantomas"
       ],
       "rollForward": false
     },
     "fable": {
-      "version": "5.0.0-alpha.14",
+      "version": "5.13.0",
       "commands": [
         "fable"
+      ],
+      "rollForward": false
+    },
+    "partas.externalannotations.tool": {
+      "version": "0.1.1",
+      "commands": [
+        "partas-annotations"
       ],
       "rollForward": false
     }

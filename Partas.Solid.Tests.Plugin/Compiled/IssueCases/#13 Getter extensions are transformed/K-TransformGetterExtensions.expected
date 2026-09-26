@@ -1,0 +1,26 @@
+
+import { Show, omit } from "solid-js";
+import { flexRender, createSolidTable } from "@tanstack/solid-table";
+import { KeyedFor } from "../../../../Partas.Solid/SolidBindings.fs.jsx";
+
+export function TransformGetterExtensions(props) {
+    const PARTAS_OTHERS = omit(props, "data");
+    const table = createSolidTable({
+        data: props.data,
+    });
+    return <div>
+        <Show when={table.getRowModel().rows.length}
+            fallback={<div />}>
+            <KeyedFor each={table.getRowModel().rows}>
+                {(row, index) => <div data-state={row.getIsSelected() && "selected"}>
+                    <KeyedFor each={row.getVisibleCells()}>
+                        {(cell, index_1) => <div>
+                            {flexRender(...[cell.column.columnDef.cell, cell.getContext])}
+                        </div>}
+                    </KeyedFor>
+                </div>}
+            </KeyedFor>
+        </Show>
+    </div>;
+}
+

@@ -36,9 +36,9 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Publish nuget package
-        run: dotnet fsi ./build.fsx target publish --nuget-api-key ${{ env.NUGET_API_KEY }}
+        run: dotnet fsi ./build.fsx -- publish --nuget-key ${{ env.NUGET_API_KEY }}
 
       - name: Generate release notes
-        run: dotnet fsi ./build.fsx target releasenotes
+        run: dotnet fsi ./build.fsx -- changelog
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

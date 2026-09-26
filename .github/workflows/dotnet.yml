@@ -39,4 +39,4 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Run test script
-        run: dotnet fsi ./build.fsx
+        run: dotnet fsi ./build.fsx -- test

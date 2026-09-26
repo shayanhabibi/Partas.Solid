@@ -2,10 +2,8 @@ namespace Partas.Solid
 
 open System.Runtime.CompilerServices
 open Browser.Types
-open JetBrains.Annotations
 open Fable.Core
 open Fable.Core.JsInterop
-open Partas.Solid.Experimental.U
 
 #nowarn 1182
 
@@ -26,8 +24,26 @@ module Decorators =
     [<Emit("/*@once*/")>]
     let once: unit = jsNative
 
+
 [<AutoOpen>]
 module Tags =
+    [<EB(EBState.Never)>]
+    type DomType<^Tag, ^DomType when ^Tag:(member asDomElement: ^DomType)> = ^Tag
+    [<EB(EBState.Never)>]
+    type IntrinsicDomType<^Tag, ^DomType when ^DomType :> HTMLElement and DomType<^Tag, ^DomType> and ^Tag :> IntrinsicDOMElement> = ^Tag
+
+    [<AutoOpen>]
+    type Extensions =
+        [<Erase>] static member inline asDomElement (comp: ^A): ^B when IntrinsicDomType<^A, ^B> = (^A : (member asDomElement: ^B) comp)
+
+    [<Erase; RequireQualifiedAccess>]
+    type Ref<^DomType> =
+        | Singleton of ^DomType option
+        | Callback of (^DomType -> unit)
+        | Array of Ref<^DomType> array
+    module Ref =
+        let inline cast (ref: Ref<^DomType> when ^DomType :> #HTMLElement): Ref<#HTMLElement> = unbox ref
+
     /// Fragment (or template) node, only renders children, not itself
     [<Erase>]
     type Fragment() =
@@ -36,35 +52,50 @@ module Tags =
     /// Set of html extensions that keep original type
     [<Erase>]
     type HtmlElementExtensions =
-
         /// Add an attribute to the element
         [<Extension; Erase>]
         static member attr(this: #HtmlTag, name: string, value: obj) = this
-
-        /// Forces the prop to be treated as a property instead of an attribute.
-        [<Extension; Erase>]
-        static member prop(this: #HtmlTag, name: string, value: obj) = this
-
-        /// Add event handler to the element through the corresponding attribute
-        [<Extension; Erase>]
-        static member on(this: #HtmlTag, eventName: string, eventHandler: Event -> unit) = this
-
-        /// Add event handler to the element with the v1.9 syntax that is an intersection
-        /// of EventListenerObject and AddEventListenerOptions
-        [<Extension; Erase>]
-        static member on(this: #HtmlTag, eventName: string, eventHandler: OnHandler) = this
 
         /// Add data attribute to the element
         [<Extension; Erase>]
         static member data(this: #HtmlTag, name: string, value: string) = this
 
-        /// Referenced native HTML element
+        [<Extension; Erase; CompiledName("ref"); EB(EBState.Never)>]
+        static member _refSRTPImplementation(this: #IntrinsicDOMElement, el: obj): #IntrinsicDOMElement = this
         [<Extension; Erase>]
-        static member ref(this: #HtmlTag, el: #Element) = this
+        static member ref(this: #RefAttributeExtension, el: HTMLElement): #RefAttributeExtension = this
+        [<Extension; Erase>]
+        static member ref(this: #RefAttributeExtension, el: HTMLElement option): #RefAttributeExtension = this
+        [<Extension; Erase>]
+        static member ref(this: #RefAttributeExtension, el: HTMLElement -> unit): #RefAttributeExtension = this
+        [<Extension; Erase>]
+        static member ref(this: #RefAttributeExtension, el: (HTMLElement -> unit) array): #RefAttributeExtension = this
+        [<Extension; Erase>]
+        static member ref(this: #RefAttributeExtension, el: Ref<HTMLElement>): #RefAttributeExtension = this
 
-        /// Referenced native HTML element (before connecting to DOM)
+        /// <remarks>
+        /// If you want to create a mutable ref to an element that captures any HTMLElement:
+        /// <code>
+        /// let mutable myRef: HTMLElement = JS.undefined
+        /// div().ref(myRef :?> _) // works; will upcast to HTMLDivElement
+        /// div().ref(myRef) // compiler error - needs HTMLDivElement
+        /// </code>
+        /// </remarks>
         [<Extension; Erase>]
-        static member ref(this: #HtmlTag, el: #Element -> unit) = this
+        static member inline ref(this: ^T, el: ^U when IntrinsicDomType<^T, ^U>): ^T = this._refSRTPImplementation(el)
+        [<Extension; Erase>]
+        static member inline ref(this: ^T, el: ^U option when IntrinsicDomType<^T, ^U>): ^T = this._refSRTPImplementation(el)
+        [<Extension; Erase>]
+        static member inline ref(this: ^T, [<InlineIfLambda>] el: ^U -> unit when IntrinsicDomType<^T, ^U>): ^T = this._refSRTPImplementation(el)
+        [<Extension; Erase>]
+        static member inline ref(this: ^T, el: Ref<^U> when IntrinsicDomType<^T, ^U>): ^T = this._refSRTPImplementation(el)
+        [<Extension; Erase>]
+        static member inline ref(this: ^T, el: Ref<^U>[] when IntrinsicDomType<^T, ^U>): ^T = this._refSRTPImplementation(el)
+
+
+        // /// Referenced native HTML element (before connecting to DOM)
+        // [<Extension; Erase>]
+        // static member ref(this: #RefAttributeExtension, el: #Element -> unit) = this
 
         /// Usage `elem.style(createObj ["color", "green"; "background-color", state.myColor ])`
         [<Extension; Erase>]
@@ -79,7 +110,7 @@ module Tags =
 
         /// Usage `elem.classList(createObj ["active", true; "disabled", state.disabled ])`
         [<Extension; Erase>]
-        static member classList(this: #HtmlTag, classListObj: obj) = this
+        static member class'(this: #HtmlTag, classListObj: obj) = this
 
         /// Adds or removes attribute without value
         [<Extension; Erase>]
@@ -87,600 +118,597 @@ module Tags =
 
         /// Spreads the passed identifier within the Tag
         [<Extension; Erase>]
-        static member spread(this: #HtmlTag, value: obj) = this
-
-        /// Directive usage
-        [<Extension; Erase>]
-        static member use'(this: #HtmlTag, name: string, value: obj) = this
+        static member spread(this: #HtmlElement, value: obj) = this
 
     [<Erase>]
     type a() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface AnchorHTMLAttributes
         member inline this.asDomElement: HTMLAnchorElement = unbox this
 
     [<Erase>]
     type abbr() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type address() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type area() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         interface AreaHTMLAttributes
         member inline this.asDomElement: HTMLAreaElement = unbox this
 
     [<Erase>]
     type article() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type aside() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type audio() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface AudioHTMLAttributes
         member inline this.asDomElement: HTMLAudioElement = unbox this
 
     [<Erase>]
     type b() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type base'() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         member inline this.asDomElement: HTMLBaseElement = unbox this
 
     [<Erase>]
     type bdi() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type bdo() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type blockquote() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface BlockquoteHTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type body() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLBodyElement = unbox this
 
     [<Erase>]
     type br() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         member inline this.asDomElement: HTMLBRElement = unbox this
 
     [<Erase>]
     type button() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface ButtonHTMLAttributes
         member inline this.asDomElement: HTMLButtonElement = unbox this
 
     [<Erase>]
     type canvas() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface CanvasHTMLAttributes
         member inline this.asDomElement: HTMLCanvasElement = unbox this
 
     [<Erase>]
     type caption() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type cite() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type code() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type col() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         interface ColHTMLAttributes
         member inline this.asDomElement: HTMLTableColElement = unbox this
 
     [<Erase>]
     type colgroup() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface ColgroupHTMLAttributes
         member inline this.asDomElement: HTMLTableColElement = unbox this
 
     [<Erase>]
     type data() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface DataHTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type datalist() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLDataListElement = unbox this
 
     [<Erase>]
     type dd() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type del() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type details() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface DetailsHtmlAttributes
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type dfn() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type dialog() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface DialogHtmlAttributes
         member inline this.asDomElement: HTMLDialogElement = unbox this
 
     [<Erase>]
     type div() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLDivElement = unbox this
 
     [<Erase>]
     type dl() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLDListElement = unbox this
 
     [<Erase>]
     type dt() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type em() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type embed() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         interface EmbedHTMLAttributes
         member inline this.asDomElement: HTMLEmbedElement = unbox this
 
     [<Erase>]
     type fieldset() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface FieldsetHTMLAttributes
         member inline this.asDomElement: HTMLFieldSetElement = unbox this
 
     [<Erase>]
     type figcaption() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type figure() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type footer() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type form() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface FormHTMLAttributes
         member inline this.asDomElement: HTMLFormElement = unbox this
 
     [<Erase>]
     type h1() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLHeadingElement = unbox this
 
     [<Erase>]
     type h2() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLHeadingElement = unbox this
 
     [<Erase>]
     type h3() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLHeadingElement = unbox this
 
     [<Erase>]
     type h4() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLHeadingElement = unbox this
 
     [<Erase>]
     type h5() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLHeadingElement = unbox this
 
     [<Erase>]
     type h6() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLHeadingElement = unbox this
 
     [<Erase>]
     type head() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLHeadElement = unbox this
 
     [<Erase>]
     type header() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type hgroup() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type hr() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         member inline this.asDomElement: HTMLHRElement = unbox this
 
     [<Erase>]
     type html() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLHtmlElement = unbox this
 
     [<Erase>]
     type i() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type iframe() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface IframeHTMLAttributes
         member inline this.asDomElement: HTMLIFrameElement = unbox this
 
     [<Erase>]
     type img() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         interface ImgHTMLAttributes
         member inline this.asDomElement: HTMLImageElement = unbox this
 
     [<Erase>]
     type input() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         interface InputHTMLAttributes
         member inline this.asDomElement: HTMLInputElement = unbox this
 
     [<Erase>]
     type ins() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface InsHTMLAttributes
         member inline this.asDomElement: HTMLModElement = unbox this
 
     [<Erase>]
     type kbd() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type label() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface LabelHTMLAttributes
         member inline this.asDomElement: HTMLLabelElement = unbox this
 
     [<Erase>]
     type legend() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLLegendElement = unbox this
 
     [<Erase>]
     type li() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface LiHTMLAttributes
         member inline this.asDomElement: HTMLLIElement = unbox this
 
     [<Erase>]
     type link() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         interface LinkHTMLAttributes
         member inline this.asDomElement: HTMLLinkElement = unbox this
 
     [<Erase>]
     type main() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type map() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface MapHTMLAttributes
         member inline this.asDomElement: HTMLMapElement = unbox this
 
     [<Erase>]
     type mark() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type menu() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface MenuHTMLAttributes
         member inline this.asDomElement: HTMLMenuElement = unbox this
 
     [<Erase>]
     type meta() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         interface MetaHTMLAttributes
         member inline this.asDomElement: HTMLMetaElement = unbox this
 
     [<Erase>]
     type meter() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface MeterHTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type nav() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type noscript() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type object'() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface ObjectHTMLAttributes
         member inline this.asDomElement: HTMLObjectElement = unbox this
 
     [<Erase>]
     type ol() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface OlHTMLAttributes
         member inline this.asDomElement: HTMLOListElement = unbox this
 
     [<Erase>]
     type optgroup() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface OptgroupHTMLAttributes
         member inline this.asDomElement: HTMLOptGroupElement = unbox this
 
     [<Erase>]
     type option'() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface OptionHTMLAttributes
         member inline this.asDomElement: HTMLOptionElement = unbox this
 
     [<Erase>]
     type output() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface OutputHTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type p() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLParagraphElement = unbox this
 
     [<Erase>]
     type picture() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type pre() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLPreElement = unbox this
 
     [<Erase>]
     type progress() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface ProgressHTMLAttributes
         member inline this.asDomElement: HTMLProgressElement = unbox this
 
     [<Erase>]
     type q() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface QuoteHTMLAttributes
         member inline this.asDomElement: HTMLQuoteElement = unbox this
 
     [<Erase>]
     type rp() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type rt() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type ruby() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type s() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type samp() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type script() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface ScriptHTMLAttributes
         member inline this.asDomElement: HTMLScriptElement = unbox this
 
     [<Erase>]
     type search() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type section() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type select() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface SelectHTMLAttributes
         member inline this.asDomElement: HTMLSelectElement = unbox this
 
     [<Erase>]
     type small() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type source() =
-        interface VoidNode
+        interface IntrinsicVoidNode
         interface SourceHTMLAttributes
         member inline this.asDomElement: HTMLSourceElement = unbox this
 
     [<Erase>]
     type span() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLSpanElement = unbox this
 
     [<Erase>]
     type strong() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type style() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface StyleHTMLAttributes
         member inline this.asDomElement: HTMLStyleElement = unbox this
 
     [<Erase>]
     type sub() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type summary() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type sup() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type table() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLTableElement = unbox this
 
     [<Erase>]
     type tbody() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLTableSectionElement = unbox this
 
     [<Erase>]
     type td() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface TdHTMLAttributes
         member inline this.asDomElement: HTMLTableCellElement = unbox this
 
     [<Erase>]
     type textarea() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface TextareaHTMLAttributes
         member inline this.asDomElement: HTMLTextAreaElement = unbox this
 
     [<Erase>]
     type tfoot() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLTableSectionElement = unbox this
 
     [<Erase>]
     type th() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface ThHTMLAttributes
         member inline this.asDomElement: HTMLTableCellElement = unbox this
 
     [<Erase>]
     type thead() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLTableSectionElement = unbox this
 
     [<Erase>]
     type time() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface TimeHTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type title() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLTitleElement = unbox this
 
     [<Erase>]
     type tr() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLTableRowElement = unbox this
 
     [<Erase>]
     type track() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface TrackHTMLAttributes
         member inline this.asDomElement: HTMLTrackElement = unbox this
 
     [<Erase>]
     type u() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type ul() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLUListElement = unbox this
 
     [<Erase>]
     type var() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type video() =
-        interface RegularNode
+        interface IntrinsicParentNode
         interface VideoHTMLAttributes
         member inline this.asDomElement: HTMLVideoElement = unbox this
 
     [<Erase>]
     type wbr() =
-        interface RegularNode
+        interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
+

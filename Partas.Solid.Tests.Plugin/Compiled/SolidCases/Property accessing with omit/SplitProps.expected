@@ -1,0 +1,32 @@
+
+import { omit } from "solid-js";
+
+export function SplitProps(props) {
+    const PARTAS_OTHERS = omit(props, "class", "draggable");
+    return <div class={props.class}>
+        <button draggable={props.draggable} />
+    </div>;
+}
+
+export function NestedSplitProps(props) {
+    const PARTAS_OTHERS = omit(props, "class");
+    return <div>
+        <button class={props.class} />
+        <div>
+            <button onClick={(_arg) => {
+                    console.log(props.class);
+                }} />
+        </div>
+        text
+    </div>;
+}
+
+export function SplitValMutable(props) {
+    const PARTAS_OTHERS = omit(props, "index");
+    return <div tabindex={props.index} />;
+}
+
+export function SplitInheritedValMutable(props) {
+    const PARTAS_OTHERS = omit(props, "index");
+    return <div tabindex={props.index} />;
+}

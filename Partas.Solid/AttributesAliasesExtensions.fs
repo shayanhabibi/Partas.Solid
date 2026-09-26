@@ -5,8 +5,9 @@
 open System
 
 // aliases
-type EditorBrowsable = System.ComponentModel.EditorBrowsableAttribute
-type EditorBrowsableState = System.ComponentModel.EditorBrowsableState
+type internal EBAttribute = System.ComponentModel.EditorBrowsableAttribute
+type internal EBState = System.ComponentModel.EditorBrowsableState
+type internal IILAttribute = InlineIfLambdaAttribute
 
 /// Used for types that have inbuilt Builder computation support but are an imported
 /// component from an external library.
@@ -31,9 +32,7 @@ type internal InjectedLanguage =
     | JSON = 3
     | XML = 4
 
-[<AttributeUsage(AttributeTargets.Parameter
-                 ||| AttributeTargets.Field
-                 ||| AttributeTargets.Property)>]
+[<AttributeUsage(AttributeTargets.Parameter ||| AttributeTargets.Field ||| AttributeTargets.Property)>]
 [<Erase>]
 type internal LanguageInjectionAttribute private (?injectedLanguage: InjectedLanguage, ?injectedLanguageName: string) =
     inherit Attribute()
@@ -69,8 +68,6 @@ open Fable.Core
 /// Experimenting to see whether this improves or detracts from the developer experience.
 /// </summary>
 module U =
-
-
     /// Erased union type to represent one of two possible values.
     /// More info: https://fable.io/docs/communicate/js-from-fable.html#erase-attribute
     [<Erase>]
