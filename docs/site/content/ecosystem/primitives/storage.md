@@ -108,7 +108,7 @@ for signals only.
 
 ## Bindings
 
-:::details title="Bindings"
+:::details Bindings
 ```fsharp
 [<Erase; AutoOpen>]
 type Storage =

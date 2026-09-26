@@ -33,7 +33,7 @@ let Test () =
     DataTable(table = table)
 ```
 
-:::details title="Why are data and columns methods?"
+:::details Why are data and columns methods?
 TanStack needs `data` and `columns` to be `get` properties of the `TableOptions` object passed to `createTable`. The
 `.data` and `.columns` methods set them up that way for you.
 :::

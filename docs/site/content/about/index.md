@@ -43,7 +43,7 @@ yourself.
 - [The Oxpecker fork](oxpecker-fork.md): the history of the project.
 - [Migrating to Solid 2](../guide/migrating-to-solid-2.md): if you are coming from Partas.Solid 2.x.
 
-:::details title="Isn't this Oxpecker.Solid?"
+:::details Isn't this Oxpecker.Solid?
 Partas.Solid is an opinionated fork of Lanayx's [Oxpecker.Solid](https://github.com/lanayx/oxpecker). The plugin
 transforms the Fable AST aggressively to produce Solid-compatible **JSX**, with a lot of syntactic sugar on top.
 

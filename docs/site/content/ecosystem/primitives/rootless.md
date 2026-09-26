@@ -45,7 +45,7 @@ Core Partas.Solid 3.0 still binds `createRoot`, `getOwner` and `runWithOwner`. `
 `Owner option`, and `runWithOwner` accepts either an `Owner` or an `Owner option`.
 :::
 
-:::details title="Bindings"
+:::details Bindings
 ```fsharp
 [<AutoOpen; Erase>]
 type Rootless =

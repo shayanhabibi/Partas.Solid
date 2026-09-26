@@ -46,7 +46,7 @@ Try the next one on your own before you open the answer.
 with the classes `"w-full caption-bottom text-sm"` plus any classes passed to `Table`. The inner `table` also gets
 every other attribute passed to `Table`.
 
-:::details title="Table component"
+:::details Table component
 ```fsharp
 [<Erase>]
 type Table() =

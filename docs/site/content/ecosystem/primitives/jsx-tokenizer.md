@@ -73,7 +73,7 @@ constructor and the properties, and you can use interfaces more naturally.
 
 `resolveTokens` and `isToken` also accept an array of tokenizers.
 
-:::details title="Bindings"
+:::details Bindings
 ```fsharp
 [<AutoOpen; Erase>]
 type JsxTokenizer =

@@ -59,12 +59,12 @@ If a member does not pass, the plugin warns:
 It then transforms the body as if it were a `[<SolidComponent>]`. There is no renaming, no defaults, and no rest
 props, so the component will not work as one.
 
-:::details title="Why does the type need to be in a Partas.Solid namespace?"
+:::details Why does the type need to be in a Partas.Solid namespace?
 The plugin only treats types whose full name starts with `Partas.Solid` as tags and components. The prefix keeps it
 from rewriting code it should leave alone. A type anywhere else fails the check above.
 :::
 
-:::details title="Why does the member need to be in the same file as the type?"
+:::details Why does the member need to be in the same file as the type?
 Every use of the type's constructor imports the component from the file that declares the type. Say the type is
 declared in `MyComponent.fs` and the member is an extension in `Extensions.fs`. Partas.Solid compiles the component
 function into `Extensions.fs.jsx`, but every use imports it from `MyComponent.fs.jsx`, which has no function of that

@@ -95,7 +95,7 @@ let createClipboard(
     ): ClipboardResult
 ```
 
-:::details title="Version with an apostrophe"
+:::details Version with an apostrophe
 ```fsharp
 let createClipboard'(
     ?data: Accessor<string | ClipboardItem[]>,

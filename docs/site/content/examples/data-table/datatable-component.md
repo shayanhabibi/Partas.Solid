@@ -22,7 +22,7 @@ type DataTable<'T>() =
     interface VoidNode
 ```
 
-:::details title="Why VoidNode?"
+:::details Why VoidNode?
 `DataTable` takes no children, so it implements `VoidNode`. Passing it children is a compile error.
 :::
 
@@ -101,7 +101,7 @@ an index accessor, so you read the index as `index ()`. `For.NonKeyed` passes an
 index, so you read the item as `item ()`. See [Migrating to Solid 2](../../guide/migrating-to-solid-2.md).
 :::
 
-:::details title="Why SolidTypeComponent and not SolidComponent?"
+:::details Why SolidTypeComponent and not SolidComponent?
 With this implementation there is no real reason to use `SolidTypeComponent`, except that it lets you use the
 component the same way as the rest of the DSL.
 

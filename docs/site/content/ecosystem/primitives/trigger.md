@@ -26,7 +26,7 @@ let createTrigger(): TriggerSignal<unit>
 
 Track the trigger in reactive computations, then fire it when you want.
 
-:::details title="Example"
+:::details Example
 ```fsharp
 let track, dirty = createTrigger()
 
@@ -61,7 +61,7 @@ static member track (triggerCache: TriggerCacheSignal<'T>, key: 'T): unit
 static member dirty (triggerCache: TriggerCacheSignal<'T>, key: 'T): unit
 ```
 
-:::details title="Example"
+:::details Example
 ```fsharp
 let map = createTriggerCache<int>()
 

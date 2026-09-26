@@ -47,7 +47,7 @@ type InputMaskRegex = InputMaskRegex of regex: Regex * replacer: (obj -> string)
 The `createKeyboard*`, `createInput*` and `createClipboard*` members are inline helpers that fix the event type of
 `createInputMask` and `createMaskPattern`.
 
-:::details title="Bindings"
+:::details Bindings
 ```fsharp
 [<AutoOpen; Erase>]
 type InputMask =

@@ -104,7 +104,7 @@ You want `indeterminate` on the root component, and you also read it to decide w
 from the spread props, so you have to pass it to the root by name as well.
 :::
 
-:::details title="Using the CheckboxRenderProp instead"
+:::details Using the CheckboxRenderProp instead
 The checkbox passes its state to its child function. Read `indeterminate` from there, and you no longer need to pass
 the property by name:
 
@@ -220,7 +220,7 @@ let TestSelectableTable () =
     DataTable(table = table)
 ```
 
-:::details title="What is stateFn?"
+:::details What is stateFn?
 Like `data` and `columns`, the row selection has to be a `get` property of the options object to be reactive. `.stateFn`
 hands you an object that makes that easy to do from Fable.
 :::

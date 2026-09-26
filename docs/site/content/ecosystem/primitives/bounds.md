@@ -33,7 +33,7 @@ to `false` and turn on only the ones you use.
 | `trackMutation` | Changes to the DOM structure and styles |
 | `trackResize` | The element's resize events |
 
-:::details title="Bindings"
+:::details Bindings
 ```fsharp
 [<Erase; AutoOpen>]
 type Bounds =

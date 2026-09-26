@@ -78,7 +78,7 @@ Common parameters:
 | `initialValues` | The initial values. |
 | `pos` | For `createPositionToElement`: an accessor of the page position (relative to the page, not the window). |
 
-:::details title="Bindings"
+:::details Bindings
 ```fsharp
 [<Erase; AutoOpen>]
 type Mouse =

@@ -29,14 +29,14 @@ Two shortcuts combine flags for you:
 | `ComponentFlag.None` | `SkipPojoOptimisation ||| SkipCEOptimisation`: the minimal set of transformations |
 | `ComponentFlag.VerboseDebugMode` | `DebugMode ||| PrintDisposals` |
 
-:::details title="DebugMode"
+:::details DebugMode
 Prints the AST of the component, before the plugin transforms it, to the console during the Fable build.
 
 If you open an issue about the plugin, include a minimal example compiled with this flag and its output. See
 [Submitting Issues](../contributing/submit-issues.md).
 :::
 
-:::details title="PrintDisposals"
+:::details PrintDisposals
 While the plugin transforms a component, it throws some expressions away: plumbing from computation expressions,
 unit values, and so on. This flag logs each one.
 
@@ -44,14 +44,14 @@ Use it when part of your component is missing from the output. The log tells you
 very noisy, so turn it on for one component at a time.
 :::
 
-:::details title="SkipPojoOptimisation"
+:::details SkipPojoOptimisation
 When you set properties on a `[<Pojo>]` object outside its primary constructor, the plugin normally moves those
 assignments into the object literal, so the object is built in one step instead of being mutated after it is built.
 
 This flag turns that off. Use it if the optimisation breaks a component.
 :::
 
-:::details title="SkipCEOptimisation"
+:::details SkipCEOptimisation
 The plugin removes computation expression plumbing around lists and children, so the output is a plain array or
 plain JSX children rather than a chain of builder calls.
 
