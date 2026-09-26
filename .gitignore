@@ -13,3 +13,8 @@ riderModule.iml
 /.workbench/
 # SageFs's per-project session cache (Workbench/.SageFs/)
 .SageFs/
+
+# Local agent tooling config
+.claude/
+.codex/
+.serena/
