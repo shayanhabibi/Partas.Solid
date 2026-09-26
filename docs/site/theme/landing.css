@@ -51,7 +51,7 @@ body:has(.nacara-layout--splash) { overflow-x: clip; }
   mask-image: radial-gradient(ellipse 55% 60% at 50% 30%, #000 20%, transparent 75%); }
 
 .nacara-content .p-hero__logo {
-  display: block; width: 5.5rem; height: 5.5rem; margin: 0 auto 1.75rem; border: 0; border-radius: 0;
+  display: block; width: 5.5rem; height: 5.5rem; aspect-ratio: 1; object-fit: contain; margin: 0 auto 1.75rem; border: 0; border-radius: 0;
   filter: drop-shadow(0 10px 28px color-mix(in oklab, var(--p-warm-2) 35%, transparent)); }
 
 .nacara-content a.p-hero__eyebrow {

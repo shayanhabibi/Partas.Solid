@@ -5,7 +5,8 @@ open Nacara.Core
 open Nacara.Plugins
 open Partas.Nacara.Theme
 
-let versions = [ SiteVersion.root "3.0" ]
+/// 2.x has no build here: its prefix is only static/v2/index.html, which forwards to the old site.
+let versions = [ SiteVersion.root "3.0"; SiteVersion.create "2.x" "v2" ]
 
 /// A stylesheet from docs/site/theme. Read once at startup, so under `nacara watch` an edit to
 /// one of these files only shows after a restart.
