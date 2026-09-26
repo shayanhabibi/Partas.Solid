@@ -4,7 +4,7 @@ import styles from "@kobalte/solidbase/default-theme/components/ThemeSelector.mo
 // The 3.0 documentation is a separate site, so choosing it leaves this one.
 const VERSIONS = [
     { label: "2.x", href: null },
-    { label: "3.0", href: "https://shayanhabibi.github.io/Partas.Solid/" },
+    { label: "3.0 (unreleased)", href: "https://shayanhabibi.github.io/Partas.Solid/" },
 ];
 
 export default function VersionSelector() {
