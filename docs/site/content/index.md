@@ -40,9 +40,9 @@ let HeroCounter () =
     let mutable number: HTMLSpanElement = JS.undefined
     let mutable bars: HTMLDivElement = JS.undefined
 
-    let pop = {| scale = {| from = 1.4 |}; ease = "outElastic(1, .5)" |}
+    let pop = {| scale = {| from = 1.4; ``to`` = 1 |}; ease = "outElastic(1, .5)" |}
     let wave =
-        {| scaleY = 2.6; duration = 240
+        {| scaleY = {| from = 1; ``to`` = 2.6 |}; duration = 240
            alternate = true; loop = 1
            delay = stagger (30, {| from = "center" |}) |}
 
