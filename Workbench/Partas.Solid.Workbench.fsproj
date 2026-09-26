@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- SageFs session project for plugin and binding work. See Workbench/README.md.
+       Run `dotnet fsi workbench.fsx` from the repo root first; it prepares .workbench/Fable.SageFs. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <!-- SageFs loads references from the output folder. -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- Fable.SageFs set up for the Fable version in .config/dotnet-tools.json. -->
+    <FableSageFsRoot Condition="'$(FableSageFsRoot)' == ''">$(MSBuildThisFileDirectory)..\.workbench\Fable.SageFs</FableSageFsRoot>
+  </PropertyGroup>
+  <Import Project="$(FableSageFsRoot)\vendor\Fable.SageFs.props" />
+  <ItemGroup>
+    <Compile Include="Workbench.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- vendor/Fable.AST.dll is the unchanged Fable.AST package that Fable.Compiler depends on, the same one the
+         plugin references. Two items named Fable.AST make SageFs fault on warm-up, so keep only the package. -->
+    <Reference Remove="Fable.AST" />
+    <!-- The plugin as first loaded; Workbench.reloadPlugin replaces it without restarting the session.
+         Release, as the CLI builds it: a Debug build from SDK 10.0.4xx+ fsc throws InvalidProgramException. -->
+    <ProjectReference Include="..\Partas.Solid.FablePlugin\Partas.Solid.FablePlugin.fsproj"
+                      AdditionalProperties="Configuration=Release" />
+  </ItemGroup>
+</Project>

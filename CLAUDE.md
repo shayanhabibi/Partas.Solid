@@ -193,6 +193,24 @@ Three suites, each its own Fable project (`<Suite>/Partas.Solid.Tests.Runtime.<S
 `ScratchTests/` is an unversioned playground for the same loop (`dotnet fable ... --watch`, see above) when you
 want to eyeball JSX for input that isn't yet a test case. `Partas.Solid.Tests.Core` is a small unit-test project.
 
+### Workbench (SageFs)
+
+`Workbench/` is a SageFs session project that runs Fable in-process with a warm checker, for closing plugin and
+binding bugs quickly. Set it up with `dotnet fsi workbench.fsx`, which clones Fable.SageFs into the gitignored
+`.workbench/`. Then create a SageFs session on `Workbench/Partas.Solid.Workbench.fsproj`.
+
+- `Workbench.checkAll ()` recompiles every snapshot case and diffs it, in under a second once the session is warm.
+- After a plugin edit, `Workbench.reloadPlugin ()` rebuilds and reloads the plugin; with the next `checkAll` that
+  takes about 2.5 s. The checker stays warm unless the plugin's public surface changed.
+- `Workbench.emit <Suite>` writes a runtime suite's `.fs.jsx` files as `dotnet fable -o .` does, for
+  `node run.mjs <suite> --no-compile`. The workbench takes `run.mjs`'s `.compile-lock` while it builds or writes.
+- `Workbench.watchFiles [ "<.fs or .fs.jsx>" ]` / `watchCases [ "<case>" ]` / `watchSuite <Suite>` redo that on
+  every `.fs` save in the plugin, bindings or test inputs, reloading the plugin first when it changed. An open
+  `.fs.jsx` follows along, about 3 s after a plugin save with `watchFiles`. `Workbench.unwatch ()` stops it.
+
+SageFs eval hot-patching does not reach the plugin, whose code is almost all `internal`. `Workbench/README.md` has
+the details. The workbench isn't in `Partas.Solid.slnx`, because it only builds after setup.
+
 ## Plugin architecture
 
 Compilation order in `Partas.Solid.FablePlugin.fsproj` reflects the dependency chain:
