@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo \"prebuilt: nothing to install\"",
+  "buildCommand": "echo \"prebuilt: run npm run build locally and copy .vercel/output/static to prebuilt/\"",
+  "outputDirectory": "prebuilt"
+}

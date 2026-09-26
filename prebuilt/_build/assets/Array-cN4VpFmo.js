@@ -1,0 +1,1 @@
+function s(e,t,r,o){const n=t|0;return e.fill(o,n,n+r)}function a(e,t){if(e<0||e>=t.length)throw new Error("Index was outside the bounds of the array.\\nParameter name: index");return t[e]}function u(e,t,r){if(t<0||t>=e.length)throw new Error("Index was outside the bounds of the array.\\nParameter name: index");e[t]=r}export{s as f,a as i,u as s};
