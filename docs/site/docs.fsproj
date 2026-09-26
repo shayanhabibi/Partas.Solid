@@ -3,6 +3,7 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net10.0</TargetFramework>
         <IsPackable>false</IsPackable>
+        <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Site.fs"/>
@@ -22,6 +23,9 @@
     <!-- Built from Partas.Nacara.Plugins (feat/solid-examples) and committed under feed/,
          until those packages are published. -->
     <ItemGroup>
+        <!-- The feed's Partas.Nacara packages were built with the .NET 11 SDK and need FSharp.Core 11;
+             without this, an older SDK's implicit FSharp.Core wins and the site fails to start. -->
+        <PackageReference Include="FSharp.Core" Version="11.0.101-rc1.26425.128"/>
         <PackageReference Include="Partas.Nacara.Theme" Version="0.2.0-local.44d0693"/>
         <PackageReference Include="Partas.Nacara.Plugins.Solid" Version="0.1.0-local.44d0693"/>
     </ItemGroup>
