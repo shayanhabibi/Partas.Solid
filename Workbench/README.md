@@ -23,9 +23,12 @@ dotnet fsi workbench.fsx
 ```
 
 It clones Fable.SageFs into `.workbench/` (gitignored), points it at the Fable version in
-`.config/dotnet-tools.json`, and builds the workbench. Rerun it after changing that Fable version. Fable.SageFs's
-setup ends by building its own sample session, which targets a newer Fable; with 5.13 that step fails after
-`vendor/` is written, and the script says so and carries on.
+`.config/dotnet-tools.json`, and builds the workbench. Rerun it after changing that Fable version. It runs Fable.SageFs's
+setup with `--vendor-only`, which skips Fable.SageFs's own sample session: that targets a newer Fable than 5.13.
+Fable.SageFs's [`docs/compiler-plugins.md`](https://github.com/shayanhabibi/Fable.SageFs/blob/main/docs/compiler-plugins.md)
+covers what this workbench learned about hosting Fable and a plugin in SageFs, and
+[`docs/sagefs-issues.md`](https://github.com/shayanhabibi/Fable.SageFs/blob/main/docs/sagefs-issues.md) the SageFs
+problems met.
 
 Then create a SageFs session on `Workbench/Partas.Solid.Workbench.fsproj` with working directory `Workbench/`
 (`create_project_session` over MCP).

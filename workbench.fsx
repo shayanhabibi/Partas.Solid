@@ -5,7 +5,7 @@
 //
 // 1. Clones Fable.SageFs (pinned below) into .workbench/Fable.SageFs.
 // 2. Points its versions.json at the Fable version in .config/dotnet-tools.json.
-// 3. Runs its setup, which renames Fable's FCS fork so it loads next to SageFs's own FCS (vendor/).
+// 3. Runs its setup with --vendor-only, which renames Fable's FCS fork so it loads next to SageFs's own FCS (vendor/).
 // 4. Builds Workbench/Partas.Solid.Workbench.fsproj.
 //
 // Idempotent. It writes the gitignored .workbench/, and step 4 the usual (gitignored) bin/ and obj/.
@@ -16,7 +16,7 @@ open System.IO
 open System.Text.Json.Nodes
 
 let fableSageFsUrl = "https://github.com/shayanhabibi/Fable.SageFs.git"
-let fableSageFsCommit = "53ed66275a267d35bee2044a30550bbb5b2ffd6c"
+let fableSageFsCommit = "71e7d572d4d4250ae0d0495a45f9796bc53e38c1"
 
 let repoRoot = __SOURCE_DIRECTORY__
 let workDir = Path.Join(repoRoot, ".workbench")
@@ -81,16 +81,12 @@ else
     File.WriteAllText(versionsFile, versions.ToJsonString())
 
 step "Fable.SageFs setup (vendor/)"
-// Setup ends by building its own sample session and self-check against the Fable version it was written for;
-// with another Fable version those steps can fail after vendor/ is written. The workbench needs only vendor/.
+// --vendor-only skips setup's own sample session, which targets a newer Fable. The workbench needs only vendor/.
 let props = Path.Join(fableSageFs, "vendor", "Fable.SageFs.props")
-// Setup leaves an unchanged props file alone, so remove it first: only this run's setup can then pass the check below.
-File.Delete props
-let setupExit = run fableSageFs "dotnet" [ "fsi"; "setup.fsx" ]
+if run fableSageFs "dotnet" [ "fsi"; "setup.fsx"; "--vendor-only" ] <> 0 then
+    fail "Fable.SageFs setup failed. See its output above."
 if not (File.Exists props && File.ReadAllText(props).Contains $"<FableCompilerVersion>{fableVersion}</FableCompilerVersion>") then
     fail $"Fable.SageFs setup did not produce vendor/ for Fable {fableVersion}. See its output above."
-if setupExit <> 0 then
-    printfn $"    Setup stopped after vendor/ (exit {setupExit}); its sample session is not used here."
 printfn $"    OK   vendor/Fable.SageFs.props for Fable {fableVersion}"
 
 // ---------------------------------------------------------------- the workbench
