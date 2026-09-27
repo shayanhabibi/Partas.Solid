@@ -11,6 +11,7 @@
   </PropertyGroup>
   <Import Project="$(FableSageFsRoot)\vendor\Fable.SageFs.props" />
   <ItemGroup>
+    <Compile Include="AstPrinter.fs" />
     <Compile Include="Workbench.fs" />
   </ItemGroup>
   <ItemGroup>

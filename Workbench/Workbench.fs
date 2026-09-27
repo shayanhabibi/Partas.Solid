@@ -13,6 +13,7 @@
 ///     Workbench.accept "MergeProps";;                       // write the case's output to its .expected
 ///     Workbench.reloadPlugin ();;                           // after editing Partas.Solid.FablePlugin
 ///     Workbench.compile "<path to .fsproj>" "<path to .fs>";;
+///     Workbench.ast "<path to .fs>" "<member>" 8;;          // the AST the plugin receives, 8 levels deep
 ///     Workbench.emit Workbench.Suite.Dom;;                  // write .fs.jsx for a runtime suite, then
 ///                                                           // `node run.mjs dom --no-compile`
 ///     Workbench.watchCases [ "MergeProps" ];;               // on every save: reload if needed, re-check
@@ -499,6 +500,68 @@ let compile (fsproj: string) (file: string) =
     match c.Js |> Map.tryFind file with
     | Some js when c.Errors.Length = 0 -> js
     | _ -> failwithf "Fable failed on %s:\n%s" file (c.Errors |> Array.map formatLog |> String.concat "\n")
+
+// ---------------------------------------------------------------- AST
+
+/// Stands in for every plugin attribute: returns each member as the plugin would have received it.
+type private NoOpPlugin(_arg: obj) =
+    inherit MemberDeclarationPluginAttribute()
+    new() = NoOpPlugin(null)
+    override _.FableMinimumVersion = "5.0"
+    override _.Transform(_, _, decl) = decl
+    override _.TransformCall(_, _, expr) = expr
+
+/// The project a source belongs to: its runtime suite, or the snapshot cases.
+let private suiteOrCasesProject (file: string) =
+    [ Suite.Primitives; Suite.Dom; Suite.Integration ]
+    |> List.tryFind (fun s -> file.StartsWith(Path.normalizeFullPath (Path.GetDirectoryName s.Project) + "/"))
+    |> Option.map _.Project
+    |> Option.defaultValue casesProject
+
+/// The members of a source file (`"Foo"`, or `"Foo__get_View"` for a type component) as the plugin receives
+/// them, printed with `AstPrinter`. An unknown member lists the file's members instead.
+let astWith (opts: AstPrinter.Options) (file: string) (memberName: string) =
+    lock gate <| fun () ->
+    let file = Path.normalizeFullPath (Path.GetFullPath file)
+    let w = warm (suiteOrCasesProject file)
+    let _, sourceReader =
+        w.Cracked.ProjectOptions.SourceFiles |> Array.map Fable.Compiler.File |> Fable.Compiler.File.MakeSourceReader
+    let typeChecked =
+        Fable.Compiler.CodeServices.typeCheckProject sourceReader w.Checker w.CliArgs w.Cracked
+        |> Async.RunSynchronously
+    let proj =
+        Project.From(
+            w.CliArgs.ProjectFile,
+            w.Cracked.ProjectOptions,
+            typeChecked.ProjectCheckResults.AssemblyContents.ImplementationFiles,
+            typeChecked.Assemblies,
+            (fun _ _ -> ()),
+            getPlugin = fun _ -> typeof<NoOpPlugin>
+        )
+    let com =
+        CompilerImpl(file, proj, w.CliArgs.CompilerOptions, Path.getRelativePath file w.Cracked.FableLibDir, w.Cracked.OutputType)
+        :> Compiler
+    let fableFile =
+        Fable.Transforms.FSharp2Fable.Compiler.transformFile com
+        |> Fable.Transforms.FableTransforms.transformFile com
+    let opts = { opts with Entity = com.TryGetEntity; Member = com.TryGetMember }
+    let rec members (d: Fable.AST.Fable.Declaration) =
+        match d with
+        | Fable.AST.Fable.ModuleDeclaration m -> m.Members |> List.collect members
+        | Fable.AST.Fable.MemberDeclaration m -> [ m ]
+        | Fable.AST.Fable.ClassDeclaration c -> Option.toList c.Constructor @ c.AttachedMembers
+        | Fable.AST.Fable.ActionDeclaration _ -> []
+    let all = fableFile.Declarations |> List.collect members
+    match all |> List.filter (fun m -> m.Name = memberName) with
+    | [] -> $"""No member {memberName}. Members: {all |> List.map _.Name |> String.concat ", "}"""
+    | found -> found |> List.map (AstPrinter.printMember opts) |> String.concat "\n\n"
+
+/// `astWith` at the plugin's level of detail, `depth` levels deep (0 for the whole tree).
+let ast (file: string) (memberName: string) (depth: int) =
+    astWith
+        { AstPrinter.Options.Default with MaxDepth = (if depth > 0 then Some depth else None) }
+        file
+        memberName
 
 /// Warnings and errors of the last type-check and compile of `files`, readable.
 let logs (c: Compiled) =

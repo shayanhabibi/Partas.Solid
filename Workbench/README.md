@@ -51,6 +51,48 @@ When a reload changes the plugin's public surface, `reloadPlugin` also recreates
 next compile, because the checker holds the plugin's metadata: a new `ComponentFlag` or attribute is then seen
 without a `reset ()`. `reset ()` is for `.fsproj` edits and new source files.
 
+### AST printer
+
+`AstPrinter` (`AstPrinter.fs`) prints a Fable `Expr`, `MemberDecl` or declaration list as a tree, one line per node,
+each labelled with the field it sits in, so a line reads as the pattern that reaches it:
+
+```
+└─ exprs[1]: Call : Partas.Solid.Tags.div @34:9
+   │  · info.MemberRef = MemberRef(Partas.Solid.Tags.div, ".ctor") [ctor ()]
+   │  · info.Tags = [value]
+   ├─ callee: Import "Tags_div_$ctor" from "../../../../Partas.Solid/Tags.fs" : (unit -> Partas.Solid.Tags.div) @none
+   │     · info.Kind = MemberImport MemberRef(Partas.Solid.Tags.div, ".ctor") [ctor ()]
+   └─ info.Args[0]: Value UnitConstant @34:9
+```
+
+```fsharp
+let opts = { AstPrinter.Options.Default with Detail = AstPrinter.Full; MaxDepth = Some 4 }
+AstPrinter.printExpr opts expr |> printfn "%s";;
+AstPrinter.printMember opts memberDecl |> printfn "%s";;
+```
+
+`Detail.Plugin`, the default, prints what the plugin's patterns read: idents with their `this`/`gen`/`mutable`
+flags, import selectors, paths and kinds, member refs, types, tags, and `@none` for a missing range (patterns like
+`Import(_, Any, None)` depend on it). `Full` adds signature types, every attribute and whole ranges; `Shape` keeps
+only cases and names. Ranges are 1-based editor positions. Give `Options.Entity` and `Options.Member` a
+compiler's `TryGetEntity`/`TryGetMember` to show member kinds (`[getter]`, `[setter extension]`, `[ctor (a, b)]`),
+union case and record field names, and the attributes the plugin checks for (`{Pojo}`, `{PartasImport}`).
+
+The plugin receives a member after Fable's own passes (`FableTransforms`: beta reduction, uncurrying), so print
+that AST, not FSharp2Fable's.
+
+`Workbench.ast` does that for a member of any snapshot case or runtime fixture, with the warm checker (well under a
+second), and without running the plugin:
+
+```fsharp
+Workbench.ast "<path to .fs>" "PendingBadge__get_View" 8;;   // 8 levels deep; 0 prints the whole tree
+Workbench.ast "<path to .fs>" "?" 0;;                        // an unknown name lists the file's members
+Workbench.astWith { AstPrinter.Options.Default with Detail = AstPrinter.Full } "<path to .fs>" "Foo";;
+```
+
+Type components are named `<Type>__get_View`. It type-checks the file's project from disk, so bindings and fixture
+edits show without a reload.
+
 ### Runtime tests
 
 ```fsharp
