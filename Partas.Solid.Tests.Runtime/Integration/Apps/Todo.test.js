@@ -7,8 +7,7 @@ const $$ = (root, sel) => [...root.querySelectorAll(sel)];
 const labels = root => $$(root, ".todo-list li.todo .label").map(text);
 const rowById = (root, id) => $(root, `li.todo[data-id="${id}"]`);
 
-// The F# default `props.onRemainingChange <- ignore` is dropped by the plugin (see the it.fails
-// test at the bottom), so every other test passes an explicit callback.
+// Tests pass a callback to observe it; the default `props.onRemainingChange <- ignore` has its own test at the bottom.
 const mountTodo = (initial, extra = {}) =>
     mount(TodoApp, {
         initial, onRemainingChange: () => {
@@ -180,8 +179,7 @@ describe("Apps: todo list (store + memos + keyed For)", () => {
         expect(text($(container, ".count"))).toBe("0 items left");
     });
 
-    // BUG: `props.onRemainingChange <- ignore` default is dropped from the emitted merge({...}).
-    it.fails("works without the optional onRemainingChange callback (default prop via merge)", () => {
+    it("works without the optional onRemainingChange callback (default prop via merge)", () => {
         const {container} = mount(TodoApp, {initial: ["a"]});
         expect(() => click($(rowById(container, 1), "input.toggle"))).not.toThrow();
         expect(text($(container, ".count"))).toBe("0 items left");

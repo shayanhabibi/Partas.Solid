@@ -119,23 +119,20 @@ describe("Composition: optional props", () => {
         expect(text(root)).toBe("anon");
     });
 
-    // BUG: `props.age.IsSome` on an option prop compiles to an undefined getter call `Profile__get_age(props)` (ReferenceError) instead of `props.age != null`
-    it.fails("renders a profile with every optional prop missing", () => {
+    it("renders a profile with every optional prop missing", () => {
         const {container} = mount(Profile, {name: "Ada"});
         expect(text(container.querySelector(".name"))).toBe("Ada");
         expect(text(container.querySelector(".nick"))).toBe("none");
         expect(container.querySelector(".age-unknown")).not.toBeNull();
     });
 
-    // BUG: `props.age.IsSome` on an option prop compiles to an undefined getter call `Profile__get_age(props)`
-    it.fails("renders a profile with the optional props provided", () => {
+    it("renders a profile with the optional props provided", () => {
         const {container} = mount(Profile, {name: "Ada", nickname: "Addy", age: 36});
         expect(text(container.querySelector(".nick"))).toBe("Addy");
         expect(text(container.querySelector(".age"))).toBe("36");
     });
 
-    // BUG: `props.age.IsSome` on an option prop compiles to an undefined getter call `Profile__get_age(props)`
-    it.fails("toggles an optional prop from the parent", () => {
+    it("toggles an optional prop from the parent", () => {
         const {container} = mount(ProfileHost);
         expect(text(container.querySelector(".nick"))).toBe("none");
         click(container.querySelector(".set-nick"));
@@ -144,8 +141,7 @@ describe("Composition: optional props", () => {
         expect(text(container.querySelector(".nick"))).toBe("none");
     });
 
-    // BUG: `match props.message with Some m -> "..." | None -> "..."` emits an undefined getter `Status__get_message(props)` and yields `(PARTAS_YIELD) => {}` lambdas instead of the strings
-    it.fails("matches on an optional prop to pick the text child", () => {
+    it("matches on an optional prop to pick the text child", () => {
         const [m, setM] = createSignal(undefined);
         const {root} = mount(Status, {
             get message() {

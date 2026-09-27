@@ -19,7 +19,7 @@ let ThemedLabel () =
     let theme = useContext ThemeContext
     span (class' = "theme") { theme }
 
-/// Idiomatic provider syntax: `Context(value) { children }` -> `<Context.Provider value=...>`.
+/// Idiomatic provider syntax: `Context(value) { children }` -> `<Context value=...>`.
 [<SolidComponent>]
 let ThemeApp () =
     div (class' = "app") {

@@ -83,10 +83,8 @@ describe("Apps: Kobalte-style sidebar - context-free pieces", () => {
     });
 });
 
-// All tests below need <SidebarProvider>, which is emitted as <Context_SidebarContext.Provider value=...>.
 describe("Apps: Kobalte-style sidebar - provider + consumers", () => {
-    // BUG: provider emitted as <Ctx.Provider value=...>; Solid 2 contexts are themselves the provider.
-    it.fails("SidebarProvider renders its wrapper with the default open state", () => {
+    it("SidebarProvider renders its wrapper with the default open state", () => {
         const {container: c} = mount(SidebarProvider, {class: "x", children: "body"});
         const wrapper = $(c, ".sidebar-wrapper");
         expect(wrapper.className).toBe("sidebar-wrapper x");
@@ -94,8 +92,7 @@ describe("Apps: Kobalte-style sidebar - provider + consumers", () => {
         expect(text(wrapper)).toBe("body");
     });
 
-    // BUG: provider emitted as <Ctx.Provider value=...>; undefined component in Solid 2.
-    it.fails("renders the provider wrapper, sidebar and menu with context-derived state", () => {
+    it("renders the provider wrapper, sidebar and menu with context-derived state", () => {
         const {container: c} = mount(SidebarApp, {
             startOpen: true, look: "floating", onToggle: () => {
             }
@@ -111,8 +108,7 @@ describe("Apps: Kobalte-style sidebar - provider + consumers", () => {
         expect($(c, '[data-item="settings"]').className).toBe("menu-button mb-default h-7 text-xs");
     });
 
-    // BUG: provider emitted as <Ctx.Provider value=...>; undefined component in Solid 2.
-    it.fails("the trigger toggles shared open state and reports each change", () => {
+    it("the trigger toggles shared open state and reports each change", () => {
         const onToggle = vi.fn();
         const {container: c} = mount(SidebarApp, {startOpen: true, look: "sidebar", onToggle});
         const trigger = $(c, "button.sidebar-trigger");
@@ -126,8 +122,7 @@ describe("Apps: Kobalte-style sidebar - provider + consumers", () => {
         expect(onToggle.mock.calls).toEqual([[false], [true]]);
     });
 
-    // BUG: provider emitted as <Ctx.Provider value=...>; undefined component in Solid 2.
-    it.fails("menu buttons drive the active item through a spread onClick", () => {
+    it("menu buttons drive the active item through a spread onClick", () => {
         const {container: c} = mount(SidebarApp, {
             startOpen: false, look: "inset", onToggle: () => {
             }
@@ -140,10 +135,8 @@ describe("Apps: Kobalte-style sidebar - provider + consumers", () => {
     });
 });
 
-// Control group: the same scenarios with the one missing piece supplied at runtime
-// (`Ctx.Provider = Ctx`, which is what Solid 2's context object already is). Everything below
-// passing proves the fixture is sound and that `.Provider` is the only defect behind the it.fails
-// above. When the plugin is fixed, the shim is a harmless no-op.
+// Control group: the same scenarios with a runtime `Ctx.Provider = Ctx` shim, from when the plugin
+// emitted `<Ctx.Provider>`. The plugin now emits `<Ctx>`, as Solid 2 expects, so the shim is a no-op.
 describe("Apps: Kobalte-style sidebar - with a runtime .Provider shim", () => {
     let hadProvider;
     beforeAll(() => {
@@ -230,8 +223,7 @@ describe("Apps: Kobalte-style sidebar - with a runtime .Provider shim", () => {
         expect(sb.dataset.collapsible).toBe("offcanvas");
     });
 
-    // BUG: ariaExpanded is emitted verbatim as `ariaExpanded=` instead of `aria-expanded=`.
-    it.fails("the trigger reflects the open state in aria-expanded", () => {
+    it("the trigger reflects the open state in aria-expanded", () => {
         const {container: c} = mount(SidebarApp, {startOpen: true, look: "sidebar", onToggle: () => {}});
         const trigger = $(c, "button.sidebar-trigger");
         expect(trigger.getAttribute("aria-expanded")).toBe("true");

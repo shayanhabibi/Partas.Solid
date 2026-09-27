@@ -51,9 +51,7 @@ describe("Dom/Elements @solidjs/web Portal and Dynamic", () => {
         expect(container.innerHTML).not.toContain("n$");
     });
 
-    // BUG: `Dynamic(componentAsString = props.tag)` is emitted as a bare `<Dynamic />`; the inline
-    // componentAsString setter reading a prop is disposed by the plugin (the raw component' field works, below).
-    it.fails("Dynamic with a component taken from a prop renders that tag", () => {
+    it("Dynamic with a component taken from a prop renders that tag", () => {
         const {root} = mount(DynamicTagProp, {tag: "aside"});
         expect(root.querySelector("aside")).not.toBeNull();
     });

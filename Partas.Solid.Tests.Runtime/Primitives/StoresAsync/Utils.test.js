@@ -39,11 +39,7 @@ describe("omit", () => {
         expect("$hidden" in rest).toBe(false);
     });
 
-    // BUG: Bindings.omit(obj, hidden: string -> bool) types the predicate over strings, but rc.9
-    // omit also calls it with symbol keys (utils.ts:1100 `keyof T & (string | symbol)`), so an
-    // idiomatic `k.StartsWith "$"` predicate makes key enumeration (Reflect.ownKeys, {...rest}, the
-    // spread Solid does when forwarding props) throw TypeError on any source carrying a symbol key.
-    it.fails("predicate overload over an object with a symbol-keyed prop enumerates its keys", () => {
+    it("predicate overload over an object with a symbol-keyed prop enumerates its keys", () => {
         const sym = Symbol("slot");
         const rest = omitWithSymbolKey(sym);
         const keys = Reflect.ownKeys(rest);

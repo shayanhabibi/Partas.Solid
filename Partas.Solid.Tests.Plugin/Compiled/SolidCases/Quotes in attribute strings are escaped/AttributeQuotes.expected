@@ -1,0 +1,10 @@
+
+
+export function AttributeQuotes() {
+    return <div title={"say \"hi\""}
+        class="a & b"
+        innerHTML={"<p class=\"row\">x &amp; y</p>"}>
+        text
+    </div>;
+}
+

@@ -196,3 +196,7 @@ This is why the helpers look the way they do. See `solid/packages/signals/src/co
 - The vite plugin is `@solidjs/vite-plugin@3.0.0-next.44`. Its default backend is the native
   `@solidjs/compiler`. `package.json` `overrides` pin the compiler and babel plugin to `2.0.0-rc.9`. To
   compare against the Babel backend, set `compiler: "babel"` in the plugin options in `vitest.config.mjs`.
+- Solid's dev template validator rejects any JSX child of `<template>`: it re-serialises the markup with an
+  html5ever DOM that drops template contents. Fill a template in a fixture through `innerHTML` instead.
+- jsdom does not mute a `<video>`/`<audio>` parsed with the `muted` attribute, as a browser does; it only sets
+  `defaultMuted`. Assert on that for a static `muted = true`.

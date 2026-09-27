@@ -25,11 +25,25 @@ module internal rec AST =
     [<AutoOpen>]
     module AttributesAndProperties =
         /// Matches the `delay(...)` a sequence or array expression compiles to, looking through casts.
-        /// A `toArray`/`toList` call is only unrolled when its argument is one of these: over any other
+        /// A `toArray` call is only unrolled when its argument is one of these: over any other
         /// value (`List.toArray xs`) it is a real conversion.
         let private (|DelayedSequence|_|): Expr -> unit option = function
             | TypeCast(DelayedSequence, _) -> Some ()
             | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), _, _, _) -> Some ()
+            | _ -> None
+        /// Matches a compiler-generated `fun () -> ...` passed as an argument, looking through casts.
+        /// As the argument of an ordinary call (`isPending (fun () -> ...)`) it is a real thunk, so
+        /// the generic call branches keep it instead of unwrapping it like a CE `delay` body.
+        let private (|UnitThunk|_|): Expr -> unit option = function
+            | TypeCast(UnitThunk, _) -> Some ()
+            | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, _, _) -> Some ()
+            | _ -> None
+        /// Matches the `fun () -> ...` thunk a CE `delay(...)` takes, looking through casts, and returns
+        /// its body. Only a `delay` argument is unwrapped: any other unit lambda is a user function value
+        /// (`onClose = fun () -> ...`) and must stay a function.
+        let private (|DelayThunk|_|): Expr -> Expr option = function
+            | TypeCast(DelayThunk body, _) -> Some body
+            | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, body, _) -> Some body
             | _ -> None
         let private (|MatchValueReplacerFeedback|) (ctx: PluginContext) (ident: Expr): Expr -> Expr list = function
             | expr ->
@@ -49,11 +63,14 @@ module internal rec AST =
                 match expr with
                 | IdentExpr({ Name = Utils.StartsWith "matchValue" }) ->
                     ident :: rest
-                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = [ DelayedSequence ] & MatchValueReplacer ctx ident exprs }, _typ, range) ->
+                | Call(Import({ Selector = Utils.StartsWith "toArray" }, Any, None), { Args = [ DelayedSequence ] & MatchValueReplacer ctx ident exprs }, _typ, range) ->
                     Value(NewArray(ArrayValues exprs, Any, ArrayKind.MutableArray), range) :: rest
-                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, _typ, _range) ->
+                // An F# list comprehension must stay an F# list; `toList(delay(...))` is re-run inside the prop getter
+                | Call(Import({ Selector = Utils.StartsWith "toList" }, Any, None), { Args = [ DelayedSequence ] }, _, _) ->
+                    expr :: rest
+                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = [ DelayThunk (MatchValueReplacerFeedback ctx ident exprs) ] }, _typ, _range) ->
                     exprs @ rest
-                | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, MatchValueReplacerFeedback ctx ident exprs, _range) ->
+                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, _typ, _range) ->
                     exprs @ rest
                 | Call(Import({ Selector = Utils.StartsWith "append" }, Any, None), { Args = MatchValueReplacer ctx ident exprs }, _typ, _range) ->
                     exprs @ rest
@@ -61,8 +78,16 @@ module internal rec AST =
                     exprs @ (value :: rest)
                 | Call(Import({ Selector = Utils.StartsWith "empty"; Path = Utils.EndsWith "Seq.js" }, Any, None), { Args = []; GenericArgs = typ :: _ }, _, _) ->
                     Value(ValueKind.Null(typ), None) :: rest
-                | Call(callee, ({ Args = MatchValueReplacer ctx ident exprs } as callInfo), typ, range) ->
-                    Call(callee, { callInfo with Args = exprs }, typ, range) :: rest
+                | Call(callee, ({ Args = args } as callInfo), typ, range) ->
+                    let args =
+                        args |> List.collect (function
+                            | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true } as v, MatchValueReplacerFeedback ctx ident body, r) ->
+                                [ Lambda(v, AstUtils.Sequential body, r) ]
+                            | TypeCast(Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true } as v, MatchValueReplacerFeedback ctx ident body, r), castTyp) ->
+                                [ TypeCast(Lambda(v, AstUtils.Sequential body, r), castTyp) ]
+                            | UnitThunk as thunk -> [ thunk ]
+                            | arg -> match [ arg ] with MatchValueReplacer ctx ident exprs -> exprs)
+                    Call(callee, { callInfo with Args = args }, typ, range) :: rest
                 // If we hit this path, then we are likely matching on a new identifier
                 | Let({ Name = Utils.StartsWith "matchValue" } as identifier, body, value) ->
                     match body with
@@ -127,11 +152,14 @@ module internal rec AST =
                 exprs @ rest
             | expr :: ValueUnroller ctx rest ->
                 match expr with
-                | Call(Import({ Selector = (Utils.StartsWith "toArray" | Utils.StartsWith "toList") }, Any, None), { Args = [ DelayedSequence ] & ValueUnroller ctx exprs }, _typ, range) ->
+                | Call(Import({ Selector = Utils.StartsWith "toArray" }, Any, None), { Args = [ DelayedSequence ] & ValueUnroller ctx exprs }, _typ, range) ->
                     Value(NewArray(ArrayValues exprs, Any, ArrayKind.MutableArray), range) :: rest
-                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = ValueUnroller ctx exprs }, _typ, _range) ->
+                // An F# list comprehension must stay an F# list; `toList(delay(...))` is re-run inside the prop getter
+                | Call(Import({ Selector = Utils.StartsWith "toList" }, Any, None), { Args = [ DelayedSequence ] }, _, _) ->
+                    expr :: rest
+                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = [ DelayThunk (ValueUnrollerFeedback ctx exprs) ] }, _typ, _range) ->
                     exprs @ rest
-                | Lambda({ Name = Utils.StartsWith "unitVar"; IsCompilerGenerated = true }, ValueUnrollerFeedback ctx exprs, _range) ->
+                | Call(Import({ Selector = Utils.StartsWith "delay" }, Any, None), { Args = ValueUnroller ctx exprs }, _typ, _range) ->
                     exprs @ rest
                 | Call(Import({ Selector = Utils.StartsWith "append" }, Any, None), { Args = ValueUnroller ctx exprs }, _typ, _range) ->
                     exprs @ rest
@@ -139,8 +167,14 @@ module internal rec AST =
                     exprs @ (value :: rest)
                 | Call(Import({ Selector = Utils.StartsWith "empty"; Path = Utils.EndsWith "Seq.js" }, Any, None), { Args = []; GenericArgs = typ :: _ }, _, _) ->
                     Value(ValueKind.Null(typ), None) :: rest
-                | Call(callee, ({ Args = ValueUnroller ctx exprs } as callInfo), typ, range) ->
-                    Call(callee, { callInfo with Args = exprs }, typ, range) :: rest
+                // Unrolling strips the lambda TagValue recognises, e.g. `!@Fancy` in an if/else
+                | TagValue.TagValue ctx _ -> expr :: rest
+                | Call(callee, ({ Args = args } as callInfo), typ, range) ->
+                    let args =
+                        args |> List.collect (function
+                            | UnitThunk as thunk -> [ thunk ]
+                            | arg -> match [ arg ] with ValueUnroller ctx exprs -> exprs)
+                    Call(callee, { callInfo with Args = args }, typ, range) :: rest
                 | Let({ Name = Utils.StartsWith "matchValue" } as ident, body, value) ->
                     match body with
                     | PropertyGetter ctx prop ->
@@ -252,10 +286,49 @@ module internal rec AST =
                     )
                 |> Some
             | PropertySetter ctx (prop, expr) ->
-                PluginContext.addSetter ctx (prop, transform ctx expr)
+                PluginContext.addSetter ctx (prop, transformValue ctx expr)
                 AstUtils.Unit
                 |> Some
             | _ -> None
+        let private lambdaArity (typ: Type) =
+            let rec go n = function LambdaType(_, returnType) -> go (n + 1) returnType | _ -> n
+            go 0 typ
+        // `props.f a b` where `f: A -> B -> C`. Fable sends a function prop uncurried through its setter, but
+        // leaves the application through the getter curried; call it uncurried to match. Must be matched before
+        // the getter is transformed, which loses its type.
+        let (|UncurriedPropsApply|_|) (ctx: PluginContext) = function
+            | CurriedApply(PropertyGetter ctx prop & getter, args, typ, range)
+                when lambdaArity getter.Type > 1 && args.Length >= lambdaArity getter.Type ->
+                PluginContext.addGetter ctx prop
+                let now, later = args |> List.map (transform ctx) |> List.splitAt (lambdaArity getter.Type)
+                let call =
+                    AstUtils.Call(
+                        AstUtils.GetProp(ctx.SelfIdentifier, StringUtils.TrimReservedIdentifiers prop),
+                        AstUtils.CallInfo(args = now),
+                        typ
+                        )
+                Some(if later.IsEmpty then call else CurriedApply(call, later, typ, range))
+            // Partial application, e.g. `onClick = props.onSelect item`: close over the missing arguments
+            | CurriedApply(PropertyGetter ctx prop & getter, args, typ, range)
+                when lambdaArity getter.Type > 1 ->
+                PluginContext.addGetter ctx prop
+                let missing =
+                    List.init (lambdaArity getter.Type - args.Length) (fun i -> AstUtils.Ident($"PARTAS_ARG{i}", isCompilerGenerated = true))
+                let call =
+                    AstUtils.Call(
+                        AstUtils.GetProp(ctx.SelfIdentifier, StringUtils.TrimReservedIdentifiers prop),
+                        AstUtils.CallInfo(args = (args |> List.map (transform ctx)) @ (missing |> List.map IdentExpr)),
+                        Any
+                        )
+                Some(Delegate(missing, call, None, []))
+            | _ -> None
+        // Coerces a bool attribute value to the strings "true"/"false", for enumerated attributes where Solid 2
+        // would otherwise remove the attribute on `false`. Non-bool values pass through.
+        let private enumeratedBool (ctx: PluginContext) expr =
+            match transform ctx expr with
+            | Value(BoolConstant b, r) -> Value(StringConstant(if b then "true" else "false"), r)
+            | value when value.Type = Type.Boolean -> AstUtils.Emit("String($0)", AstUtils.CallInfo(args = [ value ]))
+            | value -> value
         // Determines at top level whether the current expression could be considered
         // as a attribute expression by any of our definitions
         let (|AttributeExpression|_|) (ctx: PluginContext) = function
@@ -272,9 +345,23 @@ module internal rec AST =
                 _,
                 _) ->
                 match callee, memberRef with
+                // Aria module properties: `ariaLabel` -> `aria-label`. ARIA's boolean states take the strings
+                // "true"/"false"; Solid 2 removes an attribute whose value is `false`.
+                | (Expr.ImportedSetter ctx, Some(MemberRef({ FullName = "Partas.Solid.Aria" }, _)))
+                | (_, Some(MemberRef({ FullName = "Partas.Solid.Aria" }, _) & MemberRef.MemberRefIs ctx MemberRefType.Setter))
+                    when prop.StartsWith "aria" ->
+                    ($"""aria-{(prop.Substring "aria".Length).ToLower()}""", enumeratedBool ctx expr)
+                    |> Some
+                // `spellcheck` is an enumerated "true"/"false" attribute typed `bool` in the bindings. Solid 2
+                // removes an attribute whose value is `false`, so it takes the same coercion as ARIA.
+                | (Expr.ImportedSetter ctx, Some(MemberRef({ FullName = "Partas.Solid.HtmlAttributes" }, _)))
+                | (_, Some(MemberRef({ FullName = "Partas.Solid.HtmlAttributes" }, _) & MemberRef.MemberRefIs ctx MemberRefType.Setter))
+                    when prop = "spellcheck" ->
+                    (prop, enumeratedBool ctx expr)
+                    |> Some
                 | Expr.ImportedSetter ctx, _ // Captures properties defined in other modules
                 | _, Some(MemberRef.MemberRefIs ctx MemberRefType.Setter) -> // Captures properties defined in self module
-                    (prop, transform ctx expr)
+                    (prop, transformValue ctx expr)
                     |> Some
                 | _, _ -> None
             // member val set/get
@@ -283,7 +370,7 @@ module internal rec AST =
                 kind = FieldSet(prop)
                 value = expr
                 ) ->
-                (prop, transform ctx (unrollValue ctx expr))
+                (prop, transformValue ctx (unrollValue ctx expr))
                 |> Some
             // Inlined named overloads to `[<DefaultValue>] val mutable` properties/attributes
             | Let(
@@ -295,7 +382,22 @@ module internal rec AST =
                         value = expr
                     )
                 ) ->
-                (prop, transform ctx (unrollValue ctx expr)) |> Some
+                (prop, transformValue ctx (unrollValue ctx expr)) |> Some
+            // As above, where Fable let-binds a non-trivial argument before the set
+            | Let(
+                    { IsThisArgument = true; IsCompilerGenerated = true },
+                    IdentExpr(Ident.IdentIs ctx IdentType.ReturnVal),
+                    Let(
+                        valueIdent,
+                        expr,
+                        Set(
+                            expr = IdentExpr({  IsThisArgument = true })
+                            kind = FieldSet(prop)
+                            value = Expr.TypeCastDrill ctx (IdentExpr({ Name = valueName }))
+                        )
+                    )
+                ) when valueIdent.Name = valueName ->
+                (prop, transformValue ctx (unrollValue ctx expr)) |> Some
             // Captured method/Extension call
             | Call(
                 Value(ValueKind.UnitConstant, None),
@@ -410,12 +512,11 @@ module internal rec AST =
                     )
                     Args = ValueUnrollerFeedback ctx [ value ] :: _
                 }) ->
-                let transformedPropName =
-                    match propName with
-                    | Utils.StartsWithTrimmed "aria" propName ->
-                        $"aria-{propName.ToLower()}"
-                    | _ -> propName
-                Some(transformedPropName, transform ctx value)
+                match propName with
+                | Utils.StartsWithTrimmed "aria" ariaName ->
+                    Some($"aria-{ariaName.ToLower()}", enumeratedBool ctx value)
+                | "spellcheck" -> Some(propName, enumeratedBool ctx value)
+                | _ -> Some(propName, transformValue ctx value)
             | _ -> None
         /// wraps single expressions in a list and feeds back to the list collector
         let (|PropCollectorFeeder|) (ctx: PluginContext): Expr -> PropList = fun e -> [ e ] |> function
@@ -525,8 +626,8 @@ module internal rec AST =
                 Args = PropCollector ctx props
                 MemberRef  = Some(MemberRef(_, { CompiledName = ".ctor" }))
             },
-            Type.PartasName ctx _typeName,
-            range) ->
+            (Type.PartasName ctx _typeName & typ),
+            range) when Type.isTag ctx typ ->
             ElementBuilder.create (TagSource.LibraryImport imp) props range
             |> Some
         // Non LibraryImports; ie User defined imports
@@ -536,8 +637,8 @@ module internal rec AST =
                 Args = PropCollector ctx props
                 MemberRef = Some(MemberRef(_, { CompiledName = ".ctor" }))
             },
-            Type.PartasName ctx typeName,
-            range) ->
+            (Type.PartasName ctx typeName & typ),
+            range) when Type.isTag ctx typ -> // an imported JS class in user code is not a tag
             let importExpr = Import({identee with Selector = typeName}, t, r)
             ElementBuilder.create (TagSource.LibraryImport importExpr) props range
             |> Some
@@ -580,7 +681,7 @@ module internal rec AST =
                 irange)
             args = props) ->
             {
-                TagSource = TagSource.LibraryImport(Import({ imp with Selector = typeName + ".Provider" }, typ, irange))
+                TagSource = TagSource.LibraryImport(Import(imp, typ, irange)) // Solid 2: a context is its own provider
                 Properties = [("value", Sequential(props))]
                 Children = []
                 Range = irange
@@ -593,7 +694,7 @@ module internal rec AST =
                 range = range
             ) ->
             {
-                TagSource = TagSource.AutoImport $"{typeName}.Provider"
+                TagSource = TagSource.AutoImport typeName
                 Properties = [("value", Sequential(props))]
                 Children = []
                 Range = range
@@ -625,6 +726,7 @@ module internal rec AST =
                 BuilderCollectorFeedback ctx body
                 ) ->
                     body @ value @ restBuilds
+            | UncurriedPropsApply ctx expr -> expr :: restBuilds
             // This was somehow related to fixes for Oxpecker.Solid.Tests
             | CurriedApply(BuilderCollectorFeedback ctx applied, BuilderCollector ctx args, typ, range) ->
                 if args.IsEmpty then applied @ restBuilds
@@ -649,24 +751,22 @@ module internal rec AST =
                         )
                     )
                 ) ->
-                let getHead = List.tryHead >> Option.defaultValue AstUtils.Unit
-                Delegate([ p1; p2; p3; p4], getHead expr, None, []) :: restBuilds
+                Delegate([ p1; p2; p3; p4], AstUtils.Sequential expr, None, []) :: restBuilds
             // Captures and correctly generates lambda in ChildLambdaProvider3
             | Lambda(
                 Ident.IdentIs ctx IdentType.Cont,
                 TypeCast(Lambda(p1, Lambda(p2, Lambda(p3, BuilderCollectorFeedback ctx expr, _), _), _), _),
                 _
                 ) ->
-                let getHead = List.tryHead >> Option.defaultValue (Value(UnitConstant, None))
-                Delegate([ p1; p2; p3], getHead expr, None, []) :: restBuilds
+                Delegate([ p1; p2; p3], AstUtils.Sequential expr, None, []) :: restBuilds
             // This captures and correctly generates the lambda in the For and Index bindings
             | Lambda(
                 Ident.IdentIs ctx IdentType.Cont,
                 TypeCast(Lambda(item, Lambda(index, BuilderCollectorFeedback ctx expr, _), _), _),
                 _
                 ) ->
-                let getHead = List.tryHead >> Option.defaultValue AstUtils.Unit
-                Delegate([ item; index ], getHead expr, None, []) :: restBuilds
+                // Keep every collected item: `stmt; element` must return the element, not the statement
+                Delegate([ item; index ], AstUtils.Sequential expr, None, []) :: restBuilds
             // Builder op
             | Lambda(
                 Ident.IdentIs ctx (IdentType.Builder | IdentType.Yield | IdentType.Cont),
@@ -674,8 +774,10 @@ module internal rec AST =
                 _
                 ) -> expr @ restBuilds
             // In the case of JSX (not tsx) the type cast is irrelevant for the string
-            | TypeCast(Value(StringConstant _, _) as text, Unit) ->
-                 text :: restBuilds
+            | TypeCast(Value(StringConstant value, _) as text, Unit)
+            // The builder lambda's body is transformed first, which drops the type cast
+            | (Value(StringConstant value, _) as text) ->
+                 JsxUtils.TextChild(value, text) :: restBuilds
             // Ensure typecasts are transformed
             | TypeCast(BuilderCollectorFeedback ctx expr, _typ) ->
                 expr @ restBuilds
@@ -685,11 +787,10 @@ module internal rec AST =
                 BuilderCollectorFeedback ctx thenExpr,
                 BuilderCollectorFeedback ctx elseExpr,
                 range) ->
-                let getHead = List.tryHead >> Option.defaultValue AstUtils.Unit
                 [ IfThenElse(
-                    getHead guardExpr,
-                    getHead thenExpr,
-                    getHead elseExpr,
+                    AstUtils.Sequential guardExpr,
+                    AstUtils.Sequential thenExpr,
+                    AstUtils.Sequential elseExpr,
                     range) ] @ restBuilds
             // lift any getters/setters
             | PropsGetterOrSetter ctx (BuilderCollectorFeedback ctx exprs) ->
@@ -729,6 +830,15 @@ module internal rec AST =
             // This is one of our builder identifiers; no reason it should be rendered.
             | IdentExpr _
             | Value(UnitConstant, None) -> restBuilds // You have been judged unworthy
+            // `match` in a builder: a user or match binding, then a decision tree whose targets are children
+            // A body can hold statements before its element; Sequential keeps the element as its value
+            | Let(ident, value, BuilderCollectorFeedback ctx body) ->
+                Let(ident, transform ctx value, AstUtils.Sequential body) :: restBuilds
+            | DecisionTree(decisionTree, targets) ->
+                DecisionTree(
+                    transform ctx decisionTree,
+                    targets |> List.map (fun (idents, BuilderCollectorFeedback ctx target) -> idents, AstUtils.Sequential target)
+                ) :: restBuilds
             // Trust the F# compiler to not allow invalid elements within the builder.
             | _ ->
                 expr :: restBuilds
@@ -779,6 +889,19 @@ module internal rec AST =
         | SpecialAttributeTransformation.Pojo ctx expr -> Some expr
         | _ -> None
     /// <summary>
+    /// Transforms a value assigned to a prop or attribute. Unlike <c>transform</c>, a lone
+    /// <c>fun x -> ()</c> (F# <c>ignore</c>) is kept: it has the same shape as the builder 'husk'
+    /// that <c>transform</c> reduces out, but here it is the user's value.
+    /// </summary>
+    let transformValue (ctx: PluginContext) (expr: Expr) =
+        match expr with
+        | Lambda(
+                { Name = name; IsCompilerGenerated = true },
+                TypeCast(IdentExpr({ Name = otherName; IsCompilerGenerated = true }), Unit),
+                None)
+            when name = otherName -> expr
+        | _ -> transform ctx expr
+    /// <summary>
     /// First pass transformations of all expressions.<br/>
     /// Reduce AST where reasonable; capture and expand tags where encountered; dispose only in exceptional circumstances.<br/>
     /// </summary>
@@ -811,9 +934,18 @@ module internal rec AST =
             exprs
             |> List.map (transform ctx)
             |> Sequential
+        | UncurriedPropsApply ctx expr -> expr
         // Expression match and transform any `props` accesses or assignments
         | PropsGetterOrSetter ctx expr ->
             expr
+        // A `[<SolidComponent>]` let binding called for its element. It takes positional arguments, so it
+        // cannot be a tag; run it untracked instead, as `createComponent` does for `<Comp/>`.
+        | Call(callee, ({ MemberRef = Some(MemberRef(_, { AttributeFullNames = attrs })) } as callInfo), typ, range)
+            when attrs |> List.contains "Partas.Solid.SolidComponentAttribute"
+                 && Type.isElement ctx typ ->
+            // The MemberRef is dropped so that later passes do not wrap the call again.
+            let callInfo = { callInfo with Args = callInfo.Args |> List.map (transform ctx); MemberRef = None }
+            Baked.untracked (Call(transform ctx callee, callInfo, typ, range))
         // Transform calls that are getters
         | Call(
             callee = Expr.ImportedGetter ctx
@@ -834,12 +966,15 @@ module internal rec AST =
         // Transform branch expressions
         | DecisionTree(decisionTree, targets) ->
             DecisionTree(
-                decisionTree,
+                transform ctx decisionTree,
                 targets
                 |> List.map (fun (target, expr) -> target, transform ctx expr)
                 )
+        | DecisionTreeSuccess(index, boundValues, typ) ->
+            DecisionTreeSuccess(index, boundValues |> List.map (transform ctx), typ)
         // Within a computation expression, property assignment for `props` is transformed out. In cases where a null
         // lambda 'husk' remains, we reduce to a null expression.
+        // F# `ignore` has the same shape; values assigned to props/attributes go through `transformValue` to keep it.
         | Lambda(
                 { Name = name; IsCompilerGenerated = true },
                 TypeCast(IdentExpr({ Name = otherName; IsCompilerGenerated = true }), Unit),
@@ -946,6 +1081,34 @@ module internal rec AST =
             ]
             |> fun exprMembers ->
                 ObjectExpr(exprMembers, typ, exprOption |> Option.map (transform ctx))
+        // Transform nested expressions: `props.opt.IsSome`, `while` guards, `failwith` messages etc. can read props
+        | Test(expr, kind, range) ->
+            Test(transform ctx expr, kind, range)
+        | WhileLoop(guard, body, range) ->
+            WhileLoop(transform ctx guard, transform ctx body, range)
+        | ForLoop(ident, start, limit, body, isUp, range) ->
+            ForLoop(ident, transform ctx start, transform ctx limit, transform ctx body, isUp, range)
+        | TryCatch(body, catch, finalizer, range) ->
+            TryCatch(
+                transform ctx body,
+                catch |> Option.map (fun (ident, expr) -> ident, transform ctx expr),
+                finalizer |> Option.map (transform ctx),
+                range )
+        | Extended(Throw(Some expr, typ), range) ->
+            Extended(Throw(Some (transform ctx expr), typ), range)
+        | Extended(Curry(expr, arity), range) ->
+            Extended(Curry(transform ctx expr, arity), range)
+        | LetRec(bindings, body) ->
+            LetRec(bindings |> List.map (fun (ident, expr) -> ident, transform ctx expr), transform ctx body)
+        | Set(expr, kind, typ, value, range) ->
+            Set(
+                transform ctx expr,
+                (match kind with
+                 | ExprSet expr -> ExprSet (transform ctx expr)
+                 | _ -> kind),
+                typ,
+                transform ctx value,
+                range )
         // No further first pass transformations applicable
         | expr -> expr
 
@@ -987,6 +1150,8 @@ module internal rec AST =
                         str |> StringUtils.TrimReservedIdentifiers,
                         expr)
                 |> Some
+            // `render ()`
+            | [] | [ Value(UnitConstant, _) ] -> Some []
             | _ -> None
         let (|TagValue|_|) (ctx: PluginContext): Expr -> Expr option = function
             | Call(
@@ -1053,8 +1218,11 @@ module internal rec AST =
                 |> collectTagInfo ctx
                 |> fun eleBuilder ->
                     match thisArg with
-                    | Some expr // Make sure we capture getters
-                    | Some(PropsGetterOrSetter ctx expr) ->
+                    // A single-use local `let Wrapper = !@Pill` is inlined by Fable, leaving the `!@` call here
+                    | Some(TagValue ctx tag) ->
+                        { eleBuilder with TagSource = TagSource.LibraryImport tag }
+                    | Some(PropsGetterOrSetter ctx expr) // Make sure we capture getters
+                    | Some expr ->
                         { eleBuilder with TagSource = TagSource.LibraryImport expr }
                     | _ -> eleBuilder
                 |> Baked.renderElement ctx |> Some
@@ -1070,6 +1238,8 @@ module internal rec AST =
              ->
                 let importExpr =
                     match thisArg with
+                    | Some(TagValue ctx tag) ->
+                        tag
                     | Some(PropsGetterOrSetter ctx expr) ->
                         expr
                     | Some(IdentExpr _ as ident) ->

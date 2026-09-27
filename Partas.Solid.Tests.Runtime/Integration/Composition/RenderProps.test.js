@@ -59,8 +59,7 @@ describe("Composition: render props and function children", () => {
         expect([...container.querySelector(".stateful").children].map(e => e.tagName)).toEqual(["SPAN", "BUTTON"]);
     });
 
-    // BUG: a curried F# function prop (string -> int -> HtmlElement) is passed uncurried `(item, i) =>` at the call site but invoked curried `props.renderItem(item)(index())` inside the component
-    it.fails("renders list rows through a two-argument render prop authored in F#", () => {
+    it("renders list rows through a two-argument render prop authored in F#", () => {
         const {container} = mount(ListOfHost);
         expect([...container.querySelectorAll(".row .item")].map(text)).toEqual(["0-x", "1-y"]);
         click(container.querySelector(".add"));

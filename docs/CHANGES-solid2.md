@@ -9,7 +9,7 @@ bindings — it is not gratuitous churn. Expect to touch every non-trivial compo
 > **Status:** the branch is a release candidate built from `wip:` commits, tracking `solid-js` 2.0.0-rc.9. The
 > plugin test inputs that were stubbed with `failwith "redo"` / `"REDO"` (`IndexedPropSpreading`,
 > `OperatorsInProps`, `SignalSetterInvoke`, `ThisArgTransforms`, `ExperimentalBuilders`) have been restored against
-> the Solid 2 API and their snapshots regenerated; all 31 plugin cases pass.
+> the Solid 2 API and their snapshots regenerated; all plugin cases pass.
 
 ---
 
@@ -193,6 +193,57 @@ Two specifics worth calling out:
   signatures compiled to a one-argument JS function, so Solid never passed the index / reset.
 - **`lazy'` follows `lazy(fn, options?, moduleUrl?)`.** `moduleUrl` is now the third argument, after a
   `LazyOptions(?export)`.
+- **Thunk arguments survive in attribute values.** `isPending (fun () -> ...)` and `latest (fun () -> ...)` can be
+  written inline in an attribute or a `when'`; the plugin no longer strips the `fun () -> ...` passed to a call there,
+  which used to emit `isPending(value())`.
+- **Function values are no longer dropped.** `props.onChange <- ignore` now reaches the `merge({...})` defaults, and
+  a `unit -> unit` value such as `onClose = fun () -> a (); b ()` stays a function; before, the first was left out and
+  the second was dropped from the element. Only the thunk passed to a CE `delay(...)` is unwrapped now.
+- **`For` child functions may start with a statement.** `yield fun item index -> log item; li () { ... }` compiles to a
+  block that returns the element; previously the element was dropped and the row rendered nothing.
+- **`[<SolidComponent>]` calls in JSX are untracked.** `Label "x"` inside another component now emits
+  `{untrack(() => Label("x"))}` instead of `{Label("x")}`, matching the `createComponent` behind `<Comp/>`. The body runs
+  once: a signal read in the body is a snapshot, a read in the returned JSX stays live. Before, Solid tracked the body
+  and rebuilt the component's DOM on every change.
+- **Function props with two or more arguments are called uncurried.** `props.renderItem item index` emits
+  `props.renderItem(item, index)`, the shape Fable uses when an F# parent sets the prop. It used to emit
+  `props.renderItem(item)(index)`, which broke every F# caller. JS callers must now pass `(item, index) => ...`, not a
+  curried `item => index => ...`.
+- **List comprehensions in component props stay F# lists.** `styles = [ a; if on () then b ]` on a component prop typed
+  `list` emits `toList(delay(...))`; it used to be unrolled into a JS array with a `null` hole. Array comprehensions
+  (`[| ... |]`) are still unrolled.
+- **Local tag values render as tags.** `let Wrapper = !@Pill` then `Wrapper % span (...)` or `Wrapper % {| ... |}` emits
+  `<Pill ...>`; it used to emit `<op_BangAt(Pill_$ctor) ...>` when Fable inlined the single-use binding.
+- **`createProjection` returns the store alone.** It is typed `RefreshableStore<'T>`, matching rc.9's
+  `Refreshable<Store<T>>`; it used to be typed as a `RefreshableStoreReturn<'T>` store and setter tuple, and
+  destructuring it read index `0` of the store. Code written `let sel, _ = createProjection (...)` no longer compiles:
+  write `let sel = createProjection (...)`. `createStore (fn, seed)` still returns the pair.
+- **`setter.InvokeAndGet` returns the new value.** It used to emit `setter(x); return undefined`.
+- **`createMemo (compute, MemoOptions (...))` passes the options object as is.** It used to wrap it as
+  `{ loadingValue: options }`, so every option was ignored. `createMemo (compute, loadingValue)` still emits
+  `{ loadingValue }`.
+- **`omit (props, predicate)` skips symbol keys.** Solid 2 calls the predicate with symbol keys too, so a string
+  predicate such as `k.StartsWith "$"` threw. The `string -> bool` overload now keeps every symbol key, and the new
+  `omitKeys (props, fun (key: obj) -> ...)` receives all keys.
+- **`spellcheck = false` emits `spellcheck="false"`.** Solid 2 removes an attribute whose value is `false`, so a bool
+  `spellcheck` is written as the string `"true"`/`"false"`, as ARIA booleans are.
+- **Context providers emit `<Ctx value=...>`.** In Solid 2 the context is its own provider; `Ctx value { ... }` used
+  to emit `<Ctx.Provider>`, which rendered nothing.
+- **ARIA properties emit `aria-*` names.** `ariaLabel = "Close"` emits `aria-label="Close"`, and a bool state is
+  written as `"true"`/`"false"`. They used to be emitted in camelCase and ignored by the browser.
+- **String children are escaped.** A literal with `<`, `>`, `&`, `{`, `}`, `$`, a line break, or leading or trailing
+  spaces is emitted as a `{"..."}` expression child, so it renders as written.
+- **Attribute strings with `"` or an entity are escaped.** `innerHTML = "<p class=\"row\">"` or `title = "a &amp; b"` is
+  emitted as `={"..."}`; the first used to be invalid JSX and the second rendered as `a & b`.
+- **Option props and `while` guards read the prop.** `props.age.IsSome`, `match props.message with ...` and
+  `while ... props.tabs[i] ...` used to compile to an undefined getter call.
+- **Statements before a child in a `let` or `match` branch are kept.** `| A -> log (); b () { ... }` inside a builder
+  emits `(log(), <b>...)`; the element used to be dropped.
+- **A partially applied function prop closes over the rest.** `onClick = props.select "b"` emits
+  `(a) => props.select("b", a)`, consistent with the uncurried full application above.
+- **`Errored`'s `fallbackFn`/`fallbackEle` set `fallback`.** They used to be emitted as literal `fallbackFn` props.
+- **Breaking: `dynamic` returns a `TagValue`.** Render it with `Tag % {| ... |}` or `Tag.render ()`; `Tag ()` no
+  longer type-checks. `Dynamic(componentAsString = ...)` renders the named tag.
 
 ## 8. `Partas.Solid.Experimental` computation expressions re-ported
 
@@ -206,7 +257,8 @@ a builder wrapped a primitive Solid 2.0 kept or replaced, it follows the replace
 - `batch` and `selector` are **dropped** — their primitives (`batch`, `createSelector`) no longer exist upstream
   (`flush` and `createProjection` are the replacements, and neither fits a builder shape).
 
-The base builder types (`NullLambdaBuilder`, `BaseLambdaBuilder`, `LambdaBuilder`) are unchanged. Blocks using
+`NullLambdaBuilder` and `BaseLambdaBuilder` now build plain values rather than thunks, so `mount`/`cleanup` run
+statements after an else-less `if` or a `match`, and `memo { let! v = source; return v * 2 }` tracks `source`. Blocks using
 `batch { ... }` or `selector { ... }` must be rewritten as direct calls; the rest should compile to the new
 primitives, but check the emitted JSX of any effect-heavy component.
 

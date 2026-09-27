@@ -121,13 +121,9 @@ describe("createMemo: equality dedupe", () => {
 
     it("custom equals via named optional argument (ParamObject overload)", coarseSpec(makeCoarseNamed));
 
-    // BUG: createMemo(compute, MemoOptions(...)) emits createMemo(compute, { loadingValue: { equals } }) - the options
-    // POJO is wrapped as `loadingValue` (the ParamObject(1) `createMemo(compute: 'T -> 'T, loadingValue: 'T)`
-    // overload's shape), so every MemoOptions field (equals, lazy, name...) is silently ignored.
-    it.fails("custom equals via MemoOptions POJO", coarseSpec(makeCoarse));
+    it("custom equals via MemoOptions POJO", coarseSpec(makeCoarse));
 
-    // BUG: same as above; annotating `prev: int option` (or passing `options = ...` by name) does not avoid it.
-    it.fails("custom equals via MemoOptions POJO with an annotated compute", coarseSpec(makeCoarseAnnotated));
+    it("custom equals via MemoOptions POJO with an annotated compute", coarseSpec(makeCoarseAnnotated));
 });
 
 describe("createMemo: diamond dependencies", () => {

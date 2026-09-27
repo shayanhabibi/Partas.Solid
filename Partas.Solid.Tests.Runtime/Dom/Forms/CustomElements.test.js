@@ -96,10 +96,10 @@ describe("Dom/Forms component-facing globals, template and slot", () => {
         const tpl = container.querySelector("#tpl");
         expect(tpl).toBeInstanceOf(HTMLTemplateElement);
         expect(tpl.children).toHaveLength(0);
-        expect(container.querySelector("li.row")).toBeNull();
-        const li = tpl.content.querySelector("li.row");
-        expect(li).not.toBeNull();
-        expect(li.textContent.trim()).toBe("template row");
+        expect(container.querySelector("p.row")).toBeNull();
+        const row = tpl.content.querySelector("p.row");
+        expect(row).not.toBeNull();
+        expect(row.textContent.trim()).toBe("template row");
     });
 
     it("slot renders as an HTMLSlotElement with its name and fallback content", () => {

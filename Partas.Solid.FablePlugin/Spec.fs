@@ -76,6 +76,15 @@ module internal SchemaRules =
 module internal Baked =
     let private importMerge = AstUtils.Import ("merge", "solid-js")
     let private importOmit = AstUtils.Import ("omit", "solid-js")
+    let private importUntrack = AstUtils.Import ("untrack", "solid-js")
+
+    /// Wraps an expression in <c>untrack(() => expr)</c>.
+    let untracked (expr: Expr) =
+        AstUtils.Call (
+            importUntrack,
+            AstUtils.CallInfo (args = [ Expr.Delegate ([], expr, None, []) ]),
+            expr.Type
+        )
 
     /// Converts property setters into a sugar for setting their defaults by
     /// converting them into a <c>solid-js</c> <c>merge</c>, which merges an object with the key,value pairs
@@ -234,10 +243,15 @@ module internal Expr =
 
     let (|ImportedContainerExtensionName|_|) (ctx: PluginContext) =
         function
-        | Import ({ Selector = Utils.StartsWith "HtmlContainerExtensions_" | Utils.StartsWith "BindingsModule_Extensions"
+        // Fable prefixes the selector with the namespace when it is not `Partas.Solid`,
+        // e.g. `Partas_Solid_Web_BindingsModule_Extensions_Run_...` for `Dynamic`
+        | Import ({ Selector = selector
                     Kind = MemberImport (MemberRef.PartasName ctx _ & MemberRef (_, { CompiledName = compiledName })) },
                   _,
-                  _) -> Some compiledName
+                  _) when selector.StartsWith "HtmlContainerExtensions_"
+                         || selector.StartsWith "BindingsModule_Extensions_"
+                         || selector.StartsWith "Partas_Solid_" && selector.Contains "_BindingsModule_Extensions_" ->
+            Some compiledName
         | _ -> None
 
     /// Elucidates the first expr that is not a type cast.
@@ -247,6 +261,27 @@ module internal Expr =
         | expr -> expr
 
 module internal Type =
+    /// True when the type is itself a <c>Partas.Solid</c> declared type (an element), rather than a list,
+    /// tuple, option or function of one.
+    let isElement (_: PluginContext) : Type -> bool =
+        function
+        | Type.DeclaredType ({ FullName = Utils.StartsWith "Partas.Solid" }, _) -> true
+        | _ -> false
+
+    /// True when the declared type implements <c>Partas.Solid.Builder.HtmlElement</c>, like every tag does.
+    /// A <c>Partas.Solid</c> namespace alone does not make a tag: user code lives there too, and may construct
+    /// an imported JS class.
+    let isTag (ctx: PluginContext) : Type -> bool =
+        function
+        | Type.DeclaredType (entityRef, _) ->
+            try
+                let entity = PluginContext.getEntity ctx entityRef
+                entity.FullName = "Partas.Solid.Builder.HtmlElement"
+                || entity.AllInterfaces
+                   |> Seq.exists (fun i -> i.Entity.FullName = "Partas.Solid.Builder.HtmlElement")
+            with _ -> true
+        | _ -> false
+
     let rec private (|GetDeclaredType|_|) (ctx: PluginContext) : Type -> Type option =
         function
         | Type.DeclaredType _ as typ -> Some typ

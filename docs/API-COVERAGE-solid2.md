@@ -82,7 +82,7 @@ rather than a line, since [`SolidBindings.fs`](../Partas.Solid/SolidBindings.fs)
 | `TimeoutError` | [`core/error.ts:71`](../solid/packages/signals/src/core/error.ts#L71) | `TimeoutError` (`Import` class, inherits `exn`) — the rejection value of `until` on timeout |
 | `configureClientErrors(config)` | [`core/error-hooks.ts:69`](../solid/packages/signals/src/core/error-hooks.ts#L69) | `Bindings.configureClientErrors`, with `ClientErrorHook` / `ClientErrorContext` |
 | `OBSERVE` (observe-tier diagnostics; `undefined` outside dev/observe builds) | [`index.ts:177`](../solid/packages/solid/src/index.ts#L177) | `Bindings.OBSERVE`, alongside `DEV` |
-| `omit(props, predicate)` overload | [`store/utils.ts:1094`](../solid/packages/signals/src/store/utils.ts#L1094) | `Bindings.omit<'T>(obj, hidden: string -> bool)` beside the `ParamArray` key form |
+| `omit(props, predicate)` overload | [`store/utils.ts:1094`](../solid/packages/signals/src/store/utils.ts#L1094) | `Bindings.omit<'T>(obj, hidden: string -> bool)` (skips symbol keys) and `Bindings.omitKeys<'T>(obj, hidden: obj -> bool)` (all keys) beside the `ParamArray` key form |
 | `refresh(target)` now returns `Promise<T>` | [`signals.ts:793`](../solid/packages/signals/src/signals.ts#L793) | `Bindings.refresh` returns `JS.Promise<'T>` (was `unit`); fire-and-forget callers `ignore` it |
 | `render` / `hydrate` `onError` option | [`web/src/client.ts:294`](../solid/packages/web/src/client.ts#L294) / [`:2012`](../solid/packages/web/src/client.ts#L2012) | `render` / `hydrate` overloads taking `onError: ClientErrorHook` in [`SolidWebBindings.fs`](../Partas.Solid/SolidWebBindings.fs) |
 | `createStore(fn, seed, options?)` derived form; `StoreOptions.shallow` | [`store/index.ts:54-66`](../solid/packages/signals/src/store/index.ts#L54-L66) | `Bindings.createStore` seed overloads (returning `RefreshableStoreReturn`), `StoreOptions(?name, ?shallow)` |
@@ -304,7 +304,7 @@ The test inputs that were stubbed with `failwith "redo"` / `"REDO"` — `Indexed
 `SignalSetterInvoke`, `ThisArgTransforms`, `ExperimentalBuilders` — are restored against the Solid 2 API and their
 `.expected` snapshots regenerated. [`ExperimentalBuilders.fs`](../Partas.Solid.Tests.Plugin/Compiled/SolidCases/Experimental%20builders%20compile%20correct%20output/ExperimentalBuilders.fs)
 exercises the re-ported [`Experimental.fs`](../Partas.Solid/Experimental.fs) builders (`effect` → two-phase
-`createEffect`, `mount` → `onSettled`, `batch`/`selector` dropped). All 31 plugin cases pass.
+`createEffect`, `mount` → `onSettled`, `batch`/`selector` dropped). All plugin cases pass.
 
 ---
 

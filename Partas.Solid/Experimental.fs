@@ -17,19 +17,16 @@ open Fable.Core
 [<EB(EBState.Never)>]
 [<Erase>]
 type NullLambdaBuilder() =
-    member inline _.Return(x) =
-        fun () -> x
+    member inline _.Return(x) = x
 
-    member inline _.Bind(m, f) =
-        fun () -> f (m ()) ()
+    member inline _.Bind(m, f) = f (m ())
 
-    member inline _.Zero() = ignore
+    member inline _.Zero() = ()
     member inline _.Delay(f) = f
 
-    member inline _.Combine([<InlineIfLambda>] PARTAS_FIRST: 'T -> unit, [<InlineIfLambda>] PARTAS_SECOND) =
-        fun () ->
-            PARTAS_FIRST ()
-            PARTAS_SECOND ()
+    member inline _.Combine(PARTAS_FIRST: unit, [<InlineIfLambda>] PARTAS_SECOND) =
+        ignore PARTAS_FIRST
+        PARTAS_SECOND ()
 
 /// <summary>
 /// Lambdas that take null parameters and return a type are common enough to build
@@ -38,11 +35,9 @@ type NullLambdaBuilder() =
 [<EB(EBState.Never)>]
 [<Erase>]
 type BaseLambdaBuilder() =
-    member inline _.Return(x) =
-        fun () -> x
+    member inline _.Return(x) = x
 
-    member inline _.Bind(m, f) =
-        fun () -> f (m ()) ()
+    member inline _.Bind(m, f) = f (m ())
 
     member inline _.Delay(f) = f
 

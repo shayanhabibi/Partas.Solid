@@ -52,9 +52,8 @@ describe("AppsMore: theme context - consumers without a provider", () => {
     });
 });
 
-// The F# `ThemeContext api { ... }` provider syntax is emitted as <ThemeContext.Provider value=...>.
-// Solid 2 contexts are the provider component themselves and have no `.Provider`, so everything that
-// renders ThemeProvider breaks. The same scenarios run again below with a `.Provider` shim.
+// The same scenarios run below as written and again with a runtime `Ctx.Provider = Ctx` shim, from when the
+// plugin emitted `<ThemeContext.Provider>`. The plugin now emits `<ThemeContext>`, so the shim is a no-op.
 const providerScenarios = (it) => {
     it("ThemeProvider mirrors the theme to data-theme and provides it to consumers", () => {
         const {container: c} = mount(ThemeProvider, {
@@ -105,8 +104,7 @@ const providerScenarios = (it) => {
 };
 
 describe("AppsMore: theme context - F# provider (idiomatic `Ctx value { ... }`)", () => {
-    // BUG: provider emitted as <ThemeContext.Provider value=...>; Solid 2 contexts are themselves the provider.
-    providerScenarios((name, fn) => it.fails(name, fn));
+    providerScenarios(it);
 });
 
 describe("AppsMore: theme context - F# provider with a runtime .Provider shim (control group)", () => {

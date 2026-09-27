@@ -19,7 +19,7 @@ type WordRotate() =
     [<Erase>]
     member val duration: int = unbox null with get, set
 
-    [<SolidTypeComponentAttribute(ComponentFlag.DebugMode)>]
+    [<SolidTypeComponentAttribute>]
     member props.constructor =
         let index, setIndex = createSignal 0
 

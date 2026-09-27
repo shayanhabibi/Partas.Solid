@@ -24,9 +24,7 @@ type SearchBox() =
         let results =
             createMemo (fun (_: string array option) -> props.search (query ()))
 
-        // Hoisted: an isPending thunk written inline in an attribute value is unwrapped by the
-        // plugin (see PendingBadge), so the realistic app computes it in a helper.
-        // (A plain `let stale () = ...` helper gets inlined by Fable and then unwrapped too.)
+        // Computed once in a memo; PendingBadge covers the inline form in an attribute value.
         let stale =
             createMemo (fun (_: bool option) -> isPending (fun () -> box (results ())))
 

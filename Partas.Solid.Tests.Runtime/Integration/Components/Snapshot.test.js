@@ -21,8 +21,7 @@ describe("Components: component bodies are untracked", () => {
     expect(log).toEqual(["body"]);
   });
 
-  // BUG: a [<SolidComponent>] let-binding is emitted as a plain call `{Snapshot(...)}` inside a JSX insert, so its body is tracked and the whole subtree is rebuilt on every signal read in the body.
-  it.fails("SolidComponent let-binding: body runs once; a body read is a snapshot, a JSX read is live", () => {
+  it("SolidComponent let-binding: body runs once; a body read is a snapshot, a JSX read is live", () => {
     const { container, log, setValue } = setup(false);
     const el = container.querySelector(".snapshot");
     expect(text(el)).toBe("1/1");

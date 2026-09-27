@@ -115,8 +115,7 @@ describe("Apps: tabs widget", () => {
         expect(onTabChange.mock.calls.map(x => x[0])).toEqual(["b", "c"]);
     });
 
-    // BUG: ariaSelected / ariaControls are emitted verbatim instead of aria-selected / aria-controls.
-    it.fails("exposes aria-selected and aria-controls on each tab", () => {
+    it("exposes aria-selected and aria-controls on each tab", () => {
         const {c} = setupTabs();
         expect(tab(c, "a").getAttribute("aria-selected")).toBe("true");
         expect(tab(c, "b").getAttribute("aria-selected")).toBe("false");
@@ -181,8 +180,7 @@ describe("Apps: accordion widget", () => {
         expect(text($(c, ".open-count"))).toBe("1 open");
     });
 
-    // BUG: ariaExpanded / ariaControls are emitted verbatim instead of aria-expanded / aria-controls.
-    it.fails("reflects expansion in aria-expanded", () => {
+    it("reflects expansion in aria-expanded", () => {
         const c = setupAccordion();
         const ta = $(c, ".acc-trigger");
         expect(ta.getAttribute("aria-expanded")).toBe("false");

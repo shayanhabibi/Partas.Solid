@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { mount, click, input, act } from "../../helpers/index.js";
-import { EventLog, PassThrough } from "./C-Events.fs.jsx";
+import { EventLog, PassThrough, PartialHandler } from "./C-Events.fs.jsx";
 
-// EventLog's handlers call the curried F# prop `log name event`.
+// EventLog's handlers call the F# prop `log name event`. A two-argument F# function prop is called
+// uncurried, `props.log(name, event)`, the same way an F# parent sends it.
 let calls;
-const log = name => e => calls.push([name, e]);
+const log = (name, e) => calls.push([name, e]);
 const names = () => calls.map(c => c[0]);
 
 beforeEach(() => { calls = []; });
@@ -26,7 +27,7 @@ describe("Dom/Elements event handlers", () => {
 
   it("onInput receives the input event after the value changed", () => {
     let valueSeen;
-    const logWithValue = name => e => { valueSeen = e.target.value; calls.push([name, e]); };
+    const logWithValue = (name, e) => { valueSeen = e.target.value; calls.push([name, e]); };
     const { container } = mount(EventLog, { log: logWithValue });
     const txt = container.querySelector("#txt");
     input(txt, "abc");
@@ -136,5 +137,13 @@ describe("Dom/Elements event handlers", () => {
     expect(seen).toHaveLength(1);
     expect(seen[0]).toBeInstanceOf(MouseEvent);
     expect(seen[0].target).toBe(root);
+  });
+
+  it("a partially applied two-argument prop receives both arguments uncurried", () => {
+    const { root } = mount(PartialHandler, { select: log });
+    click(root);
+    expect(calls).toHaveLength(1);
+    expect(calls[0][0]).toBe("b");
+    expect(calls[0][1]).toBeInstanceOf(MouseEvent);
   });
 });

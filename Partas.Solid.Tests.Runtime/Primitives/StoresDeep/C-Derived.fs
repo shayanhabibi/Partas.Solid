@@ -138,8 +138,7 @@ let makeFilteredView () : FilteredHarness =
 
 // ---------------------------------------------------------------------------------------------
 // Selection projection (the Solid 2 replacement for createSelector).
-// createProjection is declared to return (store * setter), but upstream returns the store itself
-// (known binding bug), so the whole return is boxed and used as the store.
+// createProjection returns the projected store itself; it is boxed here so rows can index it dynamically.
 // ---------------------------------------------------------------------------------------------
 
 type SelectionHarness =

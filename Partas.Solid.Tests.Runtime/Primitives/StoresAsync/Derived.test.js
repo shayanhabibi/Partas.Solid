@@ -132,11 +132,7 @@ describe("createProjection", () => {
         }
     });
 
-    // BUG: Bindings.createProjection is typed RefreshableStoreReturn<'T> (store * setter), but
-    // solid-js 2.0.0-rc.9 createProjection returns Refreshable<Store<T>> (no tuple; see
-    // solid/packages/signals/src/store/next/projection.ts:214-219). Idiomatic
-    // `let sel, _ = createProjection(...)` emits `patternInput[0]`, which is undefined on the store.
-    it.fails("idiomatic tuple destructuring of createProjection reads the projected store", () => {
+    it("createProjection returns the projected store directly", () => {
         const h = makeProjectionIdiomatic();
         try {
             expect(h.readA()).toBe(true);

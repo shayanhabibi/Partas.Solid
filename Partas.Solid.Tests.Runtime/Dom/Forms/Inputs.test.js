@@ -228,8 +228,7 @@ describe("Dom/Forms boolean input flags", () => {
         expect(root.getAttribute("contenteditable")).toBe("true");
     });
 
-    // BUG: HTMLAttributes.spellcheck is typed bool, so spellcheck = false emits spellcheck={false}, which Solid 2 removes; it must emit the string "false".
-    it.fails("spellcheck = false renders spellcheck=\"false\" (disables spell checking)", () => {
+    it("spellcheck = false renders spellcheck=\"false\" (disables spell checking)", () => {
         const {root} = mount(SpellcheckOff);
         expect(root.getAttribute("spellcheck")).toBe("false");
     });

@@ -150,8 +150,7 @@ describe("Apps: controlled signup form with validation", () => {
         expect(errors(c)).toEqual(["Email is invalid"]);
     });
 
-    // BUG: ariaInvalid is emitted verbatim as `ariaInvalid=` instead of `aria-invalid=`.
-    it.fails("marks invalid fields with aria-invalid", () => {
+    it("marks invalid fields with aria-invalid", () => {
         const {c, name} = setup();
         expect(name.getAttribute("aria-invalid")).toBe("false");
         submit(c);

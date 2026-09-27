@@ -282,7 +282,14 @@ type JsxUtils =
         JsxUtils.KeyValue (key, AstUtils.Value value)
 
     /// Creates a property tuple (type casting the value expr?)
-    static member inline Prop(key: string, valueExpr: Expr) =
+    /// Fable prints a string value verbatim as a JSX attribute string, which cannot hold `"` and decodes entities
+    /// such as `&amp;`; such a value becomes a `{"..."}` expression.
+    static member Prop(key: string, valueExpr: Expr) =
+        let valueExpr =
+            match valueExpr with
+            | Value(StringConstant value, _) when value.Contains '"' || System.Text.RegularExpressions.Regex.IsMatch(value, "&#?\\w+;") ->
+                JsxUtils.StringExpression value
+            | _ -> valueExpr
         JsxUtils.KeyValue (key, TypeCast (valueExpr, any))
 
     static member inline Prop(key: string, value: string) =
@@ -300,6 +307,31 @@ type JsxUtils =
     /// Creates a child prop from the given list of expressions
     static member inline ChildrenProp(children: Expr list) =
         JsxUtils.Prop ("children", AstUtils.Flatten children)
+
+    /// Fable prints a string child verbatim as JSX text, where `{`, `<` and `&` are syntax and JSX trims
+    /// whitespace at line edges. Such text becomes a `{"..."}` expression child; other text is kept as is.
+    static member TextChild(value: string, text: Expr) =
+        let isRawSafe =
+            value.Length > 0
+            && not (System.Char.IsWhiteSpace value[0] || System.Char.IsWhiteSpace value[value.Length - 1])
+            && value |> Seq.forall (fun c -> c <> '{' && c <> '}' && c <> '<' && c <> '>' && c <> '&' && c <> '\n' && c <> '\r')
+        if isRawSafe then text else JsxUtils.StringExpression value
+
+    /// A JS string literal holding `value`, for positions where Fable would print it verbatim.
+    static member StringExpression(value: string) =
+        let escaped =
+            value
+            |> String.collect (function
+                | '\\' -> "\\\\"
+                | '"' -> "\\\""
+                | '\n' -> "\\n"
+                | '\r' -> "\\r"
+                | '\t' -> "\\t"
+                | c when c < ' ' -> $"\\u%04x{int c}"
+                | c -> string c)
+        // `$`, `{` and `}` are escaped too: Fable reads `$0` and `{{ }}` in an emit macro as argument slots
+        let escaped = escaped.Replace("$", "\\u0024").Replace("{", "\\u007b").Replace("}", "\\u007d")
+        AstUtils.EmitPure $"\"{escaped}\""
 
     /// Creates a JSX element with the given tag name expr, properties, and children
     static member inline CreateElement(tagNameExpr: Expr, properties: (string * Expr) list, children: Expr list) =
