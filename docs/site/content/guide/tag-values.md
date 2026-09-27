@@ -28,9 +28,8 @@ Icon % {| class' = "large" |}             // <Icon class="large" />
 Icon % span (class' = "large") { "text" } // <Icon class="large">text</Icon>
 ```
 
-With an element on the right, the plugin keeps its attributes and children and swaps its tag for the tag value. The
-`span` is only there to carry them. `Icon.render(...)` is the long form of `%`, and `Icon.render()` renders it with no
-props.
+With an element on the right, the plugin keeps its attributes and children and swaps its tag for the tag value; the
+`span` only carries them. `Icon.render(...)` is the long form of `%`, and `Icon.render()` renders it with no props.
 
 ## Example
 
@@ -84,7 +83,7 @@ div () {
 }
 ```
 
-A tag value in a local binding is meant to work the same way:
+A tag value in a local binding works the same way, and renders as `<Pill title=...>`:
 
 ```fsharp
 [<SolidComponent>]
@@ -93,12 +92,6 @@ let LocalTag () =
     Wrapper % span (title = "rendered through a local tag value") { "local" }
 ```
 
-:::danger
-This does not compile to valid JSX yet. Fable inlines the local binding, so the tag comes out as
-`<op_BangAt(Pill_$ctor) ...>`, which the Solid JSX compiler rejects. Until that is fixed, pass the tag value in through
-a prop, as `Labelled` does above, or use `Dynamic` (below).
-:::
-
 :::warning
 Give a local tag value a name that starts with a capital letter. The Solid JSX compiler reads `<wrapper>` as an HTML
 element called `wrapper`, and only `<Wrapper>` as a component.
@@ -106,11 +99,8 @@ element called `wrapper`, and only `<Wrapper>` as a component.
 
 ## HTML tags
 
-Use `!@` with components only. There are two known problems with it:
-
-- `!@button` or `!@div` compiles to a bare `button` or `div` identifier (see the `TagsAsValuesSimple` snapshot test),
-  which does not exist at runtime.
-- `!@Comp` inside an `if`/`else` does not compile to a valid tag. The runtime tests record this as a known bug.
+Use `!@` with components only. `!@button` or `!@div` compiles to a bare `button` or `div` identifier, which does not
+exist at runtime.
 
 To let the caller choose between HTML tags, or to pick a tag from a signal, use `Dynamic` from `Partas.Solid.Web`.
 It takes the tag name as a string:

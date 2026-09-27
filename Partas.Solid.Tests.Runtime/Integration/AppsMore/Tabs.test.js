@@ -93,8 +93,7 @@ describe("AppsMore: vertical tabs with disabled tabs and persistent panels", () 
         expect(visiblePanels(c)).toEqual(["vpanel-security"]);
     });
 
-    // BUG: `props.tabs[i]` in a `while` guard is emitted as undefined `VerticalTabs__get_tabs(props)` instead of `props.tabs`.
-    it.fails("ArrowDown moves to the next enabled tab, skipping disabled ones", () => {
+    it("ArrowDown moves to the next enabled tab, skipping disabled ones", () => {
         const {c, onChange} = setup();
         key(tab(c, "profile"), "ArrowDown");
         expect(selectedTabs(c)).toEqual(["vtab-security"]);
@@ -102,8 +101,7 @@ describe("AppsMore: vertical tabs with disabled tabs and persistent panels", () 
         expect(onChange.mock.calls).toEqual([["security"]]);
     });
 
-    // BUG: `props.tabs[i]` in a `while` guard is emitted as undefined `VerticalTabs__get_tabs(props)` instead of `props.tabs`.
-    it.fails("ArrowUp / ArrowDown wrap around both ends", () => {
+    it("ArrowUp / ArrowDown wrap around both ends", () => {
         const {c} = setup();
         key(tab(c, "profile"), "ArrowUp");
         expect(selectedTabs(c)).toEqual(["vtab-alerts"]);
@@ -125,8 +123,7 @@ describe("AppsMore: vertical tabs with disabled tabs and persistent panels", () 
         expect(onChange).not.toHaveBeenCalled();
     });
 
-    // BUG: ariaSelected / ariaOrientation are emitted verbatim instead of aria-selected / aria-orientation.
-    it.fails("exposes aria-selected on tabs and aria-orientation on the tablist", () => {
+    it("exposes aria-selected on tabs and aria-orientation on the tablist", () => {
         const {c} = setup();
         expect($(c, '[role="tablist"]').getAttribute("aria-orientation")).toBe("vertical");
         expect(tab(c, "profile").getAttribute("aria-selected")).toBe("true");

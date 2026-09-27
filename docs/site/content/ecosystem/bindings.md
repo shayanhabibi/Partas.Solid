@@ -18,9 +18,8 @@ plugin where to import it from.
 - `[<Import("Name", "path")>]` is the plain Fable import. Partas.Solid uses it for `Show`, `Loading`, `Repeat` and most
   of the `solid-js` flow components.
 - `[<PartasImport("Name", "path")>]` comes from `Partas.Solid`. Fable sees an ordinary local type, and the plugin adds
-  the import itself when it turns a constructor call into a JSX tag. Use it when Fable's import would get in the way,
-  for example on a type that carries its own builder members. `Router`, `Route`, `Switch` and `Dynamic` are bound this
-  way.
+  the import when it turns a constructor call into a JSX tag. Use it when Fable's import would get in the way, for
+  example on a type that carries its own builder members. `Router`, `Route`, `Switch` and `Dynamic` are bound this way.
 
 The interfaces decide what the tag accepts:
 
@@ -87,26 +86,19 @@ comes after it. See [SolidTypeComponent](../guide/solid-type-attribute.md) for t
 ## Naming
 
 `[<SolidTypeComponent>]` members must be declared inside the `Partas.Solid` namespace, or a namespace or module under
-it. The plugin also checks for that prefix when it decides whether a type is one of its own. So start binding
-namespaces with `Partas.Solid`.
-
-Give the binding an obvious access point, such as `Partas.Solid.Kobalte` rather than `Partas.Solid.Fabalte`, unless it
-is not a binding.
+it, and the plugin checks for that prefix when it decides whether a type is one of its own. So start binding
+namespaces with `Partas.Solid`, and name them after the library: `Partas.Solid.Kobalte`, not `Partas.Solid.Fabalte`.
 
 ## Specs
 
-Create a `Spec` file with the constant literals, such as the import paths of the library. Put them in a module named
-`Spec`. Include a public string literal with the version of the binding. You can mark the module `Erase`.
-
-If the file is small, put the `Enums` module in it too.
+Put the constant literals, such as the library's import paths, in a module named `Spec` (it can be `Erase`), with a
+public string literal holding the binding's version. If the file is small, put the `Enums` module in it too.
 
 ## Enums
 
-Collect the enums in the `Spec` or `Enums` file, under an auto-opened `Enums` module. This gives a consistent path to
-every enum when libraries have conflicting names, such as `Orientation`.
-
-Do not hide them behind further modules to shorten the names. Name them in full, then add submodules with aliases to
-the originals.
+Collect the enums under an auto-opened `Enums` module in the `Spec` or `Enums` file. Typing the library name and
+`.Enums` then lists every enum, even when libraries have conflicting names such as `Orientation`. Name each enum in
+full; for shorter names, add submodules with aliases to the originals, with or without `RequireQualifiedAccess`.
 
 ```fsharp
 namespace Partas.Solid.Kobalte
@@ -132,10 +124,6 @@ module Enums =
         type Orientation = PopperOrientation
 ```
 
-It takes less effort to find an enum, or to check you picked the right one, when you can type the library name,
-`.Enums`, and see them all. When names conflict, or you want shorter names, put aliases in submodules, with or without
-`RequireQualifiedAccess`. The cost is verbosity.
-
 - Use PascalCase. Use `CompiledName` and `CompiledValue` where the JS value differs.
 - Use `RequireQualifiedAccess` as much as you can.
 - You can also add aliases to an enum as static members of the type it belongs to.
@@ -157,11 +145,11 @@ static member someMethod(someparam: 'T, ?someotherparam: 'T, ?someotherotherpara
 static member someMethod(someparam: 'T): 'T = jsNative
 ```
 
-`ParamObject(1)` collects the arguments from index 1 on into an object. When no optional argument is given, that is an
-empty object. The second overload, without the optional arguments, avoids it. Partas.Solid binds `createEffect` and
-`createSignal` this way.
+`ParamObject(1)` collects the arguments from index 1 on into an object, which is empty when no optional argument is
+given; the second overload avoids that. Partas.Solid binds `createSignal` and `createEffect` this way.
 
-When an option must itself be an object, or has to be a named argument, go through a `JS.Pojo` type:
+When an option must itself be an object, or has to be a named argument, go through a `JS.Pojo` type, and flatten its
+fields into an inline overload so users do not build the options object themselves:
 
 ```fsharp
 [<JS.Pojo>]
@@ -175,17 +163,13 @@ static member inline someMethod(someparam: 'T, ?someotherparam: 'T, ?someotherot
     TYPE.someMethod(someparam, options = SomeMethodOptions(?someotherparam = someotherparam, ?someotherotherparam = someotherotherparam))
 ```
 
-Flatten optional arguments into the signature where it makes sense, so users do not have to build the options object
-themselves.
-
 ### Pojo constructors
 
-A `JS.Pojo` type compiles its constructor call to a plain object literal. Optional arguments you leave out are left out
-of the object.
+A `JS.Pojo` constructor call compiles to a plain object literal, without the optional arguments you leave out.
 
 You can also set a property that is not a constructor parameter in the same call, as `size` is set below. F# compiles
-that to a constructor call followed by a setter. Inside a `[<SolidComponent>]` the plugin folds the setters into the
-literal, so the result is still one object (`ComponentFlag.SkipPojoOptimisation` turns that off):
+that to a constructor call followed by a setter; inside a `[<SolidComponent>]` the plugin folds the setters into the
+literal (`ComponentFlag.SkipPojoOptimisation` turns that off):
 
 ```fsharp solid render=BadgeDemo jsx
 [<JS.Pojo>]

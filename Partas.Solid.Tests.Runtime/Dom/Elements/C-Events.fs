@@ -62,3 +62,14 @@ type PassThrough() =
 
     [<SolidTypeComponent>]
     member props.View = button (id = "pt", onClick = props.handler) { "pt" }
+
+/// A two-argument handler prop partially applied: `onClick = props.select "b"`.
+[<Erase>]
+type PartialHandler() =
+    inherit div()
+
+    [<Erase>]
+    member val select: string -> Fable.Core.TS.Dom.MouseEvent -> unit = unbox null with get, set
+
+    [<SolidTypeComponent>]
+    member props.View = button (id = "partial", onClick = props.select "b") { "partial" }

@@ -20,10 +20,8 @@ Each component binds its `Root` under the component's name, and its parts as qua
 
 ## Polymorphism
 
-Kobalte's `as` prop is available as the `.as'` extension method. It takes either a `TagValue` or a built element.
-
-Pass a built element when you can. You then set the morph target's props in its own constructor, where F# checks them,
-instead of chaining `.attr` for every prop the Kobalte component does not have.
+Kobalte's `as` prop is the `.as'` extension method from Partas.Solid's [polymorphism](polymorphism.md) support. Pass
+a built element, so F# checks the morph target's props in its own constructor:
 
 ```fsharp
 SidebarMenuButton(
@@ -34,8 +32,6 @@ SidebarMenuButton(
         A(href = item.Path)
     )
 ```
-
-`.as'` and the `Polymorph` interface are part of Partas.Solid 3.0. See [Polymorphism](polymorphism.md).
 
 ## Example component
 
@@ -113,11 +109,10 @@ let ColorAreaExample() =
 
 ## Contexts
 
-The Kobalte docs do not mention it, but most components expose a context from their root component. This is useful in
-dialogs and similar components. The binding only has the contexts that were needed so far.
+Most Kobalte components expose an undocumented context from their root component, which is useful in dialogs and
+similar components. The binding only has the contexts that were needed so far.
 
 ## ColorMode
 
-Kobalte also has an undocumented `ColorModeProvider`. It handles the theme mode (light or dark) and stores it locally.
-It provides a reactive signal that does the wiring for you, and a few other options. See the binding's source for
-details.
+Kobalte's undocumented `ColorModeProvider` stores the theme mode (light or dark) locally and exposes it as a reactive
+signal. See the binding's source for its options.

@@ -409,37 +409,31 @@ describe("Components: Reveal", () => {
     });
 });
 
-// Known plugin bugs are kept last: an uncaught render error halts the reactive system for the
-// rest of the file in Solid 2 dev builds.
-describe("Components: control-flow plugin bugs", () => {
-    // BUG: a two-argument child lambda (For.Keyed / For.NonKeyed) whose body is `statement; element`
-    // compiles to `(item, index) => { statement; }` - the element is dropped and nothing renders.
-    it.fails("For.Keyed row callback with a leading statement still renders its element", () => {
+// Regressions of fixed plugin bugs are kept last: an uncaught render error halts the reactive system
+// for the rest of the file in Solid 2 dev builds.
+describe("Components: control-flow plugin regressions", () => {
+    it("For.Keyed row callback with a leading statement still renders its element", () => {
         const onRowCreated = vi.fn();
         const {container} = mount(KeyedList, {items: [{id: 1, title: "a"}, {id: 2, title: "b"}], onRowCreated});
         expect(onRowCreated.mock.calls).toEqual([["a"], ["b"]]);
         expect(rowTexts(container)).toEqual(["a@0", "b@1"]);
     });
 
-    // BUG: same dropped-return as above, for For.NonKeyed.
-    it.fails("For.NonKeyed row callback with a leading statement still renders its element", () => {
+    it("For.NonKeyed row callback with a leading statement still renders its element", () => {
         const onRowCreated = vi.fn();
         const {container} = mount(IndexList, {items: ["a", "b"], onRowCreated});
         expect(onRowCreated.mock.calls).toEqual([[0], [1]]);
         expect(rowTexts(container)).toEqual(["0:a", "1:b"]);
     });
 
-    // BUG: `Errored(fallbackFn = ...)` emits a literal `fallbackFn` prop instead of `fallback`
-    // (the inline setter helper is not expanded), so Errored has no fallback to render.
-    it.fails("Errored fallbackFn helper renders the callback fallback", () => {
+    it("Errored fallbackFn helper renders the callback fallback", () => {
         const [value, setValue] = createSignal(1);
         const {container} = mount(SafeZone, {value});
         act(() => setValue(3));
         expect(text(container.querySelector(".error .message"))).toBe("boom at 3");
     });
 
-    // BUG: `Errored(fallbackEle = ...)` likewise emits `fallbackEle` instead of `fallback`.
-    it.fails("Errored fallbackEle helper renders the static fallback", () => {
+    it("Errored fallbackEle helper renders the static fallback", () => {
         const spy = vi.spyOn(console, "error").mockImplementation(() => {
         });
         try {

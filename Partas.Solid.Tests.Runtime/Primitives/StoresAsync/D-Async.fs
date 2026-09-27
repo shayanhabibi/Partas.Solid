@@ -45,7 +45,7 @@ let makeAsyncMemo (load: int -> JS.Promise<string>) : AsyncMemoHarness =
           loads = fun () -> loads
           dispose = dispose })
 
-/// createMemo(asyncFn, loadingValue): the ParamObject overload places `loadingValue` in options.
+/// createMemo(asyncFn, loadingValue): the overload places `loadingValue` in options.
 let makeAsyncMemoWithLoadingValue (load: unit -> JS.Promise<string>) =
     createRoot (fun (dispose: unit -> unit) ->
         let values = ResizeArray<string>()

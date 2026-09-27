@@ -43,12 +43,8 @@ let createSpring(
 | `stiffness` | Configures the physics of the spring. |
 | `damping` | Configures the physics of the spring. |
 
-Creates a signal that uses spring physics to move from one value to the next.
-
-When the value changes, it does not move at a steady rate. It bounces like a spring, depending on the physics
-parameters. This makes transitions feel more natural.
-
-It works best for types that can be interpolated, such as numbers, `Date` and arrays.
+A signal that moves to each new value with spring physics instead of at a steady rate. Works best for values that can
+be interpolated, such as numbers, `Date` and arrays.
 
 ## createDerivedSpring
 
@@ -60,4 +56,4 @@ let createDerivedSpring(
     ): Accessor<'T>
 ```
 
-Creates a spring that follows changes to the signal you pass in. It works like [`createTween`](tween.md).
+A spring that follows `target`, like [`createTween`](tween.md).

@@ -177,6 +177,7 @@ let theme =
                     Menu.page "contributing/dev/utilities.md"
                     Menu.page "contributing/dev/patterns.md"
                     Menu.page "contributing/dev/transformation.md"
+                    Menu.page "contributing/dev/workbench.md"
                 ]
         ]
     |> Theme.navbarEnd
@@ -330,7 +331,7 @@ let private solidExamples (options: SolidExamplesOptions) =
     options
     |> SolidExamples.partasVersion (
         fromEnvironment "PARTAS_SOLID_VERSION"
-        |> Option.defaultValue "3.0.0-local.cd6d4e2"
+        |> Option.defaultValue "3.0.0-local.e08ad85"
     )
     |> SolidExamples.feed (
         fromEnvironment "PARTAS_SOLID_FEED"

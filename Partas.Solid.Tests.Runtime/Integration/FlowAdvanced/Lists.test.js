@@ -106,8 +106,7 @@ describe("FlowAdvanced: Switch / Match", () => {
     it("Match.Keyed passes the raw value and remounts on identity change; Match.NonKeyed passes an accessor",
         matchCallbacks(SelectionViewPlain));
 
-    // BUG: Match.Keyed `when'option = props.selected` is dropped: plugin emits `<KeyedMatch>` with no `when` prop.
-    it.fails("Match.Keyed with the when'option setter matches on Some", matchCallbacks(SelectionView));
+    it("Match.Keyed with the when'option setter matches on Some", matchCallbacks(SelectionView));
 
     it("drives a tabbed UI from local state, keeping the tab node while it stays active", () => {
         const {container} = mount(Tabs);

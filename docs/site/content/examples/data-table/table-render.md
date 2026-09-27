@@ -38,11 +38,7 @@ TanStack needs `data` and `columns` to be `get` properties of the `TableOptions`
 `.data` and `.columns` methods set them up that way for you.
 :::
 
-Render `Test` from your `Root` component to see the table.
-
-:::note
-The old version of this page ran the example in the browser. It is not live here, because the examples on this site
-run on Solid 2 and TanStack Table's bindings still need Solid 1.
-:::
+Render `Test` from your `Root` component to see the table. The example is not live, because this site runs on Solid 2
+and the TanStack Table bindings still need Solid 1.
 
 Next: [Selectable rows](selectable-rows.md).

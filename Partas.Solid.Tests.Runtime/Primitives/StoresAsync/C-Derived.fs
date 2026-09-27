@@ -131,11 +131,11 @@ let private project (selected: Accessor<string>) (d: Selection) =
     d.c <- (s = "c")
     U2.Case1 None
 
-/// Idiomatic use of the binding: destructure the declared `RefreshableStoreReturn` tuple.
+/// Idiomatic use of the binding: `createProjection` returns the projected store itself.
 let makeProjectionIdiomatic () =
     createRoot (fun (dispose: unit -> unit) ->
         let selected, setSelected = createSignal "a"
-        let sel, _ = createProjection (project selected, selectionSeed ())
+        let sel = createProjection (project selected, selectionSeed ())
 
         {| readA = fun () -> sel.Value.a
            setSelected = setSelected
@@ -153,7 +153,7 @@ type ProjectionHarness =
       dispose: unit -> unit }
 
 /// Same projection, but the return value is kept whole (boxed) so the runtime shape can be
-/// inspected and used regardless of the declared tuple type.
+/// inspected directly.
 let makeProjectionRaw () : ProjectionHarness =
     createRoot (fun (dispose: unit -> unit) ->
         let selected, setSelected = createSignal "a"

@@ -22,10 +22,7 @@ Type: `interface`
 ## Bindings
 
 `createElementBounds` returns a reactive, store-like object with the element's position on the screen and its size.
-It updates on scroll, on resize, and when the DOM changes.
-
-Each kind of tracking is on by default. Turning all three on can be more than you need, so set the tracking parameters
-to `false` and turn on only the ones you use.
+All three kinds of tracking are on by default; set the ones you don't need to `false`.
 
 | Parameter | Listens to |
 | --- | --- |

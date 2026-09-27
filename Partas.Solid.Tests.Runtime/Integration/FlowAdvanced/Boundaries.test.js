@@ -122,8 +122,7 @@ describe("FlowAdvanced: Errored per list row", () => {
 
     it("isolates failures to the offending row and heals reactively", rowIsolation(GuardedListLocal));
 
-    // BUG: `string props.value` inside `failwith` in a memo emits undefined `RowGuard__get_value(props)` instead of `props.value`.
-    it.fails("formats a prop read directly in the thrown message", rowIsolation(GuardedList));
+    it("formats a prop read directly in the thrown message", rowIsolation(GuardedList));
 });
 
 describe("FlowAdvanced: nested Loading", () => {
@@ -200,8 +199,7 @@ describe("FlowAdvanced: isPending", () => {
 
     it("is false on first load and true while a refetch is in flight", pendingFlow(PendingIndicatorLocal));
 
-    // BUG: (known ValueUnroller issue) inline `isPending (fun () -> box (detail ()))` emits `isPending(detail())` instead of a thunk.
-    it.fails("inline isPending thunk shows the indicator during a refetch", pendingFlow(PendingIndicator));
+    it("inline isPending thunk shows the indicator during a refetch", pendingFlow(PendingIndicator));
 });
 
 describe("FlowAdvanced: Loading on", () => {

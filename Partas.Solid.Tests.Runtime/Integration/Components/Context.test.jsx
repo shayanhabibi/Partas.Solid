@@ -78,16 +78,12 @@ describe("Components: context", () => {
     );
   });
 
-  // BUG: the plugin emits `<Ctx.Provider value=...>`, but Solid 2 contexts are the provider component
-  // themselves (solid/packages/solid/src/client/core.ts createContext returns `provider` with no
-  // `.Provider` member), so the idiomatic `Ctx value { children }` renders an undefined component.
-  it.fails("provides nested context values through the idiomatic `Ctx value { ... }` syntax", () => {
+  it("provides nested context values through the idiomatic `Ctx value { ... }` syntax", () => {
     const { container } = mount(ThemeApp);
     expect(themes(container)).toEqual(["light", "dark", "nested"]);
   });
 
-  // BUG: same `.Provider` emission as above; a store passed through context never reaches consumers.
-  it.fails("shares a reactive store across component boundaries via the idiomatic provider", () => {
+  it("shares a reactive store across component boundaries via the idiomatic provider", () => {
     const { container } = mount(CounterApp);
     expect(text(container.querySelector(".display"))).toBe("0");
     click(container.querySelector(".inc"));

@@ -11,7 +11,7 @@ type TransformGetterExtensions() =
     [<Erase>]
     member val data: int[] = unbox null with get, set
 
-    [<SolidTypeComponent(ComponentFlag.DebugMode)>]
+    [<SolidTypeComponent>]
     member props.constructor =
         let table = createTable<int> (TableOptions (data = props.data))
 

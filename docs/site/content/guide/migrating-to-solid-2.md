@@ -2,12 +2,10 @@
 title: Migrating to Solid 2
 ---
 
-Partas.Solid 3.0 targets Solid 2.0 (`2.0.0-rc.9`). Partas.Solid 2.x targeted Solid 1.9. Solid 2 renamed,
-removed or reworked a large part of its runtime API, and the bindings follow it. Expect to touch
-every component that does more than render markup.
-
-This page goes through the changes in the order you are likely to hit them. Each section shows the
-2.x code and what replaces it. For the full 3.0 API, see [Solid-JS](../guide/solid-js.md).
+Partas.Solid 3.0 targets Solid 2.0 (`2.0.0-rc.9`); 2.x targeted Solid 1.9. Solid 2 renamed, removed or
+reworked much of its runtime API, so expect to touch every component that does more than render markup.
+Each section below shows the 2.x code and what replaces it. For the full 3.0 API, see
+[Solid-JS](../guide/solid-js.md).
 
 ## Checklist
 
@@ -32,10 +30,9 @@ This page goes through the changes in the order you are likely to hit them. Each
 ## Props: omit and merge
 
 Solid 2 replaced `splitProps` and `mergeProps` with `omit` and `merge`. `omit` returns only the rest
-of the props, so there is no longer a "local" half to read from.
+of the props, so there is no "local" half any more.
 
-For `[<SolidTypeComponent>]` members, your F# does not change. The plugin generates the calls, and
-only the JSX differs:
+For `[<SolidTypeComponent>]` members your F# does not change; only the generated JSX does:
 
 | 2.x output | 3.0 output |
 | --- | --- |
@@ -101,8 +98,8 @@ Two new `ComponentFlag`s control the props preamble:
 - `ComponentFlag.SkipOmit` leaves out the `omit` call.
 - `ComponentFlag.SpreadProps` makes `.spread` spread the self identifier instead of `PARTAS_OTHERS`.
 
-With either flag, `.spread props` compiles to `{...props}`. A wrapper can pass its props on unchanged
-without paying for `omit`:
+With either flag, `.spread props` compiles to `{...props}`, so a wrapper can pass its props on
+without paying for `omit`. `For.Keyed` is defined this way:
 
 ```fsharp
 [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps)>]
@@ -144,16 +141,15 @@ div().classList {| active = isActive () |}
 div().class' {| active = isActive () |}
 ```
 
-There is no replacement for `.on` or `.use'` yet. Use the typed event attributes (`onClick = ...`),
-or an `OnHandler` for `once`, `passive` and `capture`. For a directive, use `createDirectiveFactory`
-and `.ref`:
+`.on` and `.use'` have no direct replacement. Use the typed event attributes (`onClick = ...`), or an
+`OnHandler` for `once`, `passive` and `capture`. For a directive, pass `createDirectiveFactory` to `.ref`:
 
 ```fsharp
 // 2.x
 input().use' ("autofocus", true)
 
 // 3.0
-let autofocus = createDirectiveFactory (fun (el: Browser.Types.HTMLElement) ->
+let autofocus = createDirectiveFactory (fun (el: Browser.Types.HTMLInputElement) ->
     el.focus ()
     ignore)
 
@@ -221,8 +217,7 @@ Errored(
 }
 ```
 
-`Errored` also has `fallbackFn` and `fallbackEle` setters, but they do not work yet. Set `fallback`
-with `!^` as above.
+`Errored` also has `fallbackFn` and `fallbackEle` setters, which set `fallback` without the `!^`.
 
 ### Suspense and SuspenseList
 
@@ -241,8 +236,6 @@ Reveal(order = Reveal.Order.Sequential) {
 ```
 
 ## Removed and replaced primitives
-
-Solid 2 removed these. The bindings for them are gone too.
 
 | 2.x | 3.0 |
 | --- | --- |
@@ -343,11 +336,9 @@ that both tracks and acts.
 
 ## Stores
 
-Stores moved into `solid-js`. There is no `solid-js/store` module.
-
-The store setter takes a single updater, `'T -> 'T`. Path setters are gone, and so is `produce`,
-because mutating the draft is now the default. Mutate the draft and return it, or return a new
-value:
+Stores moved into `solid-js`; there is no `solid-js/store` module. The setter takes a single updater,
+`'T -> 'T`. Path setters and `produce` are gone, because mutating the draft is now the default. Mutate
+the draft and return it, or return a new value:
 
 ```fsharp
 // 2.x
@@ -445,13 +436,13 @@ See [Experimental features](../guide/experimental.md).
 
 ## Snapshots and generated JSX
 
-If you commit the generated JSX, or compare against it in tests, regenerate it. Expect these
-changes:
+If you commit the generated JSX, or compare against it in tests, regenerate it. Expect:
 
 - `PARTAS_LOCAL` is gone. Props are read from the self identifier.
 - `splitProps` and `mergeProps` become `omit` and `merge`, and the imports change to match.
 - `bool:n$` becomes `n$`.
-- Control-flow imports change: `KeyedFor`, `Errored`, `Loading`, `Reveal`.
+- Control-flow imports change: `Errored`, `Loading`, `Reveal` from `solid-js`, and `KeyedFor` /
+  `NonKeyedFor` from Partas.Solid's compiled bindings (`SolidBindings.fs.jsx`).
 - Anything from the web runtime is imported from `@solidjs/web`.
 
 See [JSX output](../about/jsx-output.md) for how the plugin output is laid out.

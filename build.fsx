@@ -142,7 +142,6 @@ let tests = input {
         when' (not skipTests)
         continueStepsOnFailure
         stage "run-tests" {
-            parallel'
             for test in Project.tests do
                 buildTarget test config
                 stage "run-target" {

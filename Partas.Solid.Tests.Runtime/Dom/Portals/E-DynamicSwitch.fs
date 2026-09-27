@@ -1,7 +1,5 @@
 module Partas.Solid.Tests.Runtime.Dom.Portals.DynamicSwitch
 
-// Isolated: the emitted JSX imports op_BangAt from Builder.fs.jsx, which does not exist, so this
-// module cannot be loaded. Kept separate so the other Dynamic cases still load.
 
 open Partas.Solid
 open Partas.Solid.Web

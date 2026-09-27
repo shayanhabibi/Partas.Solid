@@ -48,9 +48,7 @@ describe("Dom/Elements global attributes", () => {
         expect(root.getAttribute("aria-pressed")).toBe("true");
     });
 
-    // BUG: Aria module properties (ariaLabel, ariaExpanded, ...) are emitted verbatim as camelCase JSX
-    // attributes instead of aria-*; the HTML parser lowercases them to "arialabel" etc.
-    it.fails("renders Aria module properties as aria-* attributes", () => {
+    it("renders Aria module properties as aria-* attributes", () => {
         const {root} = mount(AriaAttrs);
         expect(root.getAttribute("aria-label")).toBe("Close dialog");
         expect(root.getAttribute("aria-expanded")).toBe("false");
@@ -58,10 +56,7 @@ describe("Dom/Elements global attributes", () => {
         expect(root.getAttribute("aria-hidden")).toBe("true");
     });
 
-    // BUG: ariaHidden = false is emitted as ariaHidden={false}. ARIA needs the string "false";
-    // even a correctly named aria-hidden={false} would remove the attribute in Solid 2 (upstream jsx.d.ts
-    // types aria-hidden as "true" | "false" | false-to-remove; the Aria binding types it as bool).
-    it.fails("renders ariaHidden = false as aria-hidden=\"false\"", () => {
+    it("renders ariaHidden = false as aria-hidden=\"false\"", () => {
         const {root} = mount(AriaHiddenFalse);
         expect(root.getAttribute("aria-hidden")).toBe("false");
     });

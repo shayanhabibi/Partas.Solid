@@ -2,8 +2,8 @@
 title: Extension Methods
 ---
 
-Tags have extension methods for the attributes that do not fit a typed property: arbitrary attributes, `data-*`,
-refs, style objects and spreads. You chain them after the constructor, before the children:
+Extension methods cover what does not fit a typed property: arbitrary attributes, `data-*`, refs, style objects and
+spreads. Chain them after the constructor, before the children:
 
 ```fsharp
 div(class' = "card").data("id", "42").attr("custom-attr", "yes") { "..." }
@@ -37,8 +37,7 @@ See [Migrating to Solid 2](migrating-to-solid-2.md) for the rest of the changes.
 
 ## attr
 
-Sets any attribute by name. Use it for attributes that have no typed property, including custom attributes and
-attributes with characters F# does not allow in a name.
+Sets any attribute by name, including custom attributes and names F# does not allow as identifiers.
 
 ```fsharp
 attr(name: string, value: obj)
@@ -68,8 +67,8 @@ div(style = "font-family: monospace").data("user-id", "42").attr("custom-attr", 
 
 ## ref
 
-Gives you the DOM element once Solid has created it. `.ref` takes a callback, a variable, an option, an array of
-callbacks, or a `Ref`. Solid calls a callback after it has applied the element's attributes and children.
+Gives you the DOM element once Solid has created it. `.ref` takes a variable, an option, a callback, an array of
+callbacks, a `Ref` or an array of `Ref`s.
 
 ```fsharp solid render=FocusDemo jsx
 [<SolidComponent>]
@@ -104,9 +103,8 @@ type Ref<'DomType> =
 
 ### Refs and DOM libraries
 
-Libraries that work on real elements need refs. The tooltip below uses
-[Floating UI](https://floating-ui.com/) from npm. Bind each export with `[<Import>]` and tupled parameters, so
-Fable emits a plain `f(a, b, c)` call:
+The tooltip below drives [Floating UI](https://floating-ui.com/) from npm through refs. Bind each export with
+`[<Import>]` and tupled parameters, so Fable emits a plain `f(a, b, c)` call:
 
 ```fsharp solid show=code
 [<Import("computePosition", "@floating-ui/dom")>]
@@ -125,9 +123,9 @@ let flip (options: obj): obj = jsNative
 let shift (options: obj): obj = jsNative
 ```
 
-Both refs are set during render, so `onSettled` can pass the two elements to `autoUpdate`. It returns its own
-stop function, and returning that from `onSettled` runs it when the component is disposed. Options are
-anonymous records, which compile to plain objects.
+Both refs are set during render, so `onSettled` can pass the two elements to `autoUpdate`. `autoUpdate` returns a
+stop function, and returning that from `onSettled` runs it when the component is disposed. Anonymous records compile to
+plain option objects.
 
 ```fsharp solid render=TooltipDemo jsx
 [<SolidComponent>]
@@ -235,9 +233,8 @@ let SpreadLocal () =
     div(style = "text-decoration: underline dotted").spread (extra) { "Hover me" }
 ```
 
-In a [SolidTypeComponent](solid-type-attribute.md), `.spread props` spreads the props the component does not read
-itself, the `PARTAS_OTHERS` binding. This is how a component passes the attributes it does not use on to the element
-it renders:
+In a [SolidTypeComponent](solid-type-attribute.md), `.spread props` spreads the props the body does not read (the
+`PARTAS_OTHERS` binding), passing unused attributes on to the rendered element:
 
 ```fsharp
 namespace Partas.Solid.MyCenteredButton

@@ -1,0 +1,46 @@
+
+import { Union } from "../../fable_modules/fable-library-js.5.13.0/Types.js";
+import { union_type } from "../../fable_modules/fable-library-js.5.13.0/Reflection.js";
+import { KeyedFor } from "../../../../Partas.Solid/SolidBindings.fs.jsx";
+
+export class Kind extends Union {
+    constructor(tag, fields) {
+        super();
+        this.tag = tag;
+        this.fields = fields;
+    }
+    cases() {
+        return ["Alpha", "Other"];
+    }
+    static Alpha = new Kind(0, []);
+    static Other = new Kind(1, []);
+}
+
+export function Kind_$reflection() {
+    return union_type("Partas.Solid.Tests.SolidCases.BuilderStatements.Kind", [], Kind, () => [[], []]);
+}
+
+export function LetBeforeChildren(items, log) {
+    return <ul>
+        <KeyedFor each={items}>
+            {(item, index) => {
+                const title = item.toLocaleUpperCase();
+                log(index);
+                return <li>
+                    {title}
+                </li>;
+            }}
+        </KeyedFor>
+    </ul>;
+}
+
+export function MatchBranchStatements(kind, log) {
+    return <div>
+        {(kind.tag === 1) ? (<i>
+            ?
+        </i>) : ((log("alpha"), <b>
+            A
+        </b>))}
+    </div>;
+}
+

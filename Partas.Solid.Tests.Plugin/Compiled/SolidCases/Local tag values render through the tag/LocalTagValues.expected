@@ -1,0 +1,29 @@
+
+import { omit } from "solid-js";
+
+export function Pill(props) {
+    const PARTAS_OTHERS = omit(props, "children");
+    return <span class="pill"
+        {...PARTAS_OTHERS} n$={false}>
+        {props.children}
+    </span>;
+}
+
+export function SolidPill() {
+    return <span class="solid-pill" />;
+}
+
+export function LocalTag() {
+    return <Pill title="local">
+        local
+    </Pill>;
+}
+
+export function LocalTagRecord() {
+    return <Pill title="rec" />;
+}
+
+export function LocalTagLet() {
+    return <SolidPill title="let" />;
+}
+

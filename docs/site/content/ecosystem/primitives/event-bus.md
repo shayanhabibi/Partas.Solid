@@ -48,8 +48,7 @@ Created by [`createEventBus`](#createeventbus).
 type EventBus<'T> = interface
 ```
 
-Provides the base functions of an event emitter, plus functions for managing listeners. A config object can customise
-its behaviour, which is useful for advanced cases.
+A single-event emitter with listener management.
 
 ```fsharp
 member listen: ('T -> unit) -> DisposeCallback
@@ -74,7 +73,7 @@ and [`MappedEmitter`](#mappedemitter).
 type Emitter<'MessageTyper> = interface
 ```
 
-An emitter you can listen to and emit different events on.
+An emitter for multiple named events.
 
 ```fsharp
 member on: (string * (obj -> unit)) -> DisposeCallback
@@ -98,10 +97,8 @@ Created by [`createMappedEmitter`](#createmappedemitter).
 type MappedEmitter<'MessageMapper> = interface
 ```
 
-A type-safe version of `Emitter`, made for F# and Fable.
-
-It uses the path from the type to one of its members as the key of the event. Because the path is typed, the message
-has the type of that member.
+A type-safe `Emitter`, made for F#. The event key is the path to a member of `'MessageMapper`, so the message has
+that member's type.
 
 ```fsharp
 member on
@@ -127,7 +124,7 @@ member clear: unit -> unit
 type GlobalEmitter<'T> = inherit Emitter<'T>
 ```
 
-A wrapper around `createEmitter`. It is an emitter that can also listen to every event.
+An emitter that can also listen to every event.
 
 ```fsharp
 member listen: (obj -> unit) -> DisposeCallback

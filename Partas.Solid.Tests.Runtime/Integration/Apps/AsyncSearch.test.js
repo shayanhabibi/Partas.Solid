@@ -140,8 +140,7 @@ describe("Apps: async search inside <Errored>", () => {
         expect(hits(c)).toEqual(["hit3"]);
     });
 
-    // BUG: the `fallbackFn` inline setter is emitted as a literal `fallbackFn=` prop, which Errored ignores.
-    it.fails("the fallbackFn helper renders the same error fallback", async () => {
+    it("the fallbackFn helper renders the same error fallback", async () => {
         const s = flaky();
         const {container: c} = mount(SafeSearchBox, {search: s.search});
         await settle();
@@ -191,14 +190,13 @@ describe("Apps: isPending written inline in an attribute", () => {
         expect(text($(c, ".value"))).toBe("A");
     });
 
-    // Control: the identical check hoisted into a memo keeps its thunk and passes. This pins the
-    // it.fails below to the inline-thunk unwrapping rather than to rc.9 isPending semantics.
+    // Control: the identical check hoisted into a memo. If only the inline form below regresses, look at
+    // attribute-value thunk unrolling rather than at rc.9 isPending semantics.
     it("control: isPending hoisted into a memo marks the value pending while the next key loads", async () => {
         await expectPendingCycle(PendingBadgeMemo);
     });
 
-    // BUG: the plugin's ValueUnroller strips the `fun () -> ...` thunk, emitting isPending(value()).
-    it.fails("marks the value as pending while the next key loads", async () => {
+    it("marks the value as pending while the next key loads", async () => {
         await expectPendingCycle(PendingBadge);
     });
 });

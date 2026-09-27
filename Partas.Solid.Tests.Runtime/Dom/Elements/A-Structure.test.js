@@ -2,7 +2,7 @@ import {describe, it, expect} from "vitest";
 import {mount, text} from "../../helpers/index.js";
 import {
     Nested, Numbers, Interpolated, Frag, Voids, EscapedText, Deep, Table, Greeting, Composed,
-    BraceText, InlineSpacing, InterpolatedMarkup, MultilineText
+    BraceText, DollarText, InlineSpacing, InterpolatedMarkup, MultilineText
 } from "./A-Structure.fs.jsx";
 
 describe("Dom/Elements structure: tags, text, nesting", () => {
@@ -25,9 +25,7 @@ describe("Dom/Elements structure: tags, text, nesting", () => {
         expect(root.firstChild.nodeValue).toBe("Hello ");
     });
 
-    // BUG: a string child with a leading space (" again") is emitted as raw JSX text on its own
-    // line, and JSX line-trimming drops the space.
-    it.fails("keeps the leading space of a string child that follows an element", () => {
+    it("keeps the leading space of a string child that follows an element", () => {
         const {root} = mount(InlineSpacing);
         expect(root.textContent).toBe("Hello world again");
     });
@@ -56,17 +54,20 @@ describe("Dom/Elements structure: tags, text, nesting", () => {
         expect(root.innerHTML).toBe('<input><br><hr><img><div class="empty"></div>');
     });
 
-    // BUG: string children are emitted raw into JSX text, so "<b>" becomes a real element.
-    it.fails("escapes HTML-significant characters in a string child (text node, not markup)", () => {
+    it("escapes HTML-significant characters in a string child (text node, not markup)", () => {
         const {root} = mount(EscapedText);
         expect(root.querySelector("b")).toBeNull();
         expect(root.textContent).toBe('<b>not bold</b> & "quoted"');
     });
 
-    // BUG: string children are emitted raw into JSX text, so "{1 + 1}" becomes a JSX expression.
-    it.fails("renders braces in a string child literally", () => {
+    it("renders braces in a string child literally", () => {
         const {root} = mount(BraceText);
         expect(root.textContent).toBe("a {1 + 1} b");
+    });
+
+    it("renders `$0` and `{{ }}` in a string child literally", () => {
+        const {root} = mount(DollarText);
+        expect(root.textContent).toBe("costs $0 {{x}}");
     });
 
     it("renders deeply nested elements", () => {
@@ -104,17 +105,14 @@ describe("Dom/Elements structure: tags, text, nesting", () => {
     });
 
     it("keeps markup characters of an interpolated string as literal text", () => {
-        // Interpolation is emitted as a JS expression child, so this is the working counterpart of
-        // the raw-string-child escaping bug above.
+        // Interpolation is emitted as a JS expression child, unlike the string-child escaping above.
         const {root} = mount(InterpolatedMarkup);
         expect(root.querySelector("i")).toBeNull();
         expect(root.childNodes).toHaveLength(1);
         expect(root.textContent).toBe("<i>you</i> & {x}");
     });
 
-    // BUG: a string child containing a newline is emitted as raw multi-line JSX text; JSX whitespace
-    // rules strip the second line's indentation and collapse the newline, even inside <pre>.
-    it.fails("preserves newlines and indentation of a string child inside <pre>", () => {
+    it("preserves newlines and indentation of a string child inside <pre>", () => {
         const {root} = mount(MultilineText);
         expect(root.textContent).toBe("line one\n  line two");
     });

@@ -18,10 +18,8 @@ Bindings for `@solid-primitives/autofocus`.
 static member createAutofocus (ref: unit -> #HtmlElement): unit = jsNative
 ```
 
-Pass an accessor that returns the element to focus. It can read a `ref` you captured, or a signal that the element's
-`ref` sets.
-
-The upstream JavaScript usage:
+Pass an accessor that returns the element to focus: one that reads a captured `ref`, or a signal that the element's
+`ref` sets. Upstream usage:
 
 ```jsx
 import { createAutofocus } from "@solid-primitives/autofocus";

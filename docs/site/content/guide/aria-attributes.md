@@ -13,14 +13,8 @@ button (ariaLabel = "Close dialog", ariaControls = "menu-1") { "x" }
 
 The bindings come from [Oxpecker.Solid](https://github.com/Lanayx/Oxpecker), by Lanayx.
 
-:::danger
-The ARIA properties are currently broken. The plugin writes them out under their F# names, so `ariaLabel = "Close"`
-becomes `ariaLabel="Close"` in the JSX, not `aria-label="Close"`. The browser lowercases it to `arialabel`, which
-assistive technology ignores. The runtime tests record this as a known bug.
-
-Until it is fixed, set ARIA attributes with [`.attr`](extension-methods.md). `role` is not affected, because its F#
-name is already the attribute's name.
-:::
+The plugin writes each one under its attribute name, so `ariaLabel = "Close"` becomes `aria-label="Close"`. `role`
+is in the same module.
 
 ```fsharp solid render=DetailsSwitch jsx
 open Partas.Solid.Aria
@@ -29,16 +23,22 @@ open Partas.Solid.Aria
 let DetailsSwitch () =
     let on, setOn = createSignal false
 
-    button(role = "switch", onClick = fun _ -> setOn (not (on ()))).attr("aria-checked", string (on ())).attr("aria-label", "Details") {
+    button (
+        role = "switch",
+        ariaChecked = string (on ()),
+        ariaLabel = "Details",
+        onClick = fun _ -> setOn (not (on ()))
+    ) {
         if on () then "Details: on" else "Details: off"
     }
 ```
 
 ## Boolean attributes
 
-`ariaDisabled`, `ariaHidden`, `ariaModal`, `ariaMultiLine` and `ariaMultiSelectable` are typed `bool`. In Solid 2,
-an attribute set to `false` is removed, but ARIA reads a missing attribute differently from `"false"`. To write
-`aria-hidden="false"`, pass a string through `.attr`: `.attr("aria-hidden", "false")`.
+`ariaDisabled`, `ariaHidden`, `ariaModal`, `ariaMultiLine` and `ariaMultiSelectable` are typed `bool`. The plugin
+writes them as the strings `"true"` and `"false"`, so `ariaHidden = false` becomes `aria-hidden="false"`. This matters
+because Solid 2 removes an attribute whose value is `false`, and ARIA reads a missing attribute differently from
+`"false"`. The other states, such as `ariaExpanded` and `ariaChecked`, are typed `string`: pass `"true"` or `"false"`.
 
 ## Attributes
 

@@ -7,21 +7,14 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 :::
 
 `Partas.Solid.NeoDrag` binds [@neodrag/solid](https://www.neodrag.dev/docs/solid), for drag and drop. See its docs for
-usage.
-
-Several drag and drop libraries were considered. NeoDrag was by far the simplest to bind: the others needed tens of
-TypeScript definition files read to find the shape of every option and event.
-
-The binding has not been tested much.
+usage. The binding has not been tested much.
 
 ## Vanilla NeoDrag on Solid 2
 
 [@neodrag/vanilla](https://www.neodrag.dev/docs/vanilla) has no framework dependency, so it works on Solid 2 today.
-Its whole API is one class, `Draggable`, and binding it takes a few lines.
-
-`[<Import>]` on a class type imports the named export, and calling the constructor emits `new Draggable(...)`. The
-options are an anonymous record, which compiles to a plain object. The interface types the data NeoDrag passes to its
-drag callbacks.
+Its whole API is one class, `Draggable`. `[<Import>]` on a class type imports the named export, and calling the
+constructor emits `new Draggable(...)`. The options are an anonymous record, and the interface types the data NeoDrag
+passes to its drag callbacks.
 
 ```fsharp solid
 open Browser.Types
@@ -49,8 +42,7 @@ let dragReadout = "font: .8125rem var(--nacara-font-mono); color: var(--nacara-t
 
 The component creates the `Draggable` in `onSettled`, once the ref is set, and returns `destroy` as the cleanup.
 `onDrag` writes the offset into two signals. `bounds = "parent"` keeps the card inside its box. Passing a `position`
-makes the position controlled, so Reset can move the card back with `updateOptions`. The style strings live in a
-hidden setup block.
+makes the position controlled, so Reset can move the card back with `updateOptions`.
 
 ```fsharp solid render=DragDemo jsx
 [<SolidComponent>]

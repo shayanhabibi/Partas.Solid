@@ -76,7 +76,7 @@ module Bindings =
     /// <summary>
     /// Created by passing a <c>JS.Pojo</c> (recommended) to a createContext call as a type arg or value. Defaults
     /// are set by calling the constructor with any default values wanted.<br/><br/>
-    /// The plugin transpiles the identifier with a <c>.Provider</c> suffix in the tag as per the SolidJS documentation.
+    /// The plugin emits the context itself as the provider tag (<c>&lt;Ctx value={...}&gt;</c>), as in Solid 2.
     /// </summary>
     type Context<'T> = 'T -> ContextProvider
     type ContextNotFoundError() = inherit exn()
@@ -96,12 +96,15 @@ module Bindings =
         [<Erase; DefaultValue>]
         val mutable fallback: U2<HtmlElement, ErrorBoundary.Fallback>
 
-        [<Erase>]
-        member inline this.fallbackEle
-            with inline set (value: HtmlElement) = this.fallback <- !^value
-        [<Erase>]
-        member inline this.fallbackFn
-            with inline set (value: ErrorBoundary.Fallback) = this.fallback <- !^value
+    /// Optional extensions, because Fable does not inline members of an imported type: an intrinsic
+    /// `fallbackEle` setter would compile to a `fallbackEle` prop.
+    [<AutoOpen>]
+    module ErroredExtensions =
+        type Errored with
+            member inline this.fallbackEle
+                with set (value: HtmlElement) = this.fallback <- !^value
+            member inline this.fallbackFn
+                with set (value: ErrorBoundary.Fallback) = this.fallback <- !^value
     module For =
         [<Import("For", "solid-js")>]
         [<Erase>]
@@ -342,8 +345,9 @@ module Bindings =
         /// <returns>The new value</returns>
         [<Extension; Erase>]
         static member inline InvokeAndGet(setter: Setter<'T>, value: 'T) : 'T =
-            setter value
-            |> unbox<'T>
+            // Retype the setter rather than the unit result: a unit-typed call is compiled as a
+            // statement and its value replaced with undefined.
+            (unbox<'T -> 'T> setter) value
 
         /// <summary>
         /// Modify a signal value by performing computation its previous value.
@@ -353,8 +357,7 @@ module Bindings =
         /// <returns>The new value</returns>
         [<Extension; Erase>]
         static member inline InvokeAndGet(setter: Setter<'T>, handler: 'T -> 'T) : 'T =
-            setter (unbox<'T> handler)
-            |> unbox<'T>
+            (unbox<('T -> 'T) -> 'T> setter) handler
     type LazyComponent<'T when 'T :> HtmlElement> =
         inherit HtmlElement
         abstract preload: unit -> JS.Promise<'T>
@@ -676,10 +679,6 @@ type Bindings =
     static member createMemo<'T>(compute: 'T option -> 'T): Accessor<'T> = jsNative
     [<ImportMember "solid-js">]
     static member createMemo<'T>(compute: 'T option -> JS.Promise<'T>): Accessor<'T> = jsNative
-    [<ImportMember "solid-js"; ParamObject(1)>]
-    static member createMemo<'T>(compute: 'T -> 'T, loadingValue: 'T): Accessor<'T> = jsNative
-    [<ImportMember "solid-js"; ParamObject(1)>]
-    static member createMemo<'T>(compute: 'T -> JS.Promise<'T>, loadingValue: 'T): Accessor<'T> = jsNative
     [<ImportMember "solid-js">]
     static member createMemo<'T>(compute: 'T option -> 'T, options: MemoOptions<'T>): Accessor<'T> = jsNative
     [<ImportMember "solid-js"; ParamObject(1)>]
@@ -688,6 +687,17 @@ type Bindings =
     static member createMemo<'T>(compute: 'T option -> JS.Promise<'T>, options: MemoOptions<'T>): Accessor<'T> = jsNative
     [<ImportMember "solid-js"; ParamObject(1)>]
     static member createMemo<'T>(compute: 'T option -> JS.Promise<'T>, ?name: string, ?transparent: bool, ?equals: EqualityFunc<'T>, ?unobserved: unit -> unit, ?``lazy``: bool, ?sync: bool, ?loadingValue: 'T): Accessor<'T> = jsNative
+    // The loadingValue overloads build MemoOptions rather than carrying ParamObject, and are declared after the
+    // imported 2-argument overloads. Fable resolves a call's member info by loosely matching name, arity and
+    // declared parameter types (generic parameters match anything), taking the first declared member, so a
+    // ParamObject overload colliding with `createMemo(compute, options: MemoOptions)` would wrap the options
+    // object as `{ loadingValue: options }`.
+    [<Import("createMemo", "solid-js"); EB(EBState.Never)>]
+    static member createMemo'<'T, 'C>(compute: 'T -> 'C, options: MemoOptions<'T>): Accessor<'T> = jsNative
+    static member inline createMemo<'T>(compute: 'T -> 'T, loadingValue: 'T): Accessor<'T> =
+        Bindings.createMemo'(compute, MemoOptions<'T>(loadingValue = loadingValue))
+    static member inline createMemo<'T>(compute: 'T -> JS.Promise<'T>, loadingValue: 'T): Accessor<'T> =
+        Bindings.createMemo'(compute, MemoOptions<'T>(loadingValue = loadingValue))
 
     (*
     Create Optimistic
@@ -752,25 +762,25 @@ type Bindings =
     [<ImportMember "solid-js"; ParamObject(2)>]
     static member inline createOptimisticStore<'T>(fn: 'T -> U3<'T, JS.Promise<'T>, JS.Promise<unit>>, store: 'T, key: 'T -> objnull, ?name: string, ?shallow: bool, ?seedLoadingValue: bool): RefreshableStoreReturn<'T> = jsNative
     [<ImportMember "solid-js">]
-    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T): RefreshableStoreReturn<'T> = jsNative
+    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T): RefreshableStore<'T> = jsNative
     [<ImportMember "solid-js">]
-    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>): RefreshableStoreReturn<'T> = jsNative
+    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>): RefreshableStore<'T> = jsNative
     [<ImportMember "solid-js"; ParamObject(2)>]
-    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, key: 'T -> objnull): RefreshableStoreReturn<'T> = jsNative
+    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, key: 'T -> objnull): RefreshableStore<'T> = jsNative
     [<ImportMember "solid-js"; ParamObject(2)>]
-    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, key: 'T -> objnull): RefreshableStoreReturn<'T> = jsNative
+    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, key: 'T -> objnull): RefreshableStore<'T> = jsNative
     [<ImportMember "solid-js">]
-    static member createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, options: ProjectionOptions<'T>): RefreshableStoreReturn<'T> = jsNative
+    static member createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, options: ProjectionOptions<'T>): RefreshableStore<'T> = jsNative
     [<ImportMember "solid-js">]
-    static member createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, options: ProjectionOptions<'T>): RefreshableStoreReturn<'T> = jsNative
+    static member createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, options: ProjectionOptions<'T>): RefreshableStore<'T> = jsNative
     [<ImportMember "solid-js"; ParamObject(2)>]
-    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStoreReturn<'T> = jsNative
+    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStore<'T> = jsNative
     [<ImportMember "solid-js"; ParamObject(2)>]
-    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStoreReturn<'T> = jsNative
+    static member inline createProjection<'T, 'I when 'T:(member id: 'I)>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStore<'T> = jsNative
     [<ImportMember "solid-js"; ParamObject(2)>]
-    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, key: 'T -> objnull, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStoreReturn<'T> = jsNative
+    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: 'T, key: 'T -> objnull, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStore<'T> = jsNative
     [<ImportMember "solid-js"; ParamObject(2)>]
-    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, key: 'T -> objnull, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStoreReturn<'T> = jsNative
+    static member inline createProjection<'T>(fn: 'T -> U2<'T option, JS.Promise<'T option>>, seed: Store<'T>, key: 'T -> objnull, ?shallow: bool, ?seedLoadingValue: bool, ?name: string): RefreshableStore<'T> = jsNative
 
     [<ImportMember "solid-js">]
     static member inline createStore<'T>(store: 'T): StoreReturn<'T> = jsNative
@@ -811,9 +821,13 @@ type Bindings =
     static member merge<'T>([<ParamArray>] sources: obj[]): 'T = jsNative
     [<ImportMember "solid-js">]
     static member omit<'T>(obj: 'T, [<ParamArray>] props: string[]): 'T = jsNative
-    /// Omits every key for which <c>hidden</c> returns true.
-    [<ImportMember "solid-js">]
-    static member omit<'T>(obj: 'T, hidden: string -> bool): 'T = jsNative
+    /// Omits every key for which <c>hidden</c> returns true. The predicate receives both string and symbol keys.
+    [<Import("omit", "solid-js")>]
+    static member omitKeys<'T>(obj: 'T, hidden: obj -> bool): 'T = jsNative
+    /// Omits every string key for which <c>hidden</c> returns true. Symbol keys are never passed to
+    /// <c>hidden</c> and are never omitted; use <c>omitKeys</c> to filter them.
+    static member inline omit<'T>(obj: 'T, hidden: string -> bool): 'T =
+        Bindings.omitKeys(obj, fun (k: obj) -> jsTypeof k = "string" && hidden (unbox<string> k))
     /// Whether <c>o[key]</c> can never change for the lifetime of <c>o</c> (a data property of a plain object, looking through <c>merge</c>/<c>omit</c>).
     [<ImportMember "solid-js">]
     static member isStatic(o: obj, key: string): bool = jsNative

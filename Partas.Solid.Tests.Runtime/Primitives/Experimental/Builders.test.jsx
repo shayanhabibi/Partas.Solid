@@ -222,8 +222,7 @@ describe("memo { }", () => {
         c.dispose();
     });
 
-    // BUG: memo { let! v = src; return v * 2 } emits createMemo(_ => () => ...) (BaseLambdaBuilder Bind/Return add a thunk Run keeps), caching a closure that never tracks src; should be createMemo(_ => src() * 2).
-    it.fails("let! + return inside memo yields a tracked value, not a closure", () => {
+    it("let! + return inside memo yields a tracked value, not a closure", () => {
         const m = makeMemoBind();
         expect(m.value()).toBe(4);
         expect(m.runs()).toBe(1);
@@ -262,16 +261,14 @@ describe("mount { } (onSettled)", () => {
         expect(m.log).toEqual(["body"]);
     });
 
-    // BUG: mount { } drops statements after an else-less `if`: NullLambdaBuilder.Combine returns an uncalled `() => { first(); second() }` that OnSettledBuilder.Run ignores.
-    it.fails("runs every statement after an else-less if", () => {
+    it("runs every statement after an else-less if", () => {
         const m = makeMountStatements();
         flush();
         expect(m.log).toEqual(["first", "guarded", "last"]);
         m.dispose();
     });
 
-    // BUG: mount { } drops statements after a `match`: NullLambdaBuilder.Combine returns an uncalled closure that OnSettledBuilder.Run ignores.
-    it.fails("runs the statement after a match", () => {
+    it("runs the statement after a match", () => {
         const m = makeMountMatch();
         flush();
         expect(m.log).toEqual(["one", "after-match"]);
@@ -295,15 +292,13 @@ describe("cleanup { } (onCleanup)", () => {
         expect(c.log.length).toBe(4);
     });
 
-    // BUG: cleanup { } drops statements after an else-less `if`: NullLambdaBuilder.Combine returns an uncalled closure that OnCleanupBuilder.Run ignores.
-    it.fails("runs every statement after an else-less if", () => {
+    it("runs every statement after an else-less if", () => {
         const c = makeCleanupStatements();
         c.dispose();
         expect(c.log).toEqual(["release-a", "release-guarded", "release-b"]);
     });
 
-    // BUG: cleanup { } drops statements after a `match`: NullLambdaBuilder.Combine returns an uncalled closure that OnCleanupBuilder.Run ignores.
-    it.fails("runs the statement after a match", () => {
+    it("runs the statement after a match", () => {
         const c = makeCleanupMatch();
         c.dispose();
         expect(c.log).toEqual(["one", "after-match"]);

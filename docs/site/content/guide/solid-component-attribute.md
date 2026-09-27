@@ -46,11 +46,10 @@ let Render () = "Button" |> Framed
 ```
 
 :::note
-Solid works on the idea that everything is a function. Your bindings can be used as components **because they are
-functions**. Give a component a unit parameter if you want to use it on its own, as in `ClickCounter ()`.
+Components are plain functions. Give one a unit parameter to use it on its own, as in `ClickCounter ()`.
 :::
 
-## Components with parameters are plain calls
+## Components with parameters are untracked calls
 
 A `[<SolidComponent>]` binding compiles to a JavaScript function, and a call to it compiles to a function call inside
 the parent's JSX, not to a `<Label />` element:
@@ -63,27 +62,18 @@ export function Label(text) {
 }
 ```
 
-The parent renders `{Label("Plain")}`. Solid 2 tracks that expression, so the component's body runs inside the
-parent's tracking scope.
-
-:::warning
-Because of this, a signal read in the **body** of a let-bound component (outside the returned JSX) re-runs the whole
-body and rebuilds its DOM when the signal changes. A `[<SolidTypeComponent>]` body runs once, as Solid intends. The
-runtime tests record this as a known bug. Until it is fixed, read signals inside the JSX, or use a
-[SolidTypeComponent](solid-type-attribute.md) for components that hold state or read accessors in their body.
-:::
+The parent renders `{untrack(() => Label("Plain"))}`. The arguments are positional, so the call cannot become a tag,
+but `untrack` gives it the same semantics as `<Label />`, which Solid compiles to an untracked `createComponent`. The
+body runs once: a signal read in the body is a snapshot, and a signal read in the returned JSX stays live, just as in
+a [SolidTypeComponent](solid-type-attribute.md).
 
 ## How it works
 
-The attribute makes the plugin walk the body of the binding. It finds the tags, collects each one with its
-properties and children into an element, and emits a JSX element in its place.
+The plugin walks the body of the binding and replaces each tag, with its properties and children, by a JSX element.
+On the way it removes computation expression plumbing around lists and children, so that it does not hide values from
+Solid's reactivity, and optimises `[<Pojo>]` constructors (see [Attribute Flags](attribute-flags.md)).
 
-The plugin does a few other things on the way. It removes computation expression plumbing around lists and children,
-so that it does not hide values from Solid's reactivity. It also optimises `[<Pojo>]` constructors (see
-[Attribute Flags](attribute-flags.md)).
-
-If you want to see what the plugin made of your code, read [JSX output](../about/jsx-output.md), or add `jsx` to a
-fence on this site.
+To see what the plugin made of your code, read [JSX output](../about/jsx-output.md).
 
 ## Tag values need a plugin scope
 
@@ -136,8 +126,6 @@ let makeItems () =
 ```
 :::
 ::::
-
-If the component is a let binding rather than a type component, you can refer to it directly and skip `!@`.
 
 ## Signatures
 

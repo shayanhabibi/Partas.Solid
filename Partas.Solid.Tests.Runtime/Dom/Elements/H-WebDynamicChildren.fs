@@ -1,7 +1,5 @@
 module Partas.Solid.Tests.Runtime.Dom.Elements.WebDynamicChildren
 
-// Kept in its own module: the emitted JSX imports an erased extension that does not exist at
-// runtime, so importing this module fails. Isolated so it cannot break the other Web cases.
 
 open Partas.Solid
 open Partas.Solid.Web

@@ -27,7 +27,7 @@ cleanly, but the icon names are the same in both.
 
 ## Without a binding: vanilla `lucide` on Solid 2
 
-Until the binding is ported, you can use the framework-free [`lucide`](https://lucide.dev/guide/packages/lucide) package
+Until the binding is ported, use the framework-free [`lucide`](https://lucide.dev/guide/packages/lucide) package
 directly. Each icon is a named export holding an icon node, a plain array that describes the SVG. `createElement` turns a
 node into an `<svg>` element, and takes optional attributes such as `width` or `stroke-width`. Bind both with
 `[<Import>]`, and import only the icons you use: the `icons` export holds the whole set and defeats tree shaking.
@@ -60,8 +60,8 @@ module LucideIcons =
 
 `createElement` returns a DOM node that Solid does not know about, so give it a place to live with a ref. A ref
 callback is enough when the icon never changes, as in the buttons below. The large preview changes with the selection,
-so a split effect reads the signals in its compute function and swaps the `<svg>` in its effect function. Pick an icon, a colour and a stroke width below. Colour needs
-no effect at all: Lucide strokes with `currentColor`, so the wrapper's CSS `color` sets it.
+so an effect reads the signals in its compute function and swaps the `<svg>` in its effect function. Colour needs no
+effect at all: Lucide strokes with `currentColor`, so the wrapper's CSS `color` sets it.
 
 ```fsharp solid setup
 // Inline styles for the demo. They only use the site's CSS variables.

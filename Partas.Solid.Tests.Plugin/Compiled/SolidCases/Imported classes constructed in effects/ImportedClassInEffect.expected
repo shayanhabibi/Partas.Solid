@@ -1,0 +1,20 @@
+
+import { onSettled } from "solid-js";
+import { Draggable } from "@neodrag/vanilla";
+
+export function ImportedClassInEffect() {
+    let card = void 0;
+    let drag = void 0;
+    onSettled(() => {
+        drag = (new Draggable(card, {
+            bounds: "parent",
+        }));
+        return () => {
+            drag.destroy();
+        };
+    });
+    return <div ref={card}>
+        Drag me
+    </div>;
+}
+

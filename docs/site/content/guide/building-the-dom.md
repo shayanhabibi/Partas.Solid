@@ -2,8 +2,7 @@
 title: Building the DOM
 ---
 
-You can compose the DOM from `[<SolidComponent>]` functions, `[<SolidTypeComponent>]` types, or both. Mix them as it
-suits you.
+Compose the DOM from `[<SolidComponent>]` functions, `[<SolidTypeComponent>]` types, or both.
 
 :::tip
 If you build components for others to use, prefer `[<SolidTypeComponent>]`.
@@ -16,14 +15,13 @@ If you build components for others to use, prefer `[<SolidTypeComponent>]`.
 ## Large and small components
 
 Solid does not re-render components. A component runs once, and fine-grained reactivity updates only the DOM that
-depends on a changed signal. So there is no performance reason to split a large component into small ones, or to
-merge small ones. Split them where it makes the code easier to read.
+depends on a changed signal. So there is no performance reason to split or merge components: split them where it makes
+the code easier to read.
 
 ## Reactivity
 
-Solid's reactivity is pleasant to work with, but it can surprise you if you come from React. The
-[Solid documentation](https://docs.solidjs.com/) covers it better than this page can, so read it there. The one rule
-that matters most in Partas.Solid:
+Solid's reactivity can surprise you if you come from React; the [Solid documentation](https://docs.solidjs.com/)
+covers it in depth. The rule that matters most in Partas.Solid:
 
 **A component body runs once. A value read in the body is a snapshot. A value read inside the JSX stays live.**
 
@@ -66,23 +64,16 @@ let ReactivityExample () =
     }
 ```
 
-Press the button. The live label follows the signal. The snapshot label keeps the value it had when it was created.
-In the JSX tab, `SnapshotLabel` stores `props.active ? ... : ...` in a `const`, while `LiveLabel` puts the same
-expression in the JSX.
+The live label follows the signal; the snapshot label keeps its first value. In the JSX tab, `SnapshotLabel` stores
+`props.active ? ... : ...` in a `const`, while `LiveLabel` puts the same expression in the JSX.
 
 To keep a derived value live in the body, make it a function (`let text () = ...`) and call it in the JSX, or wrap it
 in `createMemo`.
 
-:::warning
-`[<SolidComponent>]` let-bindings are currently emitted as plain function calls inside the JSX. Solid then tracks
-their body, so a signal read in the body rebuilds that component's DOM instead of taking a snapshot. Use
-`[<SolidTypeComponent>]` when you rely on the snapshot behaviour described above.
-:::
-
 ## Conditional rendering
 
-An `if` in a children block becomes a ternary in the JSX. `Show` is the explicit form. It also takes a `fallback`
-for when the condition is false.
+An `if` in a children block becomes a ternary in the JSX. `Show` is the explicit form, with a `fallback` for when the
+condition is false.
 
 ```fsharp solid render=Conditional jsx
 [<SolidComponent>]
@@ -104,8 +95,7 @@ or an accessor for it. See [solid-js](solid-js.md).
 
 ### Switch and Match
 
-For more than two cases, use `Switch` with a `Match` per case. The first `Match` whose `when'` is true renders.
-`Switch` shows its `fallback` when none do.
+The first `Match` whose `when'` is true renders; `Switch` shows its `fallback` when none do.
 
 ```fsharp solid render=TrafficLight
 [<SolidComponent>]
@@ -162,12 +152,6 @@ let Shopping () =
     }
 ```
 
-:::warning
-Do not put a statement before the element in a `For` child function. A side effect such as a function call, followed
-by the element, currently makes the plugin drop the element. A `let` binding before the element is fine. Move side
-effects into a helper component or into a function called from the expression.
-:::
-
 `Repeat` renders a row per number instead of per item: `Repeat(count = 3) { yield fun i -> ... }`.
 
 ## Async and errors
@@ -209,10 +193,7 @@ Errored(
 }
 ```
 
-:::warning
-`Errored` also has `fallbackEle` and `fallbackFn` setters. They currently compile to props of those literal names,
-which Solid ignores. Set `fallback` with `!^` as above.
-:::
+`Errored` also has `fallbackEle` and `fallbackFn` setters, which set `fallback` without the `!^`:
+`Errored(fallbackFn = ErrorBoundary.Fallback(fun err reset -> ...))`.
 
-The Solid documentation on async data and error handling is recommended reading. The [solid-js](solid-js.md) page
-lists the bindings.
+The [solid-js](solid-js.md) page lists the bindings.

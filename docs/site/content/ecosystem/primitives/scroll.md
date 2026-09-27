@@ -39,8 +39,8 @@ The target defaults to `window`.
 let useWindowScrollPosition(): ScrollPosition
 ```
 
-Returns a reactive object with the current window scroll position. Its signals and event listeners are shared between
-everything that uses it, so it is cheaper to use in many places at once.
+A reactive window scroll position. Its signals and listeners are shared by every caller, so it is cheap to use in many
+places.
 
 ## getScrollPosition
 
@@ -48,4 +48,4 @@ everything that uses it, so it is cheaper to use in many places at once.
 let getScrollPosition(): ScrollPosition
 ```
 
-Gets the current `ScrollPosition`.
+Reads the current position once, without tracking.

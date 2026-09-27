@@ -69,8 +69,7 @@ describe("Dom/Styles F# consumers styling components", () => {
         expect(root.style.color).toBe("maroon");
     });
 
-    // BUG: component prop `[ a; if on () then b ]` is emitted as JS array `[a, on() ? b : null]` instead of an F# list, so createObj throws on the null entry.
-    it.fails("a StyleSpec list prop with a conditional element applies only the yielded declarations", () => {
+    it("a StyleSpec list prop with a conditional element applies only the yielded declarations", () => {
         const {root} = mount(ListPropConsumer);
         const lp = $(root, "#lp");
         expect(lp.style.display).toBe("grid");
@@ -96,8 +95,7 @@ describe("Dom/Styles F# consumers styling components", () => {
         expect(root.textContent).toBe("0 overrides");
     });
 
-    // BUG: component prop `[ a; if warn () then b ]` is emitted as JS array `[a, warn() ? b : null]` instead of an F# list, so `@`/List.length break.
-    it.fails("a conditional overrides list is an F# list the component can append and measure", () => {
+    it("a conditional overrides list is an F# list the component can append and measure", () => {
         const {root} = mount(PanelConditional);
         const p = $(root, "#panel");
         expect(p.style.color).toBe("orange");

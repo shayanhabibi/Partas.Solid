@@ -31,8 +31,7 @@ describe("Dom/Portals dynamic() factory", () => {
         expect(root.innerHTML).toBe('<b class="shout">yo!</b>');
     });
 
-    // BUG: SolidWebBindings `dynamic` returns `unit -> 'T`, so `Tag()` emits `{Tag()}` (component called with no props, throws) instead of a TagValue rendered as `<Tag />`.
-    it.fails("the dynamic() result used as its binding type suggests renders the element", () => {
+    it("the dynamic() result used as its binding type suggests renders the element", () => {
         const {root} = mount(DynamicCall);
         expect(root.innerHTML).toBe("<section></section>");
     });

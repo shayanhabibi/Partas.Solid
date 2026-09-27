@@ -8,3 +8,13 @@ riderModule.iml
 *.fs.js
 .idea
 /ScratchTests/
+
+# Plugin workbench (workbench.fsx): Fable.SageFs clone and generated files
+/.workbench/
+# SageFs's per-project session cache (Workbench/.SageFs/)
+.SageFs/
+
+# Local agent tooling config
+.claude/
+.codex/
+.serena/

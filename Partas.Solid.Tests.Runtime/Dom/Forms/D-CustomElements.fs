@@ -47,8 +47,8 @@ let GlobalsForComponents () =
     }
 
 /// template and slot are not bound as tags; user-declared erased tag types stand in for them.
-/// (template content is left empty: the Solid dev template validator cannot round-trip template
-/// children through innerHTML and rejects them at vite-transform time; that is upstream, not Partas.)
+/// The template content is set through `innerHTML`: Solid's dev template validator re-serialises markup
+/// with an html5ever DOM that drops template contents, so it rejects any JSX child of `<template>`.
 [<Erase>]
 type template() =
     interface RegularNode
@@ -63,7 +63,7 @@ type slot() =
 [<SolidComponent>]
 let TemplateAndSlot () =
     div (class' = "ts") {
-        template (id = "tpl")
+        template (id = "tpl", innerHTML = "<p class=\"row\">template row</p>")
         slot (id = "sl", name = "footer") { "fallback" }
     }
 

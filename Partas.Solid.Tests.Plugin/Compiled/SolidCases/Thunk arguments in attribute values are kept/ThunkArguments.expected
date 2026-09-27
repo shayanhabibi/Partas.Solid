@@ -1,0 +1,16 @@
+
+import { latest, isPending, Show } from "solid-js";
+
+export function ThunkArguments(value) {
+    return <div class={isPending(value) ? "pending" : "idle"}>
+        <Show when={isPending(value)}>
+            <span>
+                refreshing
+            </span>
+        </Show>
+        <span title={latest(value)}>
+            {value()}
+        </span>
+    </div>;
+}
+

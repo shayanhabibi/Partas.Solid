@@ -23,7 +23,7 @@ let createIdleTimer(
     ): IdleTimer
 ```
 
-Gives you accessors and methods to watch whether the user is idle, and to react when that changes.
+Tracks whether the user is idle.
 
 ## IdleTimer
 

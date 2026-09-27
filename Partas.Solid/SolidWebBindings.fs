@@ -270,11 +270,12 @@ type Bindings =
     [<ImportMember(Spec.path)>]
     static member useHead(tag: unit -> HeadTag[]): unit = jsNative
     [<ImportMember(Spec.path)>]
-    static member dynamic<'T when 'T :> HtmlElement>(source: unit -> 'T): unit -> 'T = jsNative
+    static member dynamic<'T when 'T :> HtmlElement>(source: unit -> 'T): TagValue = jsNative
     [<ImportMember(Spec.path)>]
-    static member dynamic<'T when 'T :> HtmlElement>(source: unit -> JS.Promise<'T>): unit -> 'T = jsNative
+    static member dynamic<'T when 'T :> HtmlElement>(source: unit -> JS.Promise<'T>): TagValue = jsNative
+    /// Returns a component: render it with <c>Tag % {| ... |}</c> or <c>Tag.render ()</c>.
     /// <c>deferStream</c> (SSR only) holds the first flush until the source settles; <c>static</c> calls the source once, untracked, and must resolve synchronously.
     [<ImportMember(Spec.path); ParamObject(1)>]
-    static member dynamic<'T when 'T :> HtmlElement>(source: unit -> 'T, ?deferStream: bool, ?``static``: bool): unit -> 'T = jsNative
+    static member dynamic<'T when 'T :> HtmlElement>(source: unit -> 'T, ?deferStream: bool, ?``static``: bool): TagValue = jsNative
     [<ImportMember(Spec.path); ParamObject(1)>]
-    static member dynamic<'T when 'T :> HtmlElement>(source: unit -> JS.Promise<'T>, ?deferStream: bool): unit -> 'T = jsNative
+    static member dynamic<'T when 'T :> HtmlElement>(source: unit -> JS.Promise<'T>, ?deferStream: bool): TagValue = jsNative

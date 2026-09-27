@@ -122,6 +122,11 @@ let Composed () =
 let BraceText () =
     div (class' = "brace") { "a {1 + 1} b" }
 
+/// Text that looks like emit macro slots (`$0`, `{{ }}`).
+[<SolidComponent>]
+let DollarText () =
+    div (class' = "dollar") { "costs $0 {{x}}" }
+
 /// Whitespace between inline text and an element on the next line.
 [<SolidComponent>]
 let InlineSpacing () =

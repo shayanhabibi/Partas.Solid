@@ -45,14 +45,9 @@ dirty () // "Triggered!"
 let createTriggerCache<'T>(): TriggerCacheSignal<'T>
 ```
 
-Creates a cache of triggers, so you can mark only specific keys as dirty.
-
-The cache is a `Map` or a `WeakMap`, depending on the upstream `mapConstructor` argument. It defaults to `Map`. With
-`WeakMap` the cache is weak, and keys are garbage collected once nothing references them. The binding above takes no
-arguments, so you always get a `Map`.
-
-Triggers are added to the cache only when a computation tracks them, and are removed when nothing tracks them any
-more.
+A cache of triggers keyed by `'T`, so you can mark specific keys dirty. A key's trigger exists only while a
+computation tracks it. The binding does not expose upstream's `mapConstructor` argument, so the cache is always a
+`Map`, never a `WeakMap`.
 
 ```fsharp
 [<Extension>]
@@ -77,5 +72,5 @@ map.dirty 1 // "Triggered!"
 :::note
 Partas.Solid 3.0 removed the single-callback `createEffect`. The examples use the two-phase form,
 `createEffect(compute, effectFn)`: the compute function tracks, and the effect function runs the side effect with its
-result. See the [migration guide](../../guide/migrating-to-solid-2.md).
+result. See the [migration guide](../../guide/migrating-to-solid-2.md#effects-have-two-phases).
 :::

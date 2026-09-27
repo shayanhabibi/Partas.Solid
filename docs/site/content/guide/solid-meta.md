@@ -10,16 +10,15 @@ open Partas.Solid
 open Partas.Solid.Meta
 ```
 
-Add the npm package yourself:
+Partas.Solid does not install the npm package:
 
 ```bash
 npm install @solidjs/meta
 ```
 
 :::warning
-These bindings were written for `@solidjs/meta` on Solid 1.x and have not changed for Partas.Solid 3.0. The package
-is a separate repository that is not vendored here, and no test covers it. Nothing on this page is verified against
-Solid 2.
+These bindings were written for `@solidjs/meta` on Solid 1.x and have not changed for Partas.Solid 3.0. No test covers
+them, and they are not verified against Solid 2. For a tested alternative, use `useHead` from `@solidjs/web`, below.
 :::
 
 ## Components
@@ -53,9 +52,8 @@ compile. Set them with `.attr`, as above, until the binding is fixed.
 
 ## useHead from @solidjs/web
 
-Solid 2's `@solidjs/web` exports its own `useHead`, bound in `Partas.Solid.Web`. It needs no extra package and no
-provider. The runtime tests cover it: title and meta tags reach `document.head`, a reactive title updates, and the
-tags are removed when the component is disposed.
+Bound in `Partas.Solid.Web`. It needs no extra package and no provider. The runtime tests cover it: tags reach
+`document.head`, a reactive title updates, and the tags are removed when the component is disposed.
 
 ```fsharp
 open Partas.Solid.Web
@@ -70,7 +68,7 @@ useHead(tag: unit -> HeadTag[]): unit
 is `Title`, `Meta`, `Link`, `Style`, `Script` or `Base`. Put the element's children, such as a title's text, in
 `props` under `"children"`.
 
-```fsharp
+```fsharp solid show=code jsx
 open Partas.Solid.Web
 
 [<SolidComponent>]

@@ -38,6 +38,8 @@ Prebuilt expressions that are verbose or used in several places.
   suffixes trimmed.
 - `renderElement` turns an `ElementBuilder` into a JSX element. It also does one last rewrite: a tag named
   `Fragment` loses its name, so it is written as `<>...</>`.
+- `untracked` wraps an expression in `untrack(() => expr)`, with `untrack` imported from `solid-js`. It is used for
+  direct calls to `[<SolidComponent>]` let bindings.
 
 `omit` and `merge` are imported from `solid-js`. They replaced `splitProps` and `mergeProps` in Solid 2. Here is what
 the two produce together, from the `CombinedSpread` snapshot test:

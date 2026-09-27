@@ -40,8 +40,8 @@ let DynamicToTagValue () =
     let Comp: TagValue = unbox (dynamic (fun () -> unbox<HtmlElement> ShoutTag))
     div (class' = "dyn-comp2") { Comp % {| word = "yo" |} }
 
-/// The `dynamic()` result used the way its binding type (`unit -> 'T`) suggests: called as a function.
+/// The `dynamic()` result used the way its binding type (`TagValue`) suggests: rendered with no props.
 [<SolidComponent>]
 let DynamicCall () =
     let Tag = dynamic (fun () -> unbox<HtmlElement> "section")
-    div (class' = "dyn-call") { Tag() }
+    div (class' = "dyn-call") { Tag.render () }

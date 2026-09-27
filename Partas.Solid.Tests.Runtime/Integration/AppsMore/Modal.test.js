@@ -129,8 +129,7 @@ describe("AppsMore: modal dialog (Show + Portal)", () => {
         expect(document.body.querySelectorAll('[role="dialog"]')).toHaveLength(1);
     });
 
-    // BUG: ariaModal / ariaLabelledBy are emitted verbatim instead of aria-modal / aria-labelledby.
-    it.fails("marks the dialog aria-modal and labels it by its heading", () => {
+    it("marks the dialog aria-modal and labels it by its heading", () => {
         const {setOpen} = setupModal(false);
         act(() => setOpen(true));
         expect(dialog().getAttribute("aria-modal")).toBe("true");
@@ -190,8 +189,7 @@ describe("AppsMore: confirm-delete app using the modal", () => {
         }
     });
 
-    // BUG: `onClose = close` (local unit -> unit fn) is dropped from the emitted <Modal> props; expected onClose={() => {...}}.
-    it.fails("the dialog's Close button cancels without deleting and counts the close", () => {
+    it("the dialog's Close button cancels without deleting and counts the close", () => {
         const {c, onDeleted} = setupApp();
         click(deleteBtn(c, "gamma"));
         click($(dialog(), ".modal-close"));
@@ -201,8 +199,7 @@ describe("AppsMore: confirm-delete app using the modal", () => {
         expect(text($(c, ".closes"))).toBe("closed 1");
     });
 
-    // BUG: `onClose = close` (local unit -> unit fn) is dropped from the emitted <Modal> props; expected onClose={() => {...}}.
-    it.fails("Escape cancels the confirmation", () => {
+    it("Escape cancels the confirmation", () => {
         const {c} = setupApp();
         click(deleteBtn(c, "alpha"));
         escape(document.body);

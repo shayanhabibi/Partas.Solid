@@ -95,16 +95,13 @@ describe("createSignal: updater functions via Setter.Invoke / InvokeAndGet", () 
         c.dispose();
     });
 
-    // BUG: Setter.InvokeAndGet emits `setter(handler); return undefined` - Setter<'T> is typed 'T -> unit, so
-    // `setter handler |> unbox<'T>` returns unit and Fable drops the value Solid's setter returns.
-    it.fails("InvokeAndGet(handler) returns the new value the setter returned", () => {
+    it("InvokeAndGet(handler) returns the new value the setter returned", () => {
         const c = makeCounter(1);
         expect(c.addAndGet(5)).toBe(6);
         c.dispose();
     });
 
-    // BUG: Setter.InvokeAndGet(value) emits `setter(value); return undefined` for the same reason.
-    it.fails("InvokeAndGet(value) returns the written value", () => {
+    it("InvokeAndGet(value) returns the written value", () => {
         const c = makeCounter(1);
         expect(c.setAndGet(7)).toBe(7);
         c.dispose();

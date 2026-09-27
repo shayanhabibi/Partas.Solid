@@ -8,7 +8,7 @@ let cn (listofclasses: string array) =
     listofclasses
     |> Array.fold ((+) >> id) ""
 
-[<SolidComponent(ComponentFlag.DebugMode)>]
+[<SolidComponent>]
 let Compponent (show: bool) =
     div (
         class' =

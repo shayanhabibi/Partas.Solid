@@ -10,18 +10,17 @@ open Partas.Solid
 open Partas.Solid.Router
 ```
 
-Add the npm package yourself. Partas.Solid does not install it:
+Partas.Solid does not install the npm package:
 
 ```bash
 npm install @solidjs/router
 ```
 
 :::warning
-These bindings were written for `@solidjs/router` on Solid 1.x and carried over to Partas.Solid 3.0 unchanged. They
-compile, and the plugin emits the right imports for `Router` and `Route`, but nothing in this repository checks them
-against a Solid 2 build of the router. The router is a separate repository that is not vendored here, and the runtime
-test suite installs only `solid-js` and `@solidjs/web`. Treat every signature on this page as unverified on Solid 2,
-and check the router's own docs for the release you install.
+These bindings were written for `@solidjs/router` on Solid 1.x and carried over to Partas.Solid 3.0 unchanged. Only
+the plugin's output for `Router` and `Route` is tested; nothing checks the bindings against a Solid 2 build of the
+router. Treat every signature on this page as unverified on Solid 2, and check the router's own docs for the release
+you install.
 :::
 
 ## An example
@@ -55,11 +54,10 @@ let App () =
     }
 ```
 
-`Router` and `Route` are builders. A `Route` can hold nested `Route`s. `component'` and `root` take a `TagValue`:
-use `!@Component` to pass a component rather than call it. The router passes the matched route to `root` as
-`children`, which is why `Layout` is a type component that inherits `div` and so has a `children` property. Like
-every `[<SolidTypeComponent>]`, `Layout` must be declared in a namespace or module whose name starts with
-`Partas.Solid` (see [SolidTypeComponent](solid-type-attribute.md)).
+A `Route` can hold nested `Route`s. `component'` and `root` take a `TagValue`: use `!@Component` to pass a component
+rather than call it. The router passes the matched route to `root` as `children`, which is why `Layout` is a type
+component that inherits `div`. Like every `[<SolidTypeComponent>]`, `Layout` must be declared in a namespace or module
+whose name starts with `Partas.Solid` (see [SolidTypeComponent](solid-type-attribute.md)).
 
 What the plugin emits for `Router () { Route () }`:
 
@@ -372,8 +370,7 @@ fixed.
 
 :::note
 Solid 2 removed `createResource`. In core Solid, async data now comes from `createMemo` or `createStore` given an async
-function, with `Loading` and `isPending` to show progress. See [Migrating to Solid 2](migrating-to-solid-2.md). Whether
-a Solid 2 router still ships `createAsync`, and in what shape, is not checked here.
+function, with `Loading` and `isPending` to show progress. See [Migrating to Solid 2](migrating-to-solid-2.md#createresource).
 :::
 
 ## Actions
@@ -430,10 +427,9 @@ type Submission<'Input, 'Result> =
     abstract retry: (unit -> unit)
 ```
 
-An array of submissions has a `.pending` extension member. It has no implementation (it compiles to `undefined`), so
-check `Array.exists _.pending` yourself.
+Do not use the `.pending` extension member on an array of submissions: it has no implementation and always returns
+`undefined`. Use `Array.exists _.pending`.
 
 ## Not bound
 
-The bindings file ends with a note that `preload`, `json`, `redirect` and `reload` are not bound yet. Import them
-with `Fable.Core.JsInterop.import` if you need them.
+`preload`, `json`, `redirect` and `reload` are not bound. Import them with `Fable.Core.JsInterop.import`.

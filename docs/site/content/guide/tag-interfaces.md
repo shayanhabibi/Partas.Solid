@@ -2,11 +2,9 @@
 title: Tag Interfaces
 ---
 
-Every tag in Partas.Solid is a type, and what a tag can do comes from the interfaces it implements. A type that
-implements `HtmlContainer` takes children. A type that implements `HtmlTag` takes the global HTML attributes and the
-[extension methods](extension-methods.md). You use the same interfaces when you write your own components.
-
-In most cases you do not implement the interfaces yourself. You inherit a tag that already has them:
+Every tag in Partas.Solid is a type, and what a tag can do comes from the interfaces it implements: `HtmlContainer`
+takes children, `HtmlTag` takes the global HTML attributes and the [extension methods](extension-methods.md). Your own
+components use the same interfaces, usually by inheriting a tag that already has them:
 
 ```fsharp
 [<Erase>]
@@ -36,8 +34,8 @@ type MyButton() =
 
 ## Child lambda providers
 
-Some components take a function as their child. `For` passes you each item and its index, and your function returns
-what to render for it. The child lambda provider interfaces type that function:
+Some components take a function as their child: `For` passes it each item and its index. The child lambda provider
+interfaces type that function:
 
 | Interface | The child is |
 | --- | --- |

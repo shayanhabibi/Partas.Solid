@@ -133,8 +133,7 @@ describe("Apps: sortable, filterable data table", () => {
         expect(text($(c, ".summary"))).toBe("0 of 0 rows");
     });
 
-    // BUG: ariaSort is emitted verbatim as `ariaSort=` instead of `aria-sort=`.
-    it.fails("exposes the sort state through aria-sort", () => {
+    it("exposes the sort state through aria-sort", () => {
         const {c} = setup();
         const th = k => $(c, `th[data-key="${k}"]`);
         expect(th("name").getAttribute("aria-sort")).toBe("none");
