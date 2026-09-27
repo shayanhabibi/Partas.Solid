@@ -6,9 +6,7 @@ title: Input Mask
 These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to Solid 2 yet.
 :::
 
-Bindings for `@solid-primitives/input-mask`. The package offers several kinds of input mask.
-
-This page lists the binding's API and types. For usage, see the `@solid-primitives` documentation.
+Bindings for `@solid-primitives/input-mask`.
 
 ## InputMask
 

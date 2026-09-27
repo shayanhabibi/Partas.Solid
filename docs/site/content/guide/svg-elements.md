@@ -45,8 +45,8 @@ let Target () =
 
 The attributes are typed properties, like the HTML ones. Length and number attributes, such as `cx`, `r`, `width` and
 `stroke-width`, take a `U2<float, string>`, so you can pass `12.0` or `"12"`. This `U2` is the one in
-`Partas.Solid.Experimental.U`, which converts implicitly from either case. The examples open that module, as the
-runtime tests do.
+`Partas.Solid.Experimental.U`, which converts implicitly from either case (see
+[Erased union implicit casting](experimental.md#erased-union-implicit-casting)).
 
 SVG attributes whose names contain a hyphen are written in double backticks: ``` ``stroke-width`` = 2.0 ```. Many of
 them also have a camelCase alias, such as `strokeWidth` and `strokeLinecap`, that sets the same attribute.

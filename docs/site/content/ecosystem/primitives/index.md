@@ -6,13 +6,11 @@ title: Solid Primitives
 These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to Solid 2 yet.
 :::
 
-These are bindings for the community packages published under `@solid-primitives`.
+Bindings for the community packages published under `@solid-primitives`. Each page lists the bound signatures; for
+usage, read the upstream documentation for the package, which the bindings follow closely.
 
-Each page lists the signatures of the bound functions and types. For usage, read the upstream
-`@solid-primitives` documentation for the package: the bindings follow it closely.
-
-`@solid-primitives` itself depends on Solid 1.x, so none of these packages work with Partas.Solid 3.0 on Solid 2
-until they are ported upstream and here. There are no live examples on these pages for that reason.
+`@solid-primitives` depends on Solid 1.x, so none of these packages work with Partas.Solid 3.0 on Solid 2 until they
+are ported upstream and here. That is why these pages have no live examples.
 
 ## Packages
 
@@ -46,22 +44,18 @@ until they are ported upstream and here. There are no live examples on these pag
 
 ## Package organisation
 
-Each primitive is published as its own NuGet package, such as `Partas.Solid.Primitives.Mouse`. Whichever packages you
-install, you reach all of them through the namespace `Partas.Solid.Primitives`.
+Each primitive is its own NuGet package, such as `Partas.Solid.Primitives.Mouse`, and all of them share the namespace
+`Partas.Solid.Primitives` and a dependency on `Partas.Solid.Primitives.Common`. (Before `0.2.0`, each primitive had its
+own namespace.)
 
 :::note
 The package `Partas.Solid.Primitives` installs the latest version of every primitive. Do not depend on it when you
 publish a library.
 :::
 
-All packages share a dependency on `Partas.Solid.Primitives.Common`.
-
-Before `0.2.0`, each primitive had its own namespace, and they all depended on a shared package called
-`Partas.Solid.Primitives`.
-
 ## Femto
 
-You can install every primitive with Femto:
+Each primitive package can be installed with Femto, which also adds its npm dependency:
 
 ```bash
 femto install Partas.Solid.Primitives.Mouse

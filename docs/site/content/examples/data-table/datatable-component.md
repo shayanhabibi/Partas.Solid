@@ -38,8 +38,7 @@ matters.
     val mutable table: Table<'T>
 ```
 
-The rest needs some reading about `@tanstack/table` to follow. If you plan to use the library, you will need that
-reading anyway.
+The body follows the `@tanstack/table` API:
 
 ```fsharp
 [<Erase>]

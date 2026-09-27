@@ -18,8 +18,8 @@ Nobody has used this binding yet, and it needs review. `CreateBroadcastChannelRe
 - `createBroadcastChannel` does the same, but returns a `message` signal instead of `onMessage`. The signal updates
   when another context calls `postMessage`.
 
-If a channel with the same name already exists, you get it back instead of a new one. The channel tries to close
-when its owner is cleaned up. If several instances are connected, it stays open until the last owner goes.
+Channels are shared by name: asking for an existing name returns that channel, and it closes when its last owner is
+cleaned up.
 
 ```fsharp
 [<AllowNullLiteral; Interface>]

@@ -7,9 +7,7 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 :::
 
 `Partas.Solid.ApexCharts` binds [solid-apexcharts](https://github.com/wobsoriano/solid-apexcharts). See its docs for
-usage and options.
-
-The chart options are built with Pojo constructors. [Writing bindings](bindings.md) shows what those compile to.
+usage and options. The chart options are built with [Pojo constructors](bindings.md#pojo-constructors).
 
 ## Example
 
@@ -49,18 +47,13 @@ let ApexChartExample () =
 
 This renders a bar chart and a line chart of the same series, side by side, in a monochrome theme.
 
-:::note
-ApexCharts itself does not depend on Solid; only the `solid-apexcharts` wrapper does. A Solid 2 port could bind
-`apexcharts` directly, as the next section does.
-:::
-
 ## Binding apexcharts directly on Solid 2
 
-`apexcharts` is plain JavaScript, so you can use it on Solid 2 without a wrapper. Declare the class with
-`[<Import("default", "apexcharts")>]` and give it only the members you call. `MutationObserver` is a browser global,
-so it uses `[<Global>]` instead. Create the chart through a plain function such as `newChart`: inside a component,
-the plugin treats a call to an imported constructor as a JSX tag. Options are anonymous records, which Fable compiles
-to plain objects.
+ApexCharts itself does not depend on Solid, only the `solid-apexcharts` wrapper does, so you can use it on Solid 2
+today. Declare the class with `[<Import("default", "apexcharts")>]` and give it only the members you call;
+`MutationObserver` is a browser global, so it uses `[<Global>]`. Construct the chart through a plain function such as
+`newChart`, because inside a component the plugin treats a call to an imported constructor as a JSX tag. Options are
+anonymous records, which Fable compiles to plain objects.
 
 ```fsharp solid
 [<Import("default", "apexcharts")>]
@@ -87,10 +80,9 @@ let siteScheme () =
 ```
 
 Effects run after the first render, so the host `div` exists when the first effect builds the chart. That effect
-tracks the theme: the cleanup it returns destroys the chart, and the effect builds a new one in the other scheme.
-The cleanup also runs when the component is disposed. A second, deferred effect sends new data to `updateSeries`,
-which animates the bars. The `--apx-*` variables on the host are ApexCharts design tokens that point at the site's
-colours, so the bars use the accent colour in both themes.
+tracks the theme; its cleanup destroys the chart, on a theme change and when the component is disposed. A second,
+deferred effect sends new data to `updateSeries`, which animates the bars. The `--apx-*` variables on the host are
+ApexCharts design tokens pointed at the site's colours.
 
 ```fsharp solid render=DownloadsChart jsx
 [<SolidComponent>]

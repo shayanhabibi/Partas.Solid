@@ -13,22 +13,18 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 
 See [the docs](https://github.com/solidjs-community/solid-motionone) for usage.
 
-`solid-motionone` uses different prop names from `motion/react`, so keep that in mind when you port an example. For
-instance, keyframes in `transition` use `offset`, not `times`. See the keyframes example below.
+`solid-motionone` uses different prop names from `motion/react`: keyframes in `transition` use `offset`, not `times`
+(see [Keyframes](#keyframes)).
 
 ### Differences
 
 Each Motion-specific prop has two forms:
 
-- The plain name, such as `initial`, takes a Feliz-style list of props, with type checking and completion for every CSS
-  style prop.
-- The `JSX`-suffixed name, such as `initialJSX`, takes a string and injects the JSX language, so you write the value as
-  JSX.
-
-For the CSS props such as `animate` and `initial`, use the `MotionStyle` qualifier to get at the props, Feliz style.
-
-For `transition`, use the `MotionTransition` qualifier. It enforces the `AnimationOptions` Pojo when you set a CSS
-property inside the transition.
+- The plain name, such as `initial`, takes a Feliz-style list of props. Build it with the `MotionStyle` qualifier for
+  CSS props such as `animate` and `initial`, and `MotionTransition` for `transition`, which enforces the
+  `AnimationOptions` Pojo when you set a CSS property inside it.
+- The `JSX`-suffixed name, such as `initialJSX`, takes the value as a JSX string (see
+  [Language injection](#language-injection)).
 
 ## motion
 
@@ -112,10 +108,9 @@ See [Migrating to Solid 2](../guide/migrating-to-solid-2.md).
 
 ## Live example on Solid 2
 
-The bindings above are not ported yet, but you can still animate from Partas.Solid 3.0 by importing a framework-free
-library. `motion-dom` is the DOM engine underneath Motion. Its `animateElement` takes an element, a keyframes object and
-a transition object. `[<Import>]` binds it as a plain function. The parameters are tupled so Fable emits a normal
-call, and anonymous records compile to the plain objects Motion expects.
+Until the bindings are ported, import the framework-free `motion-dom`, the DOM engine underneath Motion. Its
+`animateElement` takes an element, a keyframes object and a transition object. The tupled parameters make Fable emit a
+normal call, and anonymous records compile to the plain objects Motion expects.
 
 ```fsharp solid jsx render=WordRotateDemo
 type PlaybackControls =
@@ -157,16 +152,13 @@ let WordRotateDemo () =
     }
 ```
 
-The interval starts in `onSettled` and its cleanup is returned from the same lambda. The effect tracks `index` and
-replays the enter animation on the `span` each time the word changes. `animateElement` returns one set of playback
-controls per animated value, and the effect returns a cleanup that stops them. Return a real cleanup here. Solid 2 calls
-whatever the effect function returns, and `animateElement (...) |> ignore` still compiles to an arrow that returns the
-controls array, which then fails as "not a function". `y` is one of Motion's transform shorthands, so it
-animates `translateY` without touching the layout.
+The effect tracks `index` and replays the enter animation each time the word changes, returning a cleanup that stops
+the playback controls `animateElement` returns. Return a real cleanup: Solid 2 calls whatever the effect function
+returns, and `animateElement (...) |> ignore` still compiles to an arrow that returns the controls array, which then
+fails as "not a function".
 
 The keyframes use `ResizeArray` rather than `[| ... |]`. Fable compiles an F# `float[]` or `int[]` to a typed array such
-as `Float64Array`, and Motion only treats a real JS array as a list of keyframes or a cubic-bezier `ease`. A
-`ResizeArray` compiles to a plain array.
+as `Float64Array`, and Motion only treats a real JS array as a list of keyframes or a cubic-bezier `ease`.
 
 ## Keyframes
 
@@ -195,8 +187,7 @@ A green square scales up, turns, rounds into a circle, and returns, on repeat.
 
 ## Computation expression helpers
 
-In Partas.Solid 2.x, `createEffect` and the other functions that take a void function could also be written with the
-experimental computation expressions:
+In Partas.Solid 2.x, `createEffect` could also be written with the experimental computation expressions:
 
 ::::tabs
 :::tab Normal
@@ -242,7 +233,6 @@ Presence(exitBeforeEnter = true) {
 ```
 
 :::note
-The injection only worked with a project reference, not with the NuGet package. The issue was reported to JetBrains
-and was due to be fixed in a 2025 Rider release. You can tell it works when the IDE suggests values for string-enum HTML
-attributes such as `dir`.
+The injection may only work with a project reference, not with the NuGet package, on older Rider releases. It works
+when the IDE suggests values for string-enum HTML attributes such as `dir`.
 :::

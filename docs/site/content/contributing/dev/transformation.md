@@ -45,12 +45,15 @@ and drop expressions only when there is no other choice. It matches, in order:
 3. special attribute transformations, such as pojo constructors
 4. `TagConstructor`, which is collected with `collectTagInfo` and rendered with `Baked.renderElement`
 5. `Sequential` expressions, transformed one by one
-6. `PropsGetterOrSetter`, which records a props read or default
-7. calls to imported getters, rewritten to field reads
-8. `IfThenElse` and `DecisionTree`, transformed branch by branch
-9. an `AttributeExpression` at the top level. This should not happen, so it is logged as a warning and reduced to its
-   value.
-10. everything else that can contain expressions: lambdas, delegates, `let`s, calls, applications, values (arrays,
+6. `UncurriedPropsApply`: a curried call of a function prop, such as `props.f a b`, rewritten to one uncurried call
+7. `PropsGetterOrSetter`, which records a props read or default
+8. a call to a `[<SolidComponent>]` let binding that returns an element, wrapped in `untrack(() => ...)` as
+   `createComponent` does for `<Comp/>`
+9. calls to imported getters, rewritten to field reads
+10. `IfThenElse` and `DecisionTree`, transformed branch by branch
+11. an `AttributeExpression` at the top level. This should not happen, so it is logged as a warning and reduced to its
+    value.
+12. everything else that can contain expressions: lambdas, delegates, `let`s, calls, applications, values (arrays,
     lists, records, tuples, unions, string templates), operations, `Get`s and object expressions. Each is rebuilt
     with its parts transformed.
 

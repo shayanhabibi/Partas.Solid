@@ -8,11 +8,8 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 
 Bindings for `@solid-primitives/event-listener`.
 
-Every method that takes options has two overloads:
-
-- One flattens the option properties into the method signature, and uses `ParamObject` to turn them back into an
-  object in JavaScript.
-- One takes an object of the options type.
+Every method that takes options has two overloads: one takes an options object, the other flattens the options into
+optional parameters (`ParamObject` rebuilds the object in JavaScript).
 
 ## makeEventListener
 

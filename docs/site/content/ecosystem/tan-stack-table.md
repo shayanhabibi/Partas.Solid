@@ -11,8 +11,6 @@ for usage, and select the `Solid` framework when you read them.
 
 ## Differences
 
-This is a large library, so there are a few more things to keep in mind.
-
 ### 1. Build all options with the provided Pojo constructors
 
 ```fsharp
@@ -59,8 +57,7 @@ Use the `.init()` helpers to create state signals:
 let rowSelection = RowSelectionState.init() |> createSignal
 ```
 
-Otherwise usage follows the upstream guides and examples. Some typings still need work, but most of the problems with
-binding this library have been ironed out.
+Otherwise usage follows the upstream guides and examples. Some typings still need work.
 
 :::note
 TanStack Table's core (`@tanstack/table-core`) does not depend on Solid; only the Solid adapter does.

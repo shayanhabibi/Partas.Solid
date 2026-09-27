@@ -24,8 +24,7 @@ let makeTimer(
     ): DisposeCallback
 ```
 
-Makes a timer that is cleaned up automatically. It takes a callback, the timespan, and either `setInterval` or
-`setTimeout` as the base.
+A timer that is cleaned up with its owner. `policy` is `setInterval` or `setTimeout`.
 
 ## createTimer
 
@@ -59,7 +58,7 @@ let createPolled(
     ): Accessor<'T>
 ```
 
-Calls a function periodically, and returns an accessor of its latest return value.
+Calls `callback` periodically and returns an accessor of its latest result.
 
 ## createIntervalCounter
 

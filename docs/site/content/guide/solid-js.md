@@ -2,19 +2,18 @@
 title: Solid-JS
 ---
 
-This page covers the `solid-js` bindings in Partas.Solid 3.0, which target Solid 2.0 (`2.0.0-rc.9`). It
-lists the types and functions, shows how each one reads in F#, and runs small examples where they
-compile.
+This page covers the `solid-js` bindings in Partas.Solid 3.0, which target Solid 2.0 (`2.0.0-rc.9`).
+The examples run live on the page.
 
 Solid 2.0 removed or renamed a large part of the 1.x API. If you are upgrading, read
-[Migrating to Solid 2](../guide/migrating-to-solid-2.md) first. The table at the
-[end of this page](#removed-apis) maps each removed API to its replacement.
+[Migrating to Solid 2](../guide/migrating-to-solid-2.md) first. [Removed APIs](#removed-apis) maps
+each removed API to its replacement.
 
 ## How the bindings are laid out
 
 - Everything imported from `solid-js` sits on the `Bindings` type in the `Partas.Solid` namespace.
   It is `[<AutoOpen>]`, so `open Partas.Solid` is all you need. The functions are `static member`s,
-  which is how they get overloads.
+  so they can have overloads.
 - The web runtime (`@solidjs/web`) lives in the `Partas.Solid.Web` namespace: `render`, `hydrate`,
   `renderToString`, `renderToStream`, `isServer`, `isDev`, `clientOnly`, `Portal` and `Dynamic`.
   Add `open Partas.Solid.Web` to use them. `DEV` stays in `Partas.Solid`.
@@ -26,9 +25,6 @@ Solid 2.0 removed or renamed a large part of the 1.x API. If you are upgrading, 
 :::tip
 See something missing? Open an issue. Missing bindings are usually quick to add.
 :::
-
-The examples below run on the page. Each one is compiled with Fable and the Partas.Solid plugin
-when the site builds.
 
 ```fsharp solid setup
 let resolveAfter (ms: int) (value: 'T) : JS.Promise<'T> =
@@ -96,19 +92,18 @@ setIndex.Invoke (fun i -> i + 1)   // compute the next value from the previous o
 ```
 
 :::warning
-Solid treats any function passed to a setter as an updater. To store a function in a signal, wrap it
-in an updater that returns it, even when you are only replacing the value:
+Solid treats a function passed to `createSignal` as a derived computation, and a function passed to a
+setter as an updater. To store a function in a signal, return it from one in both places:
 
 ```fsharp
 let myFunc () = console.log "myFunc"
-let handler, setHandler = createSignal (unbox<unit -> (unit -> unit)> myFunc)
 let myNewFunc () = console.log "newFunc"
-setHandler (fun () -> myNewFunc)
+let handler, setHandler = createSignal<unit -> unit> (fun () -> myFunc)
+setHandler.Invoke (fun (_: unit -> unit) -> myNewFunc)
 ```
 :::
 
-`InvokeAndGet` also exists, with the same two overloads. It is meant to set the value and return it,
-but it currently returns `undefined`. Do not rely on its result.
+`InvokeAndGet` also exists, with the same two overloads. It sets the value and returns the new value.
 
 ## Memos
 
@@ -136,8 +131,8 @@ let MemoDemo () =
 Annotate the parameter (`fun (_: int option) -> ...`). It tells F# which overload you mean, and it
 keeps the result type from being inferred as a promise.
 
-Options go in as named arguments: `name`, `equals`, `transparent`, `unobserved`, `lazy`, `sync` and
-`loadingValue`.
+Options go in as named arguments (`name`, `equals`, `transparent`, `unobserved`, `lazy`, `sync`,
+`loadingValue`) or as a `MemoOptions` object.
 
 ```fsharp
 let expensive = createMemo ((fun (_: int option) -> heavyWork (input ())), ``lazy`` = true)
@@ -145,18 +140,11 @@ let expensive = createMemo ((fun (_: int option) -> heavyWork (input ())), ``laz
 
 A `lazy` memo does not compute until something reads it.
 
-:::warning
-`createMemo (compute, MemoOptions (...))` emits its options in the wrong shape at the moment. Pass
-options as named arguments instead.
-:::
-
 ### Example: fuzzy search with Fuse.js
 
-A memo can wrap any pure computation, including one from an npm package. The binding below
-describes the parts of [Fuse.js](https://www.fusejs.io/) the example uses. `[<ImportDefault("fuse.js")>]`
-on a class makes `Fuse (...)` compile to `new Fuse(...)` on the package's default export, and a
-`jsNative` member becomes a plain method call. The two interfaces type only the result fields
-the example reads.
+A memo can wrap any pure computation, including one from an npm package. The binding below covers
+only the parts of [Fuse.js](https://www.fusejs.io/) the example uses. `[<ImportDefault("fuse.js")>]`
+on a class makes `Fuse (...)` compile to `new Fuse(...)` on the package's default export.
 
 ```fsharp solid
 type FuseMatch =
@@ -291,8 +279,7 @@ value with a memo instead.
 ### Cleanup
 
 The effect function can return a cleanup, a `unit -> unit`. It runs before the effect runs again,
-and when the owner is disposed. `createEffect` has overloads for an effect function that returns a
-cleanup, so return it from the lambda:
+and when the owner is disposed:
 
 ```fsharp
 createEffect (
@@ -304,20 +291,18 @@ createEffect (
 ```
 
 `createRenderEffect`, `createTrackedEffect`, `createReaction` and `onSettled` accept a
-cleanup-returning function in the same way. (The primed imports such as `createEffect'` are hidden
-implementation details of these overloads. Do not call them.)
+cleanup-returning function in the same way. The primed imports such as `createEffect'` are hidden
+implementation details of these overloads; do not call them.
 
 ### Example: confetti on milestones
 
 The compute half decides when the effect function runs. Below it returns `count () / 10`, which only
-changes at 10, 20, 30 and so on. Clicks in between produce the same value, so the effect function
-does not run and nothing fires.
+changes at 10, 20, 30 and so on, so clicks in between do not run the effect.
 
-The effect calls [canvas-confetti](https://github.com/catdad/canvas-confetti). Its default export is a
-function with a `reset` method attached, so it is bound twice. `[<ImportDefault>]` on a `let` that
-takes parameters compiles to a plain call, and the same import typed as an anonymous record exposes
-`reset`. `onCleanup` in the component body clears any confetti still falling when the example is
-disposed.
+[canvas-confetti](https://github.com/catdad/canvas-confetti)'s default export is a function with a
+`reset` method attached, so it is bound twice: as a `let` that takes parameters (a plain call), and
+as an anonymous record exposing `reset`. `onCleanup` clears any confetti still falling when the
+example is disposed.
 
 ```fsharp solid
 [<ImportDefault("canvas-confetti")>]
@@ -409,9 +394,9 @@ createEffect (
 | Function | Use |
 | --- | --- |
 | `createRenderEffect (compute, effect)` | Same two phases, but the first effect run happens immediately, during rendering. Refs are not attached yet. Within a flush, render effects run before user effects. No error overload. |
-| `createTrackedEffect (fun () -> ...)` | A single function that both tracks and does the side effect. `createTrackedEffect'` may return a cleanup. Prefer `createEffect`; this is for cases where the two phases cannot be separated. |
+| `createTrackedEffect (fun () -> ...)` | A single function that both tracks and does the side effect. Prefer `createEffect`; this is for cases where the two phases cannot be separated. |
 | `createReaction effect` | Returns a `track` function. Call `track (fun () -> box (source ()))` to name what to watch; the next time it changes, `effect` runs once. Call `track` again to re-arm it. |
-| `onSettled (fun () -> ...)` | Runs once after the owner's first render has settled. It replaces `onMount`. `onSettled'` may return a cleanup. |
+| `onSettled (fun () -> ...)` | Runs once after the owner's first render has settled. It replaces `onMount`. |
 | `onCleanup (fun () -> ...)` | Runs when the current owner is disposed or re-runs. |
 
 ```fsharp
@@ -447,7 +432,7 @@ type StoreReturn<'T> = Store<'T> * StoreSetter<'T>
 ```
 
 A store is a deeply reactive object. Every property you read through it is tracked on its own, so
-changing one field only updates what read that field. `createStore` is imported from `solid-js`.
+changing one field only updates what read that field.
 
 - Read through `.Value`: `state.Value.todos`. `Store<'T>` also converts implicitly to `'T`.
 - The setter takes an **updater, never a value**. Either mutate the draft and return it, or return a
@@ -516,7 +501,7 @@ options.
 
 | Function | Use |
 | --- | --- |
-| `reconcile next` | Returns an updater that diffs `next` into the store, so only changed fields notify. Use it as `setStore (reconcile next)`. `reconcile (next, "id")` or `reconcile (next, fun item -> item.id)` sets how array items are matched. |
+| `reconcile next` | Returns an updater that diffs `next` into the store, so only changed fields notify. Use it as `setStore (reconcile next)`. `reconcile (next, "id")` or `reconcile (next, fun item -> box item.id)` sets how array items are matched. |
 | `snapshot store` | A plain, non-reactive copy of the store's current value. It replaces `unwrap`. |
 | `deep store` | Reads every nested property, so a tracking scope that calls it re-runs on any change inside the store. |
 
@@ -548,23 +533,21 @@ let row, setRow =
 A seed type with an `id` member uses it as the key. Otherwise pass a key function as the third
 argument.
 
-The result is a `RefreshableStoreReturn<'T>`. Its store half converts to a `Store<'T>` with
-`.AsStore`, and to a `Refreshable<'T>` for [`refresh`](#refresh) with `.AsRefreshable`.
+`createStore (fn, seed)` returns a `RefreshableStoreReturn<'T>`, a store and setter pair.
+`createProjection (fn, seed)` returns the store alone, as a `RefreshableStore<'T>`. Read it with `.Value`,
+convert it to a `Store<'T>` with `.AsStore`, or to a `Refreshable<'T>` for [`refresh`](#refresh) with
+`.AsRefreshable`.
 
-:::warning
-`createProjection` is typed as returning a store and setter tuple, but Solid rc.9 returns a single
-refreshable store. Destructuring its result does not work at the moment.
-:::
+```fsharp
+let selection = createProjection (project selected, seed)
+let isA () = selection.Value.a
+```
 
 ## Control flow
 
-Control-flow components are imported from `solid-js`. Each one takes its props as named arguments
-and its children in braces.
-
 ### For
 
-`For` makes you choose how rows are keyed. The raw `For` is hidden, and you use one of three
-variants:
+The raw `For` is hidden. Pick one of three variants by how rows are keyed:
 
 | Component | Child function | Rows are keyed by |
 | --- | --- | --- |
@@ -616,12 +599,6 @@ For.KeyedFn(each = users (), keyed = (fun u -> box u.id)) {
     yield fun user index -> li () { user().name }
 }
 ```
-
-:::warning
-Keep the child function a single expression that returns the element. If it starts with a statement
-(`fun item _ -> log item; li () { ... }`), the element is dropped from the output. Move the statement
-into the element's handlers, or compute it before the `For`.
-:::
 
 ### Show
 
@@ -687,11 +664,6 @@ let TrafficLightDemo () =
 `Match<'T>` takes a child function like `Show<'T>`, and has a `when'option` setter for option values.
 `Match.Keyed` and `Match.NonKeyed` mirror the `Show` variants.
 
-:::warning
-`Match.Keyed(when'option = ...)` loses its condition in the output at the moment. Use
-`Match.Keyed(when' = ...)` or a plain `Match`.
-:::
-
 ### Errored
 
 `Errored` replaces `ErrorBoundary`. When something inside it throws, it renders `fallback` instead.
@@ -747,11 +719,8 @@ let ErroredDemo () =
 Press **Increase** until the value passes 2. The memo throws, and the boundary shows the message.
 **Reset** sets the value back and re-renders the children.
 
-:::warning
-`Errored` also has `fallbackFn` and `fallbackEle` setters, meant as typed shortcuts for the two
-kinds of fallback. They are emitted as literal `fallbackFn=` and `fallbackEle=` props, which
-`Errored` ignores. Set `fallback` with `!^` as above until this is fixed.
-:::
+`Errored` also has `fallbackFn` and `fallbackEle` setters, typed shortcuts for the two kinds of
+fallback. They set `fallback` without the `!^`.
 
 ### Loading
 
@@ -780,14 +749,11 @@ let GreetingLoader () =
     }
 ```
 
-The first load shows the fallback. After that, switching names dims the old greeting until the new
-one arrives.
+Everything inside `Loading` is replaced by the fallback on the first load, so wrap only the part that
+depends on the data, not the whole page.
 
-Put `Loading` around the part that depends on the data, not around the whole page. Anything inside
-it is replaced by the fallback on the first load.
-
-`on` limits the boundary to one source. When `on` is set, the boundary only shows its fallback for
-changes caused by writes to that source. Other changes keep the old content.
+With `on` set, the boundary only shows its fallback again for changes caused by writes to that
+source. Other changes keep the old content.
 
 ```fsharp
 Loading(fallback = Skeleton (), on = route ()) { Page () }
@@ -843,14 +809,16 @@ children on the server and skips them when hydrating.
 
 ### Portal and Dynamic
 
-`Portal` and `Dynamic` are part of `@solidjs/web`, so they are in `Partas.Solid.Web`. `Portal(mount =
-element) { ... }` renders its children into another part of the document. `Dynamic` renders a
-component chosen at run time.
+Both come from `@solidjs/web`, so they are in `Partas.Solid.Web`. `Portal(mount = element) { ... }`
+renders its children into another part of the document. `Dynamic` renders a tag or component chosen
+at run time.
 
-:::warning
-`Dynamic` has open bugs: `componentAsString = ...` is dropped from the output, and children passed in
-braces are not emitted correctly. Check the generated JSX when you use it.
-:::
+```fsharp
+Dynamic<obj>(componentAsString = props.tag) { "content" }
+```
+
+The `dynamic (fun () -> ...)` function returns a `TagValue` whose tag follows its source. Render it
+with `Field.render ()` or `Field % {| ... |}`, where `Field` is the bound value.
 
 ## Context
 
@@ -860,9 +828,9 @@ type Context<'T> = 'T -> ContextProvider
 
 `createContext` makes a context, optionally with a default value. `useContext` reads the nearest
 value. `tryUseContext` returns a `Result<'T, ContextNotFoundError>` instead of throwing when there is
-no provider and no default.
+no provider and no default. Calling the context with a value provides it to the children.
 
-```fsharp
+```fsharp solid render=ThemeApp jsx
 let ThemeContext = createContext<string> "light"
 
 [<SolidComponent>]
@@ -884,16 +852,10 @@ let ThemeApp () =
 To share state, put accessors and functions in the context value, for example a `[<JS.Pojo>]` type
 with a `count: Accessor<int>` and an `increment: unit -> unit`.
 
-:::danger
-Providing a value does not work yet. The plugin emits `<ThemeContext.Provider value=...>`, but a
-Solid 2 context is itself the provider component, and has no `.Provider`. Consumers only ever see
-the default value. `createContext` and `useContext` are fine. Only the provider syntax is broken.
-:::
-
 ## Async
 
-In Solid 2, async is built in. An async memo, an async derived store and a `lazy'` component all
-suspend their readers, and `Loading` catches them. These functions help around that.
+An async memo, an async derived store and a `lazy'` component all suspend their readers, and
+`Loading` catches them.
 
 ### isPending and latest
 
@@ -902,12 +864,6 @@ settled. It does not trigger `Loading`, so you can use it to dim old content, as
 [`Loading` example](#loading).
 
 `latest (fun () -> source ())` reads the most recent value, even while a newer one is pending.
-
-:::warning
-Put `isPending` in a memo, as in the example above, and read the memo in JSX. Written inline in an
-attribute or child, the plugin strips the `fun () -> ...` wrapper, and `isPending` receives a value
-instead of a function.
-:::
 
 ### refresh
 
@@ -942,7 +898,7 @@ action (genFn: 'Args -> 'Gen) : 'Args -> JS.Promise<'R>
 ```
 
 F# has no generator syntax, so the generator must come from JS or be written by hand as an object
-with `next` and `throw`. This makes `action` awkward to use from F# today.
+with `next` and `throw`.
 
 ### createOptimistic and createOptimisticStore
 
@@ -991,9 +947,10 @@ let hasChildren = fun () -> resolved.toArray().Length > 0
 ### merge and omit
 
 `merge (a, b, ...)` combines prop objects, with later sources winning. `omit (props, "a", "b")`
-returns the props without those keys. They replace `mergeProps` and `splitProps`. You rarely call
-them yourself, because the plugin generates them for `[<SolidTypeComponent>]` members. See
-[SolidTypeComponent](../guide/solid-type-attribute.md).
+returns the props without those keys. `omit (props, fun key -> ...)` omits every string key the
+predicate accepts, and never omits symbol keys; use `omitKeys (props, fun (key: obj) -> ...)` to
+see those too. They replace `mergeProps` and `splitProps`. You rarely call them yourself, because the
+plugin generates them for [`[<SolidTypeComponent>]`](../guide/solid-type-attribute.md) members.
 
 ### lazy'
 
@@ -1003,13 +960,11 @@ lazy' (fn: unit -> JS.Promise<'T>, ?options: LazyOptions, ?moduleUrl: string) : 
 
 `lazy'` loads a component on first render. `LazyOptions (export = "Name")` picks a named export
 instead of the default. `.preload ()` starts loading early. Rendering it before it loads suspends,
-like an async memo.
+like an async memo. It takes Fable's `importDynamic` in place of the removed `importComponent`.
 
 ```fsharp
 let Settings = lazy' (fun () -> importDynamic "./Settings.fs.jsx")
 ```
-
-`importComponent` is gone. Use Fable's `importDynamic`.
 
 ### createUniqueId
 
@@ -1047,7 +1002,7 @@ ref, which you attach with `.ref`. The function runs once the element has settle
 cleanup (`ignore` when there is nothing to clean up).
 
 ```fsharp
-let autofocus = createDirectiveFactory (fun (el: Browser.Types.HTMLElement) ->
+let autofocus = createDirectiveFactory (fun (el: Browser.Types.HTMLInputElement) ->
     el.focus ()
     ignore)
 

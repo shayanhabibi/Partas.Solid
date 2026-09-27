@@ -17,7 +17,7 @@ type RootPoolFactory<'Arg, 'Result> =
     delegate of arg: Accessor<'Arg> * active: Accessor<bool> * dispose: DisposeCallback -> 'Result
 ```
 
-The callback for `createRootPool`. It is called when a new root is created.
+The factory for `createRootPool`, called whenever the pool creates a new root.
 
 | Param | Desc |
 | --- | --- |
@@ -36,9 +36,8 @@ The callback for `createRootPool`. It is called when a new root is created.
 | `createHydratableSingletonRoot` | `createSingletonRoot` that is safe to hydrate. |
 | `createRootPool` | Creates a pool of roots to reuse. Useful for components that mount and unmount often. |
 
-`createRootPool` calls `factory` whenever it creates a new root. You create roots by calling the returned function.
-When a root is cleaned up it is not disposed, but put back in the pool. The next call reuses it and updates it with
-the new `arg`. `limit` is the size of the pool, and defaults to `100`.
+Call the function `createRootPool` returns to get a root. A root that is cleaned up goes back to the pool instead of
+being disposed, and the next call reuses it with the new `arg`. `limit` is the pool size, and defaults to `100`.
 
 :::note
 Core Partas.Solid 3.0 still binds `createRoot`, `getOwner` and `runWithOwner`. `getOwner` returns

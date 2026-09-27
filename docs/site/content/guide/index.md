@@ -21,7 +21,7 @@ let Counter () =
     }
 ```
 
-The example above is live. It was compiled from the F# on this page when the site was built.
+The example above is live, compiled from this F# when the site was built.
 
 :::warning
 These docs are for **Partas.Solid 3.0 on Solid 2.0.0-rc.9**. 3.0 is a prerelease and is not on NuGet yet. If you use

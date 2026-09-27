@@ -52,7 +52,7 @@ expressions that happen to read from the props.
 5. a tag with properties, which Fable writes as a `let` of the element followed by setters
 6. a tag with an extension call such as `.spread` or `.data`
 7. a tag with children: a call to the builder's `Run` with the tag as its first argument
-8. a context provider, imported or local, which becomes `<Context.Provider value={...}>`
+8. a context provider, imported or local, which becomes `<Context value={...}>` (in Solid 2 the context is its own provider)
 
 ## Children
 

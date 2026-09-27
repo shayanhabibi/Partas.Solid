@@ -43,9 +43,7 @@ let targetFPS(
     ): FrameRequestCallback
 ```
 
-Wraps a `window.requestAnimationFrame` callback so it runs at most the given number of frames per second.
-
-It limits the frame rate by skipping the callback on frames above the limit, so frame durations can be uneven.
+Caps a frame callback at `fps` frames per second by skipping frames, so frame durations can be uneven.
 
 ## createMs
 

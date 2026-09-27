@@ -14,12 +14,11 @@ function in F#:
 2. [`[<SolidTypeComponent>]`](#solidtypecomponent) on a member of a type. The type's properties become the
    component's props.
 
-Both tell the Partas.Solid Fable plugin to rewrite the body into JSX. Without one of them the plugin leaves the code
-alone, and the DSL compiles to nothing useful.
+Both tell the Fable plugin to rewrite the body into JSX. Without one, the DSL compiles to nothing useful.
 
 ## SolidComponent
 
-`[<SolidComponent>]` works on any `let` binding. The binding's parameters stay ordinary F# parameters.
+`[<SolidComponent>]` works on any `let` binding. Its parameters stay ordinary F# parameters.
 
 ```fsharp solid render=ButtonExample jsx
 [<StringEnum>]
@@ -52,17 +51,15 @@ let ButtonExample () =
     }
 ```
 
-Click the last button and the "Responsive" button switches variant.
-
-Look at the JSX tab. A `[<SolidComponent>]` with parameters is called as a plain function, `Button("Primary",
-"primary")`, not used as a `<Button />` tag. That is fine for small helpers. For a component other code will use,
-reach for `[<SolidTypeComponent>]`: it becomes a real tag with named props, for F# and for JavaScript callers alike.
-See [SolidComponent](solid-component-attribute.md) for the details.
+In the JSX tab, a `[<SolidComponent>]` with parameters is called as a plain function, `Button("Primary", "primary")`,
+not used as a `<Button />` tag. That is fine for small helpers. For a component other code will use, reach for
+`[<SolidTypeComponent>]`: it becomes a real tag with named props, for F# and JavaScript callers alike. See
+[SolidComponent](solid-component-attribute.md) for the details.
 
 ## SolidTypeComponent
 
-The second attribute defines a custom tag. You declare a type, give it properties, and put the component's body in a
-member marked `[<SolidTypeComponent>]`.
+This attribute defines a custom tag: a type whose properties are the props, with the body in a member marked
+`[<SolidTypeComponent>]`.
 
 ```fsharp solid render=GreetingExample jsx
 [<Erase>]
@@ -94,23 +91,22 @@ let GreetingExample () =
     }
 ```
 
-A few things happen in that code:
-
 - `inherit div()` gives `Greeting` every attribute a `div` has, as well as its own `name` and `loud`.
-- `props.name <- "world"` sets a default. The plugin turns assignments to props into a `merge({...}, props)` call.
-- `.spread props` passes on every prop the component did not read itself. The plugin builds that set with `omit`.
+- `props.name <- "world"` sets a default. The plugin turns assignments to props into `props = merge({...}, props)`.
+- `.spread props` passes on every prop the body does not read. The plugin collects the reads into
+  `const PARTAS_OTHERS = omit(props, ...)` and spreads that.
+- Prop reads stay as `props.x` in the JSX, so they stay reactive.
 - The member becomes a function named after the type. The member name, here `View`, does not matter.
 
-`Greeting` is now used like any built-in tag: `Greeting(name = "Partas") { ... }`.
+`Greeting` is now used like any built-in tag. The [JSX output](../about/jsx-output.md) page shows the exact shapes.
 
 :::note
 The type must live in a namespace or module that starts with `Partas.Solid`. The plugin only transforms types under
 that prefix. Put your components in something like `namespace Partas.Solid.MyApp`.
 :::
 
-A type does not have to have a body. A type with no `[<SolidTypeComponent>]` member is a way to describe a component
-that already exists in JavaScript, so you can use it from the DSL. Import it with `[<Import>]` and declare its
-properties:
+A type without a `[<SolidTypeComponent>]` member describes a component that already exists in JavaScript. Import it
+with `[<Import>]` and declare its properties:
 
 ```fsharp
 namespace Partas.Solid.MyBindings
@@ -133,14 +129,3 @@ Tooltip(placement = "top", class' = "tip") { "More info" }
 
 See [SolidTypeComponent](solid-type-attribute.md) for the rules the member must follow, and
 [tag interfaces](tag-interfaces.md) for the interfaces a custom tag can implement instead of inheriting.
-
-## What the plugin does for you
-
-Beyond turning the DSL into JSX, the plugin handles the Solid boilerplate you would otherwise write by hand:
-
-- It collects the props your component reads and emits `const PARTAS_OTHERS = omit(props, ...)` for spreading the
-  rest.
-- It turns default assignments into `props = merge({ ... }, props)`.
-- It keeps prop reads as `props.x` in the JSX, so they stay reactive.
-
-The [JSX output](../about/jsx-output.md) page shows the exact shapes.

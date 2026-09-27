@@ -32,8 +32,6 @@ The component keeps its name. Props are read as `props.class`, so Solid can trac
 out of the spread with `omit` from `solid-js`. `n$={false}` is the marker the plugin puts after a spread; it does
 nothing at runtime.
 
-The rest of this page is about why that matters.
-
 ## Onboarding JavaScript developers to F#
 
 The Oxpecker style of DSL is already close to what a JavaScript developer knows. A constructor is the opening tag, its
@@ -141,24 +139,14 @@ same treatment as hand-written Solid. Tools and helpers built to work on JSX wor
 
 ## Fewer surprises while debugging
 
-Sooner or later something in your UI goes wrong. When the output is clean JSX, you can find the cause much faster.
-
-You are not limited to the size of the F# or Fable communities, either. You can take a reproducible JSX example to
-the much larger pool of front-end developers and ask for help.
-
-It also helps you tell a bug in your code from a bug in Fable, F# or the plugin: read the output and check whether it
+When the output is clean JSX, you can take a reproducible JSX example to the much larger pool of front-end developers
+and ask for help. It also helps you tell a bug in your code from a bug in Fable, F# or the plugin: read the output and check whether it
 says what you meant. If it does not, [submit an issue](../contributing/submit-issues.md).
 
-## F# and JavaScript developers working together
+## Tooling
 
-This follows from the sections above, but it is worth saying on its own. Teams push back less on F# and Fable, with
-the safety and domain modelling they bring, when the JavaScript developers can read and use the output. The same is
-true when you work with a design team.
-
-## Other thoughts
-
-Plenty of development tools work on JSX source. Plenty of tools also produce JSX, and the gap between JSX and the
-Oxpecker style of DSL is small, whether a person or an LLM is doing the translating.
+Plenty of tools read or produce JSX, and the gap between JSX and the Oxpecker style of DSL is small, whether a person
+or an LLM is doing the translating.
 
 ## Comparing Fable/Feliz output with Partas.Solid
 

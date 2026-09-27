@@ -3,16 +3,13 @@ title: Experimental Features
 ---
 
 The `Partas.Solid.Experimental` namespace holds syntax sugar that has seen less real-world use than
-the rest of the library. Use it with care: some builders are better tested than others, and the
-known problems are listed [below](#known-problems).
+the rest of the library. Use it with care: some builders are better tested than others.
 
 ## Computation expressions
 
-Many `solid-js` functions take a lambda with no parameters, such as `onSettled` or `children`. The
-builders in this namespace write that lambda and the call for you. They take no options: when you
-need an option or a different overload, call the function directly.
-
-To use them, open the namespace:
+Many `solid-js` functions take a lambda with no parameters, such as `onSettled` or `children`. These
+builders write the lambda and the call for you. They take no options: when you need an option or a
+different overload, call the function directly. Open the namespace to use them:
 
 ```fsharp
 open Partas.Solid.Experimental
@@ -22,10 +19,9 @@ open Partas.Solid.Experimental
 open Partas.Solid.Experimental
 ```
 
-Here are three of them working together. `memo` derives a value, `effect` reacts to it, and `mount`
-runs once after the first render.
+`memo` derives a value, `effect` reacts to it, and `mount` runs once after the first render:
 
-```fsharp solid render=BuilderCounter
+```fsharp solid render=BuilderCounter jsx
 [<SolidComponent>]
 let BuilderCounter () =
     let count, setCount = createSignal 1
@@ -138,8 +134,7 @@ let label =
         if v > 0 then "positive" elif v < 0 then "negative" else "zero")
 ```
 
-Write the memo as a plain body that ends in its value. Do not use `let!` and `return` in it (see
-[Known problems](#known-problems)). The builder does not give you the previous value. Call
+Write the memo as a plain body that ends in its value. The builder does not give you the previous value. Call
 `createMemo` directly when you need it.
 
 ### lazyload
@@ -196,26 +191,14 @@ An `if ... then` without an `else`, followed by another statement, does not type
 dropped. Use `flush (fun () -> ...)` and `createProjection` instead. See
 [Solid-JS](../guide/solid-js.md#removed-apis).
 
-## Known problems
-
-:::warning
-These builders emit wrong code in some shapes. The runtime tests track each one as a known bug.
-
-- `memo { let! v = source; return v * 2 }` caches a function instead of the value, and never tracks
-  `source`. Write `memo { source () * 2 }` instead.
-- `mount { }` and `cleanup { }` drop every statement after an `if ... then` with no `else`, or after
-  a `match`. Put the branch last, give the `if` an `else`, or call `onSettled` or `onCleanup`
-  directly.
-:::
-
 ## Erased union implicit casting
 
 Bindings often accept several types for one argument, typed as an erased union such as
 `U2<string, int>`. With Fable's unions you cast a value into the union with the `!^` operator.
 
 The `U` module in `Partas.Solid.Experimental` redefines `U2` to `U9` with implicit conversions, so a
-plain value converts to the union without `!^`. It is most useful when writing bindings, because
-calls to them read with less noise.
+plain value converts to the union without `!^`. Use it in bindings, so calls to them read with less
+noise. Partas.Solid's own HTML, SVG and style bindings are typed with it.
 
 :::tip
 Open `Partas.Solid.Experimental.U` AFTER `Fable.Core`, so its union types shadow Fable's.

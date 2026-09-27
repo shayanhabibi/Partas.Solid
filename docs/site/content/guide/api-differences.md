@@ -7,14 +7,12 @@ These pages do not cover how to use Solid itself. See the [Solid documentation](
 This page lists where the F# API differs noticeably from Solid's JavaScript API.
 :::
 
-Partas.Solid 3.0 binds Solid 2.0. If you know Solid 1.x, also read [Migrating to Solid 2](migrating-to-solid-2.md):
-several APIs this page used to describe, such as `createResource` and store paths, no longer exist.
+Partas.Solid 3.0 binds Solid 2.0. Coming from Solid 1.x, also read [Migrating to Solid 2](migrating-to-solid-2.md).
 
 ## Option objects
 
-Where a Solid function takes an options object, the Partas.Solid binding usually turns the options into optional
-parameters. Fable's `ParamObject` attribute packs them back into an object when it compiles the call. You can tell
-from the signature. `createMemo`, for example:
+Where a Solid function takes an options object, the binding usually exposes the options as optional parameters, and
+Fable's `ParamObject` attribute packs them back into an object at the call site. `createMemo`, for example:
 
 ```fsharp
 [<ImportMember("solid-js"); ParamObject(1)>]
@@ -69,13 +67,12 @@ open Partas.Solid.Style
 div().style' [ Style.backgroundColor Color.Red; "--my-var" ==> "12px" ] { "Styled" }
 ```
 
-Solid 1's `on:`, `prop:` and `use:` escape hatches (`.on`, `.prop` and `.use'`) were removed in 3.0 and have no
-replacement yet. Solid 2 merged `classList` into `class`, so `.classList` is now `.class'`. See
-[extension methods](extension-methods.md) for details.
+Solid 1's `on:`, `prop:` and `use:` escape hatches (`.on`, `.prop` and `.use'`) were removed in 3.0. Solid 2 merged
+`classList` into `class`, so `.classList` is now `.class'`. See [extension methods](extension-methods.md).
 
 When you pass a variable to `.ref`, make it `mutable`:
 
-```fsharp
+```fsharp solid render=RefVariable jsx
 open Browser.Types
 
 [<SolidComponent>]
@@ -136,8 +133,8 @@ See [Building the DOM](building-the-dom.md).
 _Adapted from [Oxpecker.Solid](https://lanayx.github.io/Oxpecker/src/Oxpecker.Solid/#router). Credit to
 [Lanayx](https://github.com/Lanayx)._
 
-The `@solidjs/router` bindings live in the `Partas.Solid.Router` namespace. The function that renders the router
-needs `[<SolidComponent>]` like any other component. Pass components to routes as a `TagValue` with `!@`:
+The `@solidjs/router` bindings live in the `Partas.Solid.Router` namespace. Pass components to routes as a `TagValue`
+with `!@`:
 
 ```fsharp
 open Partas.Solid.Router
@@ -154,8 +151,8 @@ let MyRouter () =
 render ((fun () -> MyRouter ()), document.getElementById "root") |> ignore
 ```
 
-You still need `@solidjs/router` in `package.json`. The router bindings have not been checked against a Solid 2
-release of the router yet. See [Solid Router](solid-router.md).
+Add `@solidjs/router` to `package.json`. The router bindings have not yet been checked against a Solid 2 release of
+the router. See [Solid Router](solid-router.md).
 
 ## Lazy components
 
@@ -197,18 +194,14 @@ button (onClick = fun _ -> setClicks.Invoke(fun previous -> previous + 1)) {
 }
 ```
 
-`setter.Invoke(value)` is the same as `setter value`.
-
-:::warning
-`InvokeAndGet`, which was meant to return the value that was set, currently returns `undefined`. Read the accessor
-after setting instead.
-:::
+`setter.Invoke(value)` is the same as `setter value`. `setter.InvokeAndGet(value)` also returns the value that was
+set, as Solid 2's setter does.
 
 ## Context
 
 A context is created with `createContext` and read with `useContext`:
 
-```fsharp
+```fsharp solid show=code
 let ThemeContext = createContext<string> "light"
 
 [<SolidComponent>]
@@ -219,18 +212,16 @@ let ThemedLabel () =
 
 `tryUseContext` returns a `Result` instead of throwing when no provider or default exists.
 
-To provide a value, call the context with it and pass children:
+To provide a value, call the context with it and pass children. It compiles to `<ThemeContext value={...}>`:
 
-```fsharp
+```fsharp solid render=ThemeApp jsx
 [<SolidComponent>]
 let ThemeApp () =
-    ThemeContext "dark" {
+    div () {
         ThemedLabel()
+        ThemeContext "dark" {
+            ThemedLabel()
+        }
     }
 ```
 
-:::danger
-The provider syntax is broken on Solid 2. The plugin still emits `<ThemeContext.Provider value="dark">`, the Solid 1
-form. In Solid 2 the context object is itself the provider and has no `.Provider` member, so this renders an undefined
-component. `useContext` and context defaults work. Providing a value does not, until the plugin is fixed.
-:::

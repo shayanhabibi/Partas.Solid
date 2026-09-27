@@ -2,19 +2,18 @@
 title: Installation
 ---
 
-Partas.Solid has two parts that you install together:
+Partas.Solid has two NuGet packages:
 
-- **Partas.Solid**, the NuGet package with the DSL and the bindings.
-- **Partas.Solid.FablePlugin**, the Fable compiler plugin that turns your F# into JSX. `Partas.Solid` depends on it,
-  so it comes in with the package.
+- **Partas.Solid**, the DSL and the bindings.
+- **Partas.Solid.FablePlugin**, the Fable compiler plugin that turns your F# into JSX. `Partas.Solid` depends on it.
 
-Fable writes `.jsx` files. A JavaScript bundler such as Vite then runs the Solid JSX compiler over them. You need both
-a .NET toolchain and a Node toolchain.
+Fable writes `.jsx` files, and a bundler such as Vite runs the Solid JSX compiler over them, so you need both a .NET and
+a Node toolchain.
 
 :::warning
 These docs cover **Partas.Solid 3.0**, which targets **Solid 2.0.0-rc.9**. 3.0 is a prerelease and is **not on NuGet
 yet**. The latest version on nuget.org is 2.x, which targets Solid 1.9 and does not match these pages. Until 3.0 is
-published, build the packages from source and install them from a local feed. The steps are below.
+published, build the packages from source and install them from a local feed, as below.
 :::
 
 ## Requirements
@@ -30,8 +29,6 @@ published, build the packages from source and install them from a local feed. Th
 
 ### 1. Install Fable
 
-Create a tool manifest if your solution does not have one, then install Fable 5.
-
 ```bash
 dotnet new tool-manifest
 dotnet tool install fable --version 5.13.0
@@ -39,7 +36,7 @@ dotnet tool install fable --version 5.13.0
 
 ### 2. Build the 3.0 packages
 
-Clone the repository and check out the Solid 2 branch. `dotnet pack` writes both packages to a folder of your choice.
+Clone the repository, check out the Solid 2 branch, and pack both packages into a folder:
 
 ```bash
 git clone https://github.com/shayanhabibi/Partas.Solid.git
@@ -51,7 +48,7 @@ dotnet pack Partas.Solid/Partas.Solid.fsproj -c Release -o ../partas-feed
 
 ### 3. Add the local feed
 
-Tell NuGet about the folder with a `nuget.config` next to your solution.
+Add a `nuget.config` next to your solution:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -77,7 +74,7 @@ folder, then run `paket install`.
 
 ## The npm side
 
-Solid 2 is a release candidate, so pin the exact versions. These are the versions Partas.Solid 3.0 is tested against.
+Solid 2 is a release candidate, so pin the exact versions Partas.Solid 3.0 is tested against:
 
 ```bash
 npm install solid-js@2.0.0-rc.9 @solidjs/web@2.0.0-rc.9
@@ -111,8 +108,8 @@ Or in `package.json`:
 The `overrides` block stops npm from pulling in a second, different Solid release (of `solid-js`, `@solidjs/web` or
 the compiler) through the Vite plugin.
 
-In Solid 2 the web runtime moved from `solid-js/web` to its own package, `@solidjs/web`. That package is where `render`,
-`hydrate`, `Portal` and `Dynamic` come from. In F# they are in the `Partas.Solid.Web` namespace.
+In Solid 2 the web runtime moved from `solid-js/web` to `@solidjs/web`, which provides `render`, `hydrate`, `Portal`
+and `Dynamic`. In F# they are in the `Partas.Solid.Web` namespace.
 
 A minimal `vite.config.js` that picks up Fable's output:
 
@@ -132,7 +129,7 @@ export default defineConfig({
 
 ### Mounting the app
 
-Mount your root component with `render` from `Partas.Solid.Web`:
+Mount the root component with `render`. It returns a function that disposes the app.
 
 ```fsharp
 module App
@@ -147,8 +144,6 @@ let App () =
 
 render ((fun () -> App ()), document.getElementById "root") |> ignore
 ```
-
-`render` returns a function that disposes the app.
 
 ### Bindings and Femto
 

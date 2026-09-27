@@ -24,10 +24,8 @@ let createTween(
     ): Accessor<'T>
 ```
 
-Creates a derived signal that moves smoothly from the target's previous value to its next value whenever it changes.
-
-The target can be any reactive value: a signal, a memo, or a function that reads them. To tween a component prop,
-pass `fun () -> props.value`.
+A derived signal that moves smoothly from the target's previous value to its new one whenever it changes. The target
+can be any accessor; to tween a component prop, pass `fun () -> props.value`.
 
 | Param | Desc |
 | --- | --- |
@@ -35,8 +33,7 @@ pass `fun () -> props.value`.
 | `duration` | How many milliseconds the transition from one value to the next takes. Defaults to `100`. |
 | `easing` | A function that maps a number between `0.` and `1.`, to speed up or slow down parts of the transition. Defaults to linear. |
 
-`createTween` uses `requestAnimationFrame` to update the value at the display's refresh rate. Once the tweened value
-reaches the target, it stops requesting frames.
+Updates run on `requestAnimationFrame`, and stop once the value reaches the target.
 
 ## Easings
 

@@ -2,29 +2,26 @@
 title: Polymorphism
 ---
 
-Libraries such as Kobalte and ArkUI let a component render as another component or tag. The parent's props are passed
-on to the component it renders as. In Kobalte this is the `as` prop:
+Libraries such as Kobalte and ArkUI let a component render as another component or tag, passing its props on. In
+Kobalte this is the `as` prop:
 
 ```jsx
 <Button as={a} href={"/"} />
 ```
 
-Partas.Solid supports this in the plugin, and lets you enable it for other libraries. The support is part of
-Partas.Solid 3.0 itself, in the auto-opened `Partas.Solid.Polymorphism` module.
+The plugin supports this for Kobalte and ArkUI, and lets you enable it for other libraries. The F# side lives in the
+auto-opened `Partas.Solid.Polymorphism` module.
 
 :::note
-The Kobalte and ArkUI bindings themselves target Partas.Solid 2.x on Solid 1.9 and have not been ported to Solid 2 yet.
-The examples below use a small component of their own instead.
+The Kobalte and ArkUI bindings themselves have not been ported to Solid 2 yet, so the examples below use a small
+component of their own.
 :::
 
 ## Making a component polymorphic
 
 A component opts in by implementing the `Polymorph` interface. That gives it the `.as'` extension method, which takes
-either a built element or a `TagValue`.
-
-The plugin handles `.as'` specially. Passing a whole element, rather than a tag value, is what keeps F#'s type checking:
-you set the morph target's own props in its constructor, where the compiler checks them. F# cannot inherit props
-dynamically, so this is how you get to them.
+either a built element or a `TagValue`. Pass an element when you can: F# cannot inherit the morph target's props
+dynamically, but it does type-check them in the target's own constructor.
 
 Here `Box` renders whatever its `as` prop holds through `Dynamic`, and defaults to a `div`:
 
@@ -53,8 +50,7 @@ let BoxAsButton () =
     }
 ```
 
-The JSX tab shows what the plugin does with the element passed to `.as'`. It becomes a function that takes the
-parent's props and spreads them onto the morph target:
+The element passed to `.as'` becomes a function that spreads the parent's props onto the morph target:
 
 ```jsx
 as={(PARTAS_POLYPROPS) => <button {...PARTAS_POLYPROPS} n$={false} type="button" onClick={...} />}
@@ -64,7 +60,7 @@ So the rendered `<button>` gets `Box`'s `class` and children, and keeps the `typ
 
 The morph target can be another component. Its own props arrive alongside the parent's:
 
-```fsharp solid render=BoxAsLink
+```fsharp solid render=BoxAsLink jsx
 [<Erase>]
 type ToneLink() =
     inherit a()
@@ -81,8 +77,7 @@ let BoxAsLink () =
     Box(title = "Go to the top").as'(ToneLink(tone = "loud", href = "#")) { "A Box rendered as a ToneLink" }
 ```
 
-You can also pass a `TagValue` to `.as'`. The plugin passes it through unchanged, so you lose the typed props of the
-morph target and have to set them with `.attr`.
+A `TagValue` passed to `.as'` goes through unchanged, so the morph target's props are untyped and set with `.attr`.
 
 ## Polymorphic attributes
 
@@ -94,8 +89,8 @@ The plugin treats these extension methods as polymorphic attributes:
 | `.asChild` | `asChild` | ArkUI |
 | any name starting `__PARTAS_POLYMORPHIC__` | the name with the prefix cut off | anything else |
 
-Only `.as'` comes with Partas.Solid, for any type that implements `Polymorph`. The plugin recognises `asChild`, but you
-declare that extension yourself, the same way as a custom one below.
+Only `.as'` comes with Partas.Solid. The plugin recognises `asChild`, but you declare that extension yourself, the same
+way as a custom one below. This is the built-in declaration:
 
 ```fsharp
 [<Erase; Extension>]
@@ -132,8 +127,8 @@ The plugin cuts the prefix off the name, turns the element into a function as ab
 
 :::warning
 The plugin only looks for polymorphic attributes on extension method calls, and only when the type that declares the
-extension has a name ending in `PolymorphicExtensions` (or `HtmlElementExtensions`). `CustomPolymorphicExtensions`
-above qualifies. A prefixed property setter, as the 2.x docs showed, is not wrapped in a function.
+extension has a name ending in `PolymorphicExtensions` (or `HtmlElementExtensions`). A prefixed property setter is not
+wrapped in a function.
 
 Declare the extension in an earlier file than the code that calls it. When the extension and the call are in the same
 module, the plugin does not recognise the call and the component compiles to a plain function call instead of JSX.
@@ -141,5 +136,5 @@ module, the plugin does not recognise the call and the component compiles to a p
 
 ## `.attr`
 
-You can skip all of this: pass a tag value to the library's polymorphic prop, then chain `.attr` for the props the
-parent does not have. You lose the type checking that is the reason to use F# and Fable in the first place.
+Without any of this, you can pass a tag value to the library's polymorphic prop and chain `.attr` for the props the
+parent does not have, at the cost of type checking.

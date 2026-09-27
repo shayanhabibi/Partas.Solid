@@ -8,8 +8,6 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 
 Bindings for `@solid-primitives/jsx-tokenizer`.
 
-This page lists the binding's types and API. For usage, see the `@solid-primitives` documentation.
-
 ## JSXTokenizer
 
 Type: `interface`
@@ -35,7 +33,7 @@ type TokenElement<'Data>
 - `data`: `'Data`
 - `$TOKENIZER`: `obj`
 
-A resolved token, as returned by `resolveTokens`. Read its `data` property to get the data it carries.
+A resolved token, as returned by `resolveTokens`, carrying its `data`.
 
 ## TokenComponent
 
@@ -48,11 +46,8 @@ type TokenComponent<'Props, 'Data> =
 type TokenComponent<'Props> = TokenComponent<'Props, 'Props>
 ```
 
-The `createToken` overloads return this type. A class can implement it so that the plugin compiles the class as a JSX
-tag. `'Props` is meant to be your class type.
-
-This lets the binding use the plugin's tag construction. You do not have to write POJOs with parameters in both the
-constructor and the properties, and you can use interfaces more naturally.
+Returned by `createToken`. A class can implement it, with `'Props` as the class itself, so the plugin compiles it as
+a JSX tag; props then come from the plugin's tag construction instead of hand-written POJOs.
 
 ## Bindings
 

@@ -9,14 +9,12 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 `Partas.Solid.Storybook` is a thin binding to [Storybook](https://storybook.js.org/), through
 [Kachurun's solid-storybook plugin](https://github.com/kachurun/create-solid-storybook).
 
-It works, but it will not get much more work. Stories are meant to move to a data-contract style abstraction inside
-the Partas.Solid plugin itself: that is the `[<PartasStorybook>]` attribute described in
+It will not get much more work: stories are moving to the plugin's own `[<PartasStorybook>]` attribute, described in
 [Storybook support](../guide/storybook.md).
 
 ## Installation
 
-Unlike the other binding packages, this one has no Femto helpers. Follow the steps below to set everything up before you
-add the package.
+This package has no Femto helpers. Set up Storybook before you add it.
 
 ### Create a solid-storybook project
 
@@ -34,8 +32,8 @@ If that works, set up your Fable project in the same directory.
 
 ## Running Fable and Storybook
 
-Compile into the `stories/` directory, so styling and the rest resolve as Storybook expects. Storybook only picks up
-files with the `.stories.jsx` extension, so the other compiled files do not get in the way.
+Compile into the `stories/` directory, so styling and imports resolve as Storybook expects. Storybook only picks up
+files ending `.stories.jsx`, so the other compiled files do not get in the way.
 
 ```bash
 fable watch -c Release -o stories -e .jsx --run storybook dev -p 6006
@@ -104,8 +102,6 @@ let Default = meta.make [
     // the tested component
 ]
 ```
-
-Once you have written at least one story, its page comes up in Storybook.
 
 ## Example
 

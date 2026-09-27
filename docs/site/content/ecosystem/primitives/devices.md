@@ -6,8 +6,7 @@ title: Devices
 These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to Solid 2 yet.
 :::
 
-Bindings for `@solid-primitives/devices`. They list media devices, with filtered versions for convenience, and read
-device sensors.
+Bindings for `@solid-primitives/devices`: reactive lists of media devices, and device sensors.
 
 ## createDevices
 
@@ -55,7 +54,7 @@ let createAccelerometer(
 | `?includeGravity` | `bool`. Defaults to `false`. |
 | `?interval` | Number of ms. Defaults to `100`. |
 
-A reactive wrapper around the device's acceleration.
+The device's acceleration.
 
 ## createGyroscope
 

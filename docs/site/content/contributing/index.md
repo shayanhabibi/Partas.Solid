@@ -113,6 +113,12 @@ Never weaken the assertion. When the bug is fixed, vitest reports the `it.fails`
 dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize --watch
 ```
 
+### Workbench
+
+For plugin and binding work, the [workbench](dev/workbench.md) is much faster. It is a SageFs session that keeps
+Fable's checker warm: it rechecks every snapshot case in under a second, reloads the plugin in about two, prints the
+AST the plugin receives, and writes the runtime suites' `.fs.jsx` files for `node run.mjs <suite> --no-compile`.
+
 ## Conventions
 
 - Fantomas is configured through `.editorconfig`, but no build step runs it, and much of the code does not pass

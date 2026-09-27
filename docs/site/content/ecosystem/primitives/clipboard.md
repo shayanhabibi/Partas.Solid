@@ -6,7 +6,7 @@ title: Clipboard
 These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to Solid 2 yet.
 :::
 
-Bindings for `@solid-primitives/clipboard`. They make it easy to read from and write to the MDN `clipboard` API.
+Bindings for `@solid-primitives/clipboard`, which wraps the MDN `clipboard` API.
 
 ## ClipboardItem
 
@@ -30,8 +30,7 @@ member types: string[] with get
 member getType(``type``: string): JS.Promise<obj>
 ```
 
-`getType` gets the data for one MIME type from the `ClipboardItem`. It returns a promise that resolves to the data
-object, and fails if the item has no data of that MIME type.
+Resolves to the item's data for one MIME type; rejects if the item has none.
 
 ### PresentationStyle
 
@@ -51,8 +50,7 @@ type PresentationStyle = StringEnum
 let newClipboardItem(``type``: string, data: obj): ClipboardItem
 ```
 
-`newClipboardItem` wraps the creation of a `ClipboardItem`. It takes a MIME type and a data object, and returns a new
-[`ClipboardItem`](#clipboarditem).
+Creates a [`ClipboardItem`](#clipboarditem) from a MIME type and a data object.
 
 ## readClipboard
 
@@ -107,16 +105,15 @@ let createClipboard'(
 ```
 :::
 
-`createClipboard` covers both reading and writing. Destructure its result as a tuple with the apostrophe version, or
-use the named members of [`ClipboardResult`](#clipboardresult).
-
-You can write to the clipboard with the `write` member, or through the input signal. Reading wraps the async
-`clipboard` API in a Solid resource.
+`createClipboard` reads and writes. Write with the `write` member or through the input signal; reads come back as a
+Solid resource. Use the named members of [`ClipboardResult`](#clipboardresult), or destructure the apostrophe
+version's tuple.
 
 :::caution
-`SolidResource` and `createResource` were removed in Partas.Solid 3.0, because Solid 2.0 removed resources. This
+`SolidResource` and `createResource` were removed in Partas.Solid 3.0, because Solid 2.0 removed resources, so this
 binding cannot be ported as it stands. In Solid 2.0, async data comes from a `createMemo` whose compute function
-returns a `JS.Promise`, read under a `Loading` boundary. See the [migration guide](../../guide/migrating-to-solid-2.md).
+returns a `JS.Promise`, read under a `Loading` boundary. See the
+[migration guide](../../guide/migrating-to-solid-2.md#createresource).
 :::
 
 ### ClipboardResult
@@ -125,7 +122,7 @@ returns a `JS.Promise`, read under a `Loading` boundary. See the [migration guid
 type ClipboardResult = interface
 ```
 
-The result of [`createClipboard`](#createclipboard), with named access to the values it returns.
+Named access to what [`createClipboard`](#createclipboard) returns.
 
 ```fsharp
 member resourceItems: SolidResource<ClipboardItem[]>

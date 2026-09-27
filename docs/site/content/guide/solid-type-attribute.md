@@ -29,8 +29,7 @@ div (style = "display: flex; gap: .5rem") {
 }
 ```
 
-The type inherits `span`, so `Tag` accepts every attribute a `span` does, as well as its own `tone`. It is used like
-any other tag.
+The type inherits `span`, so `Tag` accepts every attribute a `span` does, as well as its own `tone`.
 
 ## Requirements
 
@@ -135,17 +134,9 @@ type Field() =
 
 ## Default values
 
-Assign to a prop in the body to give it a default:
-
-```fsharp
-[<SolidTypeComponent>]
-member props.View =
-    props.tone <- "lightblue"
-    // ...
-```
-
-Every assignment is collected into one `merge` call at the start of the component. A prop that the caller passes
-wins over the default. The JSX tab of the `Tag` example at the top of the page shows the result, which starts:
+Assign to a prop in the body to give it a default, as `Tag` does with `props.tone <- "lightblue"`. Every assignment is
+collected into one `merge` call at the start of the component, and a prop that the caller passes wins over the
+default:
 
 ```jsx
 export function Tag(props) {
@@ -162,12 +153,8 @@ Setting the same prop twice is a compile error ("Multiple defaults for the same 
 
 ## Rest props
 
-The plugin collects every prop the body reads (`props.tone`, `props.children`) and emits an `omit` call that leaves
-them out:
-
-```jsx
-const PARTAS_OTHERS = omit(props, "tone", "children");
-```
+The plugin collects every prop the body reads (`props.tone`, `props.children`) and leaves them out of
+`PARTAS_OTHERS` with the `omit` call shown above.
 
 `.spread props` spreads `PARTAS_OTHERS` onto the element, not the whole of `props`. The props your component uses
 itself are not passed on, and everything else is: `title`, event handlers, `id` and so on. If the body reads no props,
@@ -228,17 +215,6 @@ yourself, use `Bindings.omit` and `Bindings.merge` (see [Solid-JS](solid-js.md))
 :::danger
 Do not name anything in your component `PARTAS_OTHERS`. The plugin declares that name in every type component, and
 yours would clash with it.
-:::
-
-## Known issues
-
-:::warning
-The runtime tests record these as known bugs:
-
-- An option-typed prop read with `props.age.IsSome` or `match props.message with ...` compiles to an undefined getter
-  call. Reading it with `defaultArg props.nickname "anon"` works.
-- Indexing a prop inside a `while` condition (`props.tabs[i]`) has the same problem.
-- A default whose value is a function, such as `props.onChange <- ignore`, is left out of `merge`.
 :::
 
 ## Signatures
