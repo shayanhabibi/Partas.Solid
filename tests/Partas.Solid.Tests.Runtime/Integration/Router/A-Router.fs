@@ -53,6 +53,23 @@ let Greet (props: RouteSectionProps) =
 
     Loading (fallback = p (id = "greet-loading") { "Loading" }) { p (id = "greet") { greeting () } }
 
+/// A live query over a stream that yields two values, 50 ms apart. F# has no async generators, so the producer is JS.
+let ticks: LiveQuery<string, string> =
+    liveQuery (
+        (fun (room: string) ->
+            emitJsExpr room "(async function* (r) { yield r + ':1'; await new Promise(res => setTimeout(res, 50)); yield r + ':2'; })($0)"),
+        "ticks"
+    )
+
+[<SolidComponent>]
+let Live () =
+    let message = createMemo (fun (_: string option) -> ticks.Invoke "lobby")
+
+    div () {
+        Loading (fallback = p (id = "live-loading") { "Loading" }) { p (id = "live") { message () } }
+        span (id = "live-status") { string (ticks.status "lobby") }
+    }
+
 /// An action called directly through `useAction`; its settled submissions are listed.
 let addItem =
     action ((fun (text: string) -> JS.Constructors.Promise.resolve ("added " + text)), "add-item")
@@ -98,6 +115,7 @@ let Router =
                route ("/search", Search)
                route ("/greet/:name", Greet, preload = fun args -> box (getGreeting.Invoke(args.``params``["name"].Value)))
                route ("/actions", Actions)
+               route ("/live", Live)
                route ("*404", NotFound) |],
             history = history
         )

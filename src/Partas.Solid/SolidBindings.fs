@@ -693,6 +693,14 @@ type Bindings =
     static member createMemo<'T>(compute: 'T option -> 'T): Accessor<'T> = jsNative
     [<ImportMember "solid-js">]
     static member createMemo<'T>(compute: 'T option -> JS.Promise<'T>): Accessor<'T> = jsNative
+    /// <summary>
+    /// A memo over an async iterable: it holds the latest value the stream yields, and reads as pending until the
+    /// first one. A live query's <c>Invoke</c> returns one.
+    /// </summary>
+    [<ImportMember "solid-js">]
+    static member createMemo<'T>(compute: 'T option -> Fable.Core.TS.Es.AsyncIterable<'T, obj, obj>): Accessor<'T> = jsNative
+    [<ImportMember "solid-js">]
+    static member createMemo<'T>(compute: 'T option -> Fable.Core.TS.Es.AsyncIterable<'T, obj, obj>, options: MemoOptions<'T>): Accessor<'T> = jsNative
     [<ImportMember "solid-js">]
     static member createMemo<'T>(compute: 'T option -> 'T, options: MemoOptions<'T>): Accessor<'T> = jsNative
     [<ImportMember "solid-js"; ParamObject(1)>]

@@ -160,6 +160,22 @@ let UserName (props: RouteSectionProps) =
 `getUser.key` and `getUser.keyFor id` name its cache entries for `revalidate`. Pass several values as a tuple or a
 record.
 
+`liveQuery` is a query over a stream: its function returns an async iterable that yields the current value, then each
+change. Every caller with the same argument shares one connection, and a memo holds the latest value. F# has no async
+generators, so a producer usually wraps a JavaScript stream, such as an `EventSource`:
+
+```fsharp
+let roomMessages: LiveQuery<string, string> = liveQuery (subscribeToRoom, "messages")
+
+[<SolidComponent>]
+let Room (props: RouteSectionProps) =
+    let latest = createMemo (fun (_: string option) -> roomMessages.Invoke(props.``params``["room"].Value))
+    Loading (fallback = p () { "Connecting" }) { p () { latest () } }
+```
+
+`roomMessages.status room` reads the connection state (`LiveQueryStatus`) reactively, and `revalidate` with its key
+reconnects it.
+
 `action` is a mutation with a URL. A form posts its `FormData` to it, and `useAction` calls it directly. Settled
 submissions are listed by `useSubmissions`. In-flight and optimistic state belongs to Solid's optimistic primitives,
 fed by the action's `onSubmit` hook.
@@ -184,7 +200,7 @@ needs a stable name, the second argument of `action`.
 - **Deferred until Partas.Solid has a server-functions story:** server rendering helpers (`@solidjs/router/server`)
   and server component routes. They consume `"use server"` functions, which nothing in Partas.Solid produces yet.
 - **Deferred until there is a design for F# route files:** file-system routes (`@solidjs/router/fs`).
-- **Not bound yet:** `liveQuery`, the `query` cache helpers (`get`, `set`, `clear`), lazy route subtrees and
+- **Not bound yet:** the `query` cache helpers (`get`, `set`, `clear`), lazy route subtrees and
   `RouterContext`. Until then, bind one yourself with `[<Import>]`.
 - **Not needed:** `defineRoute` and `defineRoutes` only add TypeScript types.
 

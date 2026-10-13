@@ -231,6 +231,10 @@ let user = createMemo (fun (_: User option) -> fetchUser (userId ()))
 `createMemo (compute, loadingValue)` gives the memo a value to hold while the first promise is
 pending.
 
+A compute can also return an async iterable (`Fable.Core.TS.Es.AsyncIterable<'T, obj, obj>`). The memo then holds the
+latest value the stream yields, and is pending until the first. The router's
+[`liveQuery`](solid-router.md#data) returns one.
+
 ## Effects
 
 Solid 2 splits an effect into two functions:

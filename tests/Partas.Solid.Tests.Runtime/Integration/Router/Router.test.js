@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { mount, click, flush, settle, waitFor } from "../../helpers/index.js";
-import { App, Bare, history, getGreeting } from "./A-Router.fs.jsx";
+import { App, Bare, history, getGreeting, ticks } from "./A-Router.fs.jsx";
 
 // Every spec shares one module-level router on a memory history; start each at "/".
 beforeEach(() => {
@@ -119,6 +119,22 @@ describe("Integration/Router @solidjs/router 2", () => {
   it("exposes a query's key and per-argument key", () => {
     expect(getGreeting.key).toBe("greeting");
     expect(getGreeting.keyFor("Ada")).toBe(`greeting[${JSON.stringify("Ada")}]`);
+  });
+
+  it("streams a live query's values through a memo", async () => {
+    const { container } = mount(App);
+    await go("/live");
+    await waitFor(() => text(container, "#live") === "lobby:1");
+    await waitFor(() => text(container, "#live") === "lobby:2");
+  });
+
+  it("exposes a live query's keys and connection status", async () => {
+    expect(ticks.key).toBe("ticks");
+    expect(ticks.keyFor("lobby")).toBe(`ticks[${JSON.stringify("lobby")}]`);
+    const { container } = mount(App);
+    await go("/live");
+    await waitFor(() => text(container, "#live") === "lobby:1");
+    expect(text(container, "#live-status")).toBe("connected");
   });
 
   it("calls an action through useAction and lists its settled submissions", async () => {

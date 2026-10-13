@@ -284,6 +284,33 @@ module Bindings =
         /// <summary>The key of the entry for <c>arg</c>, which revalidates only that entry.</summary>
         abstract keyFor: arg: 'Arg -> string
 
+    /// <summary>The wire state of a live query's connection.</summary>
+    [<RequireQualifiedAccess; StringEnum>]
+    type LiveQueryStatus =
+        | Idle
+        | Connecting
+        | Connected
+        | Reconnecting
+        | Closed
+
+    /// <summary>
+    /// A live query: a query over a stream of values. Every call with the same argument shares one connection, and a
+    /// late caller gets the latest value at once. Call it with <c>Invoke</c> inside <c>createMemo</c>, which takes
+    /// each value the stream yields.
+    /// </summary>
+    type LiveQuery<'Arg, 'Value> =
+        [<Emit("$0($1...)")>]
+        abstract Invoke: arg: 'Arg -> Es.AsyncIterable<'Value, obj, obj>
+
+        /// <summary>The live query's key, which reconnects every entry.</summary>
+        abstract key: string
+
+        /// <summary>The key of the entry for <c>arg</c>, which reconnects only that entry.</summary>
+        abstract keyFor: arg: 'Arg -> string
+
+        /// <summary>The connection state of the entry for <c>arg</c>. A reactive read.</summary>
+        abstract status: arg: 'Arg -> LiveQueryStatus
+
     /// <summary>A settled submission of an action. See <c>useSubmissions</c>.</summary>
     type Submission<'Input, 'Result> =
         abstract input: 'Input
@@ -466,6 +493,15 @@ type Bindings =
     /// </summary>
     [<ImportMember(Spec.path)>]
     static member query(fn: 'Arg -> 'Result, name: string) : Query<'Arg, 'Result> = jsNative
+
+    /// <summary>
+    /// Wraps a producer of a value stream, keyed by <c>name</c> and the argument, so every caller shares one
+    /// connection. The producer must yield the current value each time it is called. A stream that fails
+    /// reconnects with backoff; <c>revalidate</c> with the query's key reconnects it.
+    /// </summary>
+    [<ImportMember(Spec.path)>]
+    static member liveQuery(fn: 'Arg -> Es.AsyncIterable<'Value, obj, obj>, name: string) : LiveQuery<'Arg, 'Value> =
+        jsNative
 
     /// <summary>Refetches every query.</summary>
     [<ImportMember(Spec.path)>]

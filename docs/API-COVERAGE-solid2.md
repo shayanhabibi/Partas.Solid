@@ -339,13 +339,12 @@ Flagging these so nobody burns time searching for them:
    [`Svg.fs`](../src/Partas.Solid/Svg.fs) (most likely under-bound at 145 members),
    [`HtmlAttributes.fs`](../src/Partas.Solid/HtmlAttributes.fs), and
    [`AriaAttributes.fs`](../src/Partas.Solid/AriaAttributes.fs).
-7. ~~Router bindings~~ — rebound for `@solidjs/router` 2 (`createRouter`, route definitions, plain `a` links).
+7. ~~Router bindings~~ — rebound for `@solidjs/router` 2 (`createRouter`, route definitions, plain `a` links, `query`, `action`, `liveQuery`).
 8. **Router: not bound, deferred.** What `@solidjs/router@2.0.0-next.38` exports that
    [`SolidRouterBindings.fs`](../src/Partas.Solid/SolidRouterBindings.fs) leaves out, and what each one waits on:
 
    | Export | Waits on |
    | --- | --- |
-   | `liveQuery` (`data/liveQuery`) | Client-side and bindable now: an `AsyncIterable` producer binding, tested in jsdom with an async generator |
    | `query.get` / `set` / `clear` cache helpers, `RouterContext`, lazy route subtrees | Nothing known; not bound yet |
    | `@solidjs/router/server`, `fsServer`, `serverRouteComponent`, flight data | A server-functions (`"use server"`) story: nothing in Partas.Solid produces the functions they consume since the SolidStart bindings were removed. Pairs with item 5 |
    | `@solidjs/router/fs` (`defineFileRoute`, route manifests) | A design for mapping F# files, compile order and module names onto the bundler's `routes/[id]` scan |
