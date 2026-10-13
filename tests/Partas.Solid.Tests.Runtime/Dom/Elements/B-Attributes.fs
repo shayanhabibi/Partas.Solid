@@ -109,11 +109,14 @@ let StyleString () =
 let StyleObj () =
     div(class' = "sobj").style' (createObj [ "color", box "green"; "padding-left", box "2px" ]) { "o" }
 
-/// Solid 2 class accepts an object map. The .class'(obj) extension is shadowed by the class'
-/// string property on tags (does not compile), so the object is passed through the property.
+/// Solid 2 class accepts an object map, through the property or the classObj extension.
 [<SolidComponent>]
 let ClassList () =
     div (class' = !!(createObj [ "on", box true; "off", box false; "also-on", box true ])) { "c" }
+
+[<SolidComponent>]
+let ClassObj () =
+    div().classObj (createObj [ "on", box true; "off", box false; "also-on", box true ]) { "c" }
 
 /// Per-element attributes: anchors, images, labels, inputs, textarea, select, form.
 [<SolidComponent>]

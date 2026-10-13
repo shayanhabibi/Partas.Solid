@@ -19,10 +19,11 @@ Write the call without a space between the constructor and the dot, as above. Wi
 | `.bool(name: string, value: bool)` | `#HtmlTag` | `name={value}` |
 | `.ref(...)` | tags | `ref={...}` |
 | `.style'(obj)` or `.style'((string * obj) list)` | `#HtmlTag` | `style={...}` |
+| `.classObj(obj)` | `#HtmlTag` | `class={...}` |
 | `.spread(value: obj)` | `#HtmlElement` | `{...value}` |
 
 Solid 2 dropped `on:`, `prop:` and `use:`, so `.on`, `.prop` and `.use'` are gone, and `.classList` is now
-the [object map form of `class'`](#class). See [Migrating to Solid 2](migrating-to-solid-2.md#extension-methods).
+[`.classObj`](#classobj). See [Migrating to Solid 2](migrating-to-solid-2.md#extension-methods).
 
 ## attr, data and bool
 
@@ -153,23 +154,17 @@ let StyledBox () =
 
 A plain string works as well, through the `style` property: `div (style = "color: blue")`.
 
-## class'
+## classObj
 
 In Solid 2, `class` takes a string, an object map, or an array. The object map form replaces the old `classList`: each
-key whose value is true is added.
-
-:::warning
-On HTML tags, the typed `class'` string property hides this extension, so `div().class'(obj)` does not compile.
-:::
-
-Pass the object through the property instead, with `!!` to convert it:
+key whose value is true is added. The `class'` property takes a string, so pass a map with `.classObj`:
 
 ```fsharp solid jsx
 let isOpen, setOpen = createSignal true
 
 div () {
     button (onClick = fun _ -> setOpen (not (isOpen ()))) { "Toggle" }
-    span (class' = !!(createObj [ "is-open", box (isOpen ()); "closed", box (not (isOpen ())) ])) {
+    span().classObj({| ``is-open`` = isOpen (); closed = not (isOpen ()) |}) {
         "Inspect my class"
     }
 }

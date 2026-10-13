@@ -418,8 +418,10 @@ module internal rec AST =
                         | "attr" | "bool" -> prop
                         | _ -> failwith "Unreachable"
                     Some(propName, transform ctx value)
-                | ("ref" | "style'" | "class'"), [ identExpr ] ->
+                | ("ref" | "style'"), [ identExpr ] ->
                     Some(extensionName |> StringUtils.TrimReservedIdentifiers, transform ctx identExpr)
+                | "classObj", [ identExpr ] ->
+                    Some("class", transform ctx identExpr)
                 | "spread", _ when fable4 ->
                     "Spread is not supported in fable4"
                     |> PluginContext.logError ctx

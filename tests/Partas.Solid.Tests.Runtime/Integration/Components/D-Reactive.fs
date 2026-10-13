@@ -26,8 +26,7 @@ type StatusChip() =
         div (class' = "chip chip-" + props.status, title = "status: " + props.status) {
             span(class' = "dot").style' ({| color = props.color; ``font-size`` = string props.size + "px" |})
             span(class' = "text", style = "color: " + props.color) { props.status }
-            // `.class'(obj)` cannot be called on tags: the `class'` string property shadows the extension.
-            span (class' = !!{| on = props.active; off = not props.active |})
+            span().classObj {| on = props.active; off = not props.active |}
             button (class' = "act", disabled = not props.active) { "act" }
             input (class' = "field", value = props.status)
         }

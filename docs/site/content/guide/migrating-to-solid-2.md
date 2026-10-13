@@ -126,7 +126,7 @@ The marker after a spread lost its prefix: `bool:n$={false}` is now `n$={false}`
 
 | 2.x | 3.0 |
 | --- | --- |
-| `.classList (obj)` | `class' = !!(createObj [ ... ])`, see [class object map](extension-methods.md#class) |
+| `.classList (obj)` | `.classObj (obj)` |
 | `.on (name, handler)` | Removed. Use the event attribute, or an `OnHandler` for `once`, `passive` and `capture` |
 | `.prop (name, value)` | Removed |
 | `.use' (name, value)` | Removed. Solid 2 has no `use:` directives. Pass `createDirectiveFactory` to `.ref` |

@@ -27,3 +27,11 @@ export function PropsWithExtensionChain(props) {
         key4="value4" />;
 }
 
+export function ClassObjExtension(props) {
+    const PARTAS_OTHERS = props;
+    return <div class={{
+            active: true,
+            disabled: false,
+        }} />;
+}
+

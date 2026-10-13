@@ -109,9 +109,13 @@ module Tags =
         static member inline style'(this: #HtmlTag, styles: (string * obj) list) =
             this.style' (createObj styles)
 
-        /// Usage `elem.classList(createObj ["active", true; "disabled", state.disabled ])`
+        /// <summary>
+        /// Sets <c>class</c> to an object map: each key whose value is true is added.
+        /// Usage <c>elem.classObj(createObj ["active", box true; "disabled", box state.disabled ])</c>
+        /// </summary>
+        /// <remarks>Named apart from the <c>class'</c> string property, which would hide an extension of that name.</remarks>
         [<Extension; Erase>]
-        static member class'(this: #HtmlTag, classListObj: obj) = this
+        static member classObj(this: #HtmlTag, classObj: obj) = this
 
         /// Adds or removes attribute without value
         [<Extension; Erase>]

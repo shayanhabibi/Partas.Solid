@@ -2,6 +2,7 @@
 
 open Partas.Solid
 open Fable.Core
+open Fable.Core.JsInterop
 
 [<Erase>]
 type NoPropsOneExtension() =
@@ -31,3 +32,12 @@ type PropsWithExtensionChain() =
     [<SolidTypeComponent>]
     member props.typeDef =
         div(class' = "Tester", draggable = Attr.Draggable.True).attr("key", "value").attr("key2", "value2").attr("key3", "value3").attr ("key4", "value4")
+
+[<Erase>]
+type ClassObjExtension() =
+    interface RegularNode
+
+    [<SolidTypeComponent>]
+    member props.typeDef =
+        div().classObj (createObj [ "active", box true; "disabled", box false ])
+

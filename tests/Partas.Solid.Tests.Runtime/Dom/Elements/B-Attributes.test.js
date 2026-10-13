@@ -2,7 +2,7 @@ import {describe, it, expect} from "vitest";
 import {mount} from "../../helpers/index.js";
 import {
     Globals, DataAttrs, AriaAttrs, AriaHiddenFalse, AriaViaAttr, BoolsTrue, BoolsFalse, BoolProps, BoolExt,
-    StyleSpecEl, StyleString, StyleObj, ClassList, PerElement, InnerHtml, HtmlProp, ValueProp, TabIndexes
+    StyleSpecEl, StyleString, StyleObj, ClassList, ClassObj, PerElement, InnerHtml, HtmlProp, ValueProp, TabIndexes
 } from "./B-Attributes.fs.jsx";
 
 const attrs = el => Object.fromEntries([...el.attributes].map(a => [a.name, a.value]));
@@ -138,6 +138,11 @@ describe("Dom/Elements style and class", () => {
 
     it("applies a class object map: truthy keys only", () => {
         const {root} = mount(ClassList);
+        expect([...root.classList].sort()).toEqual(["also-on", "on"]);
+    });
+
+    it("applies a class object map through the classObj extension", () => {
+        const {root} = mount(ClassObj);
         expect([...root.classList].sort()).toEqual(["also-on", "on"]);
     });
 });

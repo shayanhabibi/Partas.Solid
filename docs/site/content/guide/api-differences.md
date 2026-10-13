@@ -41,19 +41,19 @@ Attributes that do not fit a typed constructor parameter are extension methods o
 | `.bool(name, value)` | `name={value}` |
 | `.ref(element)` | `ref={element}` |
 | `.style'(obj)` | `style={obj}`, a style object |
+| `.classObj(obj)` | `class={obj}`, a class object map |
 | `.spread(obj)` | `{...obj}` |
 
 ```fsharp solid jsx
 div () {
     span().data("state", "open").attr("aria-busy", false) { "data and attr " }
-    span(class' = !!(createObj [ "card", box true; "muted", box false ])).style'({| border = "1px dashed" |}) {
+    span().classObj({| card = true; muted = false |}).style'({| border = "1px dashed" |}) {
         "class and style objects"
     }
 }
 ```
 
-`style` takes a string, and `.style'` an object. A class object goes through the `class'` property with `!!`, as
-above: on tags, the `class'` property hides the `.class'` extension. Solid 1's `on:`, `prop:` and `use:` escape
+`style` takes a string, and `.style'` an object; likewise `class'` and `.classObj`. Solid 1's `on:`, `prop:` and `use:` escape
 hatches (`.on`, `.prop` and `.use'`) were removed in 3.0. See [extension methods](extension-methods.md).
 
 When you pass a variable to `.ref`, make it `mutable`:
