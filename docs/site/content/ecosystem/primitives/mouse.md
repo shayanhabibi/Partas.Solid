@@ -8,110 +8,68 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 
 Bindings for `@solid-primitives/mouse`.
 
-:::caution
-The position and size properties below are typed `int`. They should be `float`.
-:::
+## Types
 
-## MouseSourceType
+All are POJOs. The positions and sizes are typed `int`; they should be `float`.
 
-Type: `StringEnum`
+| Type | Fields |
+| --- | --- |
+| `Position` | `x`, `y` |
+| `MousePosition` | `x`, `y`, `sourceType: MouseSourceType option` |
+| `MousePositionInside` | `x`, `y`, `sourceType: MouseSourceType`, `isInside: bool` |
+| `PositionRelativeToElement` | `x`, `y`, `isInside`, `top`, `left`, `width`, `height` |
 
-- `Mouse`
-- `Touch`
-
-## Position
-
-Type: `POJO`
-
-- x: `int`
-- y: `int`
-
-## MousePosition
-
-Type: `POJO`
-
-- x: `int`
-- y: `int`
-- sourceType: `MouseSourceType option`
-
-## MousePositionInside
-
-Type: `POJO`
-
-- x: `int`
-- y: `int`
-- sourceType: `MouseSourceType`
-- isInside: `bool`
-
-## PositionRelativeToElement
-
-Type: `POJO`
-
-- x: `int`
-- y: `int`
-- isInside: `bool`
-- top: `int`
-- left: `int`
-- width: `int`
-- height: `int`
+`MouseSourceType` is a `StringEnum`: `Mouse` or `Touch`.
 
 ## Bindings
 
 | Member | Desc |
 | --- | --- |
-| `makeMousePositionListener` | Listens for changes to the mouse or touch position on the target. Returns a function that removes the listeners. |
-| `makeMouseInsideListener` | Listens for the mouse or touch entering or leaving the target. Returns a function that removes the listeners. |
-| `getPositionToElement` | Turns a position relative to the page into a position relative to an element. |
+| `makeMousePositionListener` | Listens for changes to the mouse or touch position on the target. Returns a `DisposeCallback`. |
+| `makeMouseInsideListener` | Listens for the mouse or touch entering or leaving the target. Returns a `DisposeCallback`. |
+| `getPositionToElement` | Turns a page position into a position relative to an element. |
 | `getPositionInElement` | Like `getPositionToElement`, but clamped to the element's bounds. |
-| `getPositionToScreen` | Turns a position relative to the page into a position relative to the screen. |
-| `createMousePosition` | A reactive object with the current mouse position on the page. The target defaults to `window`, and can be an accessor. |
+| `getPositionToScreen` | Turns a page position into a screen position. |
+| `createMousePosition` | A reactive `MousePositionInside` on the page. The target defaults to `window`, and can be an accessor. |
 | `useMousePosition` | `createMousePosition` on `window`, as a singleton root shared by every caller. |
-| `createPositionToElement` | A position relative to an element, updated from a reactive page position. Also returns the element's current bounds. |
-
-Common parameters:
+| `createPositionToElement` | A position relative to an element, updated from an accessor of a page position, plus the element's bounds. |
 
 | Param | Desc |
 | --- | --- |
 | `target` | `SVGSVGElement`, `HTMLElement`, `Window` or `Document`. |
-| `touch` | Listen to touch events. If on, the position updates on `touchstart`. |
-| `followTouch` | If on, the position updates on `touchmove`. |
+| `touch` | Listen to touch events, updating on `touchstart`. |
+| `followTouch` | Update on `touchmove`. |
 | `initialValues` | The initial values. |
-| `pos` | For `createPositionToElement`: an accessor of the page position (relative to the page, not the window). |
-
-:::details Bindings
-```fsharp
-[<Erase; AutoOpen>]
-type Mouse =
-    [<Import("makeMousePositionListener", path); ParamObject(2)>]
-    static member makeMousePositionListener (target: U4<HtmlElement, Element, Document, Window>, callback: (MousePosition -> unit), ?touch: bool, ?followTouch: bool) : DisposeCallback = nativeOnly
-
-    [<Import("makeMouseInsideListener", path); ParamObject(2)>]
-    static member makeMouseInsideListener (target: U4<HtmlElement, Element, Document, Window>, callback: (bool -> unit), ?touch: bool) : DisposeCallback = nativeOnly
-
-    [<Import("getPositionToElement", path)>]
-    static member getPositionToElement(pageX: int, pageY: int, el: U4<HtmlElement, Element, Document, Window>): PositionRelativeToElement = nativeOnly
-
-    [<Import("getPositionInElement", path)>]
-    static member getPositionInElement(pageX: int, pageY: int, el: U4<HtmlElement, Element, Document, Window>): PositionRelativeToElement = nativeOnly
-
-    [<Import("getPositionToScreen", path)>]
-    static member getPositionToScreen(pageX: int, pageY: int): Position = nativeOnly
-
-    [<Import("createMousePosition", path)>]
-    static member createMousePosition (?target: U4<HtmlElement, Element, Document, Window>, ?initialValues: MousePositionInside, ?touch: bool, ?followTouch: bool) : MousePositionInside = nativeOnly
-
-    [<Import("createMousePosition", path); ParamObject(1)>]
-    static member createMousePosition (?target: U4<Accessor<HtmlElement>, Accessor<Element>, Accessor<Document>, Accessor<Window>>, ?initialValues: MousePositionInside, ?touch: bool, ?followTouch: bool) : MousePositionInside = nativeOnly
-
-    [<Import("useMousePosition", path)>]
-    static member inline useMousePosition: (unit -> MousePositionInside) = nativeOnly
-
-    [<Import("createPositionToElement", path); ParamObject(2)>]
-    static member createPositionToElement (element: U4<HtmlElement, Element, Accessor<HtmlElement>, Accessor<Element>>, pos: Accessor<Position>, ?initialValues: PositionRelativeToElement, ?touch: bool, ?followTouch: bool) : PositionRelativeToElement = nativeOnly
-```
-:::
 
 :::caution
-The first `createMousePosition` overload has no `ParamObject`, so `touch` and `followTouch` are passed as positional
-arguments rather than as an options object.
+The `createMousePosition` overload that takes an element, not an accessor, has no `ParamObject`, so `touch` and
+`followTouch` are passed as positional arguments rather than as an options object.
 :::
+
+## On Solid 2 today
+
+`createMousePosition` on an element is a store of `x`, `y` and `isInside`, kept up to date by pointer events. In plain
+Partas.Solid it is a signal written from `onPointerMove`, whose handler is typed `Dom.PointerEvent -> unit`:
+
+```fsharp solid render=PointerReadout jsx
+[<SolidComponent>]
+let PointerReadout () =
+    let x, setX = createSignal 0.
+    let y, setY = createSignal 0.
+    let inside, setInside = createSignal false
+
+    div (
+        style = "position: relative; height: 10rem; border: 1px dashed var(--nacara-border); border-radius: var(--nacara-radius-sm); cursor: crosshair; overflow: hidden",
+        onPointerMove = (fun e -> setX e.offsetX; setY e.offsetY),
+        onPointerEnter = (fun _ -> setInside true),
+        onPointerLeave = fun _ -> setInside false
+    ) {
+        code (style = "position: absolute; top: .5rem; left: .5rem; pointer-events: none") {
+            $"x {int (x ())} · y {int (y ())} · isInside {inside ()}"
+        }
+        div (
+            style =
+                $"position: absolute; width: .75rem; height: .75rem; border-radius: 999px; background: var(--nacara-primary); pointer-events: none; transform: translate({x () - 6.}px, {y () - 6.}px); opacity: {if inside () then 1 else 0}"
+        )
+    }
+```

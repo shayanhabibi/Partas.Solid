@@ -12,24 +12,24 @@ tag (attribute = value, ...) {
 }
 ```
 
-Attributes are easy to tell apart from children, and each element has a clear start and end, much like XML. To build
-attributes programmatically, for example from a list, spread an object onto the element with
-[`.spread`](extension-methods.md#spread).
-
 ## Elements
 
 Each HTML element is a class, and its attributes are optional constructor parameters. Attribute names that are F#
-keywords get an apostrophe: `class'`, `type'`, `for'`, `when'`.
+keywords get an apostrophe: `class'`, `type'`, `for'`, `when'`. An attribute with a fixed set of values takes a case
+of a union in `Attr`, and the JSX gets its string:
 
 ```fsharp solid jsx
 button (class' = "btn", type' = Attr.ButtonType.Button, title = "A plain button") { "Button" }
 ```
 
+Event handlers receive the event type of their event. `onClick` takes a `Dom.MouseEvent -> unit`, `onInput` a
+`Dom.InputEvent -> unit`; `Dom` is in `Fable.Core.TS`.
+
 ## Children
 
 The computation expression after an element holds its children: strings, numbers and other elements, in any mix.
 
-```fsharp solid
+```fsharp solid jsx
 div () {
     "Button label"
     button () { "Button" }
@@ -55,23 +55,14 @@ div () {
 
 ## Embedded JSX
 
-Embed raw JSX (Fable's `JSX.jsx`) through a small helper:
+`JSX.Element` collides with `HtmlElement` in the F# compiler, so the builder does not take Fable's `JSX.jsx`
+directly. `unbox` it. `JSX.jsx` only takes a string literal:
 
-```fsharp
-let inline toHtmlElement (func: string -> JSX.Element) (value: string) : HtmlElement =
-    unbox (func value)
-```
-
-```fsharp
+```fsharp solid jsx
 div () {
-    toHtmlElement JSX.jsx "<button>Button</button>"
+    unbox<HtmlElement> (JSX.jsx "<button>Raw JSX button</button>")
 }
 ```
-
-:::note
-`JSX.Element` collides with `HtmlElement` in the F# compiler, so the builder cannot accept both. Convert with a helper
-as above.
-:::
 
 ## Lambda children
 
@@ -82,7 +73,7 @@ To pass a function as a child, you must `yield` it. If your IDE cannot infer the
 probably left out the `yield`.
 :::
 
-```fsharp solid
+```fsharp solid jsx
 ul () {
     For.Keyed(each = [| "one"; "two"; "three" |]) {
         yield fun item _ -> li () { $"Item {item}" }
@@ -90,21 +81,9 @@ ul () {
 }
 ```
 
-:::tip
-If you write bindings for a library component that takes a function child, implement one of the `ChildLambdaProvider`
-interfaces on its type. The builder then accepts a yielded function with the right parameter types. See
-[tag interfaces](tag-interfaces.md).
-:::
+To write a component that takes a function child, see [tag interfaces](tag-interfaces.md#child-lambda-providers).
 
 ## Extension methods
 
-Extension methods cover what constructor parameters cannot: spreads, custom and `data-*` attributes, style objects and
-refs.
-
-```fsharp solid jsx
-div(style = "padding: .5em; border: 1px dashed gray").data("state", "ready").attr("aria-live", "polite") {
-    "This div has data-state and aria-live attributes."
-}
-```
-
-See [extension methods](extension-methods.md) for the full list.
+Spreads, custom and `data-*` attributes, style objects and refs are chained after the constructor:
+`div(class' = "card").data("id", "42")`. See [extension methods](extension-methods.md).

@@ -14,50 +14,20 @@ Write the call without a space between the constructor and the dot, as above. Wi
 
 | Method | On | Emits |
 | --- | --- | --- |
-| `.attr(name, value)` | `#HtmlTag` | `name={value}` |
-| `.data(name, value)` | `#HtmlTag` | `data-name={value}` |
-| `.bool(name, value)` | `#HtmlTag` | `name={value}` |
+| `.attr(name: string, value: obj)` | `#HtmlTag` | `name={value}` |
+| `.data(name: string, value: string)` | `#HtmlTag` | `data-name={value}` |
+| `.bool(name: string, value: bool)` | `#HtmlTag` | `name={value}` |
 | `.ref(...)` | tags | `ref={...}` |
-| `.style'(...)` | `#HtmlTag` | `style={...}` |
-| `.class'(...)` | `#HtmlTag` | `class={...}` |
-| `.spread(value)` | `#HtmlElement` | `{...value}` |
+| `.style'(obj)` or `.style'((string * obj) list)` | `#HtmlTag` | `style={...}` |
+| `.spread(value: obj)` | `#HtmlElement` | `{...value}` |
 
-## Changes in 3.0
+Solid 2 dropped `on:`, `prop:` and `use:`, so `.on`, `.prop` and `.use'` are gone, and `.classList` is now
+the [object map form of `class'`](#class). See [Migrating to Solid 2](migrating-to-solid-2.md#extension-methods).
 
-| 2.x on Solid 1.9 | 3.0 on Solid 2 |
-| --- | --- |
-| `.on(event, handler)` | Removed. Solid 2 dropped the `on:` namespace. Use the typed `on*` event properties. |
-| `.prop(name, value)` | Removed, with no replacement binding yet. |
-| `.use'(directive)` | Removed. Solid 2 dropped `use:` directives. Pass the directive to `.ref` as a callback. |
-| `.classList(obj)` | Renamed to `.class'(obj)`, because Solid 2's `class` takes an object map. On HTML tags the extension is hidden by the `class'` property; see `class'` below. |
-| `.bool` emitted `bool:name` | `.bool` emits the plain attribute name. |
-| `.spread` was on `#HtmlTag` | `.spread` is on `#HtmlElement`, so components that only implement `HtmlElement` have it too. |
+## attr, data and bool
 
-See [Migrating to Solid 2](migrating-to-solid-2.md) for the rest of the changes.
-
-## attr
-
-Sets any attribute by name, including custom attributes and names F# does not allow as identifiers.
-
-```fsharp
-attr(name: string, value: obj)
-```
-
-## data
-
-Sets a `data-*` attribute. `name` is the part after `data-`.
-
-```fsharp
-data(name: string, value: string)
-```
-
-## bool
-
-Sets a boolean attribute by name. `true` adds the attribute and `false` removes it.
-
-```fsharp
-bool(name: string, value: bool)
-```
+`.attr` sets any attribute by name, including names F# does not allow as identifiers. `.data` sets a `data-*`
+attribute; `name` is the part after `data-`. `.bool` adds the attribute when `true` and removes it when `false`.
 
 ```fsharp solid jsx
 div(style = "font-family: monospace").data("user-id", "42").attr("custom-attr", "yes").bool("itemscope", true) {
@@ -82,14 +52,7 @@ let FocusDemo () =
     }
 ```
 
-The same with a callback:
-
-```fsharp
-open Fable.Core.TS
-div().ref (fun (el: Dom.HTMLDivElement) -> JS.console.log el) { "..." }
-```
-
-For HTML tags, the element type follows from the tag: `input().ref` takes an `HTMLInputElement`, `div().ref` an
+A callback works too: `div().ref (fun (el: Dom.HTMLDivElement) -> JS.console.log el)`. For HTML tags, the element type follows from the tag: `input().ref` takes an `HTMLInputElement`, `div().ref` an
 `HTMLDivElement`. If you have a more general type, cast it: `div().ref (myRef :?> _)`.
 
 The `Ref<'T>` union describes every shape a ref can take, so a component can take a ref prop and pass it on:
@@ -178,11 +141,6 @@ keeps it attached while the page moves.
 Sets the `style` attribute from an object, or from a list of name and value pairs. The `Style` module in
 `Partas.Solid.Style` has typed helpers for the pairs.
 
-```fsharp
-style'(styleObj: obj)
-style'(styles: (string * obj) list)
-```
-
 ```fsharp solid render=StyledBox jsx
 open Partas.Solid.Style
 
@@ -200,17 +158,13 @@ A plain string works as well, through the `style` property: `div (style = "color
 In Solid 2, `class` takes a string, an object map, or an array. The object map form replaces the old `classList`: each
 key whose value is true is added.
 
-```fsharp
-class'(classListObj: obj)
-```
-
 :::warning
 On HTML tags, the typed `class'` string property hides this extension, so `div().class'(obj)` does not compile.
 :::
 
 Pass the object through the property instead, with `!!` to convert it:
 
-```fsharp solid
+```fsharp solid jsx
 let isOpen, setOpen = createSignal true
 
 div () {
@@ -225,10 +179,6 @@ div () {
 
 Spreads the properties of an object onto the element.
 
-```fsharp
-spread(value: obj)
-```
-
 ```fsharp solid render=SpreadLocal jsx
 [<SolidComponent>]
 let SpreadLocal () =
@@ -239,13 +189,9 @@ let SpreadLocal () =
 In a [SolidTypeComponent](solid-type-attribute.md), `.spread props` spreads the props the body does not read (the
 `PARTAS_OTHERS` binding), passing unused attributes on to the rendered element:
 
-```fsharp
-namespace Partas.Solid.MyCenteredButton
-
-open Partas.Solid
-
+```fsharp solid jsx
 [<Erase>]
-type MyCenteredButton() =
+type CenteredButton() =
     inherit button()
 
     [<SolidTypeComponent>]
@@ -256,17 +202,12 @@ type MyCenteredButton() =
         }
 ```
 
-:::note
-A prop that the body reads is left out of the spread. Above, the body reads `props.class'` for the button, so the
-spread does not carry `class`, and the button has to set `class' = props.class'` itself. If another element read
-`props.class'` and the button only had `.spread props`, the button would get no class at all. Setting a default does
+```fsharp solid
+CenteredButton(title = "title came through the spread") { "Hover me" }
+```
+
+A prop that the body reads is left out of the spread: the JSX tab shows `class` in the `omit` call. So the button
+sets `class' = props.class'` itself; with only `.spread props` it would get no class at all. Setting a default does
 not count as a read: `props.class' <- "centered"` only adds `class` to the `merge` call.
-:::
 
-To spread every prop, reads included, see `SpreadProps` in [Attribute Flags](attribute-flags.md).
-
-## OnHandler
-
-`OnHandler` is a record with `handleEvent`, `once`, `passive` and `capture` fields. It was the argument of the removed
-`.on` method, and nothing takes it now. To pass listener options in Solid 2, attach the listener yourself in a `.ref`
-callback with `addEventListener`.
+To spread every prop, reads included, see [SkipOmit and SpreadProps](attribute-flags.md#skipomit-and-spreadprops).

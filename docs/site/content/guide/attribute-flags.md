@@ -30,18 +30,14 @@ Two shortcuts combine flags for you:
 | `ComponentFlag.VerboseDebugMode` | `DebugMode ||| PrintDisposals` |
 
 :::details DebugMode
-Prints the AST of the component, before the plugin transforms it, to the console during the Fable build.
-
-If you open an issue about the plugin, include a minimal example compiled with this flag and its output. See
+The AST is printed to the console during the Fable build. If you open an issue about the plugin, include a minimal example compiled with this flag and its output. See
 [Submitting Issues](../contributing/submit-issues.md).
 :::
 
 :::details PrintDisposals
-While the plugin transforms a component, it throws some expressions away: plumbing from computation expressions,
-unit values, and so on. This flag logs each one.
-
-Use it when part of your component is missing from the output. The log tells you where the plugin dropped it. It is
-very noisy, so turn it on for one component at a time.
+The plugin throws some expressions away: plumbing from computation expressions, unit values, and so on. Use this flag
+when part of your component is missing from the output; the log tells you where the plugin dropped it. Turn it on for
+one component at a time.
 :::
 
 :::details SkipPojoOptimisation
@@ -62,47 +58,33 @@ wrong code, and report it.
 ## SkipOmit and SpreadProps
 
 These two flags only change `[<SolidTypeComponent>]` output. By default, the plugin binds the props your component
-does not read and spreads those (see [SolidTypeComponent](solid-type-attribute.md)):
+does not read to `PARTAS_OTHERS`, and `.spread props` spreads those (see [rest props](solid-type-attribute.md#rest-props)).
 
-```jsx
-const PARTAS_OTHERS = omit(props, "class");
-return <div class={props.class} {...PARTAS_OTHERS} n$={false} />;
+- `SkipOmit` leaves out the `const PARTAS_OTHERS = ...` binding, so `.spread props` spreads the self identifier.
+- `SpreadProps` makes `.spread props` spread the self identifier, `{...props}` in place of `{...PARTAS_OTHERS}`.
+
+Together they make a thin wrapper that passes all of its props on, reads included. The two components below differ
+only in their flags; compare their JSX:
+
+```fsharp solid jsx
+[<Erase>]
+type Filtered() =
+    inherit div()
+
+    [<SolidTypeComponent>]
+    member props.View = div(class' = "box " + props.class').spread props { props.children }
+
+[<Erase>]
+type PassThrough() =
+    inherit div()
+
+    [<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps)>]
+    member props.View = div(class' = "box " + props.class').spread props { props.children }
 ```
 
-- `SkipOmit` leaves out the `const PARTAS_OTHERS = ...` line.
-- `SpreadProps` makes `.spread props` spread the self identifier itself: `{...props}` in place of
-  `{...PARTAS_OTHERS}`.
-
-`SkipOmit` also makes `.spread` use the self identifier, since there is no `PARTAS_OTHERS` to spread. Use them together
-for a thin wrapper that passes all of its props on, reads included. Partas.Solid's own `Match.Keyed` is one. It
-renders Solid's `Match` with `keyed` set, and hands every prop it was given straight through:
-
-```fsharp
-[<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps)>]
-member props.comp = Match<'T>(keyed = true).spread(props)
-```
-
-The body compiles to a `<Match keyed={true} {...props} n$={false} />` element, with no `omit` before it.
+In `PassThrough`, the spread comes after `class`, so the caller's `class` replaces `"box ..."`. Partas.Solid's own
+`Match.Keyed` is built this way: it renders Solid's `Match` with `keyed` set and hands every prop straight through.
 
 :::note
 `.spread` on any value other than the self identifier spreads that value, whatever the flags are.
 :::
-
-## Signatures
-
-```fsharp
-type ComponentFlag =
-    | Default = 0b0000
-    | DebugMode = 0b0001
-    | SkipPojoOptimisation = 0b0010
-    | PrintDisposals = 0b0100
-    | SkipCEOptimisation = 0b1000
-    | SkipOmit = 0b0001_0000
-    | SpreadProps = 0b0010_0000
-
-module ComponentFlag =
-    [<Literal>]
-    let None = ComponentFlag.SkipPojoOptimisation ||| ComponentFlag.SkipCEOptimisation
-    [<Literal>]
-    let VerboseDebugMode = ComponentFlag.DebugMode ||| ComponentFlag.PrintDisposals
-```

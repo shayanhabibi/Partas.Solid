@@ -135,30 +135,16 @@ type Field() =
 ## Default values
 
 Assign to a prop in the body to give it a default, as `Tag` does with `props.tone <- "lightblue"`. Every assignment is
-collected into one `merge` call at the start of the component, and a prop that the caller passes wins over the
-default:
-
-```jsx
-export function Tag(props) {
-    props = merge({
-        tone: "lightblue",
-    }, props);
-    const PARTAS_OTHERS = omit(props, "tone", "children");
-    // ...
-}
-```
-
-`merge` comes from `solid-js`. It keeps the props reactive: `props.tone` still reads the caller's current value.
+collected into one `merge` call at the start of the component (see the JSX tab of `Tag`), and a prop that the caller
+passes wins over the default. `merge` comes from `solid-js`. It keeps the props reactive: `props.tone` still reads the caller's current value.
 Setting the same prop twice is a compile error ("Multiple defaults for the same property").
 
 ## Rest props
 
-The plugin collects every prop the body reads (`props.tone`, `props.children`) and leaves them out of
-`PARTAS_OTHERS` with the `omit` call shown above.
-
-`.spread props` spreads `PARTAS_OTHERS` onto the element, not the whole of `props`. The props your component uses
-itself are not passed on, and everything else is: `title`, event handlers, `id` and so on. If the body reads no props,
-the binding is just `const PARTAS_OTHERS = props;`.
+The plugin collects every prop the body reads (`props.tone`, `props.children`) and binds the rest to
+`PARTAS_OTHERS` with an `omit` call. `.spread props` spreads `PARTAS_OTHERS`, not the whole of `props`: the props your
+component uses itself are not passed on, and everything else is (`title`, event handlers, `id` and so on). If the
+body reads no props, the binding is just `const PARTAS_OTHERS = props;`.
 
 Here is a component that uses `variant` itself, and passes every other `button` attribute through:
 
@@ -193,34 +179,15 @@ let FancyHost () =
 
 :::note
 A prop you read in the body is **not** in `PARTAS_OTHERS`. If you read `props.class'` and also want it on the element
-you spread onto, pass it explicitly: `button(class' = props.class').spread props`. See
-[Extension Methods](extension-methods.md).
+you spread onto, pass it explicitly: `button(class' = props.class').spread props`. See [spread](extension-methods.md#spread).
 :::
 
-### Changes from Partas.Solid 2.x
-
-Partas.Solid 3.0 uses the Solid 2 primitives. `splitProps` and `mergeProps` no longer exist.
-
-| 2.x on Solid 1.9 | 3.0 on Solid 2 |
-| --- | --- |
-| `const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["class"])` | `const PARTAS_OTHERS = omit(props, "class")` |
-| reads went through `PARTAS_LOCAL.class` | reads go through `props.class` |
-| `props = mergeProps({...}, props)` | `props = merge({...}, props)` |
-| self identifier had to be `props` | any self identifier |
-
-You can turn the `omit` binding off with `ComponentFlag.SkipOmit`, and make `.spread` spread the whole self
-identifier with `ComponentFlag.SpreadProps`. See [Attribute Flags](attribute-flags.md). To call `omit` or `merge`
-yourself, use `Bindings.omit` and `Bindings.merge` (see [Solid-JS](solid-js.md)).
+`ComponentFlag.SkipOmit` turns the `omit` binding off, and `ComponentFlag.SpreadProps` makes `.spread` spread the
+whole self identifier (see [Attribute Flags](attribute-flags.md#skipomit-and-spreadprops)). To call `omit` or `merge`
+yourself, use `Bindings.omit` and `Bindings.merge` (see [Solid-JS](solid-js.md)). Coming from 2.x's `splitProps` and
+`mergeProps`? See [Migrating to Solid 2](migrating-to-solid-2.md#props-omit-and-merge).
 
 :::danger
 Do not name anything in your component `PARTAS_OTHERS`. The plugin declares that name in every type component, and
 yours would clash with it.
 :::
-
-## Signatures
-
-```fsharp
-type SolidTypeComponentAttribute(flag: int)
-new()
-new(compileOptions: ComponentFlag)
-```

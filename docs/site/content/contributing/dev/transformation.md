@@ -2,11 +2,7 @@
 title: Plugin transformation
 ---
 
-:::note
-The plugin's source is documented heavily. Every pattern has a comment on what it does and why.
-:::
-
-`Plugin.fs` holds the transformation logic and the two public attributes. It is the heart of the package.
+`Plugin.fs` holds the transformation logic and the two public attributes.
 
 ## Entry points
 
@@ -62,9 +58,9 @@ structure back together.
 
 ## Following a component through
 
-Take this component:
+Take this component. Its JSX tab is the result:
 
-```fsharp
+```fsharp solid jsx render=BadgeDemo
 [<Erase>]
 type Badge() =
     inherit span()
@@ -76,6 +72,14 @@ type Badge() =
     member props.View =
         props.tone <- "info"
         span(class' = "badge " + props.tone).spread props { props.children }
+
+[<SolidComponent>]
+let BadgeDemo () =
+    p () {
+        Badge(title = "spread through") { "Default tone, hover me" }
+        " · "
+        Badge(tone = "warning") { "Warning tone" }
+    }
 ```
 
 - `props.tone <- "info"` matches `PropsGetterOrSetter` as a setter. `("tone", "info")` is recorded and the line is
@@ -86,21 +90,6 @@ type Badge() =
 - The reads of `props.tone` and `props.children` are recorded as getters.
 - Last, the attribute wraps the result with `omit(props, "tone", "children")` and `merge({ tone: "info" }, props)`,
   and renames the function to `Badge`.
-
-The result:
-
-```jsx
-export function Badge(props) {
-    props = merge({
-        tone: "info",
-    }, props);
-    const PARTAS_OTHERS = omit(props, "tone", "children");
-    return <span class={"badge " + props.tone}
-        {...PARTAS_OTHERS} n$={false}>
-        {props.children}
-    </span>;
-}
-```
 
 ## When something goes missing
 

@@ -86,18 +86,8 @@ type DataTable<'T>() =
 ```
 
 :::note
-Partas.Solid 3.0 has no plain `For`. Solid 2 folds `Index` into `For` through a `keyed` prop, and the bindings expose
-the two modes as separate types. The list above would use `For.Keyed`, which keys rows by identity:
-
-```fsharp
-For.Keyed(each = table.getRowModel().rows) {
-    yield fun row _ -> TableRow() { (* ... *) }
-}
-```
-
-`For.NonKeyed` replaces the old `Index`. The two differ in which argument is reactive. `For.Keyed` passes the item and
-an index accessor, so you read the index as `index ()`. `For.NonKeyed` passes an item accessor and a plain `int`
-index, so you read the item as `item ()`. See [Migrating to Solid 2](../../guide/migrating-to-solid-2.md).
+Partas.Solid 3.0 has no plain `For`: the lists above would be `For.Keyed`, which keys rows by identity. See
+[Migrating to Solid 2](../../guide/migrating-to-solid-2.md).
 :::
 
 :::details Why SolidTypeComponent and not SolidComponent?

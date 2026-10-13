@@ -47,7 +47,7 @@ let ApexChartExample () =
 
 This renders a bar chart and a line chart of the same series, side by side, in a monochrome theme.
 
-## Binding apexcharts directly on Solid 2
+## On Solid 2 today
 
 ApexCharts itself does not depend on Solid, only the `solid-apexcharts` wrapper does, so you can use it on Solid 2
 today. Declare the class with `[<Import("default", "apexcharts")>]` and give it only the members you call;

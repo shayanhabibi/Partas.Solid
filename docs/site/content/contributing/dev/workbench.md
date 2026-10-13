@@ -11,12 +11,8 @@ test run:
 | a binding in `src/Partas.Solid/`, or a test input | `Workbench.checkAll ()` | under 1 s |
 | the plugin (`src/Partas.Solid.FablePlugin/`) | `Workbench.reloadPlugin ()`, then `Workbench.checkAll ()` | about 2.5 s |
 
-The first compile in a session takes about 10 s, because it cracks the project. `dotnet fsi tools/build.fsx -- test` stays
-the final gate.
-
-:::note
-`tools/Workbench/README.md` is the full reference. This page covers what you need to start.
-:::
+The first compile in a session takes about 10 s, because it cracks the project. `dotnet fsi tools/build.fsx -- test`
+stays the final gate, and `tools/Workbench/README.md` is the full reference.
 
 ## Setup
 

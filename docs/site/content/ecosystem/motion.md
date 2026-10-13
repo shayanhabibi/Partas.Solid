@@ -13,12 +13,8 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 
 See [the docs](https://github.com/solidjs-community/solid-motionone) for usage.
 
-`solid-motionone` uses different prop names from `motion/react`: keyframes in `transition` use `offset`, not `times`
-(see [Keyframes](#keyframes)).
-
-### Differences
-
-Each Motion-specific prop has two forms:
+Keyframes in `transition` use `offset`, not `motion/react`'s `times` (see [Keyframes](#keyframes)). Each Motion-specific
+prop has two forms:
 
 - The plain name, such as `initial`, takes a Feliz-style list of props. Build it with the `MotionStyle` qualifier for
   CSS props such as `animate` and `initial`, and `MotionTransition` for `transition`, which enforces the
@@ -26,9 +22,7 @@ Each Motion-specific prop has two forms:
 - The `JSX`-suffixed name, such as `initialJSX`, takes the value as a JSX string (see
   [Language injection](#language-injection)).
 
-## motion
-
-See [the docs](https://motion.dev/docs/animate) for usage. Only the `animate` function is bound.
+From `motion`, only [`animate`](https://motion.dev/docs/animate) is bound.
 
 ## Example
 
@@ -87,26 +81,10 @@ let WordRotateExample () =
 
 The word fades and slides out downwards, and the next one fades in from above, every 2.5 seconds.
 
-:::warning
-This example is written for Partas.Solid 2.x. In 3.0 the single-callback `createEffect` is gone. Solid 2 splits an
-effect into a tracked compute function and an untracked effect function, and the effect function returns its cleanup
-instead of calling `onCleanup`. The `OptionKeys` interface used above does not exist in Partas.Solid 3.0 either;
-drop it. The 3.0 effect looks like this:
+This example is written for Partas.Solid 2.x: its single-callback `createEffect` and `OptionKeys` are gone in 3.0. The
+live example below shows the Solid 2 effect.
 
-```fsharp
-createEffect(
-    (fun _ -> props.duration),
-    fun (duration: int) ->
-        let interval =
-            setInterval (fun () -> setIndex.Invoke(fun prevIndex -> (prevIndex + 1) % props.words.Length)) duration
-        fun () -> clearInterval interval
-)
-```
-
-See [Migrating to Solid 2](../guide/migrating-to-solid-2.md).
-:::
-
-## Live example on Solid 2
+## On Solid 2 today
 
 Until the bindings are ported, import the framework-free `motion-dom`, the DOM engine underneath Motion. Its
 `animateElement` takes an element, a keyframes object and a transition object. The tupled parameters make Fable emit a
@@ -158,8 +136,9 @@ the playback controls `animateElement` returns. Return a real cleanup: Solid 2 c
 returns, and `animateElement (...) |> ignore` still compiles to an arrow that returns the controls array, which then
 fails as "not a function".
 
-The keyframes use `ResizeArray` rather than `[| ... |]`. Fable compiles an F# `float[]` or `int[]` to a typed array such
-as `Float64Array`, and Motion only treats a real JS array as a list of keyframes or a cubic-bezier `ease`.
+The keyframes use `ResizeArray`, because this site compiles its examples without `--typedArrays false`, and Motion only
+treats a real JS array as a list of keyframes or a cubic-bezier `ease`. With the flag, as
+[installation](../guide/installation.md#compiling) recommends, `[| ... |]` works too.
 
 ## Keyframes
 
@@ -185,34 +164,6 @@ let KeyframeExample () =
 ```
 
 A green square scales up, turns, rounds into a circle, and returns, on repeat.
-
-## Computation expression helpers
-
-In Partas.Solid 2.x, `createEffect` could also be written with the experimental computation expressions:
-
-::::tabs
-:::tab Normal
-```fsharp
-createEffect(
-    fun () ->
-        let interval =
-            setInterval (fun () -> setIndex.Invoke(fun prevIndex -> (prevIndex + 1) % (props.words.Length))) props.duration
-        onCleanup(fun () -> clearInterval(interval))
-)
-```
-:::
-:::tab open Partas.Solid.Experimental
-```fsharp
-effect {
-    let interval = setInterval (fun _ -> setIndex.Invoke(fun prevIndex -> (prevIndex + 1) % props.words.Length)) props.duration
-    cleanup { clearInterval(interval) }
-}
-```
-:::
-::::
-
-In 3.0 the `effect { }` builder targets the two-phase `createEffect` and needs exactly one `let!` for the tracked value.
-See [Experimental](../guide/experimental.md).
 
 ## Language injection
 

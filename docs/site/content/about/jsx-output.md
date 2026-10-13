@@ -3,29 +3,21 @@ title: Benefits of JSX output
 ---
 
 Partas.Solid does not compile your components to plain JavaScript. It compiles them to JSX, and the Solid JSX
-compiler takes it from there. The JSX it writes is meant to be read. Here is a component from the plugin's snapshot
-tests, next to what it compiles to:
+compiler takes it from there. The JSX it writes is meant to be read. Every example on this site with a **JSX** tab
+shows what the plugin wrote for it:
 
-```fsharp
+```fsharp solid jsx render=ItemDemo
 [<Erase>]
-type AccordionItem() =
+type Item() =
     inherit button()
 
     [<SolidTypeComponent>]
-    member props.constructor =
-        button(class' = Lib.cn [| "border-b"; props.class' |]).spread props
-```
+    member props.View =
+        button(class' = "item " + props.class').spread props
 
-```jsx
-import { omit } from "solid-js";
-import { twMerge } from "tailwind-merge";
-import { clsx } from "clsx";
-
-export function AccordionItem(props) {
-    const PARTAS_OTHERS = omit(props, "class");
-    return <button class={twMerge(clsx(["border-b", props.class]))}
-        {...PARTAS_OTHERS} n$={false} />;
-}
+[<SolidComponent>]
+let ItemDemo () =
+    Item(class' = "wide", title = "Spread through") { "Hover me" }
 ```
 
 The component keeps its name. Props are read as `props.class`, so Solid can track them. The props you read are left
@@ -36,9 +28,7 @@ nothing at runtime.
 
 The Oxpecker style of DSL is already close to what a JavaScript developer knows. A constructor is the opening tag, its
 arguments are the attributes, and the computation expression after it is what sits between the opening and closing
-tags.
-
-Add `jsx` to a fence on this site and you get a second tab with the JSX. Try it here:
+tags. A JavaScript developer can learn the quirks of F# and Fable by reading what their code turns into:
 
 ```fsharp solid jsx
 div (class' = "flex gap-2") {
@@ -46,10 +36,7 @@ div (class' = "flex gap-2") {
 }
 ```
 
-A JavaScript developer can learn the quirks of F# and Fable by checking what their code turns into, in a language
-they already read.
-
-Components you write compile the same way. A default value set in the body turns into a `merge` from `solid-js`:
+A default value set in the body turns into a `merge` from `solid-js`:
 
 ```fsharp solid jsx render=BadgeDemo
 [<Erase>]
@@ -119,17 +106,13 @@ let ButtonRow () =
 
 The compiler checks every variant. Add a case to `Variant` and each `match` that misses it warns.
 
-## Enterprise migrations to F# and Fable
+## Migrating and publishing
 
-You can move components to Fable one at a time, or write new ones in F#, and the output is still something the rest
-of the team recognises and can use. Storybook support (see [Storybook](../guide/storybook.md)) helps here too.
-
-## Publishing as a JavaScript package
-
-In enterprise and open-source work alike, a readable source can decide whether people use your package. When users
-can read the output, they can send issues and pull requests against it.
-
-The DSL is close to JSX, so it takes little effort to carry a change from a JSX pull request back to the F# source.
+You can move components to Fable one at a time, and the output is still something the rest of the team recognises.
+[Storybook](../guide/storybook.md) support helps here too. A published package's users can read its output and send
+issues and pull requests against it, and since the DSL is close to JSX, a change in a JSX pull request carries back to
+the F# source with little effort. The same small gap makes translating between JSX and the DSL easy for a person or an
+LLM.
 
 ## Solid's optimisations and helpers
 
@@ -140,13 +123,8 @@ same treatment as hand-written Solid. Tools and helpers built to work on JSX wor
 ## Fewer surprises while debugging
 
 When the output is clean JSX, you can take a reproducible JSX example to the much larger pool of front-end developers
-and ask for help. It also helps you tell a bug in your code from a bug in Fable, F# or the plugin: read the output and check whether it
-says what you meant. If it does not, [submit an issue](../contributing/submit-issues.md).
-
-## Tooling
-
-Plenty of tools read or produce JSX, and the gap between JSX and the Oxpecker style of DSL is small, whether a person
-or an LLM is doing the translating.
+and ask for help. It also tells a bug in your code from a bug in Fable, F# or the plugin: read the output and check
+whether it says what you meant. If it does not, [submit an issue](../contributing/submit-issues.md).
 
 ## Comparing Fable/Feliz output with Partas.Solid
 

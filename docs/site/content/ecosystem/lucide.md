@@ -25,7 +25,7 @@ Icon(iconNode = LucideLab.yinYang)
 The binding is generated from the React library, with a generator written for Feliz. The Solid library is organised less
 cleanly, but the icon names are the same in both.
 
-## Without a binding: vanilla `lucide` on Solid 2
+## On Solid 2 today
 
 Until the binding is ported, use the framework-free [`lucide`](https://lucide.dev/guide/packages/lucide) package
 directly. Each icon is a named export holding an icon node, a plain array that describes the SVG. `createElement` turns a

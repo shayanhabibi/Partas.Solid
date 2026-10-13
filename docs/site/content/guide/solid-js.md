@@ -2,31 +2,23 @@
 title: Solid-JS
 ---
 
-This page covers the `solid-js` bindings in Partas.Solid 3.0, which target Solid 2.0 (`2.0.0-rc.14`).
-The examples run live on the page.
-
-Solid 2.0 removed or renamed a large part of the 1.x API. If you are upgrading, read
-[Migrating to Solid 2](../guide/migrating-to-solid-2.md) first. [Removed APIs](#removed-apis) maps
-each removed API to its replacement.
+This page covers the `solid-js` bindings in Partas.Solid 3.0, which target Solid `2.0.0-rc.14`. Coming from
+Solid 1.x, [Removed APIs](#removed-apis) maps each removed API to its replacement, and
+[Migrating to Solid 2](migrating-to-solid-2.md) covers the rest.
 
 ## How the bindings are laid out
 
-- Everything imported from `solid-js` sits on the `Bindings` type in the `Partas.Solid` namespace.
-  It is `[<AutoOpen>]`, so `open Partas.Solid` is all you need. The functions are `static member`s,
-  so they can have overloads.
-- The web runtime (`@solidjs/web`) lives in the `Partas.Solid.Web` namespace: `render`, `hydrate`,
-  `renderToString`, `renderToStream`, `isServer`, `isDev`, `clientOnly`, `Portal` and `Dynamic`.
-  Add `open Partas.Solid.Web` to use them. `DEV` stays in `Partas.Solid`.
-- Stores are part of `solid-js` now. There is no `solid-js/store` module.
-- A control-flow component that takes children implements `HtmlContainer`. One that takes a
-  function as its child implements a child-lambda interface, and you pass the function with
-  `yield fun ... -> ...`.
+- Everything imported from `solid-js` comes in with `open Partas.Solid`. The functions are
+  `static member`s, so they can have overloads.
+- The web runtime (`@solidjs/web`) needs `open Partas.Solid.Web`: `render`, `hydrate`,
+  `renderToString`, `renderToStream`, `isServer`, `isDev`, `clientOnly`, `Portal`, `Dynamic` and `dynamic`.
+- A control-flow component that takes a function as its child gets it with `yield fun ... -> ...`.
 
-:::tip
-See something missing? Open an issue. Missing bindings are usually quick to add.
-:::
+Missing a binding? [Open an issue](../contributing/submit-issues.md).
 
 ```fsharp solid setup
+open Fable.Core.TS
+
 let resolveAfter (ms: int) (value: 'T) : JS.Promise<'T> =
     emitJsExpr (ms, value) "new Promise(resolve => setTimeout(() => resolve($1), $0))"
 ```
@@ -81,14 +73,14 @@ there because the value and function overloads are otherwise ambiguous for a lam
 ### Setting with the previous value
 
 A setter is typed `'T -> unit`, so F# will not let you pass it an updater function directly. Use the
-`Invoke` extension:
+`Invoke` extension. `setter.Invoke value` is the same as `setter value`.
 
-```fsharp
-let index, setIndex = createSignal 0
+```fsharp solid jsx
+let clicks, setClicks = createSignal 0
 
-setIndex 5                         // replace the value
-setIndex.Invoke 5                  // same thing
-setIndex.Invoke (fun i -> i + 1)   // compute the next value from the previous one
+button (onClick = fun _ -> setClicks.Invoke(fun previous -> previous + 1)) {
+    $"Clicked {clicks ()} times"
+}
 ```
 
 :::warning
@@ -103,7 +95,7 @@ setHandler.Invoke (fun (_: unit -> unit) -> myNewFunc)
 ```
 :::
 
-`InvokeAndGet` also exists, with the same two overloads. It sets the value and returns the new value.
+`InvokeAndGet` takes the same arguments and also returns the new value.
 
 ## Memos
 
@@ -254,9 +246,7 @@ createEffect (
 )
 ```
 
-Annotate the compute function's parameter, as with a memo, so F# can pick the overload.
-
-The effect runs after the first render, then again each time the compute result changes. The
+Annotate the compute function's parameter, as with a memo. The effect runs after the first render, then again each time the compute result changes. The
 single-function `createEffect (fun () -> ...)` from Solid 1 no longer exists.
 
 ```fsharp solid render=EffectDemo
@@ -273,8 +263,8 @@ let EffectDemo () =
     }
 ```
 
-This example writes a signal from an effect to show when the effect runs. In real code, derive the
-value with a memo instead.
+The example writes a signal from an effect to show when it runs. In real code, derive the value with
+a memo.
 
 ### Cleanup
 
@@ -313,9 +303,6 @@ let confettiApi: {| reset: unit -> unit |} = jsNative
 ```
 
 ```fsharp solid render=ConfettiCounter jsx
-open Fable.Core
-open Fable.Core.TS
-
 [<SolidComponent>]
 let ConfettiCounter () =
     let count, setCount = createSignal 0
@@ -411,13 +398,32 @@ track (fun () -> box (isOpen ()))
 ### flush and untrack
 
 `flush ()` applies all queued writes now. `flush (fun () -> ...)` runs the function, then flushes,
-and returns what it returned. It replaces `batch`: writes are always batched in Solid 2, and `flush`
-is how you ask for them to land.
+and returns what it returned. It replaces `batch`: writes are always batched in Solid 2.
 
-```fsharp
-flush (fun () ->
-    setFirst "Ada"
-    setLast "Lovelace")
+The handler below reads the DOM right after the setter, then again after `flush ()`:
+
+```fsharp solid render=FlushDemo jsx
+[<SolidComponent>]
+let FlushDemo () =
+    let count, setCount = createSignal 0
+    let report, setReport = createSignal "Click to compare"
+    let mutable label: Dom.HTMLSpanElement = JS.undefined
+
+    div () {
+        button (
+            onClick =
+                fun _ ->
+                    setCount (count () + 1)
+                    let before: string = label?textContent
+                    flush ()
+                    let after: string = label?textContent
+                    setReport $"after the setter: {before}, after flush: {after}"
+        ) {
+            "Add one"
+        }
+        span().ref (label) { count () }
+        p () { report () }
+    }
 ```
 
 `untrack (fun () -> ...)` reads signals without subscribing to them:
@@ -593,11 +599,45 @@ let FruitList () =
     }
 ```
 
-```fsharp
-For.NonKeyed(each = names ()) {
-    yield fun name index -> li () { string index + ": " + name () }
-}
+Reverse the lists below. Each row records the order it was created in. `For.Keyed` moves its rows
+with their items. `For.NonKeyed` keeps its rows in place and updates the `name` accessor in each.
 
+```fsharp solid render=KeyingDemo jsx
+let mutable rowsCreated = 0
+
+let nextRow () =
+    rowsCreated <- rowsCreated + 1
+    rowsCreated
+
+[<SolidComponent>]
+let KeyingDemo () =
+    let names, setNames = createSignal [| "Ada"; "Grace"; "Edsger" |]
+
+    div () {
+        button (onClick = fun _ -> setNames (Array.rev (names ()))) { "Reverse" }
+
+        div (style = "display: flex; gap: 2rem") {
+            ol () {
+                For.Keyed(each = names ()) {
+                    yield fun name _ ->
+                        let row = nextRow ()
+                        li () { $"{name}, row {row}" }
+                }
+            }
+            ol () {
+                For.NonKeyed(each = names ()) {
+                    yield fun name _ ->
+                        let row = nextRow ()
+                        li () { $"{name ()}, row {row}" }
+                }
+            }
+        }
+    }
+```
+
+`For.KeyedFn` keys by a value you choose:
+
+```fsharp
 For.KeyedFn(each = users (), keyed = (fun u -> box u.id)) {
     yield fun user index -> li () { user().name }
 }
@@ -798,11 +838,40 @@ let RepeatDemo () =
 `collapsed = true` hides the fallbacks of boundaries that are still waiting their turn. It only
 applies to `Sequential`.
 
-```fsharp
-Reveal(order = Reveal.Order.Sequential) {
-    Loading(fallback = span () { "..." }) { Profile () }
-    Loading(fallback = span () { "..." }) { Posts () }
-}
+Both columns below load the same three items, which take 1.2 s, 0.4 s and 0.8 s. Without `Reveal`,
+each shows as soon as it is ready. Under `Reveal`, an item waits for the ones above it.
+
+```fsharp solid render=RevealDemo jsx
+[<SolidComponent>]
+let Delayed (ms: int) =
+    let text = createMemo (fun (_: string option) -> resolveAfter ms $"ready after {ms} ms")
+
+    Loading(fallback = li () { "..." }) { li () { text () } }
+
+[<SolidComponent>]
+let RevealDemo () =
+    let shown, setShown = createSignal false
+
+    div () {
+        button (onClick = fun _ -> setShown (not (shown ()))) { if shown () then "Hide" else "Load" }
+
+        Show(when' = shown ()) {
+            div (style = "display: flex; gap: 2rem") {
+                ul () {
+                    Delayed 1200
+                    Delayed 400
+                    Delayed 800
+                }
+                ul () {
+                    Reveal(order = Reveal.Order.Sequential) {
+                        Delayed 1200
+                        Delayed 400
+                        Delayed 800
+                    }
+                }
+            }
+        }
+    }
 ```
 
 ### Hydration and NoHydration
@@ -812,12 +881,23 @@ children on the server and skips them when hydrating.
 
 ### Portal and Dynamic
 
-Both come from `@solidjs/web`, so they are in `Partas.Solid.Web`. `Portal(mount = element) { ... }`
+Both come from `@solidjs/web`, so they need `open Partas.Solid.Web`. `Portal(mount = element) { ... }`
 renders its children into another part of the document. `Dynamic` renders a tag or component chosen
-at run time.
+at run time:
 
-```fsharp
-Dynamic<obj>(componentAsString = props.tag) { "content" }
+```fsharp solid render=DynamicDemo jsx
+open Partas.Solid.Web
+
+[<SolidComponent>]
+let DynamicDemo () =
+    let tag, setTag = createSignal "h4"
+
+    div () {
+        For.Keyed(each = [| "h4"; "p"; "button" |]) {
+            yield fun t _ -> button (onClick = fun _ -> setTag t) { t }
+        }
+        Dynamic<obj>(componentAsString = tag ()) { $"Rendered as <{tag ()}>" }
+    }
 ```
 
 The `dynamic (fun () -> ...)` function returns a `TagValue` whose tag follows its source. Render it
@@ -856,9 +936,6 @@ To share state, put accessors and functions in the context value, for example a 
 with a `count: Accessor<int>` and an `increment: unit -> unit`.
 
 ## Async
-
-An async memo, an async derived store and a `lazy'` component all suspend their readers, and
-`Loading` catches them.
 
 ### isPending and latest
 
@@ -953,7 +1030,7 @@ let hasChildren = fun () -> resolved.toArray().Length > 0
 returns the props without those keys. `omit (props, fun key -> ...)` omits every string key the
 predicate accepts, and never omits symbol keys; use `omitKeys (props, fun (key: obj) -> ...)` to
 see those too. They replace `mergeProps` and `splitProps`. You rarely call them yourself, because the
-plugin generates them for [`[<SolidTypeComponent>]`](../guide/solid-type-attribute.md) members.
+plugin generates them for [`[<SolidTypeComponent>]`](solid-type-attribute.md) members.
 
 ### lazy'
 
@@ -961,13 +1038,21 @@ plugin generates them for [`[<SolidTypeComponent>]`](../guide/solid-type-attribu
 lazy' (fn: unit -> JS.Promise<'T>, ?options: LazyOptions, ?moduleUrl: string) : LazyComponent<'T>
 ```
 
-`lazy'` loads a component on first render. `LazyOptions (export = "Name")` picks a named export
-instead of the default. `.preload ()` starts loading early. Rendering it before it loads suspends,
-like an async memo. It takes Fable's `importDynamic` in place of the removed `importComponent`.
+`lazy'` loads a component on first render. Rendering it before it loads suspends, like an async
+memo, so put it under `Loading`. `.preload ()` starts loading early. Use Fable's `importDynamic` for
+the import, and `LazyOptions` to pick a named export instead of the default:
 
 ```fsharp
-let Settings = lazy' (fun () -> importDynamic "./Settings.fs.jsx")
+let LazyPanel: LazyComponent<HtmlElement> =
+    lazy' ((fun () -> importDynamic "./Panel.fs.jsx"), LazyOptions(``export`` = "Panel"))
 ```
+
+```js
+const LazyPanel = lazy(() => import("./Panel.fs.jsx"), { export: "Panel" });
+```
+
+`lazyload { ... }` in `Partas.Solid.Experimental` is a builder alternative. See
+[Experimental](experimental.md).
 
 ### createUniqueId
 
@@ -988,15 +1073,14 @@ the mapped array.
 The map functions are curried F# lambdas (`fun item index -> ...`), compiled to a two-argument JS
 function. `mapArray` replaces both `mapArray` and `indexArray` from Solid 1.
 
-### Boundaries as functions
+### Other helpers
 
-`createErrorBoundary`, `createLoadingBoundary` and `createRevealOrder` are what `Errored`, `Loading`
-and `Reveal` are built on. Use them to build your own boundary components.
-
-```fsharp
-let content =
-    createErrorBoundary ((fun () -> riskyView ()), fun err reset -> errorView (err ()) reset)
-```
+| Function | Use |
+| --- | --- |
+| `isEqual (a, b)` | The default `equals` of signals and memos (`===`), for when you want it spelled out. |
+| `isWrappable value` | Whether a store would wrap the value in a proxy. Class instances, DOM nodes and frozen objects are stored as they are. |
+| `NotReadyError` | What a read of a pending source throws. Match `:? NotReadyError` in an error handler to tell "not loaded yet" from a real failure. |
+| `isHydrating ()`, `isHydratable ()` | Whether the page is hydrating, and whether the current owner is under hydration. Not reactive. |
 
 ### Directives
 
@@ -1015,15 +1099,14 @@ input().ref autofocus
 
 ## Removed APIs
 
-These Solid 1 APIs are gone from Solid 2, and from the bindings. Use the replacement instead.
-
 | Removed | Replacement |
 | --- | --- |
 | `createResource`, `SolidResource`, `ResourceFetcher`, ... | An async `createMemo`, read under `Loading`. `refresh` re-runs it. |
 | `Suspense` | `Loading` |
-| `SuspenseList` | `Reveal`, or `createRevealOrder` |
+| `SuspenseList` | `Reveal` |
 | `ErrorBoundary` | `Errored` |
-| `catchError` | `createErrorBoundary`, or an error handler on `createEffect` |
+| `catchError` | `Errored`, or an error handler on `createEffect` |
+| `createErrorBoundary`, `createLoadingBoundary`, `createRevealOrder` | `Errored`, `Loading`, `Reveal`. Internal to `solid-js` since rc.14, and `[<Obsolete>]` in the bindings. |
 | `Index` | `For.NonKeyed` |
 | `indexArray` | `mapArrayUnkeyed` |
 | `For` with a single child signature | `For.Keyed`, `For.NonKeyed` or `For.KeyedFn` |
@@ -1043,6 +1126,3 @@ These Solid 1 APIs are gone from Solid 2, and from the bindings. Use the replace
 | `importComponent` | `importDynamic` with `lazy'` |
 | `getListener` | `getObserver` |
 | `render`, `renderToString`, `isServer` on `Partas.Solid` | The same names in `Partas.Solid.Web` |
-
-For the full list of what changed in Partas.Solid itself, see
-[Migrating to Solid 2](../guide/migrating-to-solid-2.md).

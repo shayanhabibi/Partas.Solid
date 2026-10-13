@@ -336,6 +336,8 @@ let private solidExamples (options: SolidExamplesOptions) =
         fromEnvironment "PARTAS_SOLID_FEED"
         |> Option.defaultValue (Path.Combine(__SOURCE_DIRECTORY__, "feed"))
     )
+    // The Solid release Partas.Solid is tested against; the plugin's default is older.
+    |> SolidExamples.solidVersion "2.0.0-rc.14"
     // Libraries the live examples import. Each change re-runs npm install in .nacara/partas-solid.
     |> SolidExamples.npm "animejs" "4.5.0"
     |> SolidExamples.npm "apexcharts" "7.6.0"

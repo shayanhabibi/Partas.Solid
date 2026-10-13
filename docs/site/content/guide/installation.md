@@ -13,11 +13,9 @@ a Node toolchain.
 :::warning
 These docs cover **Partas.Solid 3.0**, which targets **Solid 2.0.0-rc.14**.
 
-**New releases are on a temporary NuGet feed.** The nuget.org account is inaccessible while NuGet support transfers
-package ownership, so new releases are published to **Cloudsmith**, under the same package IDs:
-`https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json`. Restoring from it needs no account or API key.
-The latest version on nuget.org is 2.x, which targets Solid 1.9 and does not match these pages. Once ownership is
-restored, releases return to nuget.org and this notice will be updated.
+**New releases are on a temporary NuGet feed**, while NuGet support transfers the nuget.org package ownership. They are
+published to **Cloudsmith** under the same package IDs, and restoring needs no account or API key. nuget.org has 2.x,
+which targets Solid 1.9 and does not match these pages.
 :::
 
 ## Requirements
@@ -40,8 +38,8 @@ dotnet tool install fable --version 5.13.0
 
 ### 2. Add the Cloudsmith feed
 
-Partas.Solid's DOM types come from `Xantham.Fable.Core.TS`, which is published on its own Cloudsmith feed, so add both
-feeds. Add a `nuget.config` next to your solution, keeping nuget.org for the other dependencies:
+Partas.Solid's DOM types come from `Xantham.Fable.Core.TS`, which has its own Cloudsmith feed, so add both feeds. Add
+a `nuget.config` next to your solution, keeping nuget.org for the other dependencies:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -78,7 +76,8 @@ If you use Paket, add `nuget Partas.Solid 3.0.0` to `paket.dependencies` along w
 
 DOM types come from Xantham's `Fable.Core.TS.Dom`, not `Fable.Browser.Dom`: `open Fable.Core.TS` and write
 `Dom.HTMLElement`, `Dom.MouseEvent` and so on. Lookups such as `getElementById` return options. Partas.Solid binds
-the globals `globalThis`, `document` and `window`; they come in with `open Fable.Core`.
+the globals `globalThis`, `document` and `window`; they come in with `open Fable.Core`. Write `Dom.X` rather than
+opening `Fable.Core.TS.Dom`, whose `Attr` type would hide Partas.Solid's `Attr` module.
 
 ## The npm side
 
@@ -113,11 +112,7 @@ Or in `package.json`:
 }
 ```
 
-The `overrides` block stops npm from pulling in a second, different Solid release (of `solid-js`, `@solidjs/web` or
-the compiler) through the Vite plugin.
-
-In Solid 2 the web runtime moved from `solid-js/web` to `@solidjs/web`, which provides `render`, `hydrate`, `Portal`
-and `Dynamic`. In F# they are in the `Partas.Solid.Web` namespace.
+The `overrides` block stops the Vite plugin from pulling in a second Solid release.
 
 A minimal `vite.config.js` that picks up Fable's output:
 
@@ -137,7 +132,8 @@ export default defineConfig({
 
 ### Mounting the app
 
-Mount the root component with `render`. It returns a function that disposes the app.
+Mount the root component with `render` from `Partas.Solid.Web` (`@solidjs/web`). It returns a function that disposes
+the app.
 
 ```fsharp
 module App
@@ -175,14 +171,12 @@ dotnet fable -e .fs.jsx -c Release --typedArrays false
 | `--typedArrays false` | Without it, Fable compiles numeric arrays to typed arrays, so an `int[]` becomes an `Int32Array`. Solid's stores do not wrap typed arrays (`createStore [\| 1; 2 \|]` is not reactive per item), and libraries that expect a plain array can break on them. Partas.Solid is tested with this flag, so pass it. |
 
 :::note
-The Partas.SolidStart `dotnet new` templates (`bare-devtools`, `tailwind-devtools`, `solidbase-devtools`,
-`mdx-devtools`) set up Partas.Solid 2.x on Solid 1.9 and SolidStart 1. They have not been updated for 3.0, so do not
-use them with these docs.
+The Partas.SolidStart `dotnet new` templates set up Partas.Solid 2.x on Solid 1.9. Partas.Solid 3.0 has no SolidStart
+bindings, so do not use them with these docs.
 :::
 
 ## Next
 
 - [Overview](overview.md): the two ways to write a component.
 - [Oxpecker DSL](oxpecker-dsl.md): how elements, attributes and children are written.
-- [Common issues](common-issues.md): what to check when the output looks wrong.
 - [Migrating to Solid 2](migrating-to-solid-2.md): if you are coming from Partas.Solid 2.x.

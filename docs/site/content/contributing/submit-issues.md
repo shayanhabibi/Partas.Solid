@@ -51,25 +51,11 @@ It is noisy. `ComponentFlag.VerboseDebugMode` turns on `DebugMode` and `PrintDis
 
 ## Ruling out an optimisation
 
-Some flags switch off one of the plugin's optimisations. If the problem goes away with one of them set, say so in the
-issue, because it narrows down where the bug is:
-
-| Flag | What it switches off |
-| --- | --- |
-| `SkipPojoOptimisation` | Folding setters used when building a `[<Pojo>]` object into its object literal |
-| `SkipCEOptimisation` | Unrolling computation expressions, such as list and array builders, into plain values |
-| `SkipOmit` | The `const PARTAS_OTHERS = omit(props, ...)` binding in a `[<SolidTypeComponent>]` |
-| `ComponentFlag.None` | `SkipPojoOptimisation` and `SkipCEOptimisation` together |
-
-Flags combine with `|||`:
-
-```fsharp
-[<SolidComponent(ComponentFlag.DebugMode ||| ComponentFlag.SkipCEOptimisation)>]
-let MyComponent () =
-    // ...
-```
-
-See [Attribute flags](../guide/attribute-flags.md) for the full list.
+Some flags switch off one of the plugin's optimisations: `SkipPojoOptimisation`, `SkipCEOptimisation`, `SkipOmit`,
+or `ComponentFlag.None` for the first two together. If the problem goes away with one of them set, say so in the issue,
+because it narrows down where the bug is. Flags combine with `|||`, as in
+`ComponentFlag.DebugMode ||| ComponentFlag.SkipCEOptimisation`. [Attribute flags](../guide/attribute-flags.md) lists
+them all.
 
 ## Before you file
 
@@ -78,4 +64,4 @@ See [Attribute flags](../guide/attribute-flags.md) for the full list.
 - If you are coming from Partas.Solid 2.x, check [Migrating to Solid 2](../guide/migrating-to-solid-2.md). Several
   APIs were renamed or removed.
 - If you can, add the case to the snapshot tests and send it as a pull request. See
-  [Contributing](index.md).
+  [Contributing](index.md#snapshot-tests).

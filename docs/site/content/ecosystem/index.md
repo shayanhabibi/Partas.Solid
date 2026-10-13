@@ -8,7 +8,8 @@ Bindings to Solid libraries, and component libraries built with Partas.Solid. Mo
 :::warning
 These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to Solid 2 yet. The libraries they bind
 are built on Solid 1.x, so they cannot run next to Partas.Solid 3.0 until both the library and the binding are ported.
-The pages keep their 2.x usage notes for reference.
+The pages keep their 2.x usage notes for reference. Where the underlying library does not depend on Solid (ApexCharts,
+Lucide, Motion, NeoDrag), its page has a live **On Solid 2 today** example that binds it directly.
 :::
 
 | Area | Bindings |

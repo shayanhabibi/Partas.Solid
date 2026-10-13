@@ -57,8 +57,7 @@ Use the `.init()` helpers to create state signals:
 let rowSelection = RowSelectionState.init() |> createSignal
 ```
 
-Otherwise usage follows the upstream guides and examples. Some typings still need work.
+Some typings still need work.
 
-:::note
-TanStack Table's core (`@tanstack/table-core`) does not depend on Solid; only the Solid adapter does.
-:::
+TanStack Table's core, `@tanstack/table-core`, does not depend on Solid; only the Solid adapter does. The
+[data table example](../examples/data-table/index.md) binds the core directly and runs on Solid 2 today.

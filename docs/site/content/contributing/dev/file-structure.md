@@ -7,16 +7,11 @@ The plugin's source is documented heavily, and the comments explain how each pie
 overview to read before the source.
 :::
 
-Partas.Solid ships as two NuGet packages that always share a version:
-
-- **Partas.Solid** is the DSL: tags, attributes, the style spec and the Solid bindings. Almost all of it is erased or
-  imported. The types exist to give you a typed way to write components, and the plugin erases them.
-- **Partas.Solid.FablePlugin** is a Fable compiler plugin that rewrites the F# AST into JSX. This is where the
-  behaviour lives. Without it, the library produces nothing useful.
-
-Because the plugin rewrites the AST rather than running anything at runtime, the JSX it writes is the specification.
-You see a change in behaviour by comparing the generated JSX. See [Contributing](../index.md) for how the snapshot
-tests do that.
+Partas.Solid ships as two NuGet packages that always share a version. **Partas.Solid**, in `src/Partas.Solid/`, is
+the DSL: tags, attributes and the Solid bindings, almost all of it erased or imported. **Partas.Solid.FablePlugin**, in
+`src/Partas.Solid.FablePlugin/`, rewrites the F# AST into JSX, and is where the behaviour lives. Nothing of it runs at
+runtime, so the JSX it writes is the specification: a change in behaviour shows as a change in the
+[snapshot tests](../index.md#snapshot-tests).
 
 ## Files
 
@@ -42,10 +37,5 @@ Partas.Solid.FablePlugin
 `Storybook.fs` holds `PartasStorybookAttribute`, which turns a story definition into a Storybook CSF module. It has
 its own recursion over the story type, and is covered in [Storybook](../../guide/storybook.md).
 
-## Rules for the plugin project
-
-- Warnings 3239 and 0025 (incomplete pattern matches) are errors. An inexhaustive `match` in the plugin fails the
-  build.
-- `Plugin.fs` is excluded from fantomas. Do not format it.
-- The plugin requires Fable 5 and only runs when the target is JavaScript and the file extension is `.js` or `.jsx`.
-  The docs and tests compile with `-e .fs.jsx`.
+The repository's [conventions](../index.md#conventions) apply: an inexhaustive `match` fails the build, and `Plugin.fs`
+is never formatted.

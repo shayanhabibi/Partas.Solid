@@ -156,44 +156,45 @@ let Shopping () =
 
 ## Async and errors
 
-Solid 2 renamed its boundaries:
-
-| Solid 1 | Solid 2 | Purpose |
+| Solid 2 | Replaces | Purpose |
 | --- | --- | --- |
-| `Suspense` | `Loading` | Shows `fallback` while async values under it are pending. |
-| `ErrorBoundary` | `Errored` | Shows `fallback` when something under it throws. |
-| `SuspenseList` | `Reveal` | Orders how sibling `Loading` boundaries reveal. |
+| `Loading` | `Suspense` | Shows `fallback` while async values under it are pending. |
+| `Errored` | `ErrorBoundary` | Shows `fallback` when something under it throws. |
+| `Reveal` | `SuspenseList` | Orders how sibling `Loading` boundaries reveal. |
 
-`createResource` is gone. In Solid 2 an async value is a memo or store whose computation returns a promise, and
-`Loading` waits for it.
+An async value is a memo whose computation returns a promise; `Loading` waits for it. An `ErrorBoundary.Fallback`
+gives the fallback the error and a `reset` function. Every third load below fails:
 
-```fsharp
-// fetchUser: int -> JS.Promise<User>
-let user = createMemo (fun (_: User option) -> fetchUser (userId ()))
+```fsharp solid setup
+let settleAfter (ms: int) (fail: bool) (value: string) : JS.Promise<string> =
+    emitJsExpr (ms, fail, value) "new Promise((ok, no) => setTimeout(() => $1 ? no(new Error($2)) : ok($2), $0))"
+```
 
-Errored(fallback = !^(p () { "Something broke." })) {
-    Loading(fallback = p () { "Loading..." }) {
-        p () { user().Name }
+```fsharp solid render=AsyncDemo jsx
+[<SolidComponent>]
+let AsyncDemo () =
+    let attempt, setAttempt = createSignal 1
+
+    let result =
+        createMemo (fun (_: string option) ->
+            let n = attempt ()
+            settleAfter 600 (n % 3 = 0) $"Load {n}")
+
+    div () {
+        button (onClick = fun _ -> setAttempt (attempt () + 1)) { "Load again" }
+        Errored(
+            fallback =
+                !^(ErrorBoundary.Fallback(fun err reset ->
+                    p () {
+                        $"{(err () :?> exn).Message} failed. "
+                        button (onClick = fun _ -> setAttempt (attempt () + 1); reset ()) { "Retry" }
+                    }))
+        ) {
+            Loading(fallback = p () { "Loading..." }) { p () { result () } }
+        }
     }
-}
 ```
 
-To get the error and a reset function, pass an `ErrorBoundary.Fallback`:
-
-```fsharp
-Errored(
-    fallback =
-        !^(ErrorBoundary.Fallback(fun err reset ->
-            div () {
-                p () { (err () :?> exn).Message }
-                button (onClick = fun _ -> reset ()) { "Retry" }
-            }))
-) {
-    RiskyWidget()
-}
-```
-
-`Errored` also has `fallbackEle` and `fallbackFn` setters, which set `fallback` without the `!^`:
-`Errored(fallbackFn = ErrorBoundary.Fallback(fun err reset -> ...))`.
-
-The [solid-js](solid-js.md) page lists the bindings.
+After the first load, `Loading` keeps the old content on screen while the next one is pending. `Errored` also has
+`fallbackEle` and `fallbackFn` setters, which set `fallback` without the `!^`. The [solid-js](solid-js.md) page lists
+the bindings.

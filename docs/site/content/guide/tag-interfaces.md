@@ -48,15 +48,8 @@ interfaces type that function:
 
 The strict variants fix the return type as well as the arguments. `For.Keyed` implements
 `ChildLambdaProvider2<'T, Accessor<int>>`, so its child is `fun item index -> ...`. `Repeat<'T>` implements
-`ChildLambdaProviderStrict<int, 'T>`.
-
-You pass the function with `yield`:
-
-```fsharp
-For.Keyed(each = items) {
-    yield fun item index -> li () { item }
-}
-```
+`ChildLambdaProviderStrict<int, 'T>`. Callers pass the function with `yield` (see
+[lambda children](oxpecker-dsl.md#lambda-children)).
 
 Implement one of these interfaces on your own component to take a function child. Inside the component,
 `props.children` holds the function. Unbox it to its F# type and call it:
@@ -78,7 +71,7 @@ type Toggle() =
         }
 ```
 
-```fsharp solid
+```fsharp solid jsx
 Toggle() {
     yield fun on -> span () { if on () then "ON" else "OFF" }
 }
@@ -92,14 +85,8 @@ let renderChild: System.Func<Accessor<string>, (string -> unit), HtmlElement> = 
 renderChild.Invoke(value, setValue)
 ```
 
-:::note
-Solid 2 removed `Index`. Use `For.NonKeyed`, which passes you an accessor for each item. See
-[Migrating to Solid 2](migrating-to-solid-2.md).
-:::
-
 ## Polymorph
 
-`Polymorph` lives in `Partas.Solid.Polymorphism` and inherits `HtmlTag`. It is for components whose rendered element
-the caller picks, such as Kobalte's. It adds an `.as'` extension that takes a tag or a [tag value](tag-values.md).
-
-See [Polymorphism](../ecosystem/polymorphism.md) and [Kobalte](../ecosystem/kobalte.md).
+`Polymorph`, in `Partas.Solid.Polymorphism`, inherits `HtmlTag`. It is for components whose rendered element the
+caller picks, such as Kobalte's, and adds an `.as'` extension that takes a tag or a [tag value](tag-values.md). See
+[Polymorphism](../ecosystem/polymorphism.md).

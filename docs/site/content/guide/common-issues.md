@@ -2,13 +2,11 @@
 title: Common issues
 ---
 
-The problems people run into most often, and what to check first.
-
 ## The component is not in a `Partas.Solid` namespace
 
-The plugin only treats types whose full name starts with `Partas.Solid` as tags and components, so it leaves other
-code alone. A `[<SolidTypeComponent>]` declared anywhere else gets a warning and is not transformed, and a custom tag
-type is not emitted as a JSX tag.
+The plugin only treats types whose full name starts with `Partas.Solid` as tags and components. A
+`[<SolidTypeComponent>]` declared anywhere else gets a warning and is not transformed, and a custom tag type is not
+emitted as a JSX tag.
 
 ```fsharp
 // Works
@@ -37,26 +35,43 @@ For.Keyed(each = [| "1"; "2" |]) {
 
 If your IDE cannot infer the types of `item` and `index`, the `yield` is probably missing.
 
-## Typed arrays
+## Nothing updates when a signal changes
 
-Without `--typedArrays false`, Fable compiles numeric arrays to typed arrays, so `[| 1; 2; 3 |]` becomes an
-`Int32Array`. Solid's stores leave typed arrays unwrapped, so their items are not reactive, and JavaScript libraries
-that expect a plain array can fail on them. Compile with `--typedArrays false`, as [Installation](installation.md)
-shows; Partas.Solid's own tests do.
+A signal read in the component body is read once, because the body runs once. Read it inside the JSX to keep it live:
 
-## Compiling in Debug
+```fsharp solid render=ReadOnce jsx
+[<SolidComponent>]
+let ReadOnce () =
+    let count, setCount = createSignal 0
+    let readInBody = count ()
+
+    div () {
+        button (onClick = fun _ -> setCount (count () + 1)) { "Add one" }
+        p () { $"Read in the body: {readInBody}" }
+        p () { $"Read in the JSX: {count ()}" }
+    }
+```
+
+See [Building the DOM](building-the-dom.md).
+
+## Store items in a number array do not update
+
+Compile with `--typedArrays false`. Without it, `[| 1; 2; 3 |]` is an `Int32Array`, which stores do not make reactive.
+See [Compiling](installation.md#compiling).
+
+## The output looks wrong in Debug
 
 The plugin expects the Release AST. Always pass `-c Release` to Fable, including under `dotnet fable watch`.
+
+## `Attr.Dir` or another `Attr` member is not defined
+
+`open Fable.Core.TS.Dom` brings in DOM's `Attr` type, which hides Partas.Solid's `Attr` module. Open `Fable.Core.TS`
+instead and write `Dom.HTMLElement`.
 
 ## Children of a `<template>`
 
 Solid 2's development build rejects any JSX child of `<template>` with "The HTML provided is malformed", because its
-template check re-parses the markup and cannot see template contents. Set the content with `innerHTML` instead.
-
-## Nothing updates when a signal changes
-
-A value read in a component body is read once. Read it inside the JSX, or make it a function, to keep it live. See
-[Building the DOM](building-the-dom.md).
+template check cannot see template contents. Set the content with `innerHTML` instead.
 
 ## Output that is silently missing
 
@@ -70,4 +85,3 @@ let Broken () = ...
 
 Include that output when you [submit an issue](../contributing/submit-issues.md). See
 [attribute flags](attribute-flags.md) for the other flags.
-

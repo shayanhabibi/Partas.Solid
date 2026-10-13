@@ -2,10 +2,6 @@
 title: Plugin utilities
 ---
 
-:::note
-The plugin's source is documented heavily. Only short notes are kept here.
-:::
-
 `Utils.fs` is the first file in the plugin. It sits in the `Fable.AST.Fable` namespace, so the rest of the plugin
 can use it next to Fable's own AST types.
 

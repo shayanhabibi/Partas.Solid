@@ -2,10 +2,6 @@
 title: Plugin spec
 ---
 
-:::note
-The plugin's source is documented heavily. Only short notes are kept here.
-:::
-
 `Spec.fs` says what input the plugin accepts, holds the expressions the plugin builds over and over, and holds the
 patterns that recognise particular AST nodes. The patterns are grouped in modules named after what they match:
 `MemberRef`, `Expr`, `Type`, `EntityRef`, `Ident` and `CallInfo`.
@@ -41,28 +37,28 @@ Prebuilt expressions that are verbose or used in several places.
 - `untracked` wraps an expression in `untrack(() => expr)`, with `untrack` imported from `solid-js`. It is used for
   direct calls to `[<SolidComponent>]` let bindings.
 
-`omit` and `merge` are imported from `solid-js`. They replaced `splitProps` and `mergeProps` in Solid 2. Here is what
-the two produce together, from the `CombinedSpread` snapshot test:
+`omit` and `merge` are imported from `solid-js`; they replaced `splitProps` and `mergeProps` in Solid 2. Here they are
+together, adapted from the `CombinedSpread` snapshot test. The self identifier is `this`, which Fable writes as
+`this$`, and the plugin uses that name throughout:
 
-```jsx
-export function SimpleCombination(this$) {
-    this$ = merge({
-        class: "ClassDefault",
-    }, this$);
-    const PARTAS_OTHERS = omit(this$, "class");
-    return <div>
-        Some text
-        <span class={this$.class}>
-            More text
-        </span>
-        <div {...PARTAS_OTHERS} n$={false}>
-            All but class have been spread into this tag!
-        </div>
-    </div>;
-}
+```fsharp solid jsx render=CombinationDemo
+[<Erase>]
+type SimpleCombination() =
+    inherit div()
+
+    [<SolidTypeComponent>]
+    member this.View =
+        this.class' <- "ClassDefault"
+
+        div () {
+            span (class' = this.class') { "Reads class. " }
+            div().spread this { "Gets every prop but class: hover me." }
+        }
+
+[<SolidComponent>]
+let CombinationDemo () =
+    SimpleCombination(title = "title was spread")
 ```
-
-The member's self identifier was `this`. Fable writes it as `this$`, and the plugin uses that name throughout.
 
 ## Recognisers
 

@@ -8,124 +8,52 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 
 Bindings for `@solid-primitives/storage`.
 
-## SyncStorage
-
-Type: `interface`
-
-- getItem: `key: string -> string option`
-- setItem: `key: string * value: string -> unit`
-- removeItem: `key: string -> unit`
-
-## AsyncStorage
-
-Type: `interface`
-
-- getItem: `key: string -> Promise<string option>`
-- setItem: `key: string * value: string -> Promise<obj>`
-- removeItem: `key: string -> Promise<unit>`
-
-## SyncStorageWithOptions
-
-Type: `interface`
-
-Type parameter: `'Options`
-
-- getItem: `key: string * ?options: 'Options -> string option`
-- setItem: `key: string * value: string * ?options: 'Options -> unit`
-- removeItem: `key: string * ?options: 'Options -> unit`
-
-## AsyncStorageWithOptions
-
-Type: `interface`
-
-Type parameter: `'Options`
-
-- getItem: `key: string * ?options: 'Options -> Promise<string option>`
-- setItem: `key: string * value: string * ?options: 'Options -> Promise<obj>`
-- removeItem: `key: string * ?options: 'Options -> Promise<unit>`
-
-## PersistenceSyncData
-
-Type: `interface`
-
-- key: `string`
-- newValue: `string option`
-- timeStamp: `float`
-- url: `string option`
-
-## PersistenceSyncCallback
+## makePersisted
 
 ```fsharp
-PersistenceSyncData -> unit
+let makePersisted<'T>(signal: Signal<'T>, ?options: PersistenceOptions<'T, 'Options>): PersistedState<'T>
+
+type PersistedState<'T> = Accessor<'T> * Setter<'T> * obj
 ```
 
-## PersistenceSyncSubscribe
+`makePersisted` takes a signal, such as the result of `createSignal`, and returns it with its value persisted. It is
+bound for signals only. In Partas.Solid 3.0, `Signal<'T>` is still `Accessor<'T> * Setter<'T>`, but `createStore`
+returns `Store<'T> * StoreSetter<'T>`, so a store cannot be passed.
+
+`PersistenceOptions` is a POJO:
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `serialize` | `'T -> string` |
+| `deserialize` | `string -> 'T` |
+| `sync` | `PersistenceSyncAPI` |
+| `storage` | one of the four storage interfaces below, as a `U4` |
+| `storageOptions` | `'Options` |
+
+## Storage interfaces
+
+Each has `getItem`, `setItem` and `removeItem`:
+
+| Interface | `getItem` returns | Options |
+| --- | --- | --- |
+| `SyncStorage` | `string option` | none |
+| `AsyncStorage` | `Promise<string option>` | none |
+| `SyncStorageWithOptions<'Options>` | `string option` | `?options: 'Options` on each method |
+| `AsyncStorageWithOptions<'Options>` | `Promise<string option>` | `?options: 'Options` on each method |
+
+## Sync
 
 ```fsharp
-PersistenceSyncCallback -> unit
+type PersistenceSyncData = { key: string; newValue: string option; timeStamp: float; url: string option }
+type PersistenceSyncCallback = PersistenceSyncData -> unit
+type PersistenceSyncSubscribe = PersistenceSyncCallback -> unit
+type PersistenceSyncUpdate = key: string * value: string option -> unit
+type PersistenceSyncAPI = PersistenceSyncSubscribe * PersistenceSyncUpdate
+
+let storageSync: PersistenceSyncAPI
+let messageSync(?channel: Window): PersistenceSyncAPI
+let multiplexSync([<ParamArray>] syncAPIs: PersistenceSyncAPI[]): PersistenceSyncAPI
 ```
-
-## PersistenceSyncUpdate
-
-```fsharp
-key: string * value: string option -> unit
-```
-
-## PersistenceSyncAPI
-
-```fsharp
-PersistenceSyncSubscribe * PersistenceSyncUpdate
-```
-
-## PersistenceOptions
-
-Type: `POJO`
-
-Type parameters: `'T`, `'Options`
-
-- name: `string`
-- serialize: `'T -> string`
-- deserialize: `string -> 'T`
-- sync: `PersistenceSyncAPI`
-- storage: one of the four storages above, as a `U4`
-- storageOptions: `'Options`
-
-## PersistedState
-
-Type parameter: `'T`
-
-```fsharp
-Accessor<'T> * Setter<'T> * obj
-```
-
-`makePersisted` takes a signal, such as the result of `createSignal`, and returns it with its value persisted.
-
-:::note
-In Partas.Solid 3.0, `Signal<'T>` is still `Accessor<'T> * Setter<'T>`. Stores are different: `createStore` now comes
-from `solid-js` and returns `Store<'T> * StoreSetter<'T>`, where the setter takes an updater. `makePersisted` is bound
-for signals only.
-:::
-
-## Bindings
-
-:::details Bindings
-```fsharp
-open Fable.Core.TS
-[<Erase; AutoOpen>]
-type Storage =
-    [<ImportMember(Spec.path)>]
-    static member makePersisted<'T>(signal: Signal<'T>, ?options: PersistenceOptions<'T, _>): PersistedState<'T> = jsNative
-    [<ImportMember(Spec.path)>]
-    static member storageSync: PersistenceSyncAPI = jsNative
-    // TODO broadcast channel overload
-    [<ImportMember(Spec.path)>]
-    static member messageSync(?channel: Dom.Window): PersistenceSyncAPI = jsNative
-    // TODO
-    // [<ImportMember(Spec.path)>]
-    // static member wsSync(ws: WebSocket, ?warnOnError: bool): PersistenceSyncAPI = jsNative
-    [<ImportMember(Spec.path)>]
-    static member multiplexSync([<ParamArray>] syncAPIs: PersistenceSyncAPI[]): PersistenceSyncAPI = jsNative
-```
-:::
 
 `messageSync` has no `BroadcastChannel` overload yet, and `wsSync` is not bound.

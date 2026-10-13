@@ -22,7 +22,8 @@ layout: splash
 Every example on this site is compiled from its F# when the site is built. Fable and the Partas plugin produce JSX, Solid's compiler turns it into DOM code, and it runs in your browser. This one also uses anime.js from npm.
 
 ```fsharp solid setup
-open Fable.Core.TS.Dom
+open Fable.Core.TS
+
 [<Import("animate", "animejs")>]
 let animate (targets: obj, parameters: obj): obj = jsNative
 
@@ -36,8 +37,8 @@ let stagger (step: int, parameters: obj): obj = jsNative
 [<SolidComponent>]
 let HeroCounter () =
     let count, setCount = createSignal 0
-    let mutable number: HTMLSpanElement = JS.undefined
-    let mutable bars: HTMLDivElement = JS.undefined
+    let mutable number: Dom.HTMLSpanElement = JS.undefined
+    let mutable bars: Dom.HTMLDivElement = JS.undefined
 
     let pop = {| scale = {| from = 1.4; ``to`` = 1 |}; ease = "outElastic(1, .5)" |}
     let wave =
