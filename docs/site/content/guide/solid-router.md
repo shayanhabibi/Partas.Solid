@@ -2,6 +2,12 @@
 title: Solid Router
 ---
 
+:::warning
+**Not in the current Partas.Solid 3.0 builds.** `@solidjs/router` 2 (`2.0.0-next.*`) replaced the JSX components
+this page describes (`Router`, `Route`, `A`, `Navigate`) with `createRouter` and route data, so the bindings are
+being rewritten and are excluded from the package until then. This page describes the Solid 1 router bindings.
+:::
+
 Bindings for [`@solidjs/router`](https://docs.solidjs.com/solid-router/). They live in the `Partas.Solid.Router`
 namespace, which ships inside the `Partas.Solid` package.
 

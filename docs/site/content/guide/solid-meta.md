@@ -10,45 +10,48 @@ open Partas.Solid
 open Partas.Solid.Meta
 ```
 
-Partas.Solid does not install the npm package:
+Partas.Solid does not install the npm package. Use the Solid 2 line:
 
 ```bash
-npm install @solidjs/meta
+npm install @solidjs/meta@1.0.0-next.2
 ```
 
-:::warning
-These bindings were written for `@solidjs/meta` on Solid 1.x and have not changed for Partas.Solid 3.0. No test covers
-them, and they are not verified against Solid 2. For a tested alternative, use `useHead` from `@solidjs/web`, below.
-:::
+No provider is needed: render the tag components anywhere, and they manage `document.head`. Tags reach the head in a
+microtask after the update that renders them, and are removed when their component is disposed. The runtime tests
+cover the components below.
 
 ## Components
 
-Each component inherits the matching HTML tag, so it takes the same attributes.
+Each component inherits the matching HTML tag, so it takes the same attributes. Every tag but `Base` also takes a
+`key`: a later tag with the same key replaces the earlier one until it is disposed.
 
-| Component | Inherits | Upstream docs |
+| Component | Inherits | Notes |
 | --- | --- | --- |
-| `MetaProvider` | `FragmentNode` | [MetaProvider](https://docs.solidjs.com/solid-meta/reference/meta/metaprovider) |
-| `Title` | `title` | [Title](https://docs.solidjs.com/solid-meta/reference/meta/title) |
-| `Style` | `style` | [Style](https://docs.solidjs.com/solid-meta/reference/meta/style) |
-| `Link` | `link` | [Link](https://docs.solidjs.com/solid-meta/reference/meta/link) |
-| `Meta` | `meta` | [Meta](https://docs.solidjs.com/solid-meta/reference/meta/meta) |
-| `Base` | `base'` | [Base](https://docs.solidjs.com/solid-meta/reference/meta/base) |
+| `Head` | `FragmentNode` | Groups its child tags into one replacement set |
+| `Title` | `title` | |
+| `Meta` | `meta` | |
+| `Link` | `link` | |
+| `Stylesheet` | `link` | `rel="stylesheet"` preset. Solid 2 preloads it and holds the update until it loads |
+| `Style` | `style` | |
+| `Script` | `script` | |
+| `Base` | `base'` | Shell-only: applied in server rendering, ignored on the client |
 
 ```fsharp
+open Partas.Solid
+open Partas.Solid.Meta
+
 [<SolidComponent>]
-let App () =
-    MetaProvider() {
-        Title() { "My page" }
-        Meta().attr("name", "description").attr("content", "A page about things")
-        div () { "Hello" }
+let PageHead () =
+    Head () {
+        Title (key = "title") { "My page" }
+        Meta (key = "description", name = "description", content = "A page about things")
+        Stylesheet (href = "/site.css")
     }
 ```
 
-:::warning
-The `meta` tag binding has no `name`, `content` or `charset` properties: in `HtmlAttributes.fs` they (and an `http`
-property meant as `http-equiv`) are declared on the `menu` tag's attributes instead. `Meta(name = ...)` does not
-compile. Set them with `.attr`, as above, until the binding is fixed.
-:::
+A `Head` inside another `Head` forms its own group. To add tags to the surrounding group, render bare tags instead.
+
+`MetaProvider` is gone: `@solidjs/meta` 1.0 has none.
 
 ## useHead from @solidjs/web
 

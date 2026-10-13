@@ -1,0 +1,23 @@
+
+import { Base, Script, Stylesheet, Link, Meta, Title, Head } from "@solidjs/meta";
+
+/**
+ * @solidjs/meta 1.0 tags, keyed, grouped by Head.
+ */
+export function PageHead() {
+    return <Head>
+        <Title key="title">
+            Page
+        </Title>
+        <Meta key="description"
+            name="description"
+            content="A page" />
+        <Link rel="icon"
+            href="/favicon.ico" />
+        <Stylesheet href="/site.css" />
+        <Script src="/analytics.js"
+            async={true} />
+        <Base href="/app/" />
+    </Head>;
+}
+

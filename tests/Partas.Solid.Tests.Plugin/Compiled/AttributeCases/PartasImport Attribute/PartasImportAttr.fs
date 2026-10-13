@@ -1,10 +1,17 @@
-﻿module Partas.Solid.Tests.AttributeCases.PartasProxyImportAttr
+module Partas.Solid.Tests.AttributeCases.PartasProxyImportAttr
 
 open Partas.Solid
-open Partas.Solid.Router
 open Fable.Core
 
-// todo-replace with a better test
+// Two components imported through [<PartasImport>], which (unlike [<Import>]) leaves builder parameter names alone.
+[<Erase; PartasImport("Router", "@solidjs/router")>]
+type Router() =
+    interface HtmlContainer
+
+[<Erase; PartasImport("Route", "@solidjs/router")>]
+type Route() =
+    interface HtmlElement
+
 [<Erase>]
 type PartasImportAttr() =
     interface VoidNode

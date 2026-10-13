@@ -276,6 +276,13 @@ The web runtime (`@solidjs/web`, formerly `solid-js/web`) now has its own file (
 `Bindings.render` / `renderToString` / `isServer` are no longer on the core `Bindings` type (`DEV` stays there) — update your
 `open`s accordingly.
 
+### `Partas.Solid.Meta` follows `@solidjs/meta` 1.0; the router is out for now
+
+- `MetaProvider` is gone (meta 1.0 has none). New: `Head` (groups tags into one replacement set), `Script` and
+  `Stylesheet`. Every tag but `Base` takes a `key`. Install `@solidjs/meta@1.0.0-next.2`.
+- `Partas.Solid.Router` is excluded from the package while it is rewritten for `@solidjs/router` 2, which replaced
+  its JSX components with `createRouter` and route data.
+
 ### Solid 2.0.0-rc.14
 
 Partas.Solid now tracks rc.14 (runtime tests, the `solid/` reference checkout, and the generated JSX surface).

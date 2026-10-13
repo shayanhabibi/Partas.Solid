@@ -19,6 +19,7 @@
   "devDependencies": {
     "@solidjs/babel-plugin": "2.0.0-rc.14",
     "@solidjs/compiler": "2.0.0-rc.14",
+    "@solidjs/meta": "1.0.0-next.2",
     "@solidjs/vite-plugin": "3.0.0-next.49",
     "jsdom": "30.1.1",
     "vite": "8.3.1",
