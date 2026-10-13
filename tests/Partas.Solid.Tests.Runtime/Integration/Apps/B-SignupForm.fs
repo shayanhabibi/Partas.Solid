@@ -126,7 +126,7 @@ type SignupForm() =
                 }
             }
 
-            button (type' = "submit", class' = "submit") { "Sign up" }
+            button (type' = Attr.ButtonType.Submit, class' = "submit") { "Sign up" }
 
             Show (when' = (welcome () <> "")) { p (class' = "success") { $"Welcome, {welcome ()}!" } }
         }

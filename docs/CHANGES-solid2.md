@@ -283,6 +283,22 @@ supports Solid 2: every version, including the rc and beta tags, requires `solid
 2.0. Stay on Partas.Solid 2.x for SolidStart projects. `clientOnly`, `httpStatus` and `httpHeader` are in
 `Partas.Solid.Web`.
 
+### HTML attributes are generated from Solid's JSX types
+
+`HtmlAttributes.fs` is now generated from `@solidjs/web@2.0.0-rc.14`'s JSX declarations:
+
+- Attributes with a closed set of values take a `[<StringEnum>]` from `Partas.Solid.Attr` instead of a string:
+  `dir = Attr.Dir.Rtl`, `type' = Attr.ButtonType.Submit`, `loading = Attr.Loading.Lazy`. Boolean attributes take
+  `bool` (`reversed = true`, not `reversed = ""`). Use `.attr(name, value)` for a value outside the set.
+- Names follow upstream's lowercase spelling (`tabindex`, `readonly`, `colspan`). The camelCase spellings still
+  compile, marked `[<Obsolete>]`.
+- New: `command`/`commandfor` on buttons, `shadowroot*` on `<template>`, `popovertarget` on inputs, `closedby`,
+  `blocking`, `xmlns` on `a`/`script`/`style`/`title`, and the rest of rc.14's HTML attributes.
+- Removed, as rc.14 does not declare them: `color`, `media` on `<a>`, `hreflang` on `<area>`, `form` on `<label>`,
+  `content` on `<template>`, `crossorigin` on `<input>`, and the `<meta>` attributes that were misfiled on
+  `MenuHTMLAttributes`. `<input>` `min`/`max` are now strings (they also take dates); `<meter>`/`<progress>` values
+  are `float`.
+
 ## 10. Toolchain
 
 Relevant if you build from source or pin transitively:

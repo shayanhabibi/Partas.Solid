@@ -1,4 +1,4 @@
-﻿
+
 
 export function TypeDefTest(props) {
     const PARTAS_OTHERS = props;
@@ -10,7 +10,7 @@ export function TypeDefTest(props) {
 export function TypeDefTestWithProps(props) {
     const PARTAS_OTHERS = props;
     return <button class="ButtonClass"
-        draggable="indubitably">
+        draggable="true">
         Button
         <span class="sr-only">
             Span

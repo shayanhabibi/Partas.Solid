@@ -177,9 +177,9 @@ type AccountForm() =
 
             Show (when' = (savedAs () <> "")) { p (class' = "saved") { $"Account {savedAs ()} created" } }
 
-            button (type' = "submit", class' = "submit", disabled = saving ()) {
+            button (type' = Attr.ButtonType.Submit, class' = "submit", disabled = saving ()) {
                 if saving () then "Saving..." else "Create account"
             }
 
-            button (type' = "button", class' = "reset", onClick = fun _ -> reset ()) { "Reset" }
+            button (type' = Attr.ButtonType.Button, class' = "reset", onClick = fun _ -> reset ()) { "Reset" }
         }

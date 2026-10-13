@@ -31,4 +31,4 @@ type PropsWithExtensionChain() =
 
     [<SolidTypeComponent>]
     member props.typeDef =
-        Imported(class' = "Tester", draggable = "drag").attr("key", "value").attr("key2", "value2").attr("key3", "value3").attr ("key4", "value4")
+        Imported(class' = "Tester", draggable = Attr.Draggable.True).attr("key", "value").attr("key2", "value2").attr("key3", "value3").attr ("key4", "value4")

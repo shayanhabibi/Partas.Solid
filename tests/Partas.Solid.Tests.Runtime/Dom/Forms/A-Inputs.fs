@@ -9,15 +9,15 @@ open Fable.Core.JsInterop
 let InputTypes () =
     div (class' = "types") {
         input (id = "t-text", type' = "text", value = "hello", placeholder = "p", maxlength = 8, minlength = 2, pattern = "[a-z]+", autocomplete = "off")
-        input (id = "t-num", type' = "number", value = "5", min = 0, max = 10, step = "0.5")
-        input (id = "t-range", type' = "range", value = "30", min = 0, max = 200, step = "10")
+        input (id = "t-num", type' = "number", value = "5", min = "0", max = "10", step = "0.5")
+        input (id = "t-range", type' = "range", value = "30", min = "0", max = "200", step = "10")
         input(id = "t-date", type' = "date", value = "2024-03-15").attr("min", "2024-01-01").attr ("max", "2024-12-31")
         input (id = "t-email", type' = "email", value = "a@b.co", multiple = true)
         input (id = "t-pass", type' = "password", value = "secret", minLength = 4)
         input (id = "t-hidden", type' = "hidden", name = "token", value = "xyz")
         input (id = "t-color", type' = "color", value = "#ff0000")
         input (id = "t-file", type' = "file", accept = "image/*", multiple = true)
-        input (id = "t-search", type' = "search", inputmode = "search", enterkeyhint = "search")
+        input (id = "t-search", type' = "search", inputmode = Attr.Inputmode.Search, enterkeyhint = Attr.Enterkeyhint.Search)
     }
 
 /// A checkbox whose checked state is owned by a signal; a button resets it from outside.
@@ -48,7 +48,7 @@ let RadioGroup () =
                     }
         }
         output (id = "rg-out") { size () }
-        button (id = "rg-large", type' = "button", onClick = fun _ -> setSize "l") { "large" }
+        button (id = "rg-large", type' = Attr.ButtonType.Button, onClick = fun _ -> setSize "l") { "large" }
     }
 
 /// A range slider driving a number read-out and a number input (two views of one signal).
@@ -57,8 +57,8 @@ let LinkedRange () =
     let level, setLevel = createSignal 40
 
     div (class' = "lr") {
-        input (id = "lr-range", type' = "range", min = 0, max = 100, value = string (level ()), onInput = fun e -> setLevel (!!e.currentTarget?valueAsNumber))
-        input (id = "lr-num", type' = "number", min = 0, max = 100, value = string (level ()), onInput = fun e -> setLevel (!!e.currentTarget?valueAsNumber))
+        input (id = "lr-range", type' = "range", min = "0", max = "100", value = string (level ()), onInput = fun e -> setLevel (!!e.currentTarget?valueAsNumber))
+        input (id = "lr-num", type' = "number", min = "0", max = "100", value = string (level ()), onInput = fun e -> setLevel (!!e.currentTarget?valueAsNumber))
         span (id = "lr-out") { level () }
     }
 
@@ -80,7 +80,7 @@ let ControlledTextarea () =
     let body, setBody = createSignal "first line"
 
     div (class' = "ct") {
-        textarea (id = "ct-ta", rows = 4, cols = 30, wrap = "soft", value = body (), onInput = fun e -> setBody (!!e.currentTarget?value))
+        textarea (id = "ct-ta", rows = 4, cols = 30, wrap = Attr.Wrap.Soft, value = body (), onInput = fun e -> setBody (!!e.currentTarget?value))
         span (id = "ct-len") { body().Length }
         button (id = "ct-clear", onClick = fun _ -> setBody "") { "clear" }
     }
@@ -110,12 +110,12 @@ let ToggledInputFlags () =
 /// Global enumerated attribute spellcheck: disabling spellcheck on an editable region.
 [<SolidComponent>]
 let SpellcheckOff () =
-    div (id = "sp", contenteditable = "true", spellcheck = false) { "edit me" }
+    div (id = "sp", contenteditable = Attr.Contenteditable.True, spellcheck = false) { "edit me" }
 
 /// Global enumerated attribute spellcheck set on.
 [<SolidComponent>]
 let SpellcheckOn () =
-    div (id = "sp-on", contenteditable = "true", spellcheck = true) { "edit me" }
+    div (id = "sp-on", contenteditable = Attr.Contenteditable.True, spellcheck = true) { "edit me" }
 
 /// Input value property escape hatch via .attr("prop:...") - forces a property write.
 [<SolidComponent>]

@@ -44,7 +44,7 @@ type EventLog() =
                         e.preventDefault ()
                         props.log "submit" e
             ) {
-                button (id = "submit", type' = "submit") { "send" }
+                button (id = "submit", type' = Attr.ButtonType.Submit) { "send" }
             }
             button (id = "dbl", onDblClick = fun e -> props.log "dblclick" e) { "dbl" }
             div (id = "md", onMouseDown = (fun e -> props.log "mousedown" e), onMouseUp = (fun e -> props.log "mouseup" e)) {

@@ -14,9 +14,9 @@ let Globals () =
         class' = "a b",
         title = "tip",
         lang = "en",
-        dir = "rtl",
+        dir = Attr.Dir.Rtl,
         tabindex = 3,
-        draggable = "true",
+        draggable = Attr.Draggable.True,
         accessKey = "k"
     ) {
         "globals"
@@ -118,7 +118,7 @@ let ClassList () =
 /// Per-element attributes: anchors, images, labels, inputs, textarea, select, form.
 [<SolidComponent>]
 let PerElement () =
-    form (id = "f", action = "/submit", method = "post") {
+    form (id = "f", action = "/submit", method = Attr.Method.Post) {
         a (id = "lnk", href = "https://example.com/x?y=1", target = "_blank", rel = "noopener") { "link" }
         img (id = "pic", src = "/pic.png", alt = "A picture", width = 20)
         label (id = "lbl", for' = "name") { "Name" }

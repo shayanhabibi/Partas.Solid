@@ -16,7 +16,7 @@ type TypeDefTestWithProps() =
 
     [<SolidTypeComponent>]
     member props.typeDef =
-        button (class' = "ButtonClass", draggable = "indubitably") {
+        button (class' = "ButtonClass", draggable = Attr.Draggable.True) {
             "Button"
             span (class' = "sr-only") { "Span" }
         }

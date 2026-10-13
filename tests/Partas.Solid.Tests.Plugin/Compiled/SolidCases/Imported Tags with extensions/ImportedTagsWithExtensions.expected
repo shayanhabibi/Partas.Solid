@@ -22,7 +22,7 @@ export function NoPropsExtensionChain(props) {
 export function PropsWithExtensionChain(props) {
     const PARTAS_OTHERS = props;
     return <FakeImport class="Tester"
-        draggable="drag"
+        draggable="true"
         key="value"
         key2="value2"
         key3="value3"

@@ -90,7 +90,7 @@ let FieldsetDisabled () =
         fieldset (id = "fd-set", disabled = locked (), name = "grp") {
             legend () { "Group" }
             input (id = "fd-in", name = "a", value = "1")
-            button (id = "fd-btn", type' = "button") { "inner" }
+            button (id = "fd-btn", type' = Attr.ButtonType.Button) { "inner" }
         }
         button (id = "fd-toggle", onClick = fun _ -> setLocked (not (locked ()))) { "toggle" }
     }
@@ -114,9 +114,9 @@ type ButtonTypes() =
         ) {
             input (id = "bt-in", name = "q", value = "initial")
             button (id = "bt-default") { "default" }
-            button (id = "bt-button", type' = "button") { "button" }
-            button (id = "bt-reset", type' = "reset") { "reset" }
-            button (id = "bt-submit", type' = "submit", name = "action", value = "save") { "save" }
+            button (id = "bt-button", type' = Attr.ButtonType.Button) { "button" }
+            button (id = "bt-reset", type' = Attr.ButtonType.Reset) { "reset" }
+            button (id = "bt-submit", type' = Attr.ButtonType.Submit, name = "action", value = "save") { "save" }
         }
 
 /// A form that reads its fields through FormData on submit.
@@ -132,7 +132,7 @@ type FormDataSubmit() =
         form (
             id = "fds",
             action = "/never",
-            method = "post",
+            method = Attr.Method.Post,
             noValidate = true,
             onSubmit =
                 fun e ->
@@ -148,7 +148,7 @@ type FormDataSubmit() =
                 option' (value = "pro", selected = true) { "Pro" }
             }
             textarea (name = "note") { "hi" }
-            button (id = "fds-go", type' = "submit") { "go" }
+            button (id = "fds-go", type' = Attr.ButtonType.Submit) { "go" }
         }
 
 /// onReset and onInvalid handlers.

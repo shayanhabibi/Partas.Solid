@@ -24,6 +24,7 @@
       <Compile Include="AttributesAliasesExtensions.fs" />
       <Compile Include="Builder.fs" />
       <Compile Include="HtmlAttributes.fs" />
+      <Compile Include="HtmlEvents.fs" />
       <Compile Include="AriaAttributes.fs" />
       <Compile Include="StyleSpec.fs" />
       <Compile Include="Style.fs" />

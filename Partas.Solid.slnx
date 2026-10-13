@@ -30,6 +30,7 @@
   </Folder>
   <Folder Name="/tools/">
     <File Path="tools/build.fsx" />
+    <Project Path="tools/JsxGen/Partas.Solid.JsxGen.fsproj" />
     <File Path="tools/workbench.fsx" />
   </Folder>
 </Solution>

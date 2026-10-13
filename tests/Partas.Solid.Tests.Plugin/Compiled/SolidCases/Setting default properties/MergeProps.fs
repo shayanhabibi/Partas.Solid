@@ -20,8 +20,8 @@ type MultipleMerges() =
     [<SolidTypeComponent>]
     member props.SimpleMerge =
         props.class' <- "DefaultClass"
-        props.draggable <- "stub"
-        props.dir <- "ltr"
+        props.draggable <- Attr.Draggable.True
+        props.dir <- Attr.Dir.Ltr
         div ()
 
 [<Erase>]
@@ -47,12 +47,12 @@ type NestedMerge() =
     [<SolidTypeComponent>]
     member props.SimpleMerge =
         div () {
-            props.dir <- "ltr"
+            props.dir <- Attr.Dir.Ltr
             div ()
 
             button () {
                 props.class' <- "DefaultClass"
-                props.draggable <- "stub"
+                props.draggable <- Attr.Draggable.True
             }
         }
 
@@ -63,13 +63,13 @@ type NestedMergeWithChildren() =
     [<SolidTypeComponent>]
     member props.SimpleMerge =
         div () {
-            props.dir <- "ltr"
+            props.dir <- Attr.Dir.Ltr
             div ()
 
             button () {
                 props.class' <- "DefaultClass"
                 "Button"
-                props.draggable <- "stub"
+                props.draggable <- Attr.Draggable.True
             }
         }
 

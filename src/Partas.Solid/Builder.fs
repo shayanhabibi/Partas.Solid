@@ -422,6 +422,21 @@ module Builder =
     [<EB(EBState.Never)>]
     [<AllowNullLiteral>]
     [<Interface>]
+    type BdoHTMLAttributes = interface end
+
+    [<EB(EBState.Never)>]
+    [<AllowNullLiteral>]
+    [<Interface>]
+    type CaptionHTMLAttributes = interface end
+
+    [<EB(EBState.Never)>]
+    [<AllowNullLiteral>]
+    [<Interface>]
+    type AmbiguousNamespaceAttributes = interface end
+
+    [<EB(EBState.Never)>]
+    [<AllowNullLiteral>]
+    [<Interface>]
     type BaseHTMLAttributes = interface end
 
     [<EB(EBState.Never)>]
@@ -645,6 +660,9 @@ module Builder =
         type Anchor = AnchorHTMLAttributes
         type Audio = AudioHTMLAttributes
         type Area = AreaHTMLAttributes
+        type Bdo = BdoHTMLAttributes
+        type Caption = CaptionHTMLAttributes
+        type AmbiguousNamespace = AmbiguousNamespaceAttributes
         type Base = BaseHTMLAttributes
         type Blockquote = BlockquoteHTMLAttributes
         type Button = ButtonHTMLAttributes

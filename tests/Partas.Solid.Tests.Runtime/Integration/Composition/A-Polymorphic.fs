@@ -51,7 +51,7 @@ type Slot() =
 let BoxAsButton () =
     let count, setCount = createSignal 0
 
-    Box(class' = "boxed", id = "poly-btn").as'(button (type' = "button", onClick = fun _ -> setCount (count () + 1))) {
+    Box(class' = "boxed", id = "poly-btn").as'(button (type' = Attr.ButtonType.Button, onClick = fun _ -> setCount (count () + 1))) {
         "Pressed " + string (count ())
     }
 

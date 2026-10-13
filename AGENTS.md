@@ -101,6 +101,23 @@ After Expecto, `test` runs `node tests/Partas.Solid.Tests.Runtime/run.mjs all`, 
 Format with `dotnet fantomas <files>` directly, and compile ScratchTests with `dotnet fable --exclude
 Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize [--watch]` inside `tests/ScratchTests/` (or `build.fsx test scratch`).
 
+### Generated JSX attributes (`tools/JsxGen`)
+
+`src/Partas.Solid/HtmlAttributes.fs` is **generated**: edit `tools/JsxGen/overrides.json` or the generator, never the
+file. `tools/JsxGen` (ported from Ranvier's DOM generator) reads `@solidjs/web`'s `namespace JSX` through the pinned
+TypeScript 7 compiler (Xantham.TypeScript.Wire), so interfaces, `extends` chains and member types come from the
+compiler. Regenerate with `npm ci` in `tools/JsxGen`, then `dotnet run -c Release --project tools/JsxGen`.
+`tools/JsxGen/out/diff.md` reports drift against the file being replaced.
+
+- Closed literal sets become `[<StringEnum>]` unions in `module Attr` (`dir = Attr.Dir.Rtl`); boolean attributes
+  `bool`; `string | number` `int`; open strings `string` with a Rider `LanguageInjection` whose prefix names a tag
+  that owns the attribute.
+- `overrides.json` holds what the declarations cannot say: interface renames, per-member types, skipped members,
+  and `aliases`, the legacy camelCase spellings kept as `[<Obsolete>]` members.
+- Events, `children`, `style` and `inlist` stay hand-written in `HtmlEvents.fs`. New marker interfaces still go in
+  `Builder.fs` by hand.
+- Upstream bumps are a `package.json` change in `tools/JsxGen`; regenerate and read `diff.md`.
+
 ### Releases (ShipIt)
 
 [EasyBuild.ShipIt](https://github.com/easybuild-org/EasyBuild.ShipIt) owns the version. `src/CHANGELOG.md` is the one

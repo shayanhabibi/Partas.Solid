@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Reads Solid's JSX declarations through the TypeScript 7 compiler (Xantham.TypeScript.Wire) and generates the
+    JSX attribute surface. Ported from Ranvier's tools/Ranvier.Dom.Generate. Tooling only: nothing ships from here.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <RestoreAdditionalProjectSources>https://nuget.cloudsmith.io/shayanhabibi/xantham/v3/index.json;https://api.nuget.org/v3/index.json</RestoreAdditionalProjectSources>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Xantham.TypeScript.Wire" Version="[0.3.0]" />
+    <Compile Include="Surface.fs" />
+    <Compile Include="Emit.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+</Project>

@@ -119,7 +119,7 @@ type TodoApp() =
                     onInput = fun e -> setDraft (!!e.currentTarget?value)
                 )
 
-                button (type' = "submit", class' = "add-btn") { "Add" }
+                button (type' = Attr.ButtonType.Submit, class' = "add-btn") { "Add" }
             }
 
             button (class' = "toggle-all", onClick = fun _ -> toggleAll ()) { "Toggle all" }

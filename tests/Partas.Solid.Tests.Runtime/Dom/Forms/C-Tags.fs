@@ -15,8 +15,8 @@ let Table () =
         }
         thead () {
             tr () {
-                th (scope = "col", id = "h-name") { "Name" }
-                th (scope = "col", colspan = 2) { "Scores" }
+                th (scope = Attr.Scope.Col, id = "h-name") { "Name" }
+                th (scope = Attr.Scope.Col, colspan = 2) { "Scores" }
             }
         }
         tbody () {
@@ -102,7 +102,7 @@ let DialogOpen () =
     div (class' = "dlg") {
         dialog (id = "dlg-el", open' = shown ()) {
             p () { "in dialog" }
-            form (method = "dialog") { button (id = "dlg-ok", value = "ok") { "OK" } }
+            form (method = Attr.Method.Dialog) { button (id = "dlg-ok", value = "ok") { "OK" } }
         }
         button (id = "dlg-show", onClick = fun _ -> setShown true) { "show" }
         button (id = "dlg-hide", onClick = fun _ -> setShown false) { "hide" }
@@ -112,10 +112,10 @@ let DialogOpen () =
 [<SolidComponent>]
 let Media () =
     div (class' = "media") {
-        img (id = "m-img", src = "/a.png", alt = "", width = 64, height = 32, loading = "lazy", decoding = "async", srcset = "/a.png 1x, /a@2x.png 2x", sizes = "64px", crossorigin = "anonymous", referrerpolicy = "no-referrer")
+        img (id = "m-img", src = "/a.png", alt = "", width = 64, height = 32, loading = Attr.Loading.Lazy, decoding = Attr.Decoding.Async, srcset = "/a.png 1x, /a@2x.png 2x", sizes = "64px", crossorigin = Attr.Crossorigin.Anonymous, referrerpolicy = Attr.Referrerpolicy.NoReferrer)
         a (id = "m-a", href = "/file.pdf", download = "report.pdf", hreflang = "en", type' = "application/pdf", ping = "/ping") { "download" }
-        iframe (id = "m-if", src = "about:blank", title = "frame", width = 300, height = 150, loading = "lazy", sandbox = "allow-scripts", allow = "fullscreen", name = "fr")
-        video (id = "m-vid", src = "/v.mp4", poster = "/p.png", width = 320, controls = true, muted = true, loop = true, playsinline = true, preload = "none")
+        iframe (id = "m-if", src = "about:blank", title = "frame", width = 300, height = 150, loading = Attr.Loading.Lazy, sandbox = "allow-scripts", allow = "fullscreen", name = "fr")
+        video (id = "m-vid", src = "/v.mp4", poster = "/p.png", width = 320, controls = true, muted = true, loop = true, playsinline = true, preload = Attr.MediaPreload.None)
         audio (id = "m-aud", src = "/a.mp3", controls = false, autoplay = false)
     }
 
@@ -132,7 +132,7 @@ let Voids () =
         input (value = "v")
         embed (src = "/e.swf", type' = "application/x-shockwave-flash")
         source (src = "/s.webm", type' = "video/webm")
-        area (shape = "rect", coords = "0,0,1,1", href = "#a", alt = "area")
+        area (shape = Attr.Shape.Rect, coords = "0,0,1,1", href = "#a", alt = "area")
         meta ()
         link (rel = "stylesheet", href = "/s.css")
     }
@@ -141,12 +141,12 @@ let Voids () =
 [<SolidComponent>]
 let Misc () =
     div (class' = "misc") {
-        ol (id = "ol", start = "3", reversed = "") {
+        ol (id = "ol", start = 3, reversed = true) {
             li () { "x" }
             li () { "y" }
         }
         meter (id = "met", min = 0, max = 10, low = 2, high = 8, optimum = 5, value = 7) { "7" }
-        progress (id = "prog", max = 100, value = "40") { "40%" }
+        progress (id = "prog", max = 100, value = 40.0) { "40%" }
         time (id = "tm", dateTime = "2024-03-15") { "March 15" }
     }
 
@@ -180,6 +180,6 @@ type DialogEvents() =
 [<SolidComponent>]
 let StringTypedBools () =
     div (class' = "stb") {
-        video () { track (id = "trk", kind = "subtitles", src = "/t.vtt", srclang = "en", label = "English", default' = "") }
-        iframe (id = "ifs", allowfullscreen = "")
+        video () { track (id = "trk", kind = Attr.Kind.Subtitles, src = "/t.vtt", srclang = "en", label = "English", default' = true) }
+        iframe (id = "ifs", allowfullscreen = true)
     }

@@ -12,7 +12,7 @@ export function SimpleMerge(props) {
 export function MultipleMerges(props) {
     props = merge({
         class: "DefaultClass",
-        draggable: "stub",
+        draggable: "true",
         dir: "ltr",
     }, props);
     const PARTAS_OTHERS = props;
@@ -41,7 +41,7 @@ export function SimpleNestedMerge(props) {
 
 export function NestedMerge(props) {
     props = merge({
-        draggable: "stub",
+        draggable: "true",
         class: "DefaultClass",
         dir: "ltr",
     }, props);
@@ -54,7 +54,7 @@ export function NestedMerge(props) {
 
 export function NestedMergeWithChildren(props) {
     props = merge({
-        draggable: "stub",
+        draggable: "true",
         class: "DefaultClass",
         dir: "ltr",
     }, props);
