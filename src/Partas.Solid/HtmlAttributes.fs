@@ -2304,10 +2304,10 @@ module HtmlAttributes =
         /// <summary>
         /// Route preload intent; `"false"` disables the integration's default eager preload.
         /// </summary>
-        [<Erase>]
+        [<Erase; LanguageInjection("jsx", Prefix = "<a preload='", Suffix = "' >")>]
         member _.preload
-            with set (_: bool) = ()
-            and [<Erase>] get (): bool = unbox ()
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
 
         [<Erase; LanguageInjection("jsx", Prefix = "<a attributionsrc='", Suffix = "' >")>]
         member _.attributionsrc

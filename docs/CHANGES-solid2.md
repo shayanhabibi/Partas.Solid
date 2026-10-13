@@ -296,12 +296,25 @@ Partas.Solid no longer references `Fable.Browser.Dom`. DOM types come from `Xant
 - Events: every handler is typed by its event (`onAuxClick: Dom.PointerEvent -> unit`), including window events on
   `body` and media/SVG-animation events. `onEncrypted` is on media elements only, as upstream.
 
-### `Partas.Solid.Meta` follows `@solidjs/meta` 1.0; the router is out for now
+### `Partas.Solid.Meta` follows `@solidjs/meta` 1.0
 
 - `MetaProvider` is gone (meta 1.0 has none). New: `Head` (groups tags into one replacement set), `Script` and
   `Stylesheet`. Every tag but `Base` takes a `key`. Install `@solidjs/meta@1.0.0-next.2`.
-- `Partas.Solid.Router` is excluded from the package while it is rewritten for `@solidjs/router` 2, which replaced
-  its JSX components with `createRouter` and route data.
+
+### `Partas.Solid.Router` follows `@solidjs/router` 2
+
+Rebound against `@solidjs/router@2.0.0-next.38`, which has no JSX components:
+
+- `Router`, `HashRouter`, `MemoryRouter` and `Route` are gone. Declare routes with `route` (`routePaths` for several
+  paths, `routeGroup` for a component-less parent), create the router with `createRouter (RouterConfig(routes, ...))`
+  at module level, and render it: `Router.render ()`, or `Router % RouterRoot() { yield fun props -> ... }` for a root
+  layout. `hashHistory ()` and `memoryHistory "/"` replace the router variants.
+- `A` and `Navigate` are gone. Links are plain `a` elements; `replace`, `noscroll`, `state`, `preload` and `link` are
+  anchor attributes. `<a>`'s `preload` is now a `string`, so `preload = "false"` writes the opt-out the router reads.
+- `createAsync`, `createAsyncStore` and `useSubmission` are gone. Read a `query` with `createMemo`; submissions are
+  settled history (`useSubmissions`), and in-flight state belongs to the action's `onSubmit` hook.
+- `useCurrentMatches` is `useRouteMatches`. New: `useLinkState`, `pendingLinks`, the link preload strategies,
+  `intFilter`, `Router.paths` and `Router.matchUrl`.
 
 ### Solid 2.0.0-rc.14
 

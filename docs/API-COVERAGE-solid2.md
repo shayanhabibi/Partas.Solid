@@ -17,7 +17,7 @@ jumps to the line. They will **not** resolve on GitHub for paths under `solid/`,
 | `solid-js` | [`solid/packages/solid/src/index.ts`](../solid/packages/solid/src/index.ts) (barrel) | [`SolidBindings.fs`](../src/Partas.Solid/SolidBindings.fs) | the bulk of the surface |
 | ↳ re-exports `@solidjs/signals` | [`signals/src/index.ts`](../solid/packages/signals/src/index.ts) | same | reactivity + store actually live here |
 | `@solidjs/web` | [`web/src/index.ts`](../solid/packages/web/src/index.ts) | [`SolidWebBindings.fs`](../src/Partas.Solid/SolidWebBindings.fs) | **renamed** from `solid-js/web`; already correct |
-| `@solidjs/router` | *not in submodule* | [`SolidRouterBindings.fs`](../src/Partas.Solid/SolidRouterBindings.fs) (446 ln, 27 imports) | separate repo — see [§7](#7-blind-spots--things-these-submodules-cannot-answer) |
+| `@solidjs/router` | *not in submodule* | [`SolidRouterBindings.fs`](../src/Partas.Solid/SolidRouterBindings.fs) | separate repo, bound against `2.0.0-next.38`'s `.d.ts` — see [§7](#7-blind-spots--things-these-submodules-cannot-answer) |
 | `@solidjs/meta` | *not in submodule* | [`SolidMetaBindings.fs`](../src/Partas.Solid/SolidMetaBindings.fs) (35 ln) | separate repo |
 | `@solidjs/start` | *not in submodule* | *removed in 3.0* | no SolidStart release supports Solid 2 yet |
 
@@ -317,9 +317,9 @@ Flagging these so nobody burns time searching for them:
    [`AriaAttributes.fs`](../src/Partas.Solid/AriaAttributes.fs), and [`Svg.fs`](../src/Partas.Solid/Svg.fs) are reconciled
    against `0.50.0-next.42` plus the listed deltas, not against rc.9 itself.
 2. **Router / meta / start are separate repositories.** `solid/packages/` has no `router`, `meta`, or `start`.
-   [`SolidRouterBindings.fs`](../src/Partas.Solid/SolidRouterBindings.fs) (27 imports) is the second-largest binding
-   file and is entirely unverified by this pin. If router coverage matters, add `solidjs/solid-router` as a
-   second submodule.
+   [`SolidRouterBindings.fs`](../src/Partas.Solid/SolidRouterBindings.fs) is bound against the published
+   `@solidjs/router@2.0.0-next.38` declarations, not this pin; the runtime suite
+   (`tests/Partas.Solid.Tests.Runtime/Integration/Router`) runs it against that release.
 3. **Server vs client builds diverge.** [`solid/packages/solid/src/server/`](../solid/packages/solid/src/server/)
    is a distinct entry from `src/client/`. Anything SSR-sensitive should be checked against the server entry, not
    just the client one.
@@ -339,4 +339,14 @@ Flagging these so nobody burns time searching for them:
    [`Svg.fs`](../src/Partas.Solid/Svg.fs) (most likely under-bound at 145 members),
    [`HtmlAttributes.fs`](../src/Partas.Solid/HtmlAttributes.fs), and
    [`AriaAttributes.fs`](../src/Partas.Solid/AriaAttributes.fs).
-7. Optional: second submodule for `solid-router` if router bindings need verification.
+7. ~~Router bindings~~ — rebound for `@solidjs/router` 2 (`createRouter`, route definitions, plain `a` links).
+8. **Router: not bound, deferred.** What `@solidjs/router@2.0.0-next.38` exports that
+   [`SolidRouterBindings.fs`](../src/Partas.Solid/SolidRouterBindings.fs) leaves out, and what each one waits on:
+
+   | Export | Waits on |
+   | --- | --- |
+   | `liveQuery` (`data/liveQuery`) | Client-side and bindable now: an `AsyncIterable` producer binding, tested in jsdom with an async generator |
+   | `query.get` / `set` / `clear` cache helpers, `RouterContext`, lazy route subtrees | Nothing known; not bound yet |
+   | `@solidjs/router/server`, `fsServer`, `serverRouteComponent`, flight data | A server-functions (`"use server"`) story: nothing in Partas.Solid produces the functions they consume since the SolidStart bindings were removed. Pairs with item 5 |
+   | `@solidjs/router/fs` (`defineFileRoute`, route manifests) | A design for mapping F# files, compile order and module names onto the bundler's `routes/[id]` scan |
+   | `defineRoute`, `defineRoutes`, `paths` typing | Nothing: they only add TypeScript types |

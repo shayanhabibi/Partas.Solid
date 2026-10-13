@@ -29,7 +29,7 @@ than render markup. Each section shows the 2.x code and what replaces it. The fu
 | `solid-js/web` | `@solidjs/web`, bound in `Partas.Solid.Web` |
 | `solid-js/store` | `solid-js` |
 | `@solidjs/meta` with `MetaProvider` | `@solidjs/meta` 1.0, no provider ([Solid Meta](solid-meta.md)) |
-| `Partas.Solid.Router` | Not in 3.0 yet; being rewritten for `@solidjs/router` 2 ([Solid Router](solid-router.md)) |
+| `Router`, `Route`, `A`, `Navigate` | `@solidjs/router` 2: `createRouter` with `route` definitions, plain `a` links ([Solid Router](solid-router.md)) |
 | SolidStart bindings | Removed |
 
 ## DOM types

@@ -19,7 +19,8 @@
     "ProgressHTMLAttributes.value": "float",
     "ProgressHTMLAttributes.max": "float",
     "ParamHTMLAttributes.value": "string",
-    "HTMLAttributes.spellcheck": "bool"
+    "HTMLAttributes.spellcheck": "bool",
+    "AnchorHTMLAttributes.preload": "string"
   },
   "skipMembers": [
     "CustomAttributes.ref",

@@ -1,446 +1,500 @@
 namespace Partas.Solid.Router
 
-open System.Runtime.CompilerServices
+open System
 open Fable.Core
 open Fable.Core.JS
-open Fable.Core.JsInterop
-open System
+open Fable.Core.TS
 open Partas.Solid
 
-#nowarn 49
-#nowarn 64
-
+/// <summary>
+/// Bindings for <c>@solidjs/router</c> 2 (Solid 2). The router is configured, not composed: declare the route tree
+/// with <c>route</c>, create the router with <c>createRouter</c> at module level, and render the instance it
+/// returns as a tag. Links are plain <c>a</c> elements.
+/// </summary>
 [<AutoOpen>]
 module Bindings =
+    [<EB(EBState.Never)>]
+    module Spec =
+        [<Literal>]
+        let path = "@solidjs/router"
 
-    [<RequireQualifiedAccess>]
-    [<StringEnum>]
+    /// <summary>Why a preload function is running.</summary>
+    [<RequireQualifiedAccess; StringEnum>]
     type Intent =
+        /// <summary>The first render.</summary>
         | Initial
+        /// <summary>Browser back or forward.</summary>
         | Native
+        /// <summary>A router navigation.</summary>
         | Navigate
+        /// <summary>A link preload, not a navigation.</summary>
         | Preload
 
-    [<Pojo>]
+    /// <summary>
+    /// The current route's path parameters: a reactive, store-like object. <c>params["id"]</c> reads one, and is
+    /// <c>None</c> when the route has no such parameter.
+    /// </summary>
+    [<AllowNullLiteral>]
+    type Params =
+        [<EmitIndexer>]
+        abstract Item: name: string -> string option with get
+
+    /// <summary>
+    /// The current query string as a reactive, store-like object. Read a key to subscribe to it.
+    /// </summary>
+    [<AllowNullLiteral>]
+    type SearchParams =
+        /// <summary>The value of a key. A key repeated in the query string is an array at runtime: use <c>getAll</c>.</summary>
+        [<EmitIndexer>]
+        abstract Item: key: string -> string option with get
+
+        /// <summary>Every value of a key, whether it appears once, several times or not at all.</summary>
+        [<Emit("[].concat($0[$1] ?? [])")>]
+        abstract getAll: key: string -> string[]
+
+    /// <summary>The router's reactive location.</summary>
+    type Location =
+        abstract pathname: string
+        abstract search: string
+        abstract hash: string
+        abstract query: SearchParams
+        abstract state: obj option
+        abstract key: string
+
+    /// <summary>Options for a navigation. Every field is optional.</summary>
+    [<JS.Pojo>]
     type NavigateOptions(?resolve: bool, ?replace: bool, ?scroll: bool, ?state: obj) =
-        member val resolve: bool =
-            resolve
-            |> Option.defaultValue !!null with get, set
+        /// <summary>Resolve the path against the current route. Defaults to <c>true</c>.</summary>
+        member val resolve: bool = JS.undefined with get, set
+        /// <summary>Replace the history entry instead of pushing one. Defaults to <c>false</c>.</summary>
+        member val replace: bool = JS.undefined with get, set
+        /// <summary>Scroll to the top after navigating. Defaults to <c>true</c>.</summary>
+        member val scroll: bool = JS.undefined with get, set
+        /// <summary>Custom state for <c>location.state</c>, serialised with the structured clone algorithm.</summary>
+        member val state: obj = JS.undefined with get, set
 
-        member val replace: bool =
-            replace
-            |> Option.defaultValue !!null with get, set
+    /// <summary>
+    /// A node of the router's typed path proxy, <c>Router.paths</c>. Index it by segment and call it to bind
+    /// parameters: <c>Router.paths["users"].Invoke(2)</c> is <c>/users/2</c>. Pass it to <c>navigate</c>, or use
+    /// <c>.href</c> where a string is needed.
+    /// </summary>
+    [<AllowNullLiteral>]
+    type RoutePath =
+        /// <summary>The child segment <c>segment</c>.</summary>
+        [<EmitIndexer>]
+        abstract Item: segment: string -> RoutePath with get
 
-        member val scroll: bool =
-            scroll
-            |> Option.defaultValue !!null with get, set
+        /// <summary>
+        /// Binds parameters, then optionally a search object and a hash, in that order. With no arguments it ends
+        /// the path.
+        /// </summary>
+        [<Emit("$0($1...)")>]
+        abstract Invoke: [<ParamArray>] args: obj[] -> RoutePath
 
-        member val state: obj =
-            state
-            |> Option.defaultValue !!null with get, set
+        /// <summary>The URL this node stands for.</summary>
+        [<Emit("String($0)")>]
+        abstract href: string
 
+    /// <summary>Navigates. Returned by <c>useNavigate</c>.</summary>
     type Navigator =
         [<Emit("$0($1...)")>]
-        abstract member Invoke: ``to``: string * ?options: NavigateOptions -> unit
-
-        /// Replaces NavigateOptions
-        [<Emit("$0($1...)"); ParamObject(1)>]
-        abstract member InvokeOptions: ``to``: string * ?resolve: bool * ?replace: bool * ?scroll: bool * ?state: obj -> unit
+        abstract Invoke: ``to``: string * ?options: NavigateOptions -> unit
 
         [<Emit("$0($1...)")>]
-        abstract member Invoke: delta: float -> unit
+        abstract Invoke: ``to``: RoutePath * ?options: NavigateOptions -> unit
 
-    type Path =
-        abstract member pathname: string with get, set
-        abstract member search: string with get, set
-        abstract member hash: string with get, set
+        /// <summary>Moves through the history by <c>delta</c> entries: <c>-1</c> is back.</summary>
+        [<Emit("$0($1)")>]
+        abstract Invoke: delta: int -> unit
 
-    type Location =
-        inherit Path
-        abstract member query: obj with get, set
-        abstract member state: obj option with get, set
-        abstract member key: string with get, set
+    /// <summary>Merges keys into the query string. <c>""</c>, <c>null</c> and <c>undefined</c> values remove a key.</summary>
+    type SearchParamsSetter =
+        [<Emit("$0($1...)")>]
+        abstract Invoke: values: obj * ?options: NavigateOptions -> unit
 
+    /// <summary>Passed to a <c>useBeforeLeave</c> listener.</summary>
     type BeforeLeaveEventArgs =
-        abstract member from: Location with get, set
-        abstract member ``to``: U2<string, float> with get, set
-        abstract member options: NavigateOptions option with get, set
-        abstract member defaultPrevented: bool with get
-        abstract member preventDefault: unit -> unit
-        abstract member retry: ?force: bool -> unit
+        /// <summary>The location being left.</summary>
+        abstract from: Location
+        /// <summary>The path, or history delta, passed to <c>navigate</c>.</summary>
+        abstract ``to``: U2<string, int>
+        abstract options: NavigateOptions option
+        /// <summary><c>true</c> when an earlier listener called <c>preventDefault</c>.</summary>
+        abstract defaultPrevented: bool
+        /// <summary>Blocks the navigation.</summary>
+        abstract preventDefault: unit -> unit
+        /// <summary>Retries the navigation; <c>force</c> skips the leave listeners.</summary>
+        abstract retry: ?force: bool -> unit
 
+    /// <summary>Passed to a route's <c>preload</c> function.</summary>
     type RoutePreloadFuncArgs =
-        abstract member ``params``: obj with get, set
-        abstract member location: Location with get, set
-        abstract member intent: Intent with get, set
+        abstract ``params``: Params
+        abstract location: Location
+        abstract intent: Intent
 
-    type RoutePreloadFunc = RoutePreloadFuncArgs -> unit
+    /// <summary>
+    /// The props a route component receives, and the argument of the router's root layout
+    /// (<c>RouterRoot</c>). <c>children</c> is the matched content.
+    /// </summary>
+    type RouteSectionProps =
+        abstract ``params``: Params
+        abstract location: Location
+        /// <summary>What the route's <c>preload</c> returned (the router config's <c>preload</c>, for the root).</summary>
+        abstract data: obj
+        abstract children: HtmlElement
 
-    type PathMatch =
-        abstract member ``params``: obj with get, set
-        abstract member path: string with get, set
+    /// <summary>A route: build one with <c>route</c>.</summary>
+    type RouteDefinition = interface end
 
+    /// <summary>Route metadata, as resolved by the router. See <c>useRouteMatches</c>.</summary>
     type RouteDescription =
-        abstract member key: obj with get, set
-        abstract member originalPath: string with get, set
-        abstract member pattern: string with get, set
-        abstract member preload: RoutePreloadFunc option with get, set
-        abstract member matcher: (string -> PathMatch option) with get, set
-        abstract member matchFilters: obj option with get, set
-        abstract member info: obj option with get, set
+        abstract originalPath: string
+        abstract pattern: string
+        abstract info: obj option
 
+    /// <summary>A path matched against the location.</summary>
+    type PathMatch =
+        abstract ``params``: Params
+        abstract path: string
+
+    /// <summary>One route of the chain matching the location.</summary>
     type RouteMatch =
         inherit PathMatch
-        abstract member route: RouteDescription with get, set
+        abstract route: RouteDescription
 
-    [<PartasImport("Route", "@solidjs/router")>]
-    type Route() =
-        interface HtmlElement
+    /// <summary>One route of the chain matching a URL. See <c>RouterInstance.matchUrl</c>.</summary>
+    type OutputMatch =
+        abstract path: string
+        abstract pattern: string
+        abstract ``match``: string
+        abstract ``params``: Params
+        abstract info: obj option
 
-        [<Erase; DefaultValue>]
-        val mutable path: string
+    /// <summary>
+    /// Where the router reads the URL and writes navigations: <c>browserHistory</c>, <c>hashHistory</c> or
+    /// <c>memoryHistory</c>.
+    /// </summary>
+    type RouterHistory = interface end
 
-        [<Erase>]
-        member this.paths
-            with inline get (): string array = unbox this.path
-            and inline set (value: string array) = this.path <- unbox<string> value
+    /// <summary>An in-memory history, for tests and environments without a URL bar.</summary>
+    type MemoryHistory =
+        inherit RouterHistory
+        abstract get: unit -> string
+        abstract go: delta: int -> unit
+        abstract back: unit -> unit
+        abstract forward: unit -> unit
+        /// <summary>Calls <c>listener</c> on each change; returns the function that stops it.</summary>
+        abstract listen: listener: (string -> unit) -> (unit -> unit)
 
-        [<Erase; DefaultValue>]
-        val mutable component': TagValue
+    /// <summary>A link state plugin, such as <c>pendingLinks</c>.</summary>
+    type LinksPlugin = interface end
 
-        [<Erase; DefaultValue>]
-        val mutable matchFilters: obj
+    /// <summary>A link preload strategy, such as <c>intentPreload ()</c>.</summary>
+    type LinkPreload = interface end
 
-        [<Erase; DefaultValue>]
-        val mutable preload: RoutePreloadFunc
+    /// <summary>A parameter constraint for a route's <c>matchFilters</c>, such as <c>intFilter</c>.</summary>
+    type MatchFilter = interface end
 
-        [<Erase>]
-        [<EB(EBState.Never)>]
-        member inline _.Combine
-            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
-            : HtmlContainerFun =
-            fun PARTAS_BUILDER ->
-                PARTAS_FIRST PARTAS_BUILDER
-                PARTAS_SECOND PARTAS_BUILDER
+    /// <summary>
+    /// The router's configuration. Only <c>routes</c> is required. The tree is fixed once the router is created.
+    /// </summary>
+    [<JS.Pojo>]
+    type RouterConfig
+        (
+            routes: RouteDefinition[],
+            ?``base``: string,
+            ?preload: RoutePreloadFuncArgs -> obj,
+            ?history: RouterHistory,
+            ?singleFlight: bool,
+            ?actionBase: string,
+            ?explicitLinks: bool,
+            ?links: LinksPlugin,
+            ?preloadLinks: LinkPreload[],
+            ?scrollRestoration: bool,
+            ?transformUrl: string -> string
+        ) =
+        member val routes: RouteDefinition[] = routes with get, set
 
-        [<Erase>]
-        [<EB(EBState.Never)>]
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
-            PARTAS_DELAY ()
+    /// <summary>
+    /// A router: the value <c>createRouter</c> returns. It is a component, so render it as a tag:
+    /// <c>Router.render ()</c>, or <c>Router % RouterRoot() { yield fun props -> ... }</c> to wrap the matched
+    /// content in a root layout. Bind it to a capitalised name, as the Solid compiler only treats capitalised
+    /// tags as components.
+    /// </summary>
+    [<Erase>]
+    type RouterInstance() =
+        inherit TagValue(unbox<obj -> HtmlElement> null)
 
-        [<Erase>]
-        [<EB(EBState.Never)>]
-        member inline _.Zero() : HtmlContainerFun = ignore
+        /// <summary>The typed path proxy: <c>Router.paths["users"].Invoke(2)</c> is <c>/users/2</c>.</summary>
+        [<Emit("$0.paths")>]
+        member _.paths: RoutePath = jsNative
 
-        [<Erase>]
-        [<EB(EBState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
+        /// <summary>The route tree.</summary>
+        [<Emit("$0.routes")>]
+        member _.routes: RouteDefinition[] = jsNative
 
-    [<Pojo>]
-    type RootConfig(path: string, ``component``: HtmlElement) =
-        member val path: string = jsNative with get, set
+        /// <summary>The routes matching <c>url</c>, outermost first; empty when none matches. Nothing renders.</summary>
+        [<Emit("$0.match($1)")>]
+        member _.matchUrl(url: string) : OutputMatch[] = jsNative
 
-        [<EB(EBState.Never)>]
-        member val ``component``: HtmlElement = jsNative with get, set
+        /// <summary>The query keys of the server component routes <c>url</c> shows, outermost first.</summary>
+        [<Emit("$0.keysFor($1)")>]
+        member _.keysFor(url: string) : string[] = jsNative
 
-        /// <summary> Alias for <c>_.``component``</c></summary>
-        member this.component'
-            with inline set (value: HtmlElement) = this.``component`` <- value
-            and inline get (): HtmlElement = this.``component``
+    /// <summary>
+    /// The root layout of a router. It stays mounted across navigations, and its child lambda receives the matched
+    /// content as <c>props.children</c>: <c>Router % RouterRoot() { yield fun props -> main () { props.children } }</c>.
+    /// </summary>
+    [<Erase>]
+    type RouterRoot() =
+        interface ChildLambdaProvider<RouteSectionProps>
 
-    [<PartasImport("Router", "@solidjs/router")>] // Replaces Import as it doesn't impact the builder param names
-    type Router() =
-        interface HtmlElement
-
-        [<Erase; DefaultValue>]
-        val mutable root: TagValue
-
-        [<Erase; DefaultValue>]
-        val mutable base': string
-
-        [<Erase; DefaultValue>]
-        val mutable actionBase: string
-
-        [<Erase; DefaultValue>]
-        val mutable preload: bool
-
-        [<Erase; DefaultValue>]
-        val mutable explicitLinks: bool
-
+        /// <summary>Server only: the location to render when no request is in scope. Ignored on the client.</summary>
         [<Erase; DefaultValue>]
         val mutable url: string
 
-        [<Erase>]
-        [<EB(EBState.Never)>]
-        member inline _.Combine
-            ([<InlineIfLambda>] PARTAS_FIRST: HtmlContainerFun, [<InlineIfLambda>] PARTAS_SECOND: HtmlContainerFun)
-            : HtmlContainerFun =
-            fun PARTAS_BUILDER ->
-                PARTAS_FIRST PARTAS_BUILDER
-                PARTAS_SECOND PARTAS_BUILDER
+    /// <summary>A link's state. See <c>useLinkState</c>.</summary>
+    type LinkState =
+        /// <summary>The location's path is the link's path or lies under it; the query is ignored.</summary>
+        abstract active: unit -> bool
+        /// <summary>The location matches the link exactly, query included (parameter order and hash aside).</summary>
+        abstract current: unit -> bool
+        /// <summary>The link is the target of an in-flight navigation.</summary>
+        abstract pending: unit -> bool
 
-        [<Erase>]
-        [<EB(EBState.Never)>]
-        member inline _.Delay([<InlineIfLambda>] PARTAS_DELAY: unit -> HtmlContainerFun) : HtmlContainerFun =
-            PARTAS_DELAY ()
+    /// <summary>Preloads a route's code, and optionally its data. Returned by <c>usePreloadRoute</c>.</summary>
+    type RoutePreloader =
+        [<Emit("$0($1, { preloadData: $2 })")>]
+        abstract Invoke: url: string * preloadData: bool -> unit
 
-        [<Erase>]
-        [<EB(EBState.Never)>]
-        member inline _.Zero() : HtmlContainerFun = ignore
-
-        [<Erase>]
-        [<EB(EBState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: Route) : HtmlContainerFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
-
-        [<Erase>]
-        [<EB(EBState.Never)>]
-        member inline _.Yield(PARTAS_ELEMENT: RootConfig[]) : HtmlContainerFun =
-            fun PARTAS_CONT -> ignore PARTAS_ELEMENT
-
-    [<PartasImport("HashRouter", "@solidjs/router")>]
-    type HashRouter() =
-        inherit Router()
-
-    [<PartasImport("MemoryRouter", "@solidjs/router")>]
-    type MemoryRouter() =
-        inherit Router()
-
-        [<Erase; DefaultValue>]
-        val mutable history: MemoryHistory
-
-    and MemoryHistory private () =
-        [<Erase>]
-        member this.get() : string = jsNative
-
-        [<Erase; ParamObject(0)>]
-        member this.set(value: string, ?scroll: bool, ?replace: bool) : unit = jsNative
-
-        [<Erase>]
-        member this.back() = jsNative
-
-        [<Erase>]
-        member this.forward() = jsNative
-
-        [<Erase>]
-        member this.go(n: int) : unit = jsNative
-
-        [<Erase>]
-        member this.listen(listener: string -> unit) : unit -> unit = jsNative
-
-    [<Pojo>]
-    type PreloadData(preloadData: bool) =
-        member val preloadData: bool = jsNative with get, set
-
-    [<Erase>]
-    type Extensions =
-        [<EB(EBState.Never)>]
-        [<Extension; Erase>]
-        static member Run(PARTAS_THIS: Router, PARTAS_RUN: HtmlContainerFun) =
-            PARTAS_RUN Unchecked.defaultof<_>
-            PARTAS_THIS
-
-        [<EB(EBState.Never)>]
-        [<Extension; Erase>]
-        static member Run(PARTAS_THIS: Route, PARTAS_RUN: HtmlContainerFun) =
-            PARTAS_RUN Unchecked.defaultof<_>
-            PARTAS_THIS
-
-    [<Import("A", "@solidjs/router")>]
-    type A() =
-        interface RegularNode
-
-        [<Erase; DefaultValue>]
-        val mutable href: string
-
-        [<Erase; DefaultValue>]
-        val mutable noScroll: bool
-
-        [<Erase; DefaultValue>]
-        val mutable replace: bool
-
-        [<Erase; DefaultValue>]
-        val mutable state: obj
-
-        [<Erase; DefaultValue>]
-        val mutable activeClass: string
-
-        [<Erase; DefaultValue>]
-        val mutable inactiveClass: string
-
-        [<Erase; DefaultValue>]
-        val mutable end': bool
-
-    [<Import("Navigate", "@solidjs/router")>]
-    type Navigate() =
-        interface RegularNode
-
-        [<Erase; DefaultValue>]
-        val mutable href: string
-
-        [<Erase; DefaultValue>]
-        val mutable state: obj
-
-    type SolidAction<'Input, 'Result> =
-        abstract url: string with get, set
-        abstract member with': 'Input -> string
-
-    type Submission<'Input, 'Result> =
-        abstract input: 'Input with get
-        abstract result: 'Result option with get
-        abstract error: obj with get
-        abstract pending: bool with get
-        abstract url: string with get
-        abstract clear: (unit -> unit)
-        abstract retry: (unit -> unit)
-
-    type Extensions with
-        [<Extension>]
-        static member pending(this: Submission<'Input, unit>[]) : bool = undefined
-
-    type AsyncAccessor<'T> =
-        [<Emit "$0()">]
-        abstract Invoke: unit -> 'T
-
-        abstract latest: 'T
-
-    type Query<'Input, 'Output> =
         [<Emit("$0($1)")>]
-        abstract Invoke: 'Input -> 'Output
+        abstract Invoke: url: string -> unit
 
-        [<Emit "$0.key">]
+    /// <summary>
+    /// A query: a fetching function whose calls are deduplicated and cached under its key. Call it with
+    /// <c>Invoke</c>, typically inside <c>createMemo</c>.
+    /// </summary>
+    type Query<'Arg, 'Result> =
+        [<Emit("$0($1...)")>]
+        abstract Invoke: arg: 'Arg -> 'Result
+
+        /// <summary>The query's key, which revalidates every entry.</summary>
         abstract key: string
 
-        [<Emit "$0.keyFor($1)">]
-        abstract keyFor: 'Input -> string
+        /// <summary>The key of the entry for <c>arg</c>, which revalidates only that entry.</summary>
+        abstract keyFor: arg: 'Arg -> string
 
-    type Extensions with
+    /// <summary>A settled submission of an action. See <c>useSubmissions</c>.</summary>
+    type Submission<'Input, 'Result> =
+        abstract input: 'Input
+        abstract result: 'Result option
+        abstract error: obj
+        abstract url: string
+        abstract clear: unit -> unit
+        abstract retry: unit -> JS.Promise<'Result>
 
-        [<EB(EBState.Never)>]
-        [<Extension>]
-        [<Emit "$0.latest">]
-        static member latest<'T>(this: unit -> 'T) : 'T = jsNative
+    /// <summary>
+    /// A router action: a mutation with a URL. Bind a form to it with <c>form (action = act.url, method = Attr.Method.Post)</c>,
+    /// or call it through <c>useAction</c>.
+    /// </summary>
+    type Action<'Input, 'Result> =
+        /// <summary>The URL that identifies the action, for a form's <c>action</c> or a button's <c>formaction</c>.</summary>
+        abstract url: string
 
-        [<EB(EBState.Never)>]
-        [<Extension>]
-        [<Emit "$0.key">]
-        static member key(this: FSharpFunc<_, _>) : string = jsNative
+        /// <summary>
+        /// Registers a hook, owned by the current reactive owner, that runs when a submission starts. Use it to
+        /// apply optimistic updates.
+        /// </summary>
+        abstract onSubmit: hook: ('Input -> unit) -> Action<'Input, 'Result>
 
-        [<EB(EBState.Never)>]
-        [<Extension>]
-        [<Emit "$0.keyFor($1)">]
-        static member keyFor(this: FSharpFunc<_, _>, value: string) : string = jsNative
+        /// <summary>Registers a hook, owned by the current reactive owner, that runs when a submission settles.</summary>
+        abstract onSettled: hook: (Submission<'Input, 'Result> -> unit) -> Action<'Input, 'Result>
 
-[<AutoOpen>]
-[<Erase>]
+    /// <summary>An action of two arguments. <c>with'</c> binds the first, as for a form's hidden id.</summary>
+    type Action<'Arg, 'Input, 'Result> =
+        inherit Action<'Arg * 'Input, 'Result>
+
+        /// <summary>The action with its first argument bound to <c>arg</c>.</summary>
+        [<Emit("$0.with($1)")>]
+        abstract with': arg: 'Arg -> Action<'Input, 'Result>
+
+/// <summary>Functions of <c>@solidjs/router</c> 2.</summary>
+[<AutoOpen; Erase>]
 type Bindings =
-    /// Actions only work with POST requests.
-    [<ImportMember("@solidjs/router"); ParamObject(1)>]
-    static member action<'Input, 'Output>
-        (handler: 'Input -> Promise<'Output>, ?name: string, ?onComplete: Submission<'Input, 'Output> -> unit)
-        : SolidAction<'Input, 'Output> =
-        jsNative
-
-    /// This can avoid the use of formData etc. However, it requires client-side javascript
-    /// and is not progressively enhanceable like forms are.
-    [<ImportMember("@solidjs/router")>]
-    static member useAction<'Input, 'Result>(action: SolidAction<'Input, 'Result>) : 'Input -> 'Result = jsNative
-
-    [<ImportMember("@solidjs/router")>]
-    static member useSubmission<'Input>(action: SolidAction<'Input, unit>, ?filter: 'Input -> bool) : Submission<'Input, unit> = jsNative
-
-    [<ImportMember("@solidjs/router")>]
-    static member useSubmissions<'Input>(action: SolidAction<'Input, unit>, ?filter: 'Input -> bool) : Submission<'Input, unit>[] = jsNative
-
-    [<ImportMember("@solidjs/router")>]
-    static member createAsync<'T>
+    /// <summary>
+    /// A route. <c>component</c> is a component taking <c>RouteSectionProps</c> (or <c>unit</c>), such as a
+    /// <c>[&lt;SolidComponent&gt;]</c> let binding. A parent with a component wraps its children, which render
+    /// where it places <c>props.children</c>. <c>preload</c> warms the route's data; what it returns reaches the
+    /// component as <c>props.data</c>. <c>matchFilters</c> is an object of filters per parameter:
+    /// <c>{| id = intFilter |}</c>.
+    /// </summary>
+    [<Emit("$0"); ParamObject>]
+    static member route
         (
-            fn: 'T option -> Promise<'T>,
-            ?name: string,
-            ?initialValue: 'T,
-            ?deferStream: bool,
-            ?onHydrated: unit -> unit,
-            ?ssrLoadFrom: string,
-            ?storage: unit -> Signal<'T>
-        ) : Accessor<'T> =
+            path: string,
+            ``component``: 'Props -> #HtmlElement,
+            ?children: RouteDefinition[],
+            ?preload: RoutePreloadFuncArgs -> obj,
+            ?matchFilters: obj,
+            ?info: obj
+        ) : RouteDefinition =
         jsNative
 
-    [<Import("createAsync", "@solidjs/router")>]
-    static member createAsyncWithLatest<'T>
+    /// <summary>A route matching several paths, which stays mounted when moving between them.</summary>
+    [<Emit("$0"); ParamObject>]
+    static member routePaths
         (
-            fn: 'T option -> Promise<'T>,
-            ?name: string,
-            ?initialValue: 'T,
-            ?deferStream: bool,
-            ?onHydrated: unit -> unit,
-            ?ssrLoadFrom: string,
-            ?storage: unit -> Signal<'T>
-        ) : AsyncAccessor<'T> =
+            path: string[],
+            ``component``: 'Props -> #HtmlElement,
+            ?children: RouteDefinition[],
+            ?preload: RoutePreloadFuncArgs -> obj,
+            ?matchFilters: obj,
+            ?info: obj
+        ) : RouteDefinition =
         jsNative
 
-    [<ImportMember("@solidjs/router")>]
-    static member createAsyncStore<'T>
-        (
-            fn: 'T option -> Promise<'T>,
-            ?name: string,
-            ?initialValue: 'T,
-            ?deferStream: bool,
-            ?reconcile: obj,
-            ?onHydrated: unit -> unit,
-            ?ssrLoadFrom: string
-        ) : Accessor<'T> =
+    /// <summary>A route that only groups its children under <c>path</c>, without a component of its own.</summary>
+    [<Emit("$0"); ParamObject>]
+    static member routeGroup(path: string, children: RouteDefinition[], ?preload: RoutePreloadFuncArgs -> obj, ?info: obj) : RouteDefinition =
         jsNative
 
-    [<Import("createAsyncStore", "@solidjs/router")>]
-    static member createAsyncStoreWithLatest<'T>
-        (
-            fn: 'T option -> Promise<'T>,
-            ?name: string,
-            ?initialValue: 'T,
-            ?deferStream: bool,
-            ?reconcile: obj,
-            ?onHydrated: unit -> unit,
-            ?ssrLoadFrom: string
-        ) : AsyncAccessor<'T> =
-        jsNative
+    /// <summary>
+    /// Creates the router. Call it once, at module level, and bind the result to a capitalised name: it is the
+    /// component to render.
+    /// </summary>
+    [<ImportMember(Spec.path)>]
+    static member createRouter(config: RouterConfig) : RouterInstance = jsNative
 
-    [<ImportMember("@solidjs/router")>]
-    static member query<'Input, 'Output>(fn: FSharpFunc<'Input, 'Output>, ?name: string) : FSharpFunc<'Input, 'Output> = jsNative
+    /// <summary>Reads and writes the browser's URL. The default.</summary>
+    [<ImportMember(Spec.path)>]
+    static member browserHistory() : RouterHistory = jsNative
 
-    [<Import("query", "@solidjs/router")>]
-    static member query'<'Input, 'Output>(fn: FSharpFunc<'Input, 'Output>, ?name: string) : Query<'Input, 'Output> = jsNative
+    /// <summary>Keeps the route in the URL's hash.</summary>
+    [<ImportMember(Spec.path)>]
+    static member hashHistory() : RouterHistory = jsNative
 
-    [<ImportMember("@solidjs/router")>]
-    static member revalidate(key: string, ?force: bool) : unit = jsNative
+    /// <summary>Keeps the location in memory, starting at <c>initial</c>.</summary>
+    [<ImportMember(Spec.path)>]
+    static member memoryHistory(?initial: string) : MemoryHistory = jsNative
 
-    [<ImportMember("@solidjs/router")>]
+    /// <summary>Adds <c>data-pending</c> to links covering the destination of an in-flight navigation.</summary>
+    [<ImportMember(Spec.path)>]
+    static member pendingLinks: LinksPlugin = jsNative
+
+    /// <summary>Preloads a link when the pointer rests on it for <c>delay</c> ms (default 20), it is focused, or a touch starts on it.</summary>
+    [<ImportMember(Spec.path); ParamObject>]
+    static member intentPreload(?delay: int, ?data: bool) : LinkPreload = jsNative
+
+    /// <summary>Preloads a link when a pointer goes down on it.</summary>
+    [<ImportMember(Spec.path); ParamObject>]
+    static member tapPreload(?data: bool) : LinkPreload = jsNative
+
+    /// <summary>
+    /// Preloads a link once it has stayed in the viewport for <c>delay</c> ms and the browser is idle. Applies to
+    /// links with <c>preload = "viewport"</c>, or to every link with <c>all = true</c>.
+    /// </summary>
+    [<ImportMember(Spec.path); ParamObject>]
+    static member viewportPreload(?all: bool, ?data: bool, ?delay: int, ?rootMargin: string) : LinkPreload = jsNative
+
+    /// <summary>
+    /// Preloads a link once the page has loaded and the browser is idle. Applies to links with
+    /// <c>preload = "eager"</c>, or to every link with <c>all = true</c>.
+    /// </summary>
+    [<ImportMember(Spec.path); ParamObject>]
+    static member eagerPreload(?all: bool, ?data: bool) : LinkPreload = jsNative
+
+    /// <summary>A match filter that accepts integers only.</summary>
+    [<Import("int", Spec.path)>]
+    static member intFilter: MatchFilter = jsNative
+
+    /// <summary>The current route's path parameters.</summary>
+    [<ImportMember(Spec.path)>]
+    static member useParams() : Params = jsNative
+
+    /// <summary>The function that navigates.</summary>
+    [<ImportMember(Spec.path)>]
     static member useNavigate() : Navigator = jsNative
 
-    [<ImportMember("@solidjs/router")>]
+    /// <summary>The reactive location.</summary>
+    [<ImportMember(Spec.path)>]
     static member useLocation() : Location = jsNative
 
-    [<ImportMember("@solidjs/router")>]
+    /// <summary>The query string, and the function that merges keys into it. Setting it does not scroll.</summary>
+    [<ImportMember(Spec.path)>]
+    static member useSearchParams() : SearchParams * SearchParamsSetter = jsNative
+
+    /// <summary><c>true</c> while a navigation, and the data it waits on, is settling.</summary>
+    [<ImportMember(Spec.path)>]
     static member useIsRouting() : (unit -> bool) = jsNative
 
-    [<ImportMember("@solidjs/router")>]
-    static member useMatch(fn: unit -> string, ?matchFilters: obj) : (unit -> bool) = jsNative
+    /// <summary>
+    /// Matches the pattern <c>path</c> returns against the location, without consulting the route tree.
+    /// </summary>
+    [<ImportMember(Spec.path)>]
+    static member useMatch(path: unit -> string, ?matchFilters: obj) : (unit -> PathMatch option) = jsNative
 
-    [<ImportMember("@solidjs/router")>]
-    static member useParams() : obj = jsNative
+    /// <summary>The routes matching the location, outermost first.</summary>
+    [<ImportMember(Spec.path)>]
+    static member useRouteMatches() : (unit -> RouteMatch[]) = jsNative
 
-    [<ImportMember("@solidjs/router")>]
+    /// <summary>The href for a path, resolved against the current route.</summary>
+    [<ImportMember(Spec.path)>]
+    static member useHref(``to``: unit -> string) : (unit -> string) = jsNative
+
+    /// <summary>A path resolved against the current route.</summary>
+    [<ImportMember(Spec.path)>]
+    static member useResolvedPath(path: unit -> string) : (unit -> string option) = jsNative
+
+    /// <summary>The function that preloads a route by hand, as link preloading does.</summary>
+    [<ImportMember(Spec.path)>]
+    static member usePreloadRoute() : RoutePreloader = jsNative
+
+    /// <summary>
+    /// The state of a link to <c>href</c>, for links that need more than the attributes the router sets on
+    /// <c>a</c> elements. <c>end</c> makes <c>active</c> an exact match.
+    /// </summary>
+    [<ImportMember(Spec.path); ParamObject(1)>]
+    static member useLinkState(href: unit -> string, ?``end``: bool) : LinkState = jsNative
+
+    /// <summary>Calls <c>listener</c> before the router leaves the current route; it can block the navigation.</summary>
+    [<ImportMember(Spec.path)>]
     static member useBeforeLeave(listener: BeforeLeaveEventArgs -> unit) : unit = jsNative
 
-    [<ImportMember("@solidjs/router")>]
-    static member useCurrentMatches() : unit -> RouteMatch[] = jsNative
+    /// <summary>
+    /// Wraps a fetching function so calls are deduplicated and cached under <c>name</c> and the argument. Read a
+    /// query's result with Solid's primitives, such as <c>createMemo</c>. Pass several values as a tuple or record.
+    /// </summary>
+    [<ImportMember(Spec.path)>]
+    static member query(fn: 'Arg -> 'Result, name: string) : Query<'Arg, 'Result> = jsNative
 
-    [<ImportMember("@solidjs/router")>]
-    static member usePreloadRoute() : (string -> PreloadData) -> unit = jsNative
+    /// <summary>Refetches every query.</summary>
+    [<ImportMember(Spec.path)>]
+    static member revalidate() : unit = jsNative
 
-    [<ImportMember("@solidjs/router")>]
-    static member useSearchParams() : Signal<obj> = jsNative
+    /// <summary>Refetches the queries under <c>key</c>; <c>force</c> skips the cache.</summary>
+    [<ImportMember(Spec.path)>]
+    static member revalidate(key: string, ?force: bool) : unit = jsNative
 
-    [<ImportMember("@solidjs/router")>]
-    static member createMemoryHistory() : MemoryHistory = jsNative
-// TODO preload, json, redirect and reload
+    /// <summary>Refetches the queries under each of <c>keys</c>; <c>force</c> skips the cache.</summary>
+    [<ImportMember(Spec.path)>]
+    static member revalidate(keys: string[], ?force: bool) : unit = jsNative
+
+    /// <summary>
+    /// A router action. A form posts its <c>FormData</c> to it. An action that is not a server function needs a
+    /// stable <c>name</c>.
+    /// </summary>
+    [<ImportMember(Spec.path)>]
+    static member action(fn: 'Input -> JS.Promise<'Result>, ?name: string) : Action<'Input, 'Result> = jsNative
+
+    /// <summary>A router action of two arguments: bind the first with <c>with'</c>.</summary>
+    [<ImportMember(Spec.path)>]
+    static member action(fn: 'Arg -> 'Input -> JS.Promise<'Result>, ?name: string) : Action<'Arg, 'Input, 'Result> = jsNative
+
+    /// <summary>The function that calls <c>action</c> directly, in the current router.</summary>
+    [<ImportMember(Spec.path)>]
+    static member useAction(action: Action<'Input, 'Result>) : ('Input -> JS.Promise<'Result>) = jsNative
+
+    /// <summary>The settled submissions of <c>action</c>, oldest first; <c>filter</c> selects them by input.</summary>
+    [<ImportMember(Spec.path)>]
+    static member useSubmissions(action: Action<'Input, 'Result>, ?filter: 'Input -> bool) : Submission<'Input, 'Result>[] =
+        jsNative

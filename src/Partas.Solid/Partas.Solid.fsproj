@@ -33,8 +33,7 @@
       <Compile Include="Svg.fs" />
       <Compile Include="SolidBindings.fs" />
       <Compile Include="SolidWebBindings.fs" />
-      <!-- Being rewritten for @solidjs/router 2 (no JSX components); kept out of the build until then. -->
-      <None Include="SolidRouterBindings.fs" />
+      <Compile Include="SolidRouterBindings.fs" />
       <Compile Include="SolidMetaBindings.fs" />
       <Compile Include="Experimental.fs" />
       <Compile Include="PolymorphicSupport.fs" />

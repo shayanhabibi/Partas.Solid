@@ -84,4 +84,6 @@ let RefVariable () =
 
 ## Router
 
-The `@solidjs/router` bindings are not part of Partas.Solid 3.0 yet. They are being rewritten for the Solid 2 router.
+`@solidjs/router` 2 has no JSX components: `createRouter` takes a tree of `route` definitions and returns the
+router to render, and links are plain `a` elements. `createAsync` is gone; read a `query` with `createMemo`. See
+[Solid Router](solid-router.md).

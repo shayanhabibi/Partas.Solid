@@ -233,7 +233,7 @@ The snapshot tests pin *what* the plugin emits. The runtime tests check *what th
 compiled by Fable and the plugin (same flags as the snapshots, plus `-o .`), then compiled again by the real Solid
 2 JSX compiler (`@solidjs/vite-plugin` / `@solidjs/compiler`, pinned to rc.14 with the other Solid packages in
 `package.json`). vitest runs the result in jsdom against the browser development build of `solid-js` and `@solidjs/web`.
-`README.md` there is the full guide. It covers the helpers and Solid 2 scheduling: setters only queue a microtask, so
+`@solidjs/router` ships JSX source, so `vitest.config.mjs` compiles it out of `node_modules` too. `README.md` there is the full guide. It covers the helpers and Solid 2 scheduling: setters only queue a microtask, so
 call `flush()` or use `click`/`input`/`act` before you assert.
 
 Three suites, each its own Fable project (`<Suite>/Partas.Solid.Tests.Runtime.<Suite>.fsproj`, globbing `**\*.fs`):

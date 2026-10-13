@@ -7,8 +7,9 @@ export default defineConfig({
     solid({
       // Fable emits JSX into *.fs.jsx next to each F# fixture. Hand-written specs may be .jsx too.
       // Patterns are relative to this folder (the vite root).
+      // @solidjs/router ships JSX source (its "solid" export condition), so it is compiled here too.
       include: ["**/*.jsx"],
-      exclude: ["node_modules/**", "**/fable_modules/**"],
+      exclude: [/node_modules[\/](?!@solidjs[\/]router[\/])/, "**/fable_modules/**"],
       // Use the solid-js / @solidjs/web development builds (better errors, dev diagnostics).
       dev: true
     })
