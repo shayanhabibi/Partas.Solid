@@ -1154,12 +1154,31 @@ module internal rec AST =
             // `render ()`
             | [] | [ Value(UnitConstant, _) ] -> Some []
             | _ -> None
+        /// A component rendered as a tag must compile to a capitalised name: Solid's compiler treats
+        /// `<router />` as an HTML element. A lowercase value, or one in a lowercase nested module (whose
+        /// compiled name is prefixed with the module's), is a compile error rather than a silent no-op.
+        let guardComponentName (ctx: PluginContext) (range: SourceLocation option) (expr: Expr) =
+            let name =
+                match expr with
+                | IdentExpr { Name = name } -> Some name
+                | Import({ Selector = name }, _, _) when name <> "default" && name <> "*" -> Some name
+                | _ -> None
+            match name with
+            | Some name when name.Length > 0 && System.Char.IsLower name[0] ->
+                ctx.Helper.LogError(
+                    $"`{name}` is rendered as a component, but it would compile to <{name} />, which Solid treats as "
+                    + "an HTML element. Give it a capitalised name, in a capitalised module.",
+                    ?range = Option.orElse range expr.Range)
+            | _ -> ()
+            expr
+
         let (|TagValue|_|) (ctx: PluginContext): Expr -> Expr option = function
             | Call(
                 callee = Import({ Selector = "op_BangAt"; Kind = MemberImport(MemberRef({ FullName = "Partas.Solid.Builder" }, _)) }, _, _)
                 info = {
                     Args = Lambda(body = Call(callee = callee; info = callInfo)) :: _
-                }) ->
+                }
+                range = bangRange) ->
                 match callee with
                 // Some ident
                 | IdentExpr({ Type = Type.PartasName ctx typeName } as identee) ->
@@ -1171,7 +1190,7 @@ module internal rec AST =
                     // Where the above is not true, the referenced tag is a let binding, and therefore a SolidComponent,
                     // so we intent to reference the name of the binding.
                     | _ ->
-                        callee |> Some
+                        callee |> guardComponentName ctx bangRange |> Some
                 // prevent import of native tags
                 | Expr.NativeImportedConstructor ctx
                     & Import(
@@ -1194,7 +1213,7 @@ module internal rec AST =
                     // If the above is not true, then the tag is a SolidComponent let binding, and the name of the
                     // component will be the name of the binding.
                     | _ ->
-                        Some expr
+                        expr |> guardComponentName ctx bangRange |> Some
                 | Import(info = { Kind = UserImport false }) ->
                     Some callee
                 | _ -> None
@@ -1244,8 +1263,8 @@ module internal rec AST =
                     | Some(PropsGetterOrSetter ctx expr) ->
                         expr
                     | Some(IdentExpr _ as ident) ->
-                        ident
-                    | Some expr -> expr
+                        guardComponentName ctx range ident
+                    | Some expr -> guardComponentName ctx range expr
                     | _ ->
                         failwith "unreachable"
                 { TagSource = TagSource.LibraryImport importExpr
