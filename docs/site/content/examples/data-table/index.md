@@ -16,7 +16,7 @@ it matters.
 :::tip
 If you want a table on Partas.Solid 3.0 today, the runtime tests in the Partas.Solid repository include a sortable,
 filterable data table written with plain Partas.Solid and no TanStack:
-`Partas.Solid.Tests.Runtime/Integration/Apps/E-DataTable.fs`. [Try it on Partas.Solid 3.0](#try-it-on-partas.solid-3.0),
+`tests/Partas.Solid.Tests.Runtime/Integration/Apps/E-DataTable.fs`. [Try it on Partas.Solid 3.0](#try-it-on-partas.solid-3.0),
 below, sorts a table with `@tanstack/table-core` instead, live on this page.
 :::
 

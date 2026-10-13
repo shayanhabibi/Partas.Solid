@@ -30,18 +30,18 @@ The plugin is where the real work happens. Read the [developer notes](dev/file-s
 ## Building
 
 You need the .NET SDK, and Node 22.12 or later on your `PATH` for the runtime tests. The solution is
-`Partas.Solid.slnx`. Build and test through the build CLI in `partas-solid.fsproj`:
+`Partas.Solid.slnx`. Build and test through the build script, `tools/build.fsx`, from the repository root:
 
 ```bash
-dotnet run --project partas-solid.fsproj -- build     # build Partas.Solid and the plugin (Release)
-dotnet run --project partas-solid.fsproj -- test      # clean, restore, snapshot tests, then the runtime tests
+dotnet fsi tools/build.fsx -- build     # build Partas.Solid and the plugin (Release)
+dotnet fsi tools/build.fsx -- test      # restore, fable clean, build, snapshot tests, then the runtime tests
+dotnet fsi tools/build.fsx -- --help    # every command
 ```
 
-Add `-q` (`--quick`) while you iterate. It skips the tool restore, the clean and the solution restore. A full `test`
-run cleans every `bin` folder, runs `fable clean` and restores everything again. `--skip-tests` skips the tests.
+Add `-q` (`--quick`) while you iterate. It skips the restores and `fable clean`. `--skip-tests` skips the tests.
 
-:::warning
-The `clean` step also wipes the `solid/` submodule. If it disappears, restore it with
+:::note
+If the `solid/` submodule disappears, restore it with
 `git submodule add --force -b next https://github.com/solidjs/solid.git solid`, then check out the pinned tag again.
 :::
 
@@ -55,7 +55,7 @@ output does* in a browser-like environment.
 ### Snapshot tests
 
 Because the plugin rewrites the AST, the JSX it writes is the specification. The snapshot tests live in
-`Partas.Solid.Tests.Plugin/Compiled/`, a separate Fable project that references the library and the plugin:
+`tests/Partas.Solid.Tests.Plugin/Compiled/`, a separate Fable project that references the library and the plugin:
 
 ```
 Compiled/<Category>Cases/<Readable case name>/<CaseName>.fs        <- F# input
@@ -77,15 +77,15 @@ rather than failing. If a test goes missing, check the Fable output.
 The tests use Expecto. Run one case, or one category, with a filter:
 
 ```bash
-dotnet run --project Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.fsproj -- --filter "Plugin/SolidCases.MergeProps"
-dotnet run --project Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.fsproj -- --filter-test-list SolidCases
+dotnet run --project tests/Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.fsproj -- --filter "Plugin/SolidCases.MergeProps"
+dotnet run --project tests/Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.fsproj -- --filter-test-list SolidCases
 ```
 
 The test run compiles the cases with Fable first. If that step fails, every test fails.
 
 ### Runtime tests
 
-`Partas.Solid.Tests.Runtime/` compiles F# fixtures with Fable and the plugin, then compiles the result again with
+`tests/Partas.Solid.Tests.Runtime/` compiles F# fixtures with Fable and the plugin, then compiles the result again with
 the real Solid 2 JSX compiler. vitest runs it in jsdom. There are three suites: `Primitives` (reactivity and stores,
 no DOM), `Dom` (elements, attributes, events, refs, SVG) and `Integration` (components, control flow, context, async
 and small apps).
@@ -95,10 +95,10 @@ node run.mjs dom                                   # compile the Dom suite, then
 node run.mjs integration Apps -t "sorts by name"   # extra arguments go to vitest
 node run.mjs primitives --no-compile               # rerun specs without recompiling
 node run.mjs integration --watch                   # recompile and rerun as you edit
-node run.mjs all                                   # what the build CLI runs
+node run.mjs all                                   # what build.fsx test runs
 ```
 
-Run these from `Partas.Solid.Tests.Runtime/`. To add a test, add a folder with an F# fixture and a spec that imports
+Run these from `tests/Partas.Solid.Tests.Runtime/`. To add a test, add a folder with an F# fixture and a spec that imports
 the compiled `.fs.jsx`. One fixture that fails to compile fails the whole suite, so run the suite before you finish.
 
 A test for a known bug stays in the suite as `it.fails`, with the correct assertion and a `// BUG:` comment beside it.
@@ -107,7 +107,7 @@ Never weaken the assertion. When the bug is fixed, vitest reports the `it.fails`
 
 ### Trying things out
 
-`ScratchTests/` is a playground for checking the JSX of code that is not a test case yet. From inside it:
+`tests/ScratchTests/` is a playground for checking the JSX of code that is not a test case yet. From inside it:
 
 ```bash
 dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize --watch
@@ -123,9 +123,10 @@ AST the plugin receives, and writes the runtime suites' `.fs.jsx` files for `nod
 
 - Fantomas is configured through `.editorconfig`, but no build step runs it, and much of the code does not pass
   `fantomas --check`. Format only the files you touch, and keep their layout. Never format
-  `Partas.Solid.FablePlugin/Plugin.fs`.
+  `src/Partas.Solid.FablePlugin/Plugin.fs`.
 - Incomplete pattern matches are errors in both shipped projects, not warnings.
-- Partas.Solid and Partas.Solid.FablePlugin always share a version. The release notes are generated from commit
-  messages by git-cliff, so write commits in conventional-commit style (`fix(plugin): ...`, `feat: ...`).
+- Partas.Solid and Partas.Solid.FablePlugin always share a version. [EasyBuild.ShipIt](https://github.com/easybuild-org/EasyBuild.ShipIt)
+  calculates it, and writes `src/CHANGELOG.md`, from commit messages, so write commits in conventional-commit style
+  (`fix(plugin): ...`, `feat: ...`, `feat!: ...` for a breaking change).
 
 When something does not compile the way you expect, see [Submitting issues](submit-issues.md).

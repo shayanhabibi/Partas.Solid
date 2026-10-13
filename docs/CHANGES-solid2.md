@@ -284,8 +284,9 @@ Relevant if you build from source or pin transitively:
   The `Ident` AST node gained `IsInlineIfLambda`, which is why the plugin's `AstUtils.Ident`/`IdentExpr` helpers
   took a new optional parameter.
 - Solution file replaced: `Partas.Solid.sln` → **`Partas.Solid.slnx`**.
-- New build CLI (`partas-solid.fsproj`) supersedes `build.fsx`:
-  `dotnet run --project partas-solid.fsproj -- test|build|publish|bump`. It has no format/lint command.
+- `tools/build.fsx` moved to Partas.Build 0.8 and is the only build entry point (`test|build|publish|docs|bump|release`).
+  Releases moved from git-cliff to EasyBuild.ShipIt: `src/CHANGELOG.md` versions both packages, and new releases go
+  to a temporary Cloudsmith feed while nuget.org ownership is transferred.
 - Test discovery is now directory-driven — cases are found by walking `Compiled/*Cases/**` for `.expected` files
   rather than being listed in `Tests.fs`. Adding a case means adding a folder.
 

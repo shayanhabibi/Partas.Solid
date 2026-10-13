@@ -14,12 +14,12 @@ jumps to the line. They will **not** resolve on GitHub for paths under `solid/`,
 
 | Import specifier | Upstream source | Bound in | Notes |
 | --- | --- | --- | --- |
-| `solid-js` | [`solid/packages/solid/src/index.ts`](../solid/packages/solid/src/index.ts) (barrel) | [`SolidBindings.fs`](../Partas.Solid/SolidBindings.fs) | the bulk of the surface |
+| `solid-js` | [`solid/packages/solid/src/index.ts`](../solid/packages/solid/src/index.ts) (barrel) | [`SolidBindings.fs`](../src/Partas.Solid/SolidBindings.fs) | the bulk of the surface |
 | ↳ re-exports `@solidjs/signals` | [`signals/src/index.ts`](../solid/packages/signals/src/index.ts) | same | reactivity + store actually live here |
-| `@solidjs/web` | [`web/src/index.ts`](../solid/packages/web/src/index.ts) | [`SolidWebBindings.fs`](../Partas.Solid/SolidWebBindings.fs) | **renamed** from `solid-js/web`; already correct |
-| `@solidjs/router` | *not in submodule* | [`SolidRouterBindings.fs`](../Partas.Solid/SolidRouterBindings.fs) (446 ln, 27 imports) | separate repo — see [§7](#7-blind-spots--things-these-submodules-cannot-answer) |
-| `@solidjs/meta` | *not in submodule* | [`SolidMetaBindings.fs`](../Partas.Solid/SolidMetaBindings.fs) (35 ln) | separate repo |
-| `@solidjs/start` | *not in submodule* | [`SolidStartBindings.fs`](../Partas.Solid/SolidStartBindings.fs) (182 ln) | separate repo |
+| `@solidjs/web` | [`web/src/index.ts`](../solid/packages/web/src/index.ts) | [`SolidWebBindings.fs`](../src/Partas.Solid/SolidWebBindings.fs) | **renamed** from `solid-js/web`; already correct |
+| `@solidjs/router` | *not in submodule* | [`SolidRouterBindings.fs`](../src/Partas.Solid/SolidRouterBindings.fs) (446 ln, 27 imports) | separate repo — see [§7](#7-blind-spots--things-these-submodules-cannot-answer) |
+| `@solidjs/meta` | *not in submodule* | [`SolidMetaBindings.fs`](../src/Partas.Solid/SolidMetaBindings.fs) (35 ln) | separate repo |
+| `@solidjs/start` | *not in submodule* | [`SolidStartBindings.fs`](../src/Partas.Solid/SolidStartBindings.fs) (182 ln) | separate repo |
 
 **`solid-js/store` no longer exists.** [`solid/packages/solid/package.json`](../solid/packages/solid/package.json#L30)
 declares only `.`, `./refresh`, `./attribution`, `./internal`, `./package.json`. The store API lives in
@@ -56,7 +56,7 @@ it as the don't-bind list.
 
 ## 2. Core `solid-js` — coverage
 
-Bound surface is [`SolidBindings.fs`](../Partas.Solid/SolidBindings.fs) (`type Bindings`) plus the
+Bound surface is [`SolidBindings.fs`](../src/Partas.Solid/SolidBindings.fs) (`type Bindings`) plus the
 component types above it.
 
 **Done.** All reactivity and store primitives that a component author touches:
@@ -72,8 +72,8 @@ component types above it.
 Components: `For` `Show` `Switch` `Match` `Errored` `Loading` `Repeat` `Reveal` `Hydration` `NoHydration`.
 
 **rc.9 additions (bound).** New or reshaped upstream between rc.0 and rc.9. Anchors on our side name the binding
-rather than a line, since [`SolidBindings.fs`](../Partas.Solid/SolidBindings.fs) and
-[`SolidWebBindings.fs`](../Partas.Solid/SolidWebBindings.fs) are still moving.
+rather than a line, since [`SolidBindings.fs`](../src/Partas.Solid/SolidBindings.fs) and
+[`SolidWebBindings.fs`](../src/Partas.Solid/SolidWebBindings.fs) are still moving.
 
 | Upstream | Defined at | Binding |
 | --- | --- | --- |
@@ -84,7 +84,7 @@ rather than a line, since [`SolidBindings.fs`](../Partas.Solid/SolidBindings.fs)
 | `OBSERVE` (observe-tier diagnostics; `undefined` outside dev/observe builds) | [`index.ts:177`](../solid/packages/solid/src/index.ts#L177) | `Bindings.OBSERVE`, alongside `DEV` |
 | `omit(props, predicate)` overload | [`store/utils.ts:1094`](../solid/packages/signals/src/store/utils.ts#L1094) | `Bindings.omit<'T>(obj, hidden: string -> bool)` (skips symbol keys) and `Bindings.omitKeys<'T>(obj, hidden: obj -> bool)` (all keys) beside the `ParamArray` key form |
 | `refresh(target)` now returns `Promise<T>` | [`signals.ts:793`](../solid/packages/signals/src/signals.ts#L793) | `Bindings.refresh` returns `JS.Promise<'T>` (was `unit`); fire-and-forget callers `ignore` it |
-| `render` / `hydrate` `onError` option | [`web/src/client.ts:294`](../solid/packages/web/src/client.ts#L294) / [`:2012`](../solid/packages/web/src/client.ts#L2012) | `render` / `hydrate` overloads taking `onError: ClientErrorHook` in [`SolidWebBindings.fs`](../Partas.Solid/SolidWebBindings.fs) |
+| `render` / `hydrate` `onError` option | [`web/src/client.ts:294`](../solid/packages/web/src/client.ts#L294) / [`:2012`](../solid/packages/web/src/client.ts#L2012) | `render` / `hydrate` overloads taking `onError: ClientErrorHook` in [`SolidWebBindings.fs`](../src/Partas.Solid/SolidWebBindings.fs) |
 | `createStore(fn, seed, options?)` derived form; `StoreOptions.shallow` | [`store/index.ts:54-66`](../solid/packages/signals/src/store/index.ts#L54-L66) | `Bindings.createStore` seed overloads (returning `RefreshableStoreReturn`), `StoreOptions(?name, ?shallow)` |
 | `createEffect(compute, { effect, error })` bundle | [`signals.ts:495`](../solid/packages/signals/src/signals.ts#L495), type [`:154`](../solid/packages/signals/src/signals.ts#L154) | `EffectBundle<'T, 'R>(effect, error)` + `Bindings.createEffect` overloads taking it |
 | `EffectOptions.name` (from `BaseEffectOptions`); `createReaction(effectFn, options?)` | [`signals.ts:170-177`](../solid/packages/signals/src/signals.ts#L170-L177), [`:635`](../solid/packages/signals/src/signals.ts#L635) | `EffectOptions(?name)` and `?name` on every `ParamObject` effect overload; `Bindings.createReaction` overloads taking `EffectOptions` |
@@ -129,10 +129,10 @@ also compiler-facing, but *is* bound (`Bindings.createComponent`) for custom JSX
 
 ## 3. `@solidjs/web` — coverage
 
-[`SolidWebBindings.fs`](../Partas.Solid/SolidWebBindings.fs) (`type Bindings`). **This is the healthiest area.**
+[`SolidWebBindings.fs`](../src/Partas.Solid/SolidWebBindings.fs) (`type Bindings`). **This is the healthiest area.**
 
 Done: `render` `hydrate` `Portal` `Dynamic` (component,
-[`SolidWebBindings.fs`](../Partas.Solid/SolidWebBindings.fs) `Dynamic<'T>`) `dynamic` (function) `clientOnly`
+[`SolidWebBindings.fs`](../src/Partas.Solid/SolidWebBindings.fs) `Dynamic<'T>`) `dynamic` (function) `clientOnly`
 `isServer` `isDev` `httpStatus` `httpHeader` `renderToString` `renderToStream`, plus a Partas-only
 `useHead`/`HeadTag`.
 
@@ -140,7 +140,7 @@ Gaps:
 
 | Missing | Defined at | Verdict |
 | --- | --- | --- |
-| Request/response plumbing — `createRequestEvent` `createResponseStub` `createSSRResponse` `commitEventResponse` `composeMiddleware` `getExpectedRedirectStatus` | [`server-mock.ts:254-342`](../solid/packages/web/src/server-mock.ts#L254-L342) | **belongs in [`SolidStartBindings.fs`](../Partas.Solid/SolidStartBindings.fs)**, not web — decide placement |
+| Request/response plumbing — `createRequestEvent` `createResponseStub` `createSSRResponse` `commitEventResponse` `composeMiddleware` `getExpectedRedirectStatus` | [`server-mock.ts:254-342`](../solid/packages/web/src/server-mock.ts#L254-L342) | **belongs in [`SolidStartBindings.fs`](../src/Partas.Solid/SolidStartBindings.fs)**, not web — decide placement |
 | Asset types — `AssetManifest` `AssetResolver` `AssetResolverFn` `ResolvedAssets` `InlineStyleAsset` | [`server-mock.ts:56-142`](../solid/packages/web/src/server-mock.ts#L56-L142) | only if we bind SSR asset handling |
 | Response helpers — `redirect` `reload` `respond` `markSafeError` `isSafeError` `ResponseEnvelope` `HREF` `REVALIDATE_HEADER` … (`export * from "./response.js"`) | [`response.ts:33-288`](../solid/packages/web/src/response.ts#L33-L288) | now in-tree (was an unverifiable `@dom-expressions/runtime` re-export); server-function plumbing — same placement question as the request/response row |
 | `export * from "./client.js"` | [`client.ts`](../solid/packages/web/src/client.ts) (in-tree since rc.9) | compiler-facing DOM runtime (`insert`, `spread`, `template`, `delegateEvents`) — do not bind; only `render` / `hydrate` are user-facing |
@@ -205,9 +205,9 @@ Consequences:
 
 | File | Surface |
 | --- | --- |
-| [`HtmlAttributes.fs`](../Partas.Solid/HtmlAttributes.fs) | `HTMLAttributes` base: **91** event handlers + ~60 global attributes; **47** per-element interfaces (`AnchorHTMLAttributes` … `VideoHTMLAttributes`) |
-| [`AriaAttributes.fs`](../Partas.Solid/AriaAttributes.fs) | **49** members |
-| [`Svg.fs`](../Partas.Solid/Svg.fs) | **145** members |
+| [`HtmlAttributes.fs`](../src/Partas.Solid/HtmlAttributes.fs) | `HTMLAttributes` base: **91** event handlers + ~60 global attributes; **47** per-element interfaces (`AnchorHTMLAttributes` … `VideoHTMLAttributes`) |
+| [`AriaAttributes.fs`](../src/Partas.Solid/AriaAttributes.fs) | **49** members |
+| [`Svg.fs`](../src/Partas.Solid/Svg.fs) | **145** members |
 
 The 47 element interfaces are: `Anchor` `Area` `Base` `Blockquote` `Button` `Canvas` `Col` `Colgroup` `Data`
 `Details` `Dialog` `Embed` `Fieldset` `Form` `Iframe` `Img` `Input` `Ins` `Keygen` `Label` `Li` `Link` `Map`
@@ -237,12 +237,12 @@ against rc.9's [`jsx.d.ts`](../solid/packages/web/jsx/jsx.d.ts). A file-level di
 | Event handlers | 136 | 91 | **45 missing** (24 window-scoped, 22 element-scoped) |
 | Element attribute interfaces | 49 | 45 | **3 missing**, 1 renamed, 1 non-standard |
 
-**ARIA** — [`AriaAttributes.fs`](../Partas.Solid/AriaAttributes.fs) is effectively complete. Missing:
-`aria-colindextext`, `aria-rowindextext`. Note [`AriaAttributes.fs:35`](../Partas.Solid/AriaAttributes.fs#L35)
+**ARIA** — [`AriaAttributes.fs`](../src/Partas.Solid/AriaAttributes.fs) is effectively complete. Missing:
+`aria-colindextext`, `aria-rowindextext`. Note [`AriaAttributes.fs:35`](../src/Partas.Solid/AriaAttributes.fs#L35)
 declares `ariaDescendant`, which matches no upstream key and is not in the ARIA spec — almost certainly a stray
-next to `ariaActiveDescendant` at [line 11](../Partas.Solid/AriaAttributes.fs#L11).
+next to `ariaActiveDescendant` at [line 11](../src/Partas.Solid/AriaAttributes.fs#L11).
 
-**SVG** — [`Svg.fs`](../Partas.Solid/Svg.fs) declares exactly the 59 upstream SVG tags, none missing, none extra.
+**SVG** — [`Svg.fs`](../src/Partas.Solid/Svg.fs) declares exactly the 59 upstream SVG tags, none missing, none extra.
 The earlier worry that SVG was "the most likely under-binding" was wrong at *tag* level; the SVG **attribute**
 space (145 members on our side) is still undiffed, as upstream spreads it across 65 `*SVGAttributes` interfaces.
 
@@ -302,8 +302,8 @@ Per [`CHANGES-solid2.md`](CHANGES-solid2.md), plugin-side migration is largely *
 
 The test inputs that were stubbed with `failwith "redo"` / `"REDO"` — `IndexedPropSpreading`, `OperatorsInProps`,
 `SignalSetterInvoke`, `ThisArgTransforms`, `ExperimentalBuilders` — are restored against the Solid 2 API and their
-`.expected` snapshots regenerated. [`ExperimentalBuilders.fs`](../Partas.Solid.Tests.Plugin/Compiled/SolidCases/Experimental%20builders%20compile%20correct%20output/ExperimentalBuilders.fs)
-exercises the re-ported [`Experimental.fs`](../Partas.Solid/Experimental.fs) builders (`effect` → two-phase
+`.expected` snapshots regenerated. [`ExperimentalBuilders.fs`](../tests/Partas.Solid.Tests.Plugin/Compiled/SolidCases/Experimental%20builders%20compile%20correct%20output/ExperimentalBuilders.fs)
+exercises the re-ported [`Experimental.fs`](../src/Partas.Solid/Experimental.fs) builders (`effect` → two-phase
 `createEffect`, `mount` → `onSettled`, `batch`/`selector` dropped). All plugin cases pass.
 
 ---
@@ -314,11 +314,11 @@ Flagging these so nobody burns time searching for them:
 
 1. **The JSX / DOM attribute surface is now in the checkout** (rc.9, [`web/jsx/`](../solid/packages/web/jsx/)) —
    no longer a blind spot. What remains open is the re-diff: [§5](#5-jsx--dom-attribute-surface)'s counts predate
-   rc.9, so [`HtmlAttributes.fs`](../Partas.Solid/HtmlAttributes.fs),
-   [`AriaAttributes.fs`](../Partas.Solid/AriaAttributes.fs), and [`Svg.fs`](../Partas.Solid/Svg.fs) are reconciled
+   rc.9, so [`HtmlAttributes.fs`](../src/Partas.Solid/HtmlAttributes.fs),
+   [`AriaAttributes.fs`](../src/Partas.Solid/AriaAttributes.fs), and [`Svg.fs`](../src/Partas.Solid/Svg.fs) are reconciled
    against `0.50.0-next.42` plus the listed deltas, not against rc.9 itself.
 2. **Router / meta / start are separate repositories.** `solid/packages/` has no `router`, `meta`, or `start`.
-   [`SolidRouterBindings.fs`](../Partas.Solid/SolidRouterBindings.fs) (27 imports) is the second-largest binding
+   [`SolidRouterBindings.fs`](../src/Partas.Solid/SolidRouterBindings.fs) (27 imports) is the second-largest binding
    file and is entirely unverified by this pin. If router coverage matters, add `solidjs/solid-router` as a
    second submodule.
 3. **Server vs client builds diverge.** [`solid/packages/solid/src/server/`](../solid/packages/solid/src/server/)
@@ -338,7 +338,7 @@ Flagging these so nobody burns time searching for them:
 6. **Re-run the JSX diff against rc.9** ([§5](#5-jsx--dom-attribute-surface)) using
    [`solid/packages/web/jsx/jsx.d.ts`](../solid/packages/web/jsx/jsx.d.ts) — no extra submodule needed. Start with
    the known deltas (`selectedcontent`, `xmlns` on `a`/`script`/`style`/`title`), then audit
-   [`Svg.fs`](../Partas.Solid/Svg.fs) (most likely under-bound at 145 members),
-   [`HtmlAttributes.fs`](../Partas.Solid/HtmlAttributes.fs), and
-   [`AriaAttributes.fs`](../Partas.Solid/AriaAttributes.fs).
+   [`Svg.fs`](../src/Partas.Solid/Svg.fs) (most likely under-bound at 145 members),
+   [`HtmlAttributes.fs`](../src/Partas.Solid/HtmlAttributes.fs), and
+   [`AriaAttributes.fs`](../src/Partas.Solid/AriaAttributes.fs).
 7. Optional: second submodule for `solid-router` if router bindings need verification.

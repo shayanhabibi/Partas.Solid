@@ -11,9 +11,13 @@ Fable writes `.jsx` files, and a bundler such as Vite runs the Solid JSX compile
 a Node toolchain.
 
 :::warning
-These docs cover **Partas.Solid 3.0**, which targets **Solid 2.0.0-rc.9**. 3.0 is a prerelease and is **not on NuGet
-yet**. The latest version on nuget.org is 2.x, which targets Solid 1.9 and does not match these pages. Until 3.0 is
-published, build the packages from source and install them from a local feed, as below.
+These docs cover **Partas.Solid 3.0**, which targets **Solid 2.0.0-rc.9**.
+
+**New releases are on a temporary NuGet feed.** The nuget.org account is inaccessible while NuGet support transfers
+package ownership, so new releases are published to **Cloudsmith**, under the same package IDs:
+`https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json`. Restoring from it needs no account or API key.
+The latest version on nuget.org is 2.x, which targets Solid 1.9 and does not match these pages. Once ownership is
+restored, releases return to nuget.org and this notice will be updated.
 :::
 
 ## Requirements
@@ -34,40 +38,36 @@ dotnet new tool-manifest
 dotnet tool install fable --version 5.13.0
 ```
 
-### 2. Build the 3.0 packages
+### 2. Add the Cloudsmith feed
 
-Clone the repository, check out the Solid 2 branch, and pack both packages into a folder:
-
-```bash
-git clone https://github.com/shayanhabibi/Partas.Solid.git
-cd Partas.Solid
-git checkout solid2rc
-dotnet pack Partas.Solid.FablePlugin/Partas.Solid.FablePlugin.fsproj -c Release -o ../partas-feed
-dotnet pack Partas.Solid/Partas.Solid.fsproj -c Release -o ../partas-feed
-```
-
-### 3. Add the local feed
-
-Add a `nuget.config` next to your solution:
+Add a `nuget.config` next to your solution, keeping nuget.org for the dependencies:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
-    <add key="partas-local" value="../partas-feed" />
+    <add key="partas-solid-temporary" value="https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
 </configuration>
 ```
 
-### 4. Reference Partas.Solid
+Or add it to your user configuration:
+
+```bash
+dotnet nuget add source https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json --name partas-solid-temporary
+```
+
+If your configuration uses package source mapping, map `Partas.Solid*` to this source.
+
+### 3. Reference Partas.Solid
 
 ```bash
 dotnet add package Partas.Solid --version 3.0.0
 ```
 
-If you use Paket, add `nuget Partas.Solid 3.0.0` to `paket.dependencies` along with a `source` line for the feed
-folder, then run `paket install`.
+If you use Paket, add `nuget Partas.Solid 3.0.0` to `paket.dependencies` along with
+`source https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json`, then run `paket install`.
 
 `Partas.Solid` brings in `Partas.Solid.FablePlugin`, `Fable.Core` 5.2.0, `Fable.Browser.Dom` 2.20.0,
 `Xantham.Fable.Core.TS` and `FSharp.Core` 10.

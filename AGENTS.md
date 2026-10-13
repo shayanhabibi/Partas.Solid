@@ -17,6 +17,10 @@ Oxpecker.Solid. It ships two NuGet packages that are always versioned in lockste
 Because the plugin rewrites the AST rather than emitting from a runtime, **the compiled `.jsx` output is the
 specification**. Behaviour changes are observed by diffing generated JSX, not by running the framework.
 
+Layout: the two shipped projects live in `src/`; the snapshot, runtime and unit test projects and `ScratchTests` in
+`tests/`; the build script (`tools/build.fsx`) and the SageFs workbench (`tools/Workbench/`,
+set up by `tools/workbench.fsx`) in `tools/`. `Partas.Solid.slnx`, `docs/` and the `solid/` submodule stay at the root.
+
 ## `solid/` — vendored upstream, NOT part of this project
 
 `solid/` is a **git submodule** of [`solidjs/solid`](https://github.com/solidjs/solid) (branch `next`), pinned at tag
@@ -30,8 +34,8 @@ As of rc.9 the monorepo has absorbed dom-expressions: `solid/packages/` holds `s
 (`solid/packages/compiler/src`), and the store API is exported from `solid-js` itself (there is no `solid-js/store`).
 
 **Do not search it by default.** Glob/Grep/find over the repo root will otherwise drown in tens of thousands of
-irrelevant `.ts`, `.js`, `.rs`, `.md` and `node_modules` files. Scope searches to the F# projects — `Partas.Solid/`,
-`Partas.Solid.FablePlugin/`, `Partas.Solid.Tests.*/`, `ScratchTests/`, `docs/` — or pass `--glob '!solid/**'`.
+irrelevant `.ts`, `.js`, `.rs`, `.md` and `node_modules` files. Scope searches to the F# projects — `src/Partas.Solid/`,
+`src/Partas.Solid.FablePlugin/`, `tests/Partas.Solid.Tests.*/`, `tests/ScratchTests/`, `docs/` — or pass `--glob '!solid/**'`.
 
 Read from it **only** when the question is explicitly about upstream Solid behaviour that cannot be answered from this
 repo, e.g.:
@@ -70,7 +74,7 @@ Never edit files under `solid/`. Changes there are upstream's, and committing in
 gitlink for everyone. To update the pin deliberately: `git -C solid fetch --tags origin`, check out the new
 `solid-js@<version>` tag, then commit the changed gitlink in this repo.
 
-> **The build CLI's `clean` target wipes `solid/`.** If it vanishes, restore with
+> **If `solid/` vanishes** (a since-removed build CLI's `clean` wiped it), restore with
 > `git submodule add --force -b next https://github.com/solidjs/solid.git solid` — the `.git/modules` cache
 > survives, so this reactivates the local clone without re-downloading. Then check out the pinned tag again.
 > (The former `dom-expressions/` submodule was removed after rc.9 absorbed it; use `solid/packages/web/jsx/` and
@@ -78,35 +82,44 @@ gitlink for everyone. To update the pin deliberately: `git -C solid fetch --tags
 
 ## Build & test
 
-The current entry point is the `partas-solid.fsproj` build CLI (System.CommandLine + FAKE):
+The entry point is `tools/build.fsx`, a Partas.Build script; CI runs nothing else. `dotnet fsi tools/build.fsx -- --help`
+lists the commands, and `<command> --help` or `--explain` shows a command's flags and stage tree without running it:
 
 ```powershell
-dotnet run --project partas-solid.fsproj -- test      # clean, restore, Expecto tests, then the runtime (vitest) suites
-dotnet run --project partas-solid.fsproj -- build     # build Partas.Solid + FablePlugin (Release)
-dotnet run --project partas-solid.fsproj -- publish --nuget <APIKEY>
-dotnet run --project partas-solid.fsproj -- bump <bump>   # bump the version in both .fsproj files (skipped in CI)
+dotnet fsi tools/build.fsx -- test      # restore, fable clean, build, Expecto suites, then the runtime (vitest) suites
+dotnet fsi tools/build.fsx -- build     # build Partas.Solid + FablePlugin
+dotnet fsi tools/build.fsx -- docs      # build the Nacara site in docs/site (--watch to serve it)
 ```
 
-Those four are the only registered commands. Useful flags: `-q/--quick` (skip tool restore, clean, solution restore)
-and `--skip-tests`. Builds are always Release; there is no configuration flag. `--quick` is the flag to reach for during
-iteration — a full `test` run cleans every `bin`, runs `fable clean`, and re-restores.
+Run it from the repository root: its globs resolve against the current directory. `-q/--quick` skips restores, cleans and
+`fable clean`, and is the flag to reach for during iteration. `--skip-tests` skips the suites. The script restores its
+Partas.Build packages from the Cloudsmith feed named by its `#i` line.
 
-After Expecto, `test` runs the "runtime tests" stage: `npm ci` in `Partas.Solid.Tests.Runtime/` (skipped under
-`--quick` when `node_modules` already exists), then `node run.mjs all`. It needs Node >= 22.12 on `PATH`. The `bin`
-clean excludes `**/node_modules/**`, because npm packages ship their own `bin/` folders.
+After Expecto, `test` runs `node tests/Partas.Solid.Tests.Runtime/run.mjs all`, which runs `npm ci` itself when
+`node_modules` is missing. It needs Node >= 22.12 on `PATH`.
 
-`Build/Program.fs` still defines a `format` stage and a `runScratch` input, but neither is wired to a command, and
-`Build/Spec.fs` declares `--format`/`--dry-format` options that nothing reads. Format with `dotnet fantomas <files>`
-directly, and compile ScratchTests with `dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx
---optimize [--watch]` inside `ScratchTests/`.
+Format with `dotnet fantomas <files>` directly, and compile ScratchTests with `dotnet fable --exclude
+Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize [--watch]` inside `tests/ScratchTests/` (or `build.fsx test scratch`).
 
-`build.fsx` is the older FAKE script still invoked by `.github/workflows/dotnet.yml` (`dotnet fsi ./build.fsx`). Note
-its `Build` target targets `Partas.Solid.sln`, which no longer exists — the solution is now `Partas.Solid.slnx`. Prefer
-the build CLI locally.
+### Releases (ShipIt)
 
-The documentation site is a Nacara project in `docs/site/`. Build it with `dotnet fsi build.fsx -- docs`, or add
-`--watch` to serve it. The same command runs in `.github/workflows/docs.yml`, which publishes to GitHub Pages on pushes to
-`master`.
+[EasyBuild.ShipIt](https://github.com/easybuild-org/EasyBuild.ShipIt) owns the version. `src/CHANGELOG.md` is the one
+changelog for both packages: its front matter registers both `.fsproj` `<Version>` elements as updaters, so they stay in
+lockstep. ShipIt calculates the next version from the **conventional commits** touching `src/` since
+`last_commit_released`, so commit messages must be conventional (`feat:`, `fix:`, `feat!:` ...). Edit only that front
+matter; ShipIt rewrites the body. Releases up to 2.1.3 are in `docs/RELEASE_NOTES.md`, frozen.
+
+- `build.fsx -- bump --dry-run` previews the next version; without `--dry-run` it writes the changelog and both
+  versions locally. Add `--allow-branch <branch>` off `master`.
+- `build.fsx -- release` opens the release pull request on GitHub; CI runs it.
+- The ShipIt stages run from `src/`: from the root, ShipIt would treat every `solid/**/CHANGELOG.md` as a project.
+
+`.github/workflows/release.yml` drives it. Each push to `master` runs `dotnet.yml` (the CI tests), then ShipIt opens or
+updates the `chore: release Partas.Solid@x.y.z` pull request. Merging it pushes that commit, which runs `publish` to the
+**temporary Cloudsmith feed** (`https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json`, secret
+`CLOUDSMITH_API_KEY`) and creates the GitHub release and tag (`x.y.z`, no `v`). nuget.org publishing is paused while
+package ownership is transferred; the README banner and the docs-site installation page say so, and change together
+when it resumes.
 
 Tools are pinned in `.config/dotnet-tools.json` (`fantomas` 7.0.5, `fable` 5.13.0) — run `dotnet tool restore` first if
 invoking `dotnet fable` directly.
@@ -117,27 +130,27 @@ Tests are Expecto. Test names are derived from directory structure (see below), 
 `<Category>.<CaseName>.<file>.fs.jsx` when a case has multiple files:
 
 ```powershell
-dotnet run --project Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.fsproj -- --filter "Plugin/SolidCases.MergeProps"
-dotnet run --project Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.fsproj -- --filter-test-list SolidCases
+dotnet run --project tests/Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.fsproj -- --filter "Plugin/SolidCases.MergeProps"
+dotnet run --project tests/Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.fsproj -- --filter-test-list SolidCases
 ```
 
 The test assembly first runs `buildCases()`, which shells out to
 `dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize` inside
-`Partas.Solid.Tests.Plugin/Compiled/`. That step must succeed or every test fails.
+`tests/Partas.Solid.Tests.Plugin/Compiled/`. That step must succeed or every test fails.
 
-Runtime tests (vitest) are run through `run.mjs` from `Partas.Solid.Tests.Runtime/`:
+Runtime tests (vitest) are run through `run.mjs` from `tests/Partas.Solid.Tests.Runtime/`:
 
 ```powershell
 node run.mjs dom                                   # Fable-compile the Dom suite, then run its specs
 node run.mjs integration Apps -t "sorts by name"   # extra args go to vitest: path filter, -t name filter
 node run.mjs primitives --no-compile               # rerun specs without recompiling (fast, when only .test.js changed)
-node run.mjs all                                   # what the build CLI runs
+node run.mjs all                                   # what build.fsx test runs
 node run.mjs integration --watch                   # fable watch + vitest watch; plugin edits rebuild the plugin and restart
 ```
 
 ## Test architecture (snapshot tests over generated JSX)
 
-`Partas.Solid.Tests.Plugin/Compiled/` is a **separate Fable project** (`Partas.Solid.Tests.Plugin.Compiled.fsproj`,
+`tests/Partas.Solid.Tests.Plugin/Compiled/` is a **separate Fable project** (`Partas.Solid.Tests.Plugin.Compiled.fsproj`,
 globbing `*Cases\**\*.fs`) that references the DSL and the plugin. Layout:
 
 ```
@@ -160,7 +173,7 @@ knowing:
 - The commented-out explicit test lists at the bottom of `Tests.fs` are the pre-discovery scheme; they document the
   intent of each case name and are worth reading when naming a new case.
 
-## Runtime tests (`Partas.Solid.Tests.Runtime/`)
+## Runtime tests (`tests/Partas.Solid.Tests.Runtime/`)
 
 The snapshot tests pin *what* the plugin emits. The runtime tests check *what that output does*. F# fixtures are
 compiled by Fable and the plugin (same flags as the snapshots, plus `-o .`), then compiled again by the real Solid
@@ -191,14 +204,14 @@ Three suites, each its own Fable project (`<Suite>/Partas.Solid.Tests.Runtime.<S
 - `run.mjs` serialises Fable compiles across processes with `.compile-lock/`. It does not coordinate with a
   concurrent snapshot-test build, and both of them build `Partas.Solid` and the plugin.
 
-`ScratchTests/` is an unversioned playground for the same loop (`dotnet fable ... --watch`, see above) when you
+`tests/ScratchTests/` is an unversioned playground for the same loop (`dotnet fable ... --watch`, see above) when you
 want to eyeball JSX for input that isn't yet a test case. `Partas.Solid.Tests.Core` is a small unit-test project.
 
 ### Workbench (SageFs)
 
-`Workbench/` is a SageFs session project that runs Fable in-process with a warm checker, for closing plugin and
-binding bugs quickly. Set it up with `dotnet fsi workbench.fsx`, which clones Fable.SageFs into the gitignored
-`.workbench/`. Then create a SageFs session on `Workbench/Partas.Solid.Workbench.fsproj`.
+`tools/Workbench/` is a SageFs session project that runs Fable in-process with a warm checker, for closing plugin and
+binding bugs quickly. Set it up with `dotnet fsi tools/workbench.fsx`, which clones Fable.SageFs into the gitignored
+`.workbench/`. Then create a SageFs session on `tools/Workbench/Partas.Solid.Workbench.fsproj`.
 
 - `Workbench.checkAll ()` recompiles every snapshot case and diffs it, in under a second once the session is warm.
 - After a plugin edit, `Workbench.reloadPlugin ()` rebuilds and reloads the plugin; with the next `checkAll` that
@@ -209,7 +222,7 @@ binding bugs quickly. Set it up with `dotnet fsi workbench.fsx`, which clones Fa
   every `.fs` save in the plugin, bindings or test inputs, reloading the plugin first when it changed. An open
   `.fs.jsx` follows along, about 3 s after a plugin save with `watchFiles`. `Workbench.unwatch ()` stops it.
 
-SageFs eval hot-patching does not reach the plugin, whose code is almost all `internal`. `Workbench/README.md` has
+SageFs eval hot-patching does not reach the plugin, whose code is almost all `internal`. `tools/Workbench/README.md` has
 the details. The workbench isn't in `Partas.Solid.slnx`, because it only builds after setup.
 
 ## Plugin architecture
@@ -251,15 +264,14 @@ compile that component with `PrintDisposals`.
 
 ## Conventions
 
-- **Fantomas is configured but not currently enforced.** `.editorconfig` drives it. `Partas.Solid.FablePlugin/Plugin.fs`
+- **Fantomas is configured but not currently enforced.** `.editorconfig` drives it. `src/Partas.Solid.FablePlugin/Plugin.fs`
   and any `**/IndexAccess/IndexAccess.fs` are excluded from formatting — don't run fantomas over them manually. No build
   command runs fantomas, and most sources (including `HEAD`'s bindings) do not pass `fantomas --check`, so a repo-wide
   run produces a large reformatting diff. Format only the files you touch, and match their existing layout.
 - `WarningsAsErrors` includes `3239` and `0025` (incomplete pattern matches) in both shipped projects: an inexhaustive
   match in the plugin is a build failure, not a warning.
 - Target frameworks intentionally differ: `Partas.Solid` `net8.0`, `Partas.Solid.FablePlugin` `net6.0`, plugin test host
-  `net8.0`, the fable test project and `Partas.Solid.Tests.Core` `net9.0`, build CLI and ScratchTests `net10.0`.
-- Versions are duplicated in both `.fsproj`s and driven from `docs/RELEASE_NOTES.md` at pack time; `docs/RELEASE_NOTES.md`
-  is generated by git-cliff (`cliff.toml`, `.cliffignore`), so commit messages should follow conventional-commit style.
-- `.fs.js` / `.fs.jsx` files sitting next to sources in `Partas.Solid/` and the plugin are fable build artifacts, not
+  `net8.0`, the fable test project and `Partas.Solid.Tests.Core` `net9.0`, ScratchTests `net10.0`.
+- Versions are duplicated in both `.fsproj`s and written by ShipIt (see *Releases*); never bump them by hand.
+- `.fs.js` / `.fs.jsx` files sitting next to sources in `src/Partas.Solid/` and the plugin are fable build artifacts, not
   inputs.
