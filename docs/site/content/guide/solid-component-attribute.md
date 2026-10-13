@@ -48,10 +48,13 @@ let Render () = "Button" |> Framed
 ## Calls are untracked
 
 A `[<SolidComponent>]` binding compiles to a JavaScript function, and a call to it compiles to a function call inside
-the parent's JSX, not to a `<Label />` element. The JSX tab above shows `untrack(() => Label("Plain"))`. The arguments
-are positional, so the call cannot become a tag, but `untrack` gives it the same semantics as `<Label />`: the body
-runs once. A signal read in the body is a snapshot, and a signal read in the returned JSX stays live, as in a
+the parent's JSX, not to a `<Label />` element. The JSX tab above shows `untrack(Label.bind(undefined, "Plain"))`. The
+arguments are positional, so the call cannot become a tag, but `untrack` gives the body the same semantics as
+`<Label />`: a signal read in the body is a snapshot, and a signal read in the returned JSX stays live, as in a
 [SolidTypeComponent](solid-type-attribute.md).
+
+The arguments are evaluated outside the `untrack`. `Label (name ())` reads `name` in the parent's JSX, so when it
+changes the call runs again with the new value and the body runs again with it.
 
 ## How it works
 

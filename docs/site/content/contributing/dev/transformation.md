@@ -43,8 +43,8 @@ and drop expressions only when there is no other choice. It matches, in order:
 5. `Sequential` expressions, transformed one by one
 6. `UncurriedPropsApply`: a curried call of a function prop, such as `props.f a b`, rewritten to one uncurried call
 7. `PropsGetterOrSetter`, which records a props read or default
-8. a call to a `[<SolidComponent>]` let binding that returns an element, wrapped in `untrack(() => ...)` as
-   `createComponent` does for `<Comp/>`
+8. a call to a `[<SolidComponent>]` let binding that returns an element, written `untrack(Label.bind(undefined, ...))`:
+   the body is untracked as `createComponent` does for `<Comp/>`, while the arguments stay tracked
 9. calls to imported getters, rewritten to field reads
 10. `IfThenElse` and `DecisionTree`, transformed branch by branch
 11. an `AttributeExpression` at the top level. This should not happen, so it is logged as a warning and reduced to its

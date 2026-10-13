@@ -86,6 +86,22 @@ module internal Baked =
             expr.Type
         )
 
+    /// Runs <c>callee(args)</c> untracked while its arguments stay tracked:
+    /// <c>untrack(callee.bind(undefined, ...args))</c>, or <c>untrack(callee)</c> without arguments.
+    /// The arguments are evaluated in the caller's scope, so a signal read in one still re-runs the call.
+    let untrackedCall (callee: Expr) (args: Expr list) (typ: Type) =
+        let fn =
+            match args |> List.filter (function Value(ValueKind.UnitConstant, _) -> false | _ -> true) with
+            | [] -> callee
+            | args ->
+                let macro =
+                    args
+                    |> List.mapi (fun i _ -> $", ${i + 1}")
+                    |> String.concat ""
+                    |> sprintf "$0.bind(undefined%s)"
+                AstUtils.Emit (macro, AstUtils.CallInfo (args = callee :: args))
+        AstUtils.Call (importUntrack, AstUtils.CallInfo (args = [ fn ]), typ)
+
     /// Converts property setters into a sugar for setting their defaults by
     /// converting them into a <c>solid-js</c> <c>merge</c>, which merges an object with the key,value pairs
     /// against the given props (ie overwritting any double ups).

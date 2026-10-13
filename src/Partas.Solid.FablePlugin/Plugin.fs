@@ -941,13 +941,12 @@ module internal rec AST =
         | PropsGetterOrSetter ctx expr ->
             expr
         // A `[<SolidComponent>]` let binding called for its element. It takes positional arguments, so it
-        // cannot be a tag; run it untracked instead, as `createComponent` does for `<Comp/>`.
-        | Call(callee, ({ MemberRef = Some(MemberRef(_, { AttributeFullNames = attrs })) } as callInfo), typ, range)
+        // cannot be a tag; run its body untracked instead, as `createComponent` does for `<Comp/>`.
+        // The arguments are bound outside the untrack: a signal read in one must still re-run the call.
+        | Call(callee, ({ ThisArg = None; MemberRef = Some(MemberRef(_, { AttributeFullNames = attrs })) } as callInfo), typ, _)
             when attrs |> List.contains "Partas.Solid.SolidComponentAttribute"
                  && Type.isElement ctx typ ->
-            // The MemberRef is dropped so that later passes do not wrap the call again.
-            let callInfo = { callInfo with Args = callInfo.Args |> List.map (transform ctx); MemberRef = None }
-            Baked.untracked (Call(transform ctx callee, callInfo, typ, range))
+            Baked.untrackedCall (transform ctx callee) (callInfo.Args |> List.map (transform ctx)) typ
         // Transform calls that are getters
         | Call(
             callee = Expr.ImportedGetter ctx

@@ -1,0 +1,34 @@
+
+import { int32ToString } from "../../fable_modules/fable-library-js.5.13.0/Util.js";
+import { untrack, createSignal } from "solid-js";
+
+export function NoArgs() {
+    return <span>
+        no args
+    </span>;
+}
+
+export function Label(title, count) {
+    return <span>
+        {title + int32ToString(count)}
+    </span>;
+}
+
+/**
+ * The body runs untracked; `count ()` is read in the caller, so a change re-runs the call.
+ */
+export function Host() {
+    const patternInput = createSignal(0);
+    const count = patternInput[0];
+    return <div>
+        {untrack(NoArgs)}
+        {untrack(Label.bind(undefined, "static", 1))}
+        {untrack(Label.bind(undefined, "live", count()))}
+        <button onClick={(_arg) => {
+                patternInput[1](count() + 1);
+            }}>
+            +
+        </button>
+    </div>;
+}
+

@@ -204,7 +204,9 @@ Two specifics worth calling out:
 - **`[<SolidComponent>]` calls in JSX are untracked.** `Label "x"` inside another component now emits
   `{untrack(() => Label("x"))}` instead of `{Label("x")}`, matching the `createComponent` behind `<Comp/>`. The body runs
   once: a signal read in the body is a snapshot, a read in the returned JSX stays live. Before, Solid tracked the body
-  and rebuilt the component's DOM on every change.
+  and rebuilt the component's DOM on every change. The arguments are bound outside the `untrack`, as
+  `{untrack(Label.bind(undefined, "x", count()))}`, so a signal read in an argument still re-runs the call; the first
+  form, `untrack(() => Label("x", count()))`, left such a call frozen at its first value.
 - **Function props with two or more arguments are called uncurried.** `props.renderItem item index` emits
   `props.renderItem(item, index)`, the shape Fable uses when an F# parent sets the prop. It used to emit
   `props.renderItem(item)(index)`, which broke every F# caller. JS callers must now pass `(item, index) => ...`, not a

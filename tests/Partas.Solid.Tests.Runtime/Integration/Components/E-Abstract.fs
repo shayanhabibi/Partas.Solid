@@ -188,6 +188,27 @@ type SnapshotHost() =
                 Snapshot props.value props.log
         }
 
+/// A let-bound component taking a plain value, not an accessor.
+[<SolidComponent>]
+let Labelled (label: string) (log: string -> unit) =
+    log ("body " + label)
+    span (class' = "labelled") { label }
+
+/// Passes a signal's current value positionally: the call must track the argument.
+[<Erase>]
+type LabelledHost() =
+    inherit div()
+
+    [<Erase>]
+    member val label: Accessor<string> = unbox null with get, set
+
+    [<Erase>]
+    member val log: string -> unit = unbox null with get, set
+
+    [<SolidTypeComponent>]
+    member props.View =
+        div (class' = "labelled-host") { Labelled (props.label ()) props.log }
+
 /// Keyed list of stateful rows: removing one item must dispose only that row.
 [<Erase>]
 type LifecycleList() =
