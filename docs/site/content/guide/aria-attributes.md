@@ -24,8 +24,8 @@ let DetailsSwitch () =
     let on, setOn = createSignal false
 
     button (
-        role = "switch",
-        ariaChecked = string (on ()),
+        role = Attr.AriaRole.Switch,
+        ariaChecked = on (),
         ariaLabel = "Details",
         onClick = fun _ -> setOn (not (on ()))
     ) {

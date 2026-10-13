@@ -22,7 +22,7 @@ Each HTML element is a class, and its attributes are optional constructor parame
 keywords get an apostrophe: `class'`, `type'`, `for'`, `when'`.
 
 ```fsharp solid jsx
-button (class' = "btn", type' = "button", title = "A plain button") { "Button" }
+button (class' = "btn", type' = Attr.ButtonType.Button, title = "A plain button") { "Button" }
 ```
 
 ## Children

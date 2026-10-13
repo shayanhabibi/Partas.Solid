@@ -145,11 +145,12 @@ div().class' {| active = isActive () |}
 `OnHandler` for `once`, `passive` and `capture`. For a directive, pass `createDirectiveFactory` to `.ref`:
 
 ```fsharp
+open Fable.Core.TS
 // 2.x
 input().use' ("autofocus", true)
 
 // 3.0
-let autofocus = createDirectiveFactory (fun (el: Browser.Types.HTMLInputElement) ->
+let autofocus = createDirectiveFactory (fun (el: Dom.HTMLInputElement) ->
     el.focus ()
     ignore)
 
@@ -395,6 +396,7 @@ let Panel = lazy' ((fun () -> importDynamic "./Panels.fs.jsx"), LazyOptions (``e
 `httpHeader`, `httpStatus`, `Portal`, `Dynamic` and `HeadTag`.
 
 ```fsharp
+open Fable.Core.TS
 // 2.x
 open Partas.Solid
 
@@ -404,7 +406,8 @@ render ((fun () -> App ()), document.getElementById "root")
 open Partas.Solid
 open Partas.Solid.Web
 
-render ((fun () -> App ()), document.getElementById "root")
+// DOM lookups return options in Fable.Core.TS.Dom.
+render ((fun () -> App ()), (document.getElementById "root").Value)
 ```
 
 Install `@solidjs/web` next to `solid-js`.

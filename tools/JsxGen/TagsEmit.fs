@@ -8,21 +8,6 @@ open System.Text.RegularExpressions
 open Partas.Solid.JsxGen.Surface
 open Partas.Solid.JsxGen.Emit
 
-/// Element types Fable.Browser.Dom declares, read from the assembly's metadata. A tag whose upstream element type is
-/// missing there falls back to `HTMLElement`.
-let browserTypes (dll: string) =
-    use stream = File.OpenRead dll
-    use pe = new System.Reflection.PortableExecutable.PEReader(stream)
-    let md = System.Reflection.Metadata.PEReaderExtensions.GetMetadataReader pe
-
-    md.TypeDefinitions
-    |> Seq.map (fun h ->
-        let t = md.GetTypeDefinition h
-        md.GetString t.Namespace, md.GetString t.Name)
-    |> Seq.filter (fun (ns, _) -> ns = "Browser.Types")
-    |> Seq.map snd
-    |> Set.ofSeq
-
 /// HTML void elements (HTML Living Standard, "Void elements"), plus the deprecated `param` and `keygen`. The
 /// declarations do not say which elements are void.
 let voidElements =
@@ -117,9 +102,10 @@ let renderMarkers (markers: (string * string list) list) =
 
     out.ToString()
 
-/// The new text of `Tags.fs`. Tags it already declares keep their identifier and DOM type, so user code and typed
-/// refs keep compiling; new tags take upstream's name and element type.
-let renderTags (overrides: Overrides) (surface: Surface) (browser: Set<string>) (tagsFile: string) =
+/// The new text of `Tags.fs`. Tags it already declares keep their identifier, so user code keeps compiling. Element
+/// types (`asDomElement`) are the ones `Fable.Core.TS.Dom` declares: an existing tag keeps its type if it is one,
+/// otherwise every tag takes upstream's, falling back to `HTMLElement`.
+let renderTags (overrides: Overrides) (surface: Surface) (domTypes: Set<string>) (tagsFile: string) =
     let text = File.ReadAllText(tagsFile).Replace("\r\n", "\n")
     let marker = "    // <generated>"
     let cut = text.IndexOf marker
@@ -155,16 +141,18 @@ let renderTags (overrides: Overrides) (surface: Surface) (browser: Set<string>) 
             line "    module MathML ="
             indent <- "    "
 
+        let upstreamDom =
+            if tag.Group = "mathml" then None
+            elif domTypes.Contains tag.DomType then Some tag.DomType
+            else Some "HTMLElement"
+
         let identifier, domType =
             match existing.TryFind tag.Name with
-            | Some(identifier, dom) when tag.Group <> "mathml" -> identifier, dom
-            | _ ->
-                let dom =
-                    if tag.Group = "mathml" then None
-                    elif browser.Contains tag.DomType then Some tag.DomType
-                    else Some "HTMLElement"
-
-                memberIdentifier tag.Name, dom
+            // A generic HTMLElement gives way to upstream's specific type (HTMLSlotElement); a ref typed HTMLElement still fits.
+            | Some(identifier, Some dom) when tag.Group <> "mathml" && domTypes.Contains dom && dom <> "HTMLElement" ->
+                identifier, Some dom
+            | Some(identifier, _) when tag.Group <> "mathml" -> identifier, upstreamDom
+            | _ -> memberIdentifier tag.Name, upstreamDom
 
         line ""
 

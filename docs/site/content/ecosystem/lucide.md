@@ -33,10 +33,11 @@ node into an `<svg>` element, and takes optional attributes such as `width` or `
 `[<Import>]`, and import only the icons you use: the `icons` export holds the whole set and defeats tree shaking.
 
 ```fsharp solid
+open Fable.Core.TS
 type IconNode = interface end
 
 [<Import("createElement", "lucide")>]
-let createLucideIcon (node: IconNode, attrs: obj) : Browser.Types.Element = jsNative
+let createLucideIcon (node: IconNode, attrs: obj) : Dom.Element = jsNative
 
 module LucideIcons =
     [<Import("Heart", "lucide")>]
@@ -85,6 +86,7 @@ let lucideIconButton = "width: 2.5rem; padding: 0; justify-content: center"
 ```
 
 ```fsharp solid render=LucidePicker jsx
+open Fable.Core.TS
 let lucideChoices =
     [| "Heart", LucideIcons.heart
        "Star", LucideIcons.star
@@ -101,7 +103,7 @@ let LucidePicker () =
     let picked, setPicked = createSignal lucideChoices[0]
     let colour, setColour = createSignal lucideColours[0]
     let stroke, setStroke = createSignal 2.0
-    let mutable stage: Browser.Types.HTMLDivElement = JS.undefined
+    let mutable stage: Dom.HTMLDivElement = JS.undefined
 
     // Compute reads the signals; the effect swaps the <svg> whenever they change.
     createEffect (
@@ -133,8 +135,8 @@ let LucidePicker () =
 
                 input (
                     type' = "range",
-                    min = 1,
-                    max = 3,
+                    min = "1",
+                    max = "3",
                     step = "0.25",
                     value = string (stroke ()),
                     onInput = fun e -> setStroke (!!e.currentTarget?valueAsNumber)
@@ -152,7 +154,7 @@ let LucidePicker () =
                         style = lucideIconButton,
                         onClick = fun _ -> setPicked (name, node)
                     )
-                        .ref (fun (el: Browser.Types.HTMLButtonElement) ->
+                        .ref (fun (el: Dom.HTMLButtonElement) ->
                             let icon = createLucideIcon (node, {| width = 18; height = 18 |})
                             el.appendChild icon |> ignore)
             }

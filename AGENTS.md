@@ -101,28 +101,46 @@ After Expecto, `test` runs `node tests/Partas.Solid.Tests.Runtime/run.mjs all`, 
 Format with `dotnet fantomas <files>` directly, and compile ScratchTests with `dotnet fable --exclude
 Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize --typedArrays false [--watch]` inside `tests/ScratchTests/` (or `build.fsx test scratch`).
 
-### Generated JSX attributes (`tools/JsxGen`)
+### Generated JSX surface (`tools/JsxGen`)
 
-`src/Partas.Solid/HtmlAttributes.fs` and everything after the `// <generated>` line of `Tags.fs` are **generated**:
-edit `tools/JsxGen/overrides.json` or the generator, never those. `tools/JsxGen` (ported from Ranvier's DOM generator) reads `@solidjs/web`'s `namespace JSX` through the pinned
-TypeScript 7 compiler (Xantham.TypeScript.Wire), so interfaces, `extends` chains and member types come from the
-compiler. Regenerate with `npm ci` in `tools/JsxGen`, then `dotnet run -c Release --project tools/JsxGen`.
-`tools/JsxGen/out/diff.md` reports drift against the file being replaced.
+**Generated, never hand-edited:** `HtmlAttributes.fs`, `AriaAttributes.fs`, `Svg.fs`, and everything after the
+`// <generated>` line of `Tags.fs`. Change `tools/JsxGen/overrides.json` or the generator instead. `tools/JsxGen`
+(ported from Ranvier's DOM generator) reads `@solidjs/web`'s `namespace JSX` through the pinned TypeScript 7 compiler
+(Xantham.TypeScript.Wire), so interfaces, `extends` chains, member types and event types come from the compiler.
+Regenerate with `npm ci` in `tools/JsxGen`, then `dotnet run -c Release --project tools/JsxGen`.
+`tools/JsxGen/out/diff.md` reports HTML drift against the file being replaced.
 
-- Closed literal sets become `[<StringEnum>]` unions in `module Attr` (`dir = Attr.Dir.Rtl`); boolean attributes
-  `bool`; `string | number` `int`; open strings `string` with a Rider `LanguageInjection` whose prefix names a tag
-  that owns the attribute.
-- `overrides.json` holds what the declarations cannot say: interface renames, per-member types, skipped members,
-  and `aliases`, the legacy camelCase spellings kept as `[<Obsolete>]` members.
-- Events, `children`, `style` and `inlist` stay hand-written in `HtmlEvents.fs`. Marker interfaces `Builder.fs` lacks
-  (MathML, newer HTML elements) are generated at the top of `HtmlAttributes.fs`.
-- Tags come from the tag maps. Existing tags keep their identifier (`option'`, `select`) and DOM type; new ones fall
-  back to `HTMLElement` when Fable.Browser.Dom lacks the element type. Void elements are a list in `TagsEmit.fs`,
-  because the declarations do not say. MathML tags sit behind `MathML.`, as SVG's (still hand-written) sit behind
-  `Svg.`. A per-element member that redeclares a global one (`dir` on `<bdo>`) is dropped: it would be ambiguous.
+- Closed literal sets become `[<StringEnum>]` unions in `module Attr` (`dir = Attr.Dir.Rtl`; ARIA's take an `Aria`
+  prefix, SVG's `Svg`). A boolean spelled only `""`/`"true"`/`"false"` is `bool`. HTML `string | number` is `int`,
+  SVG's `U2<float, string>`. Open strings are `string` with a Rider `LanguageInjection`.
+- Event handlers are typed by their event: `onClick: Dom.MouseEvent -> unit`, checked against `Fable.Core.TS.Dom`.
+- ARIA is `module Aria` on `HtmlTag`. Its camelCase names come from the existing file (they cannot be derived);
+  a new ARIA attribute needs an `ariaNames` entry in `overrides.json`, or generation stops.
+- SVG gives each attribute several interfaces declare one provider interface (`strokeAttributeInterfaceProvider`)
+  that those interfaces inherit, so the property is never ambiguous. Hyphenated attributes are a hidden
+  ``` ``stroke-width`` ``` member plus a camelCase alias.
+- A per-element member that redeclares a global one (`dir` on `<bdo>`, `id` on SVG) is dropped: it would be ambiguous.
+- `overrides.json` holds what the declarations cannot say: interface renames, per-member types, skipped members, ARIA
+  names, and `aliases` (legacy camelCase HTML spellings kept as `[<Obsolete>]` members).
+- `HtmlEvents.fs` keeps the hand-written members: `children`, `style` and `inlist`. Marker interfaces `Builder.fs`
+  lacks (MathML, newer HTML elements) are generated at the top of `HtmlAttributes.fs`.
+- Tags come from the tag maps. Existing tags keep their identifier (`option'`, `select`). Element types are the ones
+  `Fable.Core.TS.Dom` declares, falling back to `HTMLElement`. Void elements are a list in `TagsEmit.fs`, because the
+  declarations do not say. MathML tags sit behind `MathML.`, SVG's behind `Svg.`.
 - Solid's compiler rejects a `<template>` with static children (the browser moves them into `.content`), and
   jsdom drops a `<button>` inside `<select>`, so the runtime tests render both without those children.
 - Upstream bumps are a `package.json` change in `tools/JsxGen`; regenerate and read `diff.md`.
+
+### DOM types: Xantham only
+
+Partas.Solid does not reference `Fable.Browser.Dom`. DOM types come from `Xantham.Fable.Core.TS`
+(`open Fable.Core.TS`, then `Dom.HTMLElement`). Its published releases bind no global values, so `src/Partas.Solid/Prelude.fs`
+(first in compile order) binds `globalThis`, `document` and `window` in an auto-opened module of Xantham's own
+`Fable.Core` namespace. Its `globalThis` shadows the one Xantham's unreleased `TSExtensions` adds: when that ships, the
+binding can be deleted or left, as both are the same global. Its lookups return options (`getElementById`), and its
+`addEventListener` overloads are typed: call the string form through `EventTarget` with an
+`EventListenerOrEventListenerObject`. Opening `Fable.Core.TS.Dom` shadows Partas's `Attr` module (DOM has an `Attr`
+type), so qualify `Partas.Solid.Attr` there.
 
 ### Releases (ShipIt)
 

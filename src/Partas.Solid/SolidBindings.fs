@@ -1098,7 +1098,7 @@ type Bindings =
     /// We then return a ref callback which sets the element for the settled work, and creates a <c>Ref.Callback</c>.
     /// </remarks>
     /// <param name="directive">A lambda which performs the actions on the target element, and returns a disposal/cleanup function</param>
-    static member inline createDirectiveFactory<^DomType when ^DomType :> Browser.Types.HTMLElement>([<InlineIfLambda>] directive: ^DomType -> DisposalFunc): Ref<^DomType> =
+    static member inline createDirectiveFactory<^DomType when ^DomType :> Fable.Core.TS.Dom.HTMLElement>([<InlineIfLambda>] directive: ^DomType -> DisposalFunc): Ref<^DomType> =
         let mutable el: ^DomType option = None
         onSettled(fun () ->
             match el with

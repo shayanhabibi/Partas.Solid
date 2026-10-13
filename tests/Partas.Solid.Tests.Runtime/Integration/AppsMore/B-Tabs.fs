@@ -2,9 +2,9 @@ module Partas.Solid.Tests.Runtime.Integration.AppsMore.Tabs
 
 open Partas.Solid
 open Partas.Solid.Aria
+open Fable.Core.TS
 open Fable.Core
 open Fable.Core.JsInterop
-open Browser
 
 type TabDef =
     {| id: string
@@ -46,10 +46,9 @@ type VerticalTabs() =
                 if not (isNull (box props.onChange)) then
                     props.onChange id
 
-            let el = document.getElementById ($"vtab-{id}")
-
-            if not (isNull el) then
-                el.focus ()
+            match document.getElementById ($"vtab-{id}") with
+            | Some el -> el.focus ()
+            | None -> ()
 
         /// Next enabled tab in direction `step` (+1/-1), wrapping.
         let move (step: int) =
@@ -64,9 +63,9 @@ type VerticalTabs() =
 
         div (class' = "vtabs") {
             div (
-                role = "tablist",
+                role = Partas.Solid.Attr.AriaRole.Tablist,
                 class' = "vtablist",
-                ariaOrientation = "vertical",
+                ariaOrientation = Partas.Solid.Attr.AriaOrientation.Vertical,
                 onKeyDown =
                     fun e ->
                         match e.key with
@@ -82,10 +81,10 @@ type VerticalTabs() =
                     yield
                         fun tab _ ->
                             button (
-                                role = "tab",
+                                role = Partas.Solid.Attr.AriaRole.Tab,
                                 id = $"vtab-{tab.id}",
                                 class' = (if selected () = tab.id then "vtab selected" else "vtab"),
-                                ariaSelected = (if selected () = tab.id then "true" else "false"),
+                                ariaSelected = (selected () = tab.id),
                                 disabled = tab.disabled,
                                 tabindex = (if selected () = tab.id then 0 else -1),
                                 onClick = fun _ -> select tab.id
@@ -99,7 +98,7 @@ type VerticalTabs() =
                 yield
                     fun tab _ ->
                         div (
-                            role = "tabpanel",
+                            role = Partas.Solid.Attr.AriaRole.Tabpanel,
                             id = $"vpanel-{tab.id}",
                             class' = "vpanel",
                             hidden = !^(selected () <> tab.id)

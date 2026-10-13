@@ -2,8 +2,6 @@
 
 open Partas.Solid
 open Fable.Core
-open Browser.Dom
-
 module Section1 =
     /// Let bindings compile to functions
     [<SolidComponent>]

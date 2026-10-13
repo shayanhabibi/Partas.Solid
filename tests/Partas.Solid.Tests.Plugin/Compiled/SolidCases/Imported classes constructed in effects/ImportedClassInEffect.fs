@@ -2,8 +2,8 @@ module Partas.Solid.Tests.SolidCases.ImportedClassInEffect
 
 open Partas.Solid
 open Fable.Core
-open Browser.Types
-
+open Fable.Core.TS.Dom
+open Fable.Core.TS
 [<Import("Draggable", "@neodrag/vanilla")>]
 type Draggable(node: HTMLElement, options: obj) =
     member _.destroy() : unit = jsNative

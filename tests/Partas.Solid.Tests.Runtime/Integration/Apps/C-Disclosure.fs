@@ -52,7 +52,7 @@ type Tabs() =
 
         div (class' = "tabs") {
             div (
-                role = "tablist",
+                role = Attr.AriaRole.Tablist,
                 class' = "tablist",
                 onKeyDown =
                     fun e ->
@@ -70,10 +70,10 @@ type Tabs() =
                     yield
                         fun tab _ ->
                             button (
-                                role = "tab",
+                                role = Attr.AriaRole.Tab,
                                 id = $"tab-{tab.id}",
                                 class' = (if selected () = tab.id then "tab active" else "tab"),
-                                ariaSelected = (if selected () = tab.id then "true" else "false"),
+                                ariaSelected = (selected () = tab.id),
                                 ariaControls = $"panel-{tab.id}",
                                 tabindex = (if selected () = tab.id then 0 else -1),
                                 onClick = fun _ -> select tab.id
@@ -87,7 +87,7 @@ type Tabs() =
                 yield
                     fun tab _ ->
                         Show (when' = (selected () = tab.id)) {
-                            div (role = "tabpanel", id = $"panel-{tab.id}", class' = "panel") {
+                            div (role = Attr.AriaRole.Tabpanel, id = $"panel-{tab.id}", class' = "panel") {
                                 p (class' = "panel-content") { tab.content }
                                 PanelCounter ()
                             }
@@ -134,7 +134,7 @@ type Accordion() =
                             h3 (class' = "acc-header") {
                                 button (
                                     class' = "acc-trigger",
-                                    ariaExpanded = (if isOpen item.id then "true" else "false"),
+                                    ariaExpanded = isOpen item.id,
                                     ariaControls = $"acc-{item.id}",
                                     onClick = fun _ -> toggle item.id
                                 ) {
@@ -143,7 +143,7 @@ type Accordion() =
                             }
 
                             Show (when' = isOpen item.id) {
-                                div (class' = "acc-panel", id = $"acc-{item.id}", role = "region") { item.content }
+                                div (class' = "acc-panel", id = $"acc-{item.id}", role = Attr.AriaRole.Region) { item.content }
                             }
                         }
             }

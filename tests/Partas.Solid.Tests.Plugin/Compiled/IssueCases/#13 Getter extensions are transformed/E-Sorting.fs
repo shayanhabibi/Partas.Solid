@@ -3,6 +3,7 @@
 open Fable.Core
 open Fable.Core.JS
 open Fable.Core.JsInterop
+open Fable.Core.TS
 
 [<StringEnum>]
 type SortUndefined =
@@ -46,7 +47,7 @@ module uwu =
         member _.getFirstSortDir: (unit -> SortDirection) = unbox null
         member _.clearSorting: (unit -> unit) = unbox null
         member _.toggleSorting: ((bool option * bool option) -> unit) = unbox null
-        member _.getToggleSortingHandler: (Browser.Types.Event -> unit) = unbox null
+        member _.getToggleSortingHandler: (Dom.Event -> unit) = unbox null
 
     type TableOptions<'Data> with
         member _.sortingFns
@@ -80,10 +81,10 @@ module uwu =
             with set (value: int) = ()
 
         member _.isMultiSortEvent
-            with set (value: Browser.Types.Event -> bool) = ()
+            with set (value: Dom.Event -> bool) = ()
 
     type Table<'Data> with
-        member _.setSorting: Browser.Types.Event -> unit = unbox null
+        member _.setSorting: Dom.Event -> unit = unbox null
         member _.resetSorting: bool -> unit = unbox null
         member _.getPreSortedRowModel: (unit -> RowModel<'Data>) = unbox null
         member _.getSortedRowModel: (unit -> RowModel<'Data>) = unbox null

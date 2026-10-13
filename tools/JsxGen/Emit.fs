@@ -19,6 +19,8 @@ type Overrides =
         SkipTags: Set<string>
         /// `<PartasInterface>.<legacyName>` -> upstream name, kept as `[<Obsolete>]` members.
         Aliases: Map<string, string>
+        /// camelCase member names for ARIA attributes the existing file does not have yet.
+        AriaNames: Map<string, string>
     }
 
 let loadOverrides (path: string) =
@@ -40,6 +42,7 @@ let loadOverrides (path: string) =
         SkipInterfaces = set "skipInterfaces"
         SkipTags = set "skipTags"
         Aliases = map "aliases"
+        AriaNames = map "ariaNames"
     }
 
 /// F# keywords and reserved identifiers. A member named after one takes a trailing apostrophe, which the plugin trims.
@@ -99,25 +102,47 @@ let private stem (interfaceName: string) =
 let private xml (text: string) =
     text.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;")
 
+/// Which file a member goes to, and which conventions it follows.
+type Profile =
+    /// `HtmlAttributes.fs`: HTML and MathML attributes and events on the marker interfaces.
+    | Html
+    /// `AriaAttributes.fs`: `module Aria`, extending `HtmlTag`. The plugin turns `ariaLabel` into `aria-label`.
+    | Aria
+    /// `Svg.fs`: attributes shared by several interfaces go through one provider interface each.
+    | Svg
+
 /// The interfaces whose members land on a given Partas marker interface. Partas folds upstream's
-/// `ElementAttributes` and `CustomAttributes` into `HTMLAttributes`, which every tag inherits through `HtmlTag`.
+/// `ElementAttributes`, `CustomAttributes` and `EventHandlersElement` into `HTMLAttributes`, which every tag inherits
+/// through `HtmlTag`.
 let htmlTargets (overrides: Overrides) (surface: Surface) =
+    let skip (name: string) = overrides.SkipInterfaces.Contains name
+
     let isHtml (name: string) =
         (name.EndsWith "HTMLAttributes"
          || name.EndsWith "HtmlAttributes"
          || (name.StartsWith "HTML" && name.EndsWith "ElementAttributes")
          || (name.StartsWith "MathML" && name.EndsWith "Attributes"))
         && name <> "HTMLAttributes"
-        && not (overrides.SkipInterfaces.Contains name)
+        && not (skip name)
+
+    let isSvg (name: string) =
+        name.Contains "SVG" && name.EndsWith "Attributes" && not (skip name)
 
     let byName = surface.Interfaces |> Array.map (fun i -> i.Name, i) |> Map.ofArray
 
     [
-        yield "HTMLAttributes", [ byName["CustomAttributes"]; byName["ElementAttributes"]; byName["HTMLAttributes"] ]
-        yield "AmbiguousNamespaceAttributes", [ byName["AmbiguousNamespaceAttributes"] ]
+        yield
+            "HTMLAttributes",
+            Html,
+            [ byName["CustomAttributes"]; byName["ElementAttributes"]; byName["HTMLAttributes"]; byName["EventHandlersElement"] ]
+        yield "AmbiguousNamespaceAttributes", Html, [ byName["AmbiguousNamespaceAttributes"] ]
+        yield "EventHandlersWindow", Html, [ byName["EventHandlersWindow"] ]
+        yield "HtmlTag", Aria, [ byName["AriaAttributes"] ]
         for i in surface.Interfaces do
             if isHtml i.Name then
-                yield (overrides.RenameInterfaces.TryFind i.Name |> Option.defaultValue i.Name), [ i ]
+                yield (overrides.RenameInterfaces.TryFind i.Name |> Option.defaultValue i.Name), Html, [ i ]
+            elif isSvg i.Name then
+                yield i.Name, Svg, [ i ]
     ]
 
 type EnumType =
@@ -128,9 +153,13 @@ type EnumType =
 
 type EmittedMember =
     {
+        Profile: Profile
         Target: string
         Upstream: string
+        /// The JSX attribute name.
         Name: string
+        /// The F# member name, before escaping.
+        Identifier: string
         Type: string
         Injection: string option
         Docs: string
@@ -144,7 +173,23 @@ type Emission =
         Omitted: (string * string) list
     }
 
-let plan (overrides: Overrides) (surface: Surface) : Emission =
+/// The existing ARIA members, by attribute name: the camelCase identifier and the value type. The names cannot be
+/// derived (`aria-activedescendant` is `ariaActiveDescendant`), and the numeric ones keep their int/float split.
+let existingAria (path: string) =
+    if not (File.Exists path) then
+        Map.empty
+    else
+        Regex.Matches(File.ReadAllText(path).Replace("\r\n", "\n"), @"member (?:_|this)\.(aria\w+|role)\s*\n\s*with set \(_: ([^)]*)\)")
+        |> Seq.map (fun m ->
+            let identifier = m.Groups[1].Value
+
+            let attribute =
+                if identifier = "role" then "role" else "aria-" + identifier.Substring(4).ToLowerInvariant()
+
+            attribute, (identifier, m.Groups[2].Value.Trim()))
+        |> Map.ofSeq
+
+let plan (overrides: Overrides) (surface: Surface) (aria: Map<string, string * string>) (domTypes: Set<string>) : Emission =
     let targets = htmlTargets overrides surface
     let omitted = ResizeArray()
 
@@ -161,27 +206,29 @@ let plan (overrides: Overrides) (surface: Surface) : Emission =
         fun (upstream: string) -> owners.TryFind upstream |> Option.defaultValue "div"
 
     // Every tag reaches HTMLAttributes through HtmlTag. A same-named member on another interface (`dir` on
-    // `<bdo>`, `href` on MathML) would make the property ambiguous, so the global one stands.
+    // `<bdo>`, `id` on SVG) would make the property ambiguous, so the global one stands.
     let globalNames =
         targets
-        |> List.filter (fun (target, _) -> target = "HTMLAttributes")
-        |> List.collect (fun (_, sources) -> sources |> List.collect (fun s -> s.Members |> Array.toList))
+        |> List.filter (fun (target, _, _) -> target = "HTMLAttributes")
+        |> List.collect (fun (_, _, sources) -> sources |> List.collect (fun s -> s.Members |> Array.toList))
         |> List.map _.Name
         |> Set.ofList
 
     let candidates =
         [
-            for target, sources in targets do
+            for target, profile, sources in targets do
                 for source in sources do
                     for m in source.Members do
                         let key = $"{source.Name}.{m.Name}"
 
-                        if target <> "HTMLAttributes" && globalNames.Contains m.Name then
+                        if profile <> Aria && target <> "HTMLAttributes" && globalNames.Contains m.Name then
                             omitted.Add(key, "redeclares a global HTMLAttributes member")
                         elif overrides.SkipMembers.Contains key then
                             omitted.Add(key, "skipped by overrides.json")
-                        elif m.Method || m.Name.StartsWith "on" then
-                            omitted.Add(key, "event or method: hand-written")
+                        elif m.Method then
+                            omitted.Add(key, "method")
+                        elif m.EventType.IsSome then
+                            yield target, profile, source, m
                         elif
                             m.Value.Object
                             && not (m.Value.String || m.Value.Number || m.Value.Boolean || m.Value.Literals.Length > 0)
@@ -189,70 +236,127 @@ let plan (overrides: Overrides) (surface: Surface) : Emission =
                         then
                             omitted.Add(key, "callback or object value: hand-written")
                         else
-                            yield target, source, m
+                            yield target, profile, source, m
         ]
 
-    // Enum names: the attribute's own name, unless two interfaces give the same attribute different literal sets.
-    let enumLiterals (m: Member) =
-        m.Value.Literals |> Array.filter (fun l -> not (m.Value.Boolean && l = ""))
+    // SVG shares one member per attribute (through a provider), so its value type is the union over every interface.
+    let svgMerged =
+        candidates
+        |> List.filter (fun (_, profile, _, _) -> profile = Svg)
+        |> List.groupBy (fun (_, _, _, m) -> m.Name)
+        |> List.map (fun (name, uses) ->
+            let values = uses |> List.map (fun (_, _, _, m) -> m.Value)
 
-    let isEnum (m: Member) =
-        not m.Value.String && not m.Value.Number && (enumLiterals m).Length > 0
+            name,
+            {
+                Literals = values |> List.collect (fun v -> List.ofArray v.Literals) |> List.distinct |> List.toArray
+                String = values |> List.exists _.String
+                Number = values |> List.exists _.Number
+                Boolean = values |> List.exists _.Boolean
+                Object = values |> List.exists _.Object
+            })
+        |> Map.ofList
 
+    let valueOf profile (m: Member) =
+        match profile with
+        | Svg -> svgMerged[m.Name]
+        // ARIA's "true"/"false" states are booleans to Partas: the plugin writes a `bool` as those strings.
+        | Aria when m.Value.Literals |> Array.exists (fun l -> l = "true" || l = "false") ->
+            { m.Value with Boolean = true }
+        | _ -> m.Value
+
+    // A boolean whose only spellings are ""/"true"/"false" is just `bool`. When other values sit beside them
+    // (contenteditable's "plaintext-only", aria-checked's "mixed") the explicit cases stay: an explicit "false" is
+    // not the same as leaving the attribute out.
+    let enumLiterals (v: ValueType) =
+        let booleanSpelling (l: string) = l = "" || l = "true" || l = "false"
+
+        if v.Boolean && Array.forall booleanSpelling v.Literals then [||]
+        else v.Literals |> Array.filter (fun l -> not (v.Boolean && l = ""))
+
+    let isEnum (v: ValueType) =
+        not v.String && not v.Number && (enumLiterals v).Length > 0
+
+    let setKey (v: ValueType) = enumLiterals v |> Array.sort |> String.concat "|"
+
+    // Enum names: HTML uses the attribute's name, prefixed with the interface when two interfaces give it different
+    // sets; ARIA and SVG take an `Aria`/`Svg` prefix, so they cannot collide with HTML's.
     let enumNames =
         candidates
-        |> List.filter (fun (_, source, m) -> isEnum m && not (overrides.Types.ContainsKey $"{source.Name}.{m.Name}"))
-        |> List.groupBy (fun (_, _, m) -> m.Name)
-        |> List.collect (fun (name, uses) ->
-            let sets =
-                uses
-                |> List.groupBy (fun (_, _, m) -> enumLiterals m |> Array.sort |> String.concat "|")
+        |> List.filter (fun (_, profile, source, m) ->
+            isEnum (valueOf profile m) && not (overrides.Types.ContainsKey $"{source.Name}.{m.Name}"))
+        |> List.groupBy (fun (_, profile, _, m) -> profile, m.Name)
+        |> List.collect (fun ((profile, name), uses) ->
+            let _, _, _, first = uses.Head
 
-            match sets with
-            | [ (key, _) ] -> [ key, name, pascal name ]
-            | _ ->
-                sets
-                |> List.map (fun (key, setUses) ->
-                    let _, source, _ = setUses.Head
-                    key, name, stem source.Name + pascal name))
+            match profile with
+            | Aria -> [ (profile, name, setKey (valueOf profile first)), "Aria" + pascal (name.Replace("aria-", "")) ]
+            | Svg -> [ (profile, name, setKey svgMerged[name]), "Svg" + pascal name ]
+            | Html ->
+                let sets = uses |> List.groupBy (fun (_, _, _, m) -> setKey m.Value)
 
-    let enumFor (m: Member) =
-        let key = enumLiterals m |> Array.sort |> String.concat "|"
+                match sets with
+                | [ (key, _) ] -> [ (profile, name, key), pascal name ]
+                | _ ->
+                    sets
+                    |> List.map (fun (key, setUses) ->
+                        let _, _, source, _ = setUses.Head
+                        (profile, name, key), stem source.Name + pascal name))
+        |> Map.ofList
 
-        enumNames
-        |> List.find (fun (k, name, _) -> k = key && name = m.Name)
-        |> fun (_, _, typeName) -> typeName
+    let enumFor profile (m: Member) =
+        enumNames[(profile, m.Name, setKey (valueOf profile m))]
+
+    let identifierFor profile (m: Member) =
+        match profile with
+        | Aria ->
+            match aria.TryFind m.Name, overrides.AriaNames.TryFind m.Name with
+            | Some(identifier, _), _ -> identifier
+            | None, Some identifier -> identifier
+            | None, None when m.Name = "role" -> "role"
+            | None, None -> failwith $"New ARIA attribute {m.Name}: name its camelCase member in overrides.json ariaNames"
+        | _ -> m.Name
 
     let members =
         candidates
-        |> List.map (fun (target, source, m) ->
+        |> List.map (fun (target, profile, source, m) ->
             let key = $"{source.Name}.{m.Name}"
-            let v = m.Value
+            let v = valueOf profile m
 
             let typ =
-                match overrides.Types.TryFind key with
-                | Some t -> t
-                | None when isEnum m && v.Boolean -> $"U2<bool, Attr.{enumFor m}>"
-                | None when isEnum m -> $"Attr.{enumFor m}"
-                // `number | string` (width, span, tabindex) stays `int` as before; `ClassValue` also admits
-                // arrays and records, so its object arm keeps it a string.
-                | None when v.Number && not v.Object && v.Literals.Length = 0 -> "int"
-                | None when v.String -> "string"
-                | None when v.Number -> "int"
-                | None when v.Boolean -> "bool"
-                | None -> "string"
+                match overrides.Types.TryFind key, m.EventType with
+                | Some t, _ -> t
+                | None, Some event when domTypes.Contains event -> $"Dom.{event} -> unit"
+                | None, Some _ -> "Dom.Event -> unit"
+                | None, None when isEnum v && v.Boolean -> $"U2<bool, Attr.{enumFor profile m}>"
+                | None, None when isEnum v -> $"Attr.{enumFor profile m}"
+                | None, None when v.Number && not v.Object && v.Literals.Length = 0 ->
+                    match profile with
+                    // `number | string` (width, span, tabindex) stays `int`; SVG coordinates are fractional.
+                    | Html -> "int"
+                    | Svg -> if v.String then "U2<float, string>" else "float"
+                    | Aria -> aria.TryFind m.Name |> Option.map snd |> Option.defaultValue "U2<int, string>"
+                // `ClassValue` also admits arrays and records, so its object arm keeps it a string.
+                | None, None when v.String -> "string"
+                | None, None when v.Number -> (if profile = Svg then "float" else "int")
+                | None, None when v.Boolean -> "bool"
+                | None, None -> "string"
 
             let injection =
-                if m.Name = "innerHTML" then Some "InjectedLanguage.HTML"
-                elif typ = "string" then
+                match profile with
+                | _ when m.Name = "innerHTML" -> Some "InjectedLanguage.HTML"
+                | Html when typ = "string" ->
                     let tag = if target = "HTMLAttributes" then "div" else tagFor source.Name
                     Some $"\"jsx\", Prefix = \"<{tag} {m.Name}='\", Suffix = \"' >\""
-                else None
+                | Aria when typ = "string" -> Some $"InjectedLanguage.HTML, Prefix = \"<div {m.Name}='\", Suffix = \"'>\""
+                | _ -> None
 
             {
+                Profile = profile
                 Target = target
                 Upstream = source.Name
                 Name = m.Name
+                Identifier = identifierFor profile m
                 Type = typ
                 Injection = injection
                 Docs = m.Docs
@@ -261,7 +365,8 @@ let plan (overrides: Overrides) (surface: Surface) : Emission =
     {
         Enums =
             enumNames
-            |> List.map (fun (key, _, typeName) ->
+            |> Map.toList
+            |> List.map (fun ((_, _, key), typeName) ->
                 {
                     Name = typeName
                     Literals = if key = "" then [||] else key.Split '|'
@@ -281,6 +386,7 @@ let render (overrides: Overrides) (markers: string) (emission: Emission) =
     line ""
     line "open JetBrains.Annotations"
     line "open Fable.Core"
+    line "open Fable.Core.TS"
     line "open Partas.Solid.Experimental.U"
     line ""
     line "/// Closed value sets of JSX attributes, as string enums: `dir = Attr.Dir.Rtl`."
@@ -302,7 +408,9 @@ let render (overrides: Overrides) (markers: string) (emission: Emission) =
         line "    // Marker interfaces Builder.fs does not declare: MathML, and HTML elements added since."
         out.Append(markers) |> ignore
 
-    for target, members in emission.Members |> List.groupBy _.Target do
+    let html = emission.Members |> List.filter (fun m -> m.Profile = Html)
+
+    for target, members in html |> List.groupBy _.Target do
         line $"    type {target} with"
 
         for m in members |> List.distinctBy _.Name do
@@ -329,7 +437,7 @@ let render (overrides: Overrides) (markers: string) (emission: Emission) =
     line "module HtmlAttributeAliases ="
 
     let generated =
-        emission.Members |> List.map (fun m -> (m.Target, m.Name), m) |> Map.ofList
+        html |> List.map (fun m -> (m.Target, m.Name), m) |> Map.ofList
 
     for target, aliases in
         overrides.Aliases
@@ -372,7 +480,9 @@ let report (emission: Emission) (handWritten: string) =
     let oursByKey = ours |> List.map (fun (t, n, ty) -> (t, n.ToLowerInvariant()), (n, ty)) |> Map.ofList
 
     let generated =
-        emission.Members |> List.distinctBy (fun m -> m.Target, m.Name)
+        emission.Members
+        |> List.filter (fun m -> m.Profile = Html)
+        |> List.distinctBy (fun m -> m.Target, m.Name)
 
     let generatedKeys =
         generated |> List.map (fun m -> m.Target, m.Name.ToLowerInvariant()) |> Set.ofList

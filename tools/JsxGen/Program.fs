@@ -27,34 +27,37 @@ let main args =
             (JsonSerializer.Serialize(surface, JsonSerializerOptions(WriteIndented = true)) + "\n")
 
         let overrides = Emit.loadOverrides (Path.Combine(root, "overrides.json"))
-        let emission = Emit.plan overrides surface
-
         let src = Path.GetFullPath(Path.Combine(root, "..", "..", "src", "Partas.Solid"))
         let target = Path.Combine(src, "HtmlAttributes.fs")
+        let fsproj = File.ReadAllText(Path.Combine(src, "Partas.Solid.fsproj"))
+
+        let packages =
+            Environment.GetEnvironmentVariable "NUGET_PACKAGES"
+            |> Option.ofObj
+            |> Option.defaultValue (Path.Combine(Environment.GetFolderPath Environment.SpecialFolder.UserProfile, ".nuget", "packages"))
+
+        // A package Partas.Solid references, at the version it pins.
+        let referenced (id: string) (dll: string) =
+            let version = Regex.Match(fsproj, $"\"{id}\" Version=\"([^\"]+)\"").Groups[1].Value
+            Directory.GetFiles(Path.Combine(packages, id.ToLowerInvariant(), version), dll, SearchOption.AllDirectories) |> Array.head
+
+        let domTypes = ProfilesEmit.domTypes (referenced "Xantham.Fable.Core.TS" "Xantham.Fable.Core.TS.dll")
+        let ariaFile = Path.Combine(src, "AriaAttributes.fs")
+        let emission = Emit.plan overrides surface (Emit.existingAria ariaFile) domTypes
 
         let markers =
             TagsEmit.missingMarkers overrides surface (File.ReadAllText(Path.Combine(src, "Builder.fs")))
 
-        // Fable.Browser.Dom at the version Partas.Solid references: the element types tags can name.
-        let browser =
-            let fsproj = File.ReadAllText(Path.Combine(src, "Partas.Solid.fsproj"))
-            let version = Regex.Match(fsproj, "\"Fable.Browser.Dom\" Version=\"([^\"]+)\"").Groups[1].Value
-
-            let packages =
-                Environment.GetEnvironmentVariable "NUGET_PACKAGES"
-                |> Option.ofObj
-                |> Option.defaultValue (Path.Combine(Environment.GetFolderPath Environment.SpecialFolder.UserProfile, ".nuget", "packages"))
-
-            Directory.GetFiles(Path.Combine(packages, "fable.browser.dom", version), "Browser.Dom.dll", SearchOption.AllDirectories)
-            |> Array.head
-            |> TagsEmit.browserTypes
 
         // Report drift against the file being replaced before replacing it.
         write (Path.Combine(output, "diff.md")) (Emit.report emission target)
         write target (Emit.render overrides (TagsEmit.renderMarkers markers) emission)
 
         let tagsFile = Path.Combine(src, "Tags.fs")
-        write tagsFile (TagsEmit.renderTags overrides surface browser tagsFile)
+        write tagsFile (TagsEmit.renderTags overrides surface domTypes tagsFile)
+        write ariaFile (ProfilesEmit.renderAria emission)
+        let svgFile = Path.Combine(src, "Svg.fs")
+        write svgFile (ProfilesEmit.renderSvg surface emission (File.ReadAllText svgFile))
 
         printfn
             "JSX: %d interfaces, %d tags (%d generated, %d new markers); generated %d attribute members, %d enums, %d omitted -> %s"

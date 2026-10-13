@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <None Include="../../README.md" Pack="true" PackagePath="\" />
+      <Compile Include="Prelude.fs" />
       <Compile Include="AttributesAliasesExtensions.fs" />
       <Compile Include="Builder.fs" />
       <Compile Include="HtmlAttributes.fs" />
@@ -41,14 +42,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Fable.Browser.Dom" Version="2.20.0" />
       <PackageReference Include="Fable.Core" Version="5.2.0" />
       <PackageReference Include="Fable.Package.SDK" Version="1.3.2">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
       <PackageReference Update="FSharp.Core" Version="10.0.100" />
-      <PackageReference Include="Xantham.Fable.Core.TS" Version="0.1.0-alpha.3" />
+      <PackageReference Include="Xantham.Fable.Core.TS" Version="0.2.1" />
     </ItemGroup>
 
     <ItemGroup>

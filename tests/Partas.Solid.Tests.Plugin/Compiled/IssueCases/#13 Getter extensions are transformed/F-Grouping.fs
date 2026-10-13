@@ -3,8 +3,8 @@
 open Fable.Core
 open Fable.Core.JS
 open Fable.Core.JsInterop
-open Browser.Types
-
+open Fable.Core.TS.Dom
+open Fable.Core.TS
 [<Pojo>]
 type Renderable<'Data>
     (table: Table<'Data>, row: Row<'Data>, column: Column<'Data>, cell: Cell<'Data>, getValue: (unit -> obj), renderValue: (unit -> obj)) =

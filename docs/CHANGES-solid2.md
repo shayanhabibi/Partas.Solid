@@ -276,6 +276,24 @@ The web runtime (`@solidjs/web`, formerly `solid-js/web`) now has its own file (
 `Bindings.render` / `renderToString` / `isServer` are no longer on the core `Bindings` type (`DEV` stays there) — update your
 `open`s accordingly.
 
+### DOM types from Xantham; `Fable.Browser.Dom` is gone
+
+Partas.Solid no longer references `Fable.Browser.Dom`. DOM types come from `Xantham.Fable.Core.TS` 0.2.1:
+`open Fable.Core.TS` and write `Dom.HTMLElement`, `Dom.MouseEvent`. Partas.Solid binds the globals `globalThis`,
+`document` and `window`, which `open Fable.Core` brings in. Its lookups return options: `getElementById` is
+`HTMLElement option`. Tags whose element type was a generic `HTMLElement` now name it (`slot` is `HTMLSlotElement`,
+`details` `HTMLDetailsElement`), so a ref typed `HTMLElement` on those tags needs `:?> _`.
+
+### ARIA, SVG and events are generated too
+
+- ARIA: closed sets are enums (`role = Attr.AriaRole.Dialog`); "true"/"false" states are `bool`
+  (`ariaExpanded = isOpen ()`); states with more values take `U2<bool, Attr.AriaX>` (`ariaChecked`, `ariaInvalid`).
+  New: `ariaColIndexText`, `ariaRowIndexText`. Removed: `ariaDescendant`, which wrote the non-existent
+  `aria-descendant`.
+- SVG: every attribute rc.14 declares, with enums for closed sets (`Attr.Svg*`).
+- Events: every handler is typed by its event (`onAuxClick: Dom.PointerEvent -> unit`), including window events on
+  `body` and media/SVG-animation events. `onEncrypted` is on media elements only, as upstream.
+
 ### `Partas.Solid.Meta` follows `@solidjs/meta` 1.0; the router is out for now
 
 - `MetaProvider` is gone (meta 1.0 has none). New: `Head` (groups tags into one replacement set), `Script` and

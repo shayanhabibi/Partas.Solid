@@ -3,6 +3,7 @@ namespace Partas.Solid
 
 open JetBrains.Annotations
 open Fable.Core
+open Fable.Core.TS
 open Partas.Solid.Experimental.U
 
 /// Closed value sets of JSX attributes, as string enums: `dir = Attr.Dir.Rtl`.
@@ -13,8 +14,163 @@ module Attr =
         | [<CompiledName "toggle">] Toggle
 
     [<StringEnum; RequireQualifiedAccess>]
-    type AnchorPreload =
+    type AriaAutocomplete =
+        | [<CompiledName "both">] Both
+        | [<CompiledName "inline">] Inline
+        | [<CompiledName "list">] List
+        | [<CompiledName "none">] None
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaChecked =
         | [<CompiledName "false">] False
+        | [<CompiledName "mixed">] Mixed
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaCurrent =
+        | [<CompiledName "date">] Date
+        | [<CompiledName "false">] False
+        | [<CompiledName "location">] Location
+        | [<CompiledName "page">] Page
+        | [<CompiledName "step">] Step
+        | [<CompiledName "time">] Time
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaDropeffect =
+        | [<CompiledName "copy">] Copy
+        | [<CompiledName "execute">] Execute
+        | [<CompiledName "link">] Link
+        | [<CompiledName "move">] Move
+        | [<CompiledName "none">] None
+        | [<CompiledName "popup">] Popup
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaHaspopup =
+        | [<CompiledName "dialog">] Dialog
+        | [<CompiledName "false">] False
+        | [<CompiledName "grid">] Grid
+        | [<CompiledName "listbox">] Listbox
+        | [<CompiledName "menu">] Menu
+        | [<CompiledName "tree">] Tree
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaInvalid =
+        | [<CompiledName "false">] False
+        | [<CompiledName "grammar">] Grammar
+        | [<CompiledName "spelling">] Spelling
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaLive =
+        | [<CompiledName "assertive">] Assertive
+        | [<CompiledName "off">] Off
+        | [<CompiledName "polite">] Polite
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaOrientation =
+        | [<CompiledName "horizontal">] Horizontal
+        | [<CompiledName "vertical">] Vertical
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaPressed =
+        | [<CompiledName "false">] False
+        | [<CompiledName "mixed">] Mixed
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaRelevant =
+        | [<CompiledName "additions">] Additions
+        | [<CompiledName "additions removals">] AdditionsRemovals
+        | [<CompiledName "additions text">] AdditionsText
+        | [<CompiledName "all">] All
+        | [<CompiledName "removals">] Removals
+        | [<CompiledName "removals additions">] RemovalsAdditions
+        | [<CompiledName "removals text">] RemovalsText
+        | [<CompiledName "text">] Text
+        | [<CompiledName "text additions">] TextAdditions
+        | [<CompiledName "text removals">] TextRemovals
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaRole =
+        | [<CompiledName "alert">] Alert
+        | [<CompiledName "alertdialog">] Alertdialog
+        | [<CompiledName "application">] Application
+        | [<CompiledName "article">] Article
+        | [<CompiledName "banner">] Banner
+        | [<CompiledName "button">] Button
+        | [<CompiledName "cell">] Cell
+        | [<CompiledName "checkbox">] Checkbox
+        | [<CompiledName "columnheader">] Columnheader
+        | [<CompiledName "combobox">] Combobox
+        | [<CompiledName "complementary">] Complementary
+        | [<CompiledName "contentinfo">] Contentinfo
+        | [<CompiledName "definition">] Definition
+        | [<CompiledName "dialog">] Dialog
+        | [<CompiledName "directory">] Directory
+        | [<CompiledName "document">] Document
+        | [<CompiledName "feed">] Feed
+        | [<CompiledName "figure">] Figure
+        | [<CompiledName "form">] Form
+        | [<CompiledName "grid">] Grid
+        | [<CompiledName "gridcell">] Gridcell
+        | [<CompiledName "group">] Group
+        | [<CompiledName "heading">] Heading
+        | [<CompiledName "img">] Img
+        | [<CompiledName "link">] Link
+        | [<CompiledName "list">] List
+        | [<CompiledName "listbox">] Listbox
+        | [<CompiledName "listitem">] Listitem
+        | [<CompiledName "log">] Log
+        | [<CompiledName "main">] Main
+        | [<CompiledName "marquee">] Marquee
+        | [<CompiledName "math">] Math
+        | [<CompiledName "menu">] Menu
+        | [<CompiledName "menubar">] Menubar
+        | [<CompiledName "menuitem">] Menuitem
+        | [<CompiledName "menuitemcheckbox">] Menuitemcheckbox
+        | [<CompiledName "menuitemradio">] Menuitemradio
+        | [<CompiledName "meter">] Meter
+        | [<CompiledName "navigation">] Navigation
+        | [<CompiledName "none">] None
+        | [<CompiledName "note">] Note
+        | [<CompiledName "option">] Option
+        | [<CompiledName "presentation">] Presentation
+        | [<CompiledName "progressbar">] Progressbar
+        | [<CompiledName "radio">] Radio
+        | [<CompiledName "radiogroup">] Radiogroup
+        | [<CompiledName "region">] Region
+        | [<CompiledName "row">] Row
+        | [<CompiledName "rowgroup">] Rowgroup
+        | [<CompiledName "rowheader">] Rowheader
+        | [<CompiledName "scrollbar">] Scrollbar
+        | [<CompiledName "search">] Search
+        | [<CompiledName "searchbox">] Searchbox
+        | [<CompiledName "separator">] Separator
+        | [<CompiledName "slider">] Slider
+        | [<CompiledName "spinbutton">] Spinbutton
+        | [<CompiledName "status">] Status
+        | [<CompiledName "switch">] Switch
+        | [<CompiledName "tab">] Tab
+        | [<CompiledName "table">] Table
+        | [<CompiledName "tablist">] Tablist
+        | [<CompiledName "tabpanel">] Tabpanel
+        | [<CompiledName "term">] Term
+        | [<CompiledName "textbox">] Textbox
+        | [<CompiledName "timer">] Timer
+        | [<CompiledName "toolbar">] Toolbar
+        | [<CompiledName "tooltip">] Tooltip
+        | [<CompiledName "tree">] Tree
+        | [<CompiledName "treegrid">] Treegrid
+        | [<CompiledName "treeitem">] Treeitem
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type AriaSort =
+        | [<CompiledName "ascending">] Ascending
+        | [<CompiledName "descending">] Descending
+        | [<CompiledName "none">] None
+        | [<CompiledName "other">] Other
 
     [<StringEnum; RequireQualifiedAccess>]
     type As =
@@ -268,12 +424,6 @@ module Attr =
         | [<CompiledName "normal">] Normal
 
     [<StringEnum; RequireQualifiedAccess>]
-    type MediaPreload =
-        | [<CompiledName "auto">] Auto
-        | [<CompiledName "metadata">] Metadata
-        | [<CompiledName "none">] None
-
-    [<StringEnum; RequireQualifiedAccess>]
     type MenuType =
         | [<CompiledName "context">] Context
         | [<CompiledName "toolbar">] Toolbar
@@ -301,6 +451,12 @@ module Attr =
         | [<CompiledName "hide">] Hide
         | [<CompiledName "show">] Show
         | [<CompiledName "toggle">] Toggle
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type Preload =
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "metadata">] Metadata
+        | [<CompiledName "none">] None
 
     [<StringEnum; RequireQualifiedAccess>]
     type Referrerpolicy =
@@ -351,6 +507,631 @@ module Attr =
         | [<CompiledName "default">] Default
         | [<CompiledName "poly">] Poly
         | [<CompiledName "rect">] Rect
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAccumulate =
+        | [<CompiledName "none">] None
+        | [<CompiledName "sum">] Sum
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAdditive =
+        | [<CompiledName "replace">] Replace
+        | [<CompiledName "sum">] Sum
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAlignmentBaseline =
+        | [<CompiledName "after-edge">] AfterEdge
+        | [<CompiledName "alphabetic">] Alphabetic
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "baseline">] Baseline
+        | [<CompiledName "before-edge">] BeforeEdge
+        | [<CompiledName "central">] Central
+        | [<CompiledName "hanging">] Hanging
+        | [<CompiledName "ideographic">] Ideographic
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "mathematical">] Mathematical
+        | [<CompiledName "middle">] Middle
+        | [<CompiledName "text-after-edge">] TextAfterEdge
+        | [<CompiledName "text-before-edge">] TextBeforeEdge
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaAtomic =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaAutocomplete =
+        | [<CompiledName "both">] Both
+        | [<CompiledName "inline">] Inline
+        | [<CompiledName "list">] List
+        | [<CompiledName "none">] None
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaBusy =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaChecked =
+        | [<CompiledName "false">] False
+        | [<CompiledName "mixed">] Mixed
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaCurrent =
+        | [<CompiledName "date">] Date
+        | [<CompiledName "false">] False
+        | [<CompiledName "location">] Location
+        | [<CompiledName "page">] Page
+        | [<CompiledName "step">] Step
+        | [<CompiledName "time">] Time
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaDisabled =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaDropeffect =
+        | [<CompiledName "copy">] Copy
+        | [<CompiledName "execute">] Execute
+        | [<CompiledName "link">] Link
+        | [<CompiledName "move">] Move
+        | [<CompiledName "none">] None
+        | [<CompiledName "popup">] Popup
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaExpanded =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaGrabbed =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaHaspopup =
+        | [<CompiledName "dialog">] Dialog
+        | [<CompiledName "false">] False
+        | [<CompiledName "grid">] Grid
+        | [<CompiledName "listbox">] Listbox
+        | [<CompiledName "menu">] Menu
+        | [<CompiledName "tree">] Tree
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaHidden =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaInvalid =
+        | [<CompiledName "false">] False
+        | [<CompiledName "grammar">] Grammar
+        | [<CompiledName "spelling">] Spelling
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaLive =
+        | [<CompiledName "assertive">] Assertive
+        | [<CompiledName "off">] Off
+        | [<CompiledName "polite">] Polite
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaModal =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaMultiline =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaMultiselectable =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaOrientation =
+        | [<CompiledName "horizontal">] Horizontal
+        | [<CompiledName "vertical">] Vertical
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaPressed =
+        | [<CompiledName "false">] False
+        | [<CompiledName "mixed">] Mixed
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaReadonly =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaRelevant =
+        | [<CompiledName "additions">] Additions
+        | [<CompiledName "additions removals">] AdditionsRemovals
+        | [<CompiledName "additions text">] AdditionsText
+        | [<CompiledName "all">] All
+        | [<CompiledName "removals">] Removals
+        | [<CompiledName "removals additions">] RemovalsAdditions
+        | [<CompiledName "removals text">] RemovalsText
+        | [<CompiledName "text">] Text
+        | [<CompiledName "text additions">] TextAdditions
+        | [<CompiledName "text removals">] TextRemovals
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaRequired =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaSelected =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAriaSort =
+        | [<CompiledName "ascending">] Ascending
+        | [<CompiledName "descending">] Descending
+        | [<CompiledName "none">] None
+        | [<CompiledName "other">] Other
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgAttributeType =
+        | [<CompiledName "CSS">] CSS
+        | [<CompiledName "XML">] XML
+        | [<CompiledName "auto">] Auto
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgCalcMode =
+        | [<CompiledName "discrete">] Discrete
+        | [<CompiledName "linear">] Linear
+        | [<CompiledName "paced">] Paced
+        | [<CompiledName "spline">] Spline
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgClipPathUnits =
+        | [<CompiledName "objectBoundingBox">] ObjectBoundingBox
+        | [<CompiledName "userSpaceOnUse">] UserSpaceOnUse
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgClipRule =
+        | [<CompiledName "evenodd">] Evenodd
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "nonzero">] Nonzero
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgColorInterpolation =
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "linearRGB">] LinearRGB
+        | [<CompiledName "sRGB">] SRGB
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgColorInterpolationFilters =
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "linearRGB">] LinearRGB
+        | [<CompiledName "sRGB">] SRGB
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgColorRendering =
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "optimizeQuality">] OptimizeQuality
+        | [<CompiledName "optimizeSpeed">] OptimizeSpeed
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgDirection =
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "ltr">] Ltr
+        | [<CompiledName "rtl">] Rtl
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgDominantBaseline =
+        | [<CompiledName "alphabetic">] Alphabetic
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "central">] Central
+        | [<CompiledName "hanging">] Hanging
+        | [<CompiledName "ideographic">] Ideographic
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "mathematical">] Mathematical
+        | [<CompiledName "middle">] Middle
+        | [<CompiledName "text-bottom">] TextBottom
+        | [<CompiledName "text-top">] TextTop
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgEdgeMode =
+        | [<CompiledName "duplicate">] Duplicate
+        | [<CompiledName "none">] None
+        | [<CompiledName "wrap">] Wrap
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgExternalResourcesRequired =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgFillRule =
+        | [<CompiledName "evenodd">] Evenodd
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "nonzero">] Nonzero
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgFilterUnits =
+        | [<CompiledName "objectBoundingBox">] ObjectBoundingBox
+        | [<CompiledName "userSpaceOnUse">] UserSpaceOnUse
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgFontStyle =
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "italic">] Italic
+        | [<CompiledName "normal">] Normal
+        | [<CompiledName "oblique">] Oblique
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgGradientUnits =
+        | [<CompiledName "objectBoundingBox">] ObjectBoundingBox
+        | [<CompiledName "userSpaceOnUse">] UserSpaceOnUse
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgImageRendering =
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "optimizeQuality">] OptimizeQuality
+        | [<CompiledName "optimizeSpeed">] OptimizeSpeed
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgLengthAdjust =
+        | [<CompiledName "spacing">] Spacing
+        | [<CompiledName "spacingAndGlyphs">] SpacingAndGlyphs
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgMarkerUnits =
+        | [<CompiledName "strokeWidth">] StrokeWidth
+        | [<CompiledName "userSpaceOnUse">] UserSpaceOnUse
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgMaskContentUnits =
+        | [<CompiledName "objectBoundingBox">] ObjectBoundingBox
+        | [<CompiledName "userSpaceOnUse">] UserSpaceOnUse
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgMaskUnits =
+        | [<CompiledName "objectBoundingBox">] ObjectBoundingBox
+        | [<CompiledName "userSpaceOnUse">] UserSpaceOnUse
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgMethod =
+        | [<CompiledName "align">] Align
+        | [<CompiledName "stretch">] Stretch
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgMode =
+        | [<CompiledName "darken">] Darken
+        | [<CompiledName "lighten">] Lighten
+        | [<CompiledName "multiply">] Multiply
+        | [<CompiledName "normal">] Normal
+        | [<CompiledName "screen">] Screen
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgOperator =
+        | [<CompiledName "arithmetic">] Arithmetic
+        | [<CompiledName "atop">] Atop
+        | [<CompiledName "dilate">] Dilate
+        | [<CompiledName "erode">] Erode
+        | [<CompiledName "in">] In
+        | [<CompiledName "out">] Out
+        | [<CompiledName "over">] Over
+        | [<CompiledName "xor">] Xor
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgOrigin =
+        | [<CompiledName "default">] Default
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgOverflow =
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "hidden">] Hidden
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "scroll">] Scroll
+        | [<CompiledName "visible">] Visible
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgPatternContentUnits =
+        | [<CompiledName "objectBoundingBox">] ObjectBoundingBox
+        | [<CompiledName "userSpaceOnUse">] UserSpaceOnUse
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgPatternUnits =
+        | [<CompiledName "objectBoundingBox">] ObjectBoundingBox
+        | [<CompiledName "userSpaceOnUse">] UserSpaceOnUse
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgPointerEvents =
+        | [<CompiledName "all">] All
+        | [<CompiledName "bounding-box">] BoundingBox
+        | [<CompiledName "color">] Color
+        | [<CompiledName "fill">] Fill
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "none">] None
+        | [<CompiledName "painted">] Painted
+        | [<CompiledName "stroke">] Stroke
+        | [<CompiledName "visible">] Visible
+        | [<CompiledName "visibleFill">] VisibleFill
+        | [<CompiledName "visiblePainted">] VisiblePainted
+        | [<CompiledName "visibleStroke">] VisibleStroke
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgPreserveAlpha =
+        | [<CompiledName "false">] False
+        | [<CompiledName "true">] True
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgPreserveAspectRatio =
+        | [<CompiledName "defer none">] DeferNone
+        | [<CompiledName "defer xMaxYMax">] DeferXMaxYMax
+        | [<CompiledName "defer xMaxYMax meet">] DeferXMaxYMaxMeet
+        | [<CompiledName "defer xMaxYMax slice">] DeferXMaxYMaxSlice
+        | [<CompiledName "defer xMaxYMid">] DeferXMaxYMid
+        | [<CompiledName "defer xMaxYMid meet">] DeferXMaxYMidMeet
+        | [<CompiledName "defer xMaxYMid slice">] DeferXMaxYMidSlice
+        | [<CompiledName "defer xMaxYMin">] DeferXMaxYMin
+        | [<CompiledName "defer xMaxYMin meet">] DeferXMaxYMinMeet
+        | [<CompiledName "defer xMaxYMin slice">] DeferXMaxYMinSlice
+        | [<CompiledName "defer xMidYMax">] DeferXMidYMax
+        | [<CompiledName "defer xMidYMax meet">] DeferXMidYMaxMeet
+        | [<CompiledName "defer xMidYMax slice">] DeferXMidYMaxSlice
+        | [<CompiledName "defer xMidYMid">] DeferXMidYMid
+        | [<CompiledName "defer xMidYMid meet">] DeferXMidYMidMeet
+        | [<CompiledName "defer xMidYMid slice">] DeferXMidYMidSlice
+        | [<CompiledName "defer xMidYMin">] DeferXMidYMin
+        | [<CompiledName "defer xMidYMin meet">] DeferXMidYMinMeet
+        | [<CompiledName "defer xMidYMin slice">] DeferXMidYMinSlice
+        | [<CompiledName "defer xMinYMax">] DeferXMinYMax
+        | [<CompiledName "defer xMinYMax meet">] DeferXMinYMaxMeet
+        | [<CompiledName "defer xMinYMax slice">] DeferXMinYMaxSlice
+        | [<CompiledName "defer xMinYMid">] DeferXMinYMid
+        | [<CompiledName "defer xMinYMid meet">] DeferXMinYMidMeet
+        | [<CompiledName "defer xMinYMid slice">] DeferXMinYMidSlice
+        | [<CompiledName "defer xMinYMin">] DeferXMinYMin
+        | [<CompiledName "defer xMinYMin meet">] DeferXMinYMinMeet
+        | [<CompiledName "defer xMinYMin slice">] DeferXMinYMinSlice
+        | [<CompiledName "none">] None
+        | [<CompiledName "xMaxYMax">] XMaxYMax
+        | [<CompiledName "xMaxYMax meet">] XMaxYMaxMeet
+        | [<CompiledName "xMaxYMax slice">] XMaxYMaxSlice
+        | [<CompiledName "xMaxYMid">] XMaxYMid
+        | [<CompiledName "xMaxYMid meet">] XMaxYMidMeet
+        | [<CompiledName "xMaxYMid slice">] XMaxYMidSlice
+        | [<CompiledName "xMaxYMin">] XMaxYMin
+        | [<CompiledName "xMaxYMin meet">] XMaxYMinMeet
+        | [<CompiledName "xMaxYMin slice">] XMaxYMinSlice
+        | [<CompiledName "xMidYMax">] XMidYMax
+        | [<CompiledName "xMidYMax meet">] XMidYMaxMeet
+        | [<CompiledName "xMidYMax slice">] XMidYMaxSlice
+        | [<CompiledName "xMidYMid">] XMidYMid
+        | [<CompiledName "xMidYMid meet">] XMidYMidMeet
+        | [<CompiledName "xMidYMid slice">] XMidYMidSlice
+        | [<CompiledName "xMidYMin">] XMidYMin
+        | [<CompiledName "xMidYMin meet">] XMidYMinMeet
+        | [<CompiledName "xMidYMin slice">] XMidYMinSlice
+        | [<CompiledName "xMinYMax">] XMinYMax
+        | [<CompiledName "xMinYMax meet">] XMinYMaxMeet
+        | [<CompiledName "xMinYMax slice">] XMinYMaxSlice
+        | [<CompiledName "xMinYMid">] XMinYMid
+        | [<CompiledName "xMinYMid meet">] XMinYMidMeet
+        | [<CompiledName "xMinYMid slice">] XMinYMidSlice
+        | [<CompiledName "xMinYMin">] XMinYMin
+        | [<CompiledName "xMinYMin meet">] XMinYMinMeet
+        | [<CompiledName "xMinYMin slice">] XMinYMinSlice
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgPrimitiveUnits =
+        | [<CompiledName "objectBoundingBox">] ObjectBoundingBox
+        | [<CompiledName "userSpaceOnUse">] UserSpaceOnUse
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgRestart =
+        | [<CompiledName "always">] Always
+        | [<CompiledName "never">] Never
+        | [<CompiledName "whenNotActive">] WhenNotActive
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgRole =
+        | [<CompiledName "alert">] Alert
+        | [<CompiledName "alertdialog">] Alertdialog
+        | [<CompiledName "application">] Application
+        | [<CompiledName "article">] Article
+        | [<CompiledName "banner">] Banner
+        | [<CompiledName "button">] Button
+        | [<CompiledName "cell">] Cell
+        | [<CompiledName "checkbox">] Checkbox
+        | [<CompiledName "columnheader">] Columnheader
+        | [<CompiledName "combobox">] Combobox
+        | [<CompiledName "complementary">] Complementary
+        | [<CompiledName "contentinfo">] Contentinfo
+        | [<CompiledName "definition">] Definition
+        | [<CompiledName "dialog">] Dialog
+        | [<CompiledName "directory">] Directory
+        | [<CompiledName "document">] Document
+        | [<CompiledName "feed">] Feed
+        | [<CompiledName "figure">] Figure
+        | [<CompiledName "form">] Form
+        | [<CompiledName "grid">] Grid
+        | [<CompiledName "gridcell">] Gridcell
+        | [<CompiledName "group">] Group
+        | [<CompiledName "heading">] Heading
+        | [<CompiledName "img">] Img
+        | [<CompiledName "link">] Link
+        | [<CompiledName "list">] List
+        | [<CompiledName "listbox">] Listbox
+        | [<CompiledName "listitem">] Listitem
+        | [<CompiledName "log">] Log
+        | [<CompiledName "main">] Main
+        | [<CompiledName "marquee">] Marquee
+        | [<CompiledName "math">] Math
+        | [<CompiledName "menu">] Menu
+        | [<CompiledName "menubar">] Menubar
+        | [<CompiledName "menuitem">] Menuitem
+        | [<CompiledName "menuitemcheckbox">] Menuitemcheckbox
+        | [<CompiledName "menuitemradio">] Menuitemradio
+        | [<CompiledName "meter">] Meter
+        | [<CompiledName "navigation">] Navigation
+        | [<CompiledName "none">] None
+        | [<CompiledName "note">] Note
+        | [<CompiledName "option">] Option
+        | [<CompiledName "presentation">] Presentation
+        | [<CompiledName "progressbar">] Progressbar
+        | [<CompiledName "radio">] Radio
+        | [<CompiledName "radiogroup">] Radiogroup
+        | [<CompiledName "region">] Region
+        | [<CompiledName "row">] Row
+        | [<CompiledName "rowgroup">] Rowgroup
+        | [<CompiledName "rowheader">] Rowheader
+        | [<CompiledName "scrollbar">] Scrollbar
+        | [<CompiledName "search">] Search
+        | [<CompiledName "searchbox">] Searchbox
+        | [<CompiledName "separator">] Separator
+        | [<CompiledName "slider">] Slider
+        | [<CompiledName "spinbutton">] Spinbutton
+        | [<CompiledName "status">] Status
+        | [<CompiledName "switch">] Switch
+        | [<CompiledName "tab">] Tab
+        | [<CompiledName "table">] Table
+        | [<CompiledName "tablist">] Tablist
+        | [<CompiledName "tabpanel">] Tabpanel
+        | [<CompiledName "term">] Term
+        | [<CompiledName "textbox">] Textbox
+        | [<CompiledName "timer">] Timer
+        | [<CompiledName "toolbar">] Toolbar
+        | [<CompiledName "tooltip">] Tooltip
+        | [<CompiledName "tree">] Tree
+        | [<CompiledName "treegrid">] Treegrid
+        | [<CompiledName "treeitem">] Treeitem
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgShapeRendering =
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "crispEdges">] CrispEdges
+        | [<CompiledName "geometricPrecision">] GeometricPrecision
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "optimizeSpeed">] OptimizeSpeed
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgSpacing =
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "exact">] Exact
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgSpreadMethod =
+        | [<CompiledName "pad">] Pad
+        | [<CompiledName "reflect">] Reflect
+        | [<CompiledName "repeat">] Repeat
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgStitchTiles =
+        | [<CompiledName "noStitch">] NoStitch
+        | [<CompiledName "stitch">] Stitch
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgStrokeLinecap =
+        | [<CompiledName "butt">] Butt
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "round">] Round
+        | [<CompiledName "square">] Square
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgStrokeLinejoin =
+        | [<CompiledName "arcs">] Arcs
+        | [<CompiledName "bevel">] Bevel
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "miter">] Miter
+        | [<CompiledName "miter-clip">] MiterClip
+        | [<CompiledName "round">] Round
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgTextAnchor =
+        | [<CompiledName "end">] End
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "middle">] Middle
+        | [<CompiledName "start">] Start
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgTextDecoration =
+        | [<CompiledName "blink">] Blink
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "line-through">] LineThrough
+        | [<CompiledName "none">] None
+        | [<CompiledName "overline">] Overline
+        | [<CompiledName "underline">] Underline
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgTextRendering =
+        | [<CompiledName "auto">] Auto
+        | [<CompiledName "geometricPrecision">] GeometricPrecision
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "optimizeLegibility">] OptimizeLegibility
+        | [<CompiledName "optimizeSpeed">] OptimizeSpeed
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgType =
+        | [<CompiledName "discrete">] Discrete
+        | [<CompiledName "fractalNoise">] FractalNoise
+        | [<CompiledName "gamma">] Gamma
+        | [<CompiledName "hueRotate">] HueRotate
+        | [<CompiledName "identity">] Identity
+        | [<CompiledName "linear">] Linear
+        | [<CompiledName "luminanceToAlpha">] LuminanceToAlpha
+        | [<CompiledName "matrix">] Matrix
+        | [<CompiledName "rotate">] Rotate
+        | [<CompiledName "saturate">] Saturate
+        | [<CompiledName "scale">] Scale
+        | [<CompiledName "skewX">] SkewX
+        | [<CompiledName "skewY">] SkewY
+        | [<CompiledName "table">] Table
+        | [<CompiledName "translate">] Translate
+        | [<CompiledName "turbulence">] Turbulence
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgVisibility =
+        | [<CompiledName "collapse">] Collapse
+        | [<CompiledName "hidden">] Hidden
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "visible">] Visible
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgWritingMode =
+        | [<CompiledName "inherit">] Inherit
+        | [<CompiledName "lr">] Lr
+        | [<CompiledName "lr-tb">] LrTb
+        | [<CompiledName "rl">] Rl
+        | [<CompiledName "rl-tb">] RlTb
+        | [<CompiledName "tb">] Tb
+        | [<CompiledName "tb-rl">] TbRl
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgXChannelSelector =
+        | [<CompiledName "A">] A
+        | [<CompiledName "B">] B
+        | [<CompiledName "G">] G
+        | [<CompiledName "R">] R
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgYChannelSelector =
+        | [<CompiledName "A">] A
+        | [<CompiledName "B">] B
+        | [<CompiledName "G">] G
+        | [<CompiledName "R">] R
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type SvgZoomAndPan =
+        | [<CompiledName "disable">] Disable
+        | [<CompiledName "magnify">] Magnify
 
     [<StringEnum; RequireQualifiedAccess>]
     type Translate =
@@ -760,11 +1541,692 @@ module HtmlAttributes =
             with set (_: string) = ()
             and [<Erase>] get (): string = unbox ()
 
+        [<Erase>]
+        member _.onAbort
+            with set (_: Dom.UIEvent -> unit) = ()
+            and [<Erase>] get (): Dom.UIEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onAnimationCancel
+            with set (_: Dom.AnimationEvent -> unit) = ()
+            and [<Erase>] get (): Dom.AnimationEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onAnimationEnd
+            with set (_: Dom.AnimationEvent -> unit) = ()
+            and [<Erase>] get (): Dom.AnimationEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onAnimationIteration
+            with set (_: Dom.AnimationEvent -> unit) = ()
+            and [<Erase>] get (): Dom.AnimationEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onAnimationStart
+            with set (_: Dom.AnimationEvent -> unit) = ()
+            and [<Erase>] get (): Dom.AnimationEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onAuxClick
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onBeforeCopy
+            with set (_: Dom.ClipboardEvent -> unit) = ()
+            and [<Erase>] get (): Dom.ClipboardEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onBeforeCut
+            with set (_: Dom.ClipboardEvent -> unit) = ()
+            and [<Erase>] get (): Dom.ClipboardEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onBeforeInput
+            with set (_: Dom.InputEvent -> unit) = ()
+            and [<Erase>] get (): Dom.InputEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onBeforeMatch
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onBeforePaste
+            with set (_: Dom.ClipboardEvent -> unit) = ()
+            and [<Erase>] get (): Dom.ClipboardEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onBeforeToggle
+            with set (_: Dom.ToggleEvent -> unit) = ()
+            and [<Erase>] get (): Dom.ToggleEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onBeforeXRSelect
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onBlur
+            with set (_: Dom.FocusEvent -> unit) = ()
+            and [<Erase>] get (): Dom.FocusEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onCancel
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onCanPlay
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onCanPlayThrough
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onClick
+            with set (_: Dom.MouseEvent -> unit) = ()
+            and [<Erase>] get (): Dom.MouseEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onClose
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onCommand
+            with set (_: Dom.CommandEvent -> unit) = ()
+            and [<Erase>] get (): Dom.CommandEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onCompositionEnd
+            with set (_: Dom.CompositionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.CompositionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onCompositionStart
+            with set (_: Dom.CompositionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.CompositionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onCompositionUpdate
+            with set (_: Dom.CompositionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.CompositionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onContentVisibilityAutoStateChange
+            with set (_: Dom.ContentVisibilityAutoStateChangeEvent -> unit) = ()
+            and [<Erase>] get (): Dom.ContentVisibilityAutoStateChangeEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onContextLost
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onContextMenu
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onContextRestored
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onCopy
+            with set (_: Dom.ClipboardEvent -> unit) = ()
+            and [<Erase>] get (): Dom.ClipboardEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onCueChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onCut
+            with set (_: Dom.ClipboardEvent -> unit) = ()
+            and [<Erase>] get (): Dom.ClipboardEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDblClick
+            with set (_: Dom.MouseEvent -> unit) = ()
+            and [<Erase>] get (): Dom.MouseEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDrag
+            with set (_: Dom.DragEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DragEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDragEnd
+            with set (_: Dom.DragEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DragEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDragEnter
+            with set (_: Dom.DragEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DragEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDragExit
+            with set (_: Dom.DragEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DragEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDragLeave
+            with set (_: Dom.DragEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DragEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDragOver
+            with set (_: Dom.DragEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DragEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDragStart
+            with set (_: Dom.DragEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DragEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDrop
+            with set (_: Dom.DragEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DragEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDurationChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onEmptied
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onEnded
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onError
+            with set (_: Dom.ErrorEvent -> unit) = ()
+            and [<Erase>] get (): Dom.ErrorEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onFocus
+            with set (_: Dom.FocusEvent -> unit) = ()
+            and [<Erase>] get (): Dom.FocusEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onFocusIn
+            with set (_: Dom.FocusEvent -> unit) = ()
+            and [<Erase>] get (): Dom.FocusEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onFocusOut
+            with set (_: Dom.FocusEvent -> unit) = ()
+            and [<Erase>] get (): Dom.FocusEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onFormData
+            with set (_: Dom.FormDataEvent -> unit) = ()
+            and [<Erase>] get (): Dom.FormDataEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onFullscreenChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onFullscreenError
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onGotPointerCapture
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onInput
+            with set (_: Dom.InputEvent -> unit) = ()
+            and [<Erase>] get (): Dom.InputEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onInvalid
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onKeyDown
+            with set (_: Dom.KeyboardEvent -> unit) = ()
+            and [<Erase>] get (): Dom.KeyboardEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onKeyPress
+            with set (_: Dom.KeyboardEvent -> unit) = ()
+            and [<Erase>] get (): Dom.KeyboardEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onKeyUp
+            with set (_: Dom.KeyboardEvent -> unit) = ()
+            and [<Erase>] get (): Dom.KeyboardEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onLoad
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onLoadedData
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onLoadedMetadata
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onLoadStart
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onLostPointerCapture
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onMouseDown
+            with set (_: Dom.MouseEvent -> unit) = ()
+            and [<Erase>] get (): Dom.MouseEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onMouseEnter
+            with set (_: Dom.MouseEvent -> unit) = ()
+            and [<Erase>] get (): Dom.MouseEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onMouseLeave
+            with set (_: Dom.MouseEvent -> unit) = ()
+            and [<Erase>] get (): Dom.MouseEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onMouseMove
+            with set (_: Dom.MouseEvent -> unit) = ()
+            and [<Erase>] get (): Dom.MouseEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onMouseOut
+            with set (_: Dom.MouseEvent -> unit) = ()
+            and [<Erase>] get (): Dom.MouseEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onMouseOver
+            with set (_: Dom.MouseEvent -> unit) = ()
+            and [<Erase>] get (): Dom.MouseEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onMouseUp
+            with set (_: Dom.MouseEvent -> unit) = ()
+            and [<Erase>] get (): Dom.MouseEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPaste
+            with set (_: Dom.ClipboardEvent -> unit) = ()
+            and [<Erase>] get (): Dom.ClipboardEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPause
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPlay
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPlaying
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPointerCancel
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPointerDown
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPointerEnter
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPointerLeave
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPointerMove
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPointerOut
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPointerOver
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPointerRawUpdate
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPointerUp
+            with set (_: Dom.PointerEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PointerEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onProgress
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onRateChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onReset
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onResize
+            with set (_: Dom.UIEvent -> unit) = ()
+            and [<Erase>] get (): Dom.UIEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onScroll
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onScrollEnd
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onScrollSnapChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onScrollSnapChanging
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onSecurityPolicyViolation
+            with set (_: Dom.SecurityPolicyViolationEvent -> unit) = ()
+            and [<Erase>] get (): Dom.SecurityPolicyViolationEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onSeeked
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onSeeking
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onSelect
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onSelectionChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onSelectStart
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onSlotChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onStalled
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onSubmit
+            with set (_: Dom.SubmitEvent -> unit) = ()
+            and [<Erase>] get (): Dom.SubmitEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onSuspend
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onTimeUpdate
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onToggle
+            with set (_: Dom.ToggleEvent -> unit) = ()
+            and [<Erase>] get (): Dom.ToggleEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onTouchCancel
+            with set (_: Dom.TouchEvent -> unit) = ()
+            and [<Erase>] get (): Dom.TouchEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onTouchEnd
+            with set (_: Dom.TouchEvent -> unit) = ()
+            and [<Erase>] get (): Dom.TouchEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onTouchMove
+            with set (_: Dom.TouchEvent -> unit) = ()
+            and [<Erase>] get (): Dom.TouchEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onTouchStart
+            with set (_: Dom.TouchEvent -> unit) = ()
+            and [<Erase>] get (): Dom.TouchEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onTransitionCancel
+            with set (_: Dom.TransitionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.TransitionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onTransitionEnd
+            with set (_: Dom.TransitionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.TransitionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onTransitionRun
+            with set (_: Dom.TransitionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.TransitionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onTransitionStart
+            with set (_: Dom.TransitionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.TransitionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onVolumeChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onWaiting
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onWheel
+            with set (_: Dom.WheelEvent -> unit) = ()
+            and [<Erase>] get (): Dom.WheelEvent -> unit = unbox ()
+
     type AmbiguousNamespaceAttributes with
         [<Erase; LanguageInjection("jsx", Prefix = "<div xmlns='", Suffix = "' >")>]
         member _.xmlns
             with set (_: string) = ()
             and [<Erase>] get (): string = unbox ()
+
+    type EventHandlersWindow with
+        [<Erase>]
+        member _.onAfterPrint
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onBeforePrint
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onBeforeUnload
+            with set (_: Dom.BeforeUnloadEvent -> unit) = ()
+            and [<Erase>] get (): Dom.BeforeUnloadEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDeviceMotion
+            with set (_: Dom.DeviceMotionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DeviceMotionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDeviceOrientation
+            with set (_: Dom.DeviceOrientationEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DeviceOrientationEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onDeviceOrientationAbsolute
+            with set (_: Dom.DeviceOrientationEvent -> unit) = ()
+            and [<Erase>] get (): Dom.DeviceOrientationEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onGamepadConnected
+            with set (_: Dom.GamepadEvent -> unit) = ()
+            and [<Erase>] get (): Dom.GamepadEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onGamepadDisconnected
+            with set (_: Dom.GamepadEvent -> unit) = ()
+            and [<Erase>] get (): Dom.GamepadEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onHashchange
+            with set (_: Dom.HashChangeEvent -> unit) = ()
+            and [<Erase>] get (): Dom.HashChangeEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onLanguageChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onMessage
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onMessageError
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onOffline
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onOnline
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onOrientationChange
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPageHide
+            with set (_: Dom.PageTransitionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PageTransitionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPageReveal
+            with set (_: Dom.PageRevealEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PageRevealEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPageShow
+            with set (_: Dom.PageTransitionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PageTransitionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPageSwap
+            with set (_: Dom.PageSwapEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PageSwapEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onPopstate
+            with set (_: Dom.PopStateEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PopStateEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onRejectionHandled
+            with set (_: Dom.PromiseRejectionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PromiseRejectionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onStorage
+            with set (_: Dom.StorageEvent -> unit) = ()
+            and [<Erase>] get (): Dom.StorageEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onUnhandledRejection
+            with set (_: Dom.PromiseRejectionEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PromiseRejectionEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onUnload
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
 
     type AnchorHTMLAttributes with
         [<Erase; LanguageInjection("jsx", Prefix = "<a download='", Suffix = "' >")>]
@@ -844,8 +2306,8 @@ module HtmlAttributes =
         /// </summary>
         [<Erase>]
         member _.preload
-            with set (_: U2<bool, Attr.AnchorPreload>) = ()
-            and [<Erase>] get (): U2<bool, Attr.AnchorPreload> = unbox ()
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
 
         [<Erase; LanguageInjection("jsx", Prefix = "<a attributionsrc='", Suffix = "' >")>]
         member _.attributionsrc
@@ -2327,13 +3789,23 @@ module HtmlAttributes =
 
         [<Erase>]
         member _.preload
-            with set (_: U2<bool, Attr.MediaPreload>) = ()
-            and [<Erase>] get (): U2<bool, Attr.MediaPreload> = unbox ()
+            with set (_: U2<bool, Attr.Preload>) = ()
+            and [<Erase>] get (): U2<bool, Attr.Preload> = unbox ()
 
         [<Erase; LanguageInjection("jsx", Prefix = "<div src='", Suffix = "' >")>]
         member _.src
             with set (_: string) = ()
             and [<Erase>] get (): string = unbox ()
+
+        [<Erase>]
+        member _.onEncrypted
+            with set (_: Dom.MediaEncryptedEvent -> unit) = ()
+            and [<Erase>] get (): Dom.MediaEncryptedEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onWaitingForKey
+            with set (_: Dom.Event -> unit) = ()
+            and [<Erase>] get (): Dom.Event -> unit = unbox ()
 
         [<Erase; LanguageInjection("jsx", Prefix = "<div mediagroup='", Suffix = "' >")>]
         member _.mediagroup
@@ -3207,6 +4679,16 @@ module HtmlAttributes =
         member _.width
             with set (_: int) = ()
             and [<Erase>] get (): int = unbox ()
+
+        [<Erase>]
+        member _.onEnterPictureInPicture
+            with set (_: Dom.PictureInPictureEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PictureInPictureEvent -> unit = unbox ()
+
+        [<Erase>]
+        member _.onLeavePictureInPicture
+            with set (_: Dom.PictureInPictureEvent -> unit) = ()
+            and [<Erase>] get (): Dom.PictureInPictureEvent -> unit = unbox ()
 
 /// Earlier spellings of attributes that upstream now names in lowercase.
 [<AutoOpen>]

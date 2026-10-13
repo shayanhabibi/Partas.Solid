@@ -4,8 +4,10 @@ open Partas.Solid
 open Partas.Solid.Web
 open Fable.Core
 open Fable.Core.JsInterop
-open Browser.Types
+open Fable.Core.TS.Dom
 open Partas.Solid.Aria
+open Fable.Core.TS
+
 
 /// Portal content reads a prop: updates to the prop reach the portalled DOM.
 [<Erase>]
@@ -97,7 +99,7 @@ type Modal() =
             span (id = "state") { if isOpen () then "open" else "closed" }
             Show (when' = isOpen ()) {
                 Portal(mount = props.target) {
-                    div (class' = "dialog", role = "dialog") {
+                    div (class' = "dialog", role = Attr.AriaRole.Dialog) {
                         h2 () { "Dialog title" }
                         button (id = "close", onClick = fun _ -> setOpen false) { "close" }
                     }
@@ -312,7 +314,7 @@ type PortalAttrs() =
 /// Portal with the mount given as document.body explicitly.
 [<SolidComponent>]
 let PortalExplicitBody () =
-    div (class' = "eb") { Portal(mount = unbox Browser.Dom.document.body) { aside (id = "eb-aside") { "to body" } } }
+    div (class' = "eb") { Portal(mount = unbox document.body) { aside (id = "eb-aside") { "to body" } } }
 
 /// Input inside a body portal feeds a signal displayed outside it.
 [<SolidComponent>]

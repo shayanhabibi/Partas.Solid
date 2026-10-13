@@ -1,7 +1,8 @@
 namespace Partas.Solid
 
 open System.Runtime.CompilerServices
-open Browser.Types
+open Fable.Core.TS
+open Fable.Core.TS.Dom
 open Fable.Core
 open Fable.Core.JsInterop
 
@@ -188,7 +189,7 @@ module Tags =
     type blockquote() =
         interface IntrinsicParentNode
         interface BlockquoteHTMLAttributes
-        member inline this.asDomElement: HTMLElement = unbox this
+        member inline this.asDomElement: HTMLQuoteElement = unbox this
 
     [<Erase>]
     type body() =
@@ -218,7 +219,7 @@ module Tags =
     type caption() =
         interface IntrinsicParentNode
         interface CaptionHTMLAttributes
-        member inline this.asDomElement: HTMLElement = unbox this
+        member inline this.asDomElement: HTMLTableCaptionElement = unbox this
 
     [<Erase>]
     type cite() =
@@ -246,7 +247,7 @@ module Tags =
     type data() =
         interface IntrinsicParentNode
         interface DataHTMLAttributes
-        member inline this.asDomElement: HTMLElement = unbox this
+        member inline this.asDomElement: HTMLDataElement = unbox this
 
     [<Erase>]
     type datalist() =
@@ -262,13 +263,13 @@ module Tags =
     type del() =
         interface IntrinsicParentNode
         interface InsHTMLAttributes
-        member inline this.asDomElement: HTMLElement = unbox this
+        member inline this.asDomElement: HTMLModElement = unbox this
 
     [<Erase>]
     type details() =
         interface IntrinsicParentNode
         interface DetailsHtmlAttributes
-        member inline this.asDomElement: HTMLElement = unbox this
+        member inline this.asDomElement: HTMLDetailsElement = unbox this
 
     [<Erase>]
     type dfn() =
@@ -478,7 +479,7 @@ module Tags =
     type meter() =
         interface IntrinsicParentNode
         interface MeterHTMLAttributes
-        member inline this.asDomElement: HTMLElement = unbox this
+        member inline this.asDomElement: HTMLMeterElement = unbox this
 
     [<Erase>]
     type nav() =
@@ -518,7 +519,7 @@ module Tags =
     type output() =
         interface IntrinsicParentNode
         interface OutputHTMLAttributes
-        member inline this.asDomElement: HTMLElement = unbox this
+        member inline this.asDomElement: HTMLOutputElement = unbox this
 
     [<Erase>]
     type p() =
@@ -528,7 +529,7 @@ module Tags =
     [<Erase>]
     type picture() =
         interface IntrinsicParentNode
-        member inline this.asDomElement: HTMLElement = unbox this
+        member inline this.asDomElement: HTMLPictureElement = unbox this
 
     [<Erase>]
     type pre() =
@@ -604,7 +605,7 @@ module Tags =
     type slot() =
         interface IntrinsicParentNode
         interface HTMLSlotElementAttributes
-        member inline this.asDomElement: HTMLElement = unbox this
+        member inline this.asDomElement: HTMLSlotElement = unbox this
 
     [<Erase>]
     type small() =
@@ -697,7 +698,7 @@ module Tags =
     type time() =
         interface IntrinsicParentNode
         interface TimeHTMLAttributes
-        member inline this.asDomElement: HTMLElement = unbox this
+        member inline this.asDomElement: HTMLTimeElement = unbox this
 
     [<Erase>]
     type title() =

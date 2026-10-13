@@ -125,10 +125,11 @@ property with `member val`.
 | `controlType="false"` | Hides the control. So does any value starting with `hide`. |
 
 ```fsharp
+open Fable.Core.TS
 /// <summary>Fired when the button is chosen.</summary>
 /// <storybook spy="true"/>
 [<Erase>]
-member val choosey: Browser.Types.Event -> unit = unbox null with get, set
+member val choosey: Dom.Event -> unit = unbox null with get, set
 ```
 
 ## Args
@@ -194,6 +195,7 @@ tags [| "autodocs" |]
 ## Example
 
 ```fsharp
+open Fable.Core.TS
 [<StringEnum>]
 type Variant =
     | Brown2
@@ -221,7 +223,7 @@ type Button() =
     /// </summary>
     /// <storybook spy="true"/>
     [<Erase>]
-    member val choosey: Browser.Types.Event -> unit = unbox null with get, set
+    member val choosey: Dom.Event -> unit = unbox null with get, set
 
     [<SolidTypeComponent>]
     member props.__ =

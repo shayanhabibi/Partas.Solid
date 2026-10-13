@@ -22,8 +22,7 @@ layout: splash
 Every example on this site is compiled from its F# when the site is built. Fable and the Partas plugin produce JSX, Solid's compiler turns it into DOM code, and it runs in your browser. This one also uses anime.js from npm.
 
 ```fsharp solid setup
-open Browser.Types
-
+open Fable.Core.TS.Dom
 [<Import("animate", "animejs")>]
 let animate (targets: obj, parameters: obj): obj = jsNative
 

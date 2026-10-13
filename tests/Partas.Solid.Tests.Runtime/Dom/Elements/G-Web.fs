@@ -4,6 +4,7 @@ open Partas.Solid
 open Partas.Solid.Web
 open Fable.Core
 open Fable.Core.JsInterop
+open Fable.Core.TS
 
 /// Portal into an explicit mount node.
 [<Erase>]
@@ -11,7 +12,7 @@ type Portaled() =
     inherit div()
 
     [<Erase>]
-    member val target: Browser.Types.Element = unbox null with get, set
+    member val target: Dom.Element = unbox null with get, set
 
     [<SolidTypeComponent>]
     member props.View =

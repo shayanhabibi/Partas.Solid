@@ -89,5 +89,10 @@
   },
   "skipTags": [
     "webview"
-  ]
+  ],
+  "$ariaNames": "camelCase members for ARIA attributes AriaAttributes.fs does not have yet: aria-name -> member.",
+  "ariaNames": {
+    "aria-colindextext": "ariaColIndexText",
+    "aria-rowindextext": "ariaRowIndexText"
+  }
 }

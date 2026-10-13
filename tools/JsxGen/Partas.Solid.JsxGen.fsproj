@@ -15,6 +15,7 @@
     <Compile Include="Surface.fs" />
     <Compile Include="Emit.fs" />
     <Compile Include="TagsEmit.fs" />
+    <Compile Include="ProfilesEmit.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>

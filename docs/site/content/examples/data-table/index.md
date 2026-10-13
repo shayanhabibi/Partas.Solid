@@ -549,10 +549,11 @@ open Partas.Solid.Example.Root
 open Partas.Solid
 open Fable.Core
 open Fable.Core.JsInterop
+open Fable.Core.TS
 
 importSideEffects "./index.css"
 
-render(Root, Browser.Dom.document.getElementById "root")
+render(Root, (document.getElementById "root").Value)
 ```
 
 Keeping `Root` in its own file avoids glitches with hot module reloading.

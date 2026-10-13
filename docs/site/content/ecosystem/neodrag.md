@@ -17,8 +17,7 @@ constructor emits `new Draggable(...)`. The options are an anonymous record, and
 passes to its drag callbacks.
 
 ```fsharp solid
-open Browser.Types
-
+open Fable.Core.TS.Dom
 [<Import("Draggable", "@neodrag/vanilla")>]
 type Draggable(node: HTMLElement, options: obj) =
     member _.updateOptions(options: obj) : unit = jsNative

@@ -2,8 +2,8 @@ module Partas.Solid.Tests.Runtime.Dom.Elements.Refs
 
 open Partas.Solid
 open Fable.Core
-open Browser.Types
-
+open Fable.Core.TS.Dom
+open Fable.Core.TS
 /// A ref callback receives the element it is attached to.
 [<Erase>]
 type RefCallback() =

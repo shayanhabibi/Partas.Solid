@@ -4,6 +4,7 @@ open Partas.Solid
 open Partas.Solid.Web
 open Fable.Core
 open Fable.Core.JsInterop
+open Fable.Core.TS
 
 /// Build-time flags, read through the bindings.
 let flags () = {| isServer = isServer; isDev = isDev |}
@@ -12,7 +13,7 @@ let flags () = {| isServer = isServer; isDev = isDev |}
 let Hello () = p (class' = "hello") { "hello from render" }
 
 /// `render` from the bindings, mounting a component into a node; returns the dispose function.
-let renderHello (el: Browser.Types.Element) : unit -> unit =
+let renderHello (el: Dom.Element) : unit -> unit =
     let d = render ((fun () -> Hello()), el)
     fun () -> d ()
 

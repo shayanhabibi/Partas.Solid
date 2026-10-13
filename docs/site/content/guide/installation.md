@@ -69,8 +69,11 @@ dotnet add package Partas.Solid --version 3.0.0
 If you use Paket, add `nuget Partas.Solid 3.0.0` to `paket.dependencies` along with
 `source https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json`, then run `paket install`.
 
-`Partas.Solid` brings in `Partas.Solid.FablePlugin`, `Fable.Core` 5.2.0, `Fable.Browser.Dom` 2.20.0,
-`Xantham.Fable.Core.TS` and `FSharp.Core` 10.
+`Partas.Solid` brings in `Partas.Solid.FablePlugin`, `Fable.Core` 5.2.0, `Xantham.Fable.Core.TS` and `FSharp.Core` 10.
+
+DOM types come from Xantham's `Fable.Core.TS.Dom`, not `Fable.Browser.Dom`: `open Fable.Core.TS` and write
+`Dom.HTMLElement`, `Dom.MouseEvent` and so on. Lookups such as `getElementById` return options. Partas.Solid binds
+the globals `globalThis`, `document` and `window`; they come in with `open Fable.Core`.
 
 ## The npm side
 
@@ -136,13 +139,14 @@ module App
 
 open Partas.Solid
 open Partas.Solid.Web
-open Browser.Dom
+open Fable.Core
+open Fable.Core.TS
 
 [<SolidComponent>]
 let App () =
     h1 () { "Hello from F#" }
 
-render ((fun () -> App ()), document.getElementById "root") |> ignore
+render ((fun () -> App ()), (document.getElementById "root").Value) |> ignore
 ```
 
 ### Bindings and Femto

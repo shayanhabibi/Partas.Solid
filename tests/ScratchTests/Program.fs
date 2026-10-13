@@ -1,9 +1,10 @@
 ﻿module Partas.Solid.Tests
 
-open Browser.Types
+open Fable.Core.TS.Dom
 open Fable.Core
 open Partas.Solid.Aria
 open Fable.Core.JsInterop
+open Fable.Core.TS
 
 [<Erase>]
 type TransformGetterExtensions() =

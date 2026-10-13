@@ -56,26 +56,29 @@ today. Declare the class with `[<Import("default", "apexcharts")>]` and give it 
 anonymous records, which Fable compiles to plain objects.
 
 ```fsharp solid
+open Fable.Core
+open Fable.Core.TS
+
 [<Import("default", "apexcharts")>]
-type ApexCharts(element: Browser.Types.HTMLElement, options: obj) =
+type ApexCharts(element: Dom.HTMLElement, options: obj) =
     member _.render(): JS.Promise<unit> = jsNative
     member _.updateSeries(series: obj): JS.Promise<unit> = jsNative
     member _.destroy(): unit = jsNative
 
 /// Inside a component, the plugin reads a call to an imported constructor as a JSX tag,
 /// so construct the chart from a plain function.
-let newChart (element: Browser.Types.HTMLElement, options: obj) =
+let newChart (element: Dom.HTMLElement, options: obj) =
     ApexCharts(element, options)
 
 [<Global>]
 type MutationObserver(callback: obj -> unit) =
-    member _.observe(target: Browser.Types.Node, options: obj): unit = jsNative
+    member _.observe(target: Dom.Node, options: obj): unit = jsNative
     member _.disconnect(): unit = jsNative
 
 /// "light" or "dark", read from the attribute the site's theme switch sets.
 let siteScheme () =
-    match Browser.Dom.document.documentElement.getAttribute "data-theme" with
-    | "dark" -> "dark"
+    match document.documentElement.getAttribute "data-theme" with
+    | Some "dark" -> "dark"
     | _ -> "light"
 ```
 
@@ -85,12 +88,15 @@ deferred effect sends new data to `updateSeries`, which animates the bars. The `
 ApexCharts design tokens pointed at the site's colours.
 
 ```fsharp solid render=DownloadsChart jsx
+open Fable.Core
+open Fable.Core.TS
+
 [<SolidComponent>]
 let DownloadsChart () =
     let data, setData = createSignal [| 42; 58; 51; 73; 66; 88; 97 |]
     let total = createMemo (fun (_: int option) -> Array.sum (data ()))
     let scheme, setScheme = createSignal (siteScheme ())
-    let mutable host: Browser.Types.HTMLDivElement = JS.undefined
+    let mutable host: Dom.HTMLDivElement = JS.undefined
     let mutable chart: ApexCharts option = None
     let chartTokens =
         "--apx-accent: var(--nacara-primary); --apx-fore: var(--nacara-text-muted);"
@@ -99,7 +105,7 @@ let DownloadsChart () =
     onSettled (fun () ->
         let observer = MutationObserver(fun _ -> setScheme (siteScheme ()))
         observer.observe (
-            Browser.Dom.document.documentElement,
+            document.documentElement,
             {| attributes = true; attributeFilter = [| "data-theme" |] |}
         )
         fun () -> observer.disconnect ())

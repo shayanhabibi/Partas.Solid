@@ -73,8 +73,7 @@ Solid 1's `on:`, `prop:` and `use:` escape hatches (`.on`, `.prop` and `.use'`) 
 When you pass a variable to `.ref`, make it `mutable`:
 
 ```fsharp solid render=RefVariable jsx
-open Browser.Types
-
+open Fable.Core.TS.Dom
 [<SolidComponent>]
 let RefVariable () =
     let mutable inputRef: HTMLInputElement = JS.undefined
@@ -139,7 +138,8 @@ with `!@`:
 ```fsharp
 open Partas.Solid.Router
 open Partas.Solid.Web
-open Browser.Dom
+open Fable.Core
+open Fable.Core.TS
 
 [<SolidComponent>]
 let MyRouter () =
@@ -148,7 +148,7 @@ let MyRouter () =
         Route(path = "/about", component' = !@About)
     }
 
-render ((fun () -> MyRouter ()), document.getElementById "root") |> ignore
+render ((fun () -> MyRouter ()), (document.getElementById "root").Value) |> ignore
 ```
 
 Add `@solidjs/router` to `package.json`. The router bindings have not yet been checked against a Solid 2 release of

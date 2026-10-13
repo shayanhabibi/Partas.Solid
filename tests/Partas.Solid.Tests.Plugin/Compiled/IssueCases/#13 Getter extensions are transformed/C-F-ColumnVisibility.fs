@@ -4,8 +4,8 @@ open System.Runtime.CompilerServices
 open Fable.Core
 open Fable.Core.JS
 open Fable.Core.JsInterop
-open Browser.Types
-
+open Fable.Core.TS.Dom
+open Fable.Core.TS
 [<AutoOpen; Erase>]
 module aa =
     type ColumnDef<'Data> with

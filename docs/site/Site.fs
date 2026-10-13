@@ -330,7 +330,7 @@ let private solidExamples (options: SolidExamplesOptions) =
     options
     |> SolidExamples.partasVersion (
         fromEnvironment "PARTAS_SOLID_VERSION"
-        |> Option.defaultValue "3.0.0-local.e08ad85"
+        |> Option.defaultValue "3.0.0-local.xantham2"
     )
     |> SolidExamples.feed (
         fromEnvironment "PARTAS_SOLID_FEED"

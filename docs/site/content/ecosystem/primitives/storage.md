@@ -110,6 +110,7 @@ for signals only.
 
 :::details Bindings
 ```fsharp
+open Fable.Core.TS
 [<Erase; AutoOpen>]
 type Storage =
     [<ImportMember(Spec.path)>]
@@ -118,7 +119,7 @@ type Storage =
     static member storageSync: PersistenceSyncAPI = jsNative
     // TODO broadcast channel overload
     [<ImportMember(Spec.path)>]
-    static member messageSync(?channel: Browser.Types.Window): PersistenceSyncAPI = jsNative
+    static member messageSync(?channel: Dom.Window): PersistenceSyncAPI = jsNative
     // TODO
     // [<ImportMember(Spec.path)>]
     // static member wsSync(ws: WebSocket, ?warnOnError: bool): PersistenceSyncAPI = jsNative

@@ -90,14 +90,14 @@ type SignupForm() =
                 class' = "name",
                 name = "name",
                 value = name (),
-                ariaInvalid = (if showNameError () then "true" else "false"),
+                ariaInvalid = showNameError (),
                 onInput = (fun e -> setName (!!e.currentTarget?value)),
                 onBlur = fun _ -> setTouchedName true
             )
 
             span (class' = "counter") { $"{name().Length} chars" }
 
-            Show (when' = showNameError ()) { p (class' = "error name-error", role = "alert") { nameError () } }
+            Show (when' = showNameError ()) { p (class' = "error name-error", role = Attr.AriaRole.Alert) { nameError () } }
 
             label (for' = "su-email") { "Email" }
 
@@ -106,12 +106,12 @@ type SignupForm() =
                 class' = "email",
                 type' = "email",
                 value = email (),
-                ariaInvalid = (if showEmailError () then "true" else "false"),
+                ariaInvalid = showEmailError (),
                 onInput = (fun e -> setEmail (!!e.currentTarget?value)),
                 onBlur = fun _ -> setTouchedEmail true
             )
 
-            Show (when' = showEmailError ()) { p (class' = "error email-error", role = "alert") { emailError () } }
+            Show (when' = showEmailError ()) { p (class' = "error email-error", role = Attr.AriaRole.Alert) { emailError () } }
 
             // Transforming controlled input: the signal stores an upper-cased value.
             input (

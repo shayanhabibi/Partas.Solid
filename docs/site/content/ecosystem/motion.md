@@ -113,6 +113,7 @@ Until the bindings are ported, import the framework-free `motion-dom`, the DOM e
 normal call, and anonymous records compile to the plain objects Motion expects.
 
 ```fsharp solid jsx render=WordRotateDemo
+open Fable.Core.TS
 type PlaybackControls =
     abstract stop: unit -> unit
 
@@ -124,7 +125,7 @@ let animateElement (element: obj, keyframes: obj, transition: obj): PlaybackCont
 let WordRotateDemo () =
     let words = [| "typed"; "reactive"; "fine-grained"; "just F#" |]
     let index, setIndex = createSignal 0
-    let mutable word: Browser.Types.HTMLSpanElement = JS.undefined
+    let mutable word: Dom.HTMLSpanElement = JS.undefined
 
     onSettled (fun () ->
         let id = JS.setInterval (fun () -> setIndex ((index () + 1) % words.Length)) 2000

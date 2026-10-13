@@ -77,5 +77,5 @@ type LikeButton() =
             span (class' = "count") { $"{optLikes ()} likes" }
             span (class' = "confirmed") { $"{likes ()}" }
 
-            Show (when' = (error () <> "")) { p (class' = "like-error", role = "alert") { error () } }
+            Show (when' = (error () <> "")) { p (class' = "like-error", role = Attr.AriaRole.Alert) { error () } }
         }

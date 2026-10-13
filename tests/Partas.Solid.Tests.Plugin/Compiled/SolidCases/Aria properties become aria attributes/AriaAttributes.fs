@@ -6,9 +6,9 @@ open Partas.Solid.Aria
 [<SolidComponent>]
 let AriaAttributes (isOpen: unit -> bool) =
     div (
-        role = "dialog",
+        role = Attr.AriaRole.Dialog,
         ariaLabelledBy = "title",
-        ariaExpanded = (if isOpen () then "true" else "false"),
+        ariaExpanded = isOpen (),
         ariaModal = true,
         ariaHidden = false,
         ariaDisabled = isOpen ()

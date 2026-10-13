@@ -39,6 +39,8 @@ type Member =
         Readonly: bool
         Method: bool
         Value: ValueType
+        /// For an event handler (`EventHandlerUnion<T, E>` and its variants), the event type `E`.
+        EventType: string option
         Docs: string
     }
 
@@ -219,6 +221,28 @@ let read (root: string) : Surface =
                     ))
         }
 
+    // Every arm of a handler union (`EventHandler<T, E>`, `BoundEventHandler<T, E, _>`, the Input/Change/Focus
+    // variants) carries the event as its second type argument.
+    // Only a generic type reference has type arguments; asking any other type crashes the compiler server.
+    let isReference (t: TypeResponse) =
+        has TypeFlags.Object t
+        && t.ObjectFlags |> ValueOption.exists (fun f -> f &&& ObjectFlags.Reference = ObjectFlags.Reference)
+
+    let eventType (symbol: SymbolResponse) =
+        flatten (typeOf symbol)
+        |> List.filter isReference
+        |> List.tryPick (fun t ->
+            Api.getTypeArguments
+                channel
+                {
+                    Snapshot = snapshot
+                    Project = project
+                    Type = t.Id
+                }
+            |> ValueOption.toOption
+            |> Option.filter (fun args -> args.Length >= 2)
+            |> Option.bind (fun args -> symbolName args[1] |> ValueOption.toOption))
+
     let baseNames (symbol: SymbolResponse) =
         let declared =
             Api.getDeclaredTypeOfSymbol
@@ -256,6 +280,40 @@ let read (root: string) : Surface =
 
     let jsxExports = exportsOf jsx
 
+    // Members an interface gains through an anonymous base, such as SVG's `Pick<PresentationSVGAttributes, ...>`.
+    let anonymousBaseMembers (symbol: SymbolResponse) =
+        let declared =
+            Api.getDeclaredTypeOfSymbol
+                channel
+                {
+                    Snapshot = snapshot
+                    Project = project
+                    Symbol = symbol.Id
+                }
+
+        Api.getBaseTypes
+            channel
+            {
+                Snapshot = snapshot
+                Project = project
+                Type = declared.Id
+            }
+        |> ValueOption.defaultValue [||]
+        |> Array.filter (fun baseType ->
+            match symbolName baseType with
+            | ValueSome name -> name = "__type"
+            | ValueNone -> true)
+        |> Array.collect (fun baseType ->
+            Api.getPropertiesOfType
+                channel
+                {
+                    Snapshot = snapshot
+                    Project = project
+                    Type = baseType.Id
+                }
+            |> ValueOption.defaultValue [||])
+        |> Array.filter (fun m -> not (m.Name.Contains ":"))
+
     let interfaces =
         jsxExports
         |> Array.filter (hasFlag SymbolFlags.Interface)
@@ -263,10 +321,11 @@ let read (root: string) : Surface =
         |> Array.map (fun symbol ->
             {
                 Name = symbol.Name
-                Bases = baseNames symbol
+                Bases = baseNames symbol |> Array.filter ((<>) "__type")
                 Docs = docs symbol
                 Members =
-                    membersOf symbol
+                    Array.append (membersOf symbol) (anonymousBaseMembers symbol)
+                    |> Array.distinctBy _.Name
                     |> Array.map (fun memberSymbol ->
                         {
                             Name = memberSymbol.Name
@@ -274,6 +333,8 @@ let read (root: string) : Surface =
                             Readonly = readonly memberSymbol
                             Method = hasFlag SymbolFlags.Method memberSymbol
                             Value = valueType memberSymbol
+                            EventType =
+                                if memberSymbol.Name.StartsWith "on" then eventType memberSymbol else None
                             Docs = docs memberSymbol
                         })
             })

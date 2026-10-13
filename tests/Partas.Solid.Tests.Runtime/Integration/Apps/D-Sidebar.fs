@@ -171,7 +171,7 @@ type SidebarTrigger() =
 
         button(
             class' = cn [| "sidebar-trigger"; props.class' |],
-            ariaExpanded = (if ctx.open' () then "true" else "false"),
+            ariaExpanded = ctx.open' (),
             onClick = fun _ -> ctx.toggle ()
         )
             .spread props {

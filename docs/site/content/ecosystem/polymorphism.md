@@ -45,7 +45,7 @@ type Box() =
 let BoxAsButton () =
     let count, setCount = createSignal 0
     Box(class' = "boxed")
-        .as'(button (type' = "button", onClick = fun _ -> setCount (count () + 1))) {
+        .as'(button (type' = Attr.ButtonType.Button, onClick = fun _ -> setCount (count () + 1))) {
         $"Pressed {count ()} times"
     }
 ```

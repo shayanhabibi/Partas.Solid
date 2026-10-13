@@ -313,10 +313,13 @@ let confettiApi: {| reset: unit -> unit |} = jsNative
 ```
 
 ```fsharp solid render=ConfettiCounter jsx
+open Fable.Core
+open Fable.Core.TS
+
 [<SolidComponent>]
 let ConfettiCounter () =
     let count, setCount = createSignal 0
-    let mutable launcher: Browser.Types.HTMLButtonElement = JS.undefined
+    let mutable launcher: Dom.HTMLButtonElement = JS.undefined
 
     createEffect (
         (fun (_: int option) -> count () / 10),
@@ -327,8 +330,8 @@ let ConfettiCounter () =
                     particleCount = 90
                     spread = 70
                     startVelocity = 35
-                    origin = {| x = (r.left + r.width / 2.) / Browser.Dom.window.innerWidth
-                                y = (r.top + r.height / 2.) / Browser.Dom.window.innerHeight |}
+                    origin = {| x = (r.left + r.width / 2.) / window.innerWidth
+                                y = (r.top + r.height / 2.) / window.innerHeight |}
                     colors = [| "#f28b5b"; "#b845fc"; "#1d8fe0"; "#1fd8e8"; "#6366f1" |]
                     disableForReducedMotion = true
                 |}
@@ -1002,7 +1005,8 @@ ref, which you attach with `.ref`. The function runs once the element has settle
 cleanup (`ignore` when there is nothing to clean up).
 
 ```fsharp
-let autofocus = createDirectiveFactory (fun (el: Browser.Types.HTMLInputElement) ->
+open Fable.Core.TS
+let autofocus = createDirectiveFactory (fun (el: Dom.HTMLInputElement) ->
     el.focus ()
     ignore)
 

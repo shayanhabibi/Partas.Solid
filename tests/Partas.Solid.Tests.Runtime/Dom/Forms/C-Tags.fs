@@ -115,7 +115,7 @@ let Media () =
         img (id = "m-img", src = "/a.png", alt = "", width = 64, height = 32, loading = Attr.Loading.Lazy, decoding = Attr.Decoding.Async, srcset = "/a.png 1x, /a@2x.png 2x", sizes = "64px", crossorigin = Attr.Crossorigin.Anonymous, referrerpolicy = Attr.Referrerpolicy.NoReferrer)
         a (id = "m-a", href = "/file.pdf", download = "report.pdf", hreflang = "en", type' = "application/pdf", ping = "/ping") { "download" }
         iframe (id = "m-if", src = "about:blank", title = "frame", width = 300, height = 150, loading = Attr.Loading.Lazy, sandbox = "allow-scripts", allow = "fullscreen", name = "fr")
-        video (id = "m-vid", src = "/v.mp4", poster = "/p.png", width = 320, controls = true, muted = true, loop = true, playsinline = true, preload = Attr.MediaPreload.None)
+        video (id = "m-vid", src = "/v.mp4", poster = "/p.png", width = 320, controls = true, muted = true, loop = true, playsinline = true, preload = Attr.Preload.None)
         audio (id = "m-aud", src = "/a.mp3", controls = false, autoplay = false)
     }
 

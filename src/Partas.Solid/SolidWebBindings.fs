@@ -200,7 +200,7 @@ module Bindings =
     [<Erase>]
     type Portal() =
         interface HtmlContainer
-        [<Erase; DefaultValue>] val mutable mount: Browser.Types.Element
+        [<Erase; DefaultValue>] val mutable mount: Fable.Core.TS.Dom.Element
 
 [<AutoOpen; Erase>]
 type Bindings =
@@ -216,7 +216,7 @@ type Bindings =
     static member httpStatus(code: System.Net.HttpStatusCode, ?text: string): unit = jsNative
 
     [<ImportMember(Spec.path); ParamObject(2)>]
-    static member hydrate(code: unit -> HtmlElement, element: Browser.Types.Node, ?renderId: string, ?owner: objnull, ?onError: ClientErrorHook): DisposalFunc = jsNative
+    static member hydrate(code: unit -> HtmlElement, element: Fable.Core.TS.Dom.Node, ?renderId: string, ?owner: objnull, ?onError: ClientErrorHook): DisposalFunc = jsNative
 
     [<ImportMember(Spec.path)>]
     static member isDev: bool = jsNative
@@ -254,12 +254,12 @@ type Bindings =
         ): string = jsNative
 
     [<ImportMember(Spec.path)>]
-    static member render(fn: unit -> HtmlElement, element: Browser.Types.Node): DisposalFunc = jsNative
+    static member render(fn: unit -> HtmlElement, element: Fable.Core.TS.Dom.Node): DisposalFunc = jsNative
     [<ImportMember(Spec.path)>]
-    static member render(fn: unit -> HtmlElement, element: Browser.Types.Node, init: HtmlElement): DisposalFunc = jsNative
+    static member render(fn: unit -> HtmlElement, element: Fable.Core.TS.Dom.Node, init: HtmlElement): DisposalFunc = jsNative
     /// <c>onError</c> is this root's client error hook, ahead of <c>configureClientErrors</c>'.
     [<ImportMember(Spec.path); ParamObject(3)>]
-    static member render(fn: unit -> HtmlElement, element: Browser.Types.Node, init: HtmlElement option, ?owner: objnull, ?renderId: string, ?onError: ClientErrorHook): DisposalFunc = jsNative
+    static member render(fn: unit -> HtmlElement, element: Fable.Core.TS.Dom.Node, init: HtmlElement option, ?owner: objnull, ?renderId: string, ?onError: ClientErrorHook): DisposalFunc = jsNative
 
     [<ImportMember(Spec.path)>]
     static member useHead(tag: HeadTag): unit = jsNative

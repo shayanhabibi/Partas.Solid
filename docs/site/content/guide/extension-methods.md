@@ -71,9 +71,10 @@ Gives you the DOM element once Solid has created it. `.ref` takes a variable, an
 callbacks, a `Ref` or an array of `Ref`s.
 
 ```fsharp solid render=FocusDemo jsx
+open Fable.Core.TS
 [<SolidComponent>]
 let FocusDemo () =
-    let mutable inputRef: Browser.Types.HTMLInputElement = JS.undefined
+    let mutable inputRef: Dom.HTMLInputElement = JS.undefined
 
     div () {
         input(placeholder = "Filled by the button").ref (inputRef)
@@ -84,7 +85,8 @@ let FocusDemo () =
 The same with a callback:
 
 ```fsharp
-div().ref (fun (el: Browser.Types.HTMLDivElement) -> JS.console.log el) { "..." }
+open Fable.Core.TS
+div().ref (fun (el: Dom.HTMLDivElement) -> JS.console.log el) { "..." }
 ```
 
 For HTML tags, the element type follows from the tag: `input().ref` takes an `HTMLInputElement`, `div().ref` an
@@ -128,10 +130,11 @@ stop function, and returning that from `onSettled` runs it when the component is
 plain option objects.
 
 ```fsharp solid render=TooltipDemo jsx
+open Fable.Core.TS
 [<SolidComponent>]
 let TooltipDemo () =
-    let mutable anchor: Browser.Types.HTMLButtonElement = JS.undefined
-    let mutable tip: Browser.Types.HTMLDivElement = JS.undefined
+    let mutable anchor: Dom.HTMLButtonElement = JS.undefined
+    let mutable tip: Dom.HTMLDivElement = JS.undefined
 
     let place () =
         // padding keeps the tooltip clear of the sticky navbar

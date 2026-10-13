@@ -83,8 +83,8 @@ type DataTable() =
 
         let ariaSortFor (key: SortKey) =
             match sortKey () with
-            | Some k when k = key -> if dir () = Asc then "ascending" else "descending"
-            | _ -> "none"
+            | Some k when k = key -> if dir () = Asc then Attr.AriaSort.Ascending else Attr.AriaSort.Descending
+            | _ -> Attr.AriaSort.None
 
         div (class' = "datatable") {
             input (

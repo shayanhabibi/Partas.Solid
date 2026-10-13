@@ -20,8 +20,8 @@ type Lib =
 
 open Partas.Solid
 open Fable.Core
-open Browser.Types
-
+open Fable.Core.TS.Dom
+open Fable.Core.TS
 module Spec =
     [<Literal>]
     let checkbox = "@kobalte/core/checkbox"

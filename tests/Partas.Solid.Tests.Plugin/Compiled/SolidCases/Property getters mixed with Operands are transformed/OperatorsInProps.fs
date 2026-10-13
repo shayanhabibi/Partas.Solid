@@ -2,9 +2,7 @@
 
 open Partas.Solid
 open Fable.Core
-open Browser.Types
-open Browser.Dom
-
+open Fable.Core.TS.Dom
 [<Erase>]
 type Lib =
     [<Import("twMerge", "tailwind-merge")>]
@@ -85,6 +83,8 @@ module sidebar =
 
 open sidebar
 open Fable.Core.JsInterop
+open Fable.Core.TS
+
 
 [<Erase>]
 type Sheet() =

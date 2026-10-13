@@ -33,7 +33,7 @@ let AriaAttrs () =
     button (
         class' = "aria",
         ariaLabel = "Close dialog",
-        ariaExpanded = "false",
+        ariaExpanded = false,
         ariaControls = "menu-1",
         ariaHidden = true
     ) {

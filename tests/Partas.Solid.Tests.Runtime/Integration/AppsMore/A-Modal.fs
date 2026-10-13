@@ -5,8 +5,8 @@ open Partas.Solid.Web
 open Partas.Solid.Aria
 open Fable.Core
 open Fable.Core.JsInterop
-open Browser.Types
-open Browser
+open Fable.Core.TS.Dom
+open Fable.Core.TS
 
 /// The dialog panel itself. It only exists while the modal is open, so its body is the
 /// "on open" hook: it listens for Escape on the document, focuses itself once mounted,
@@ -32,18 +32,20 @@ type DialogPanel() =
 
                 if ke.key = "Escape" then
                     props.onClose ()
+            |> unbox<EventListenerOrEventListenerObject>
 
-        document.addEventListener ("keydown", onDocKey)
+        (document :> EventTarget).addEventListener ("keydown", onDocKey)
 
         onSettled (fun () ->
             if not (isNull (box panelRef)) then
                 panelRef.focus ())
 
         onCleanup (fun () ->
-            document.removeEventListener ("keydown", onDocKey)
+            (document :> EventTarget).removeEventListener ("keydown", onDocKey)
 
-            if not (isNull previouslyFocused) then
-                (previouslyFocused :?> HTMLElement).focus ())
+            match previouslyFocused with
+            | Some el -> (unbox<HTMLElement> el).focus ()
+            | None -> ())
 
         div (
             class' = "backdrop",
@@ -54,7 +56,7 @@ type DialogPanel() =
                         props.onClose ()
         ) {
             div(
-                role = "dialog",
+                role = Partas.Solid.Attr.AriaRole.Dialog,
                 class' = "dialog",
                 ariaModal = true,
                 ariaLabelledBy = "modal-title",
