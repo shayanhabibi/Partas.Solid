@@ -63,7 +63,7 @@ component types above it.
 
 `createSignal` `createMemo` `createEffect` `createRenderEffect` `createTrackedEffect` `createReaction`
 `createRoot` `createStore` `createProjection` `createOptimistic` `createOptimisticStore`
-`createErrorBoundary` `createLoadingBoundary` `createRevealOrder` `createContext` `useContext`
+`createContext` `useContext` `isWrappable` `isEqual` `NotReadyError` `isHydrating`² `isHydratable`²
 `tryUseContext`¹ `children` `createUniqueId` `lazy'` `action` `affects` `deep` `snapshot` `merge` `omit`
 `reconcile` `refresh` `repeat` `resolve` `flatten` `flush` `latest` `isPending` `isDisposed` `untrack`
 `onCleanup` `onSettled` `getOwner` `getObserver` `runWithOwner` `enableExternalSource` `mapArray`
@@ -97,6 +97,14 @@ remain), and `NoHydrateContext` (now internal to [`hydration.ts:120`](../solid/p
 use the `NoHydration` component).
 
 ¹ Partas-only conveniences, not upstream names.
+² New in rc.14; their runtime tests wait for the rc.14 pin.
+
+**Obsolete.** `createErrorBoundary`, `createLoadingBoundary` and `createRevealOrder` are `@internal` from rc.14
+(`index.ts:129-134`). They still work, and are marked `[<Obsolete>]` in favour of `Errored`, `Loading` and `Reveal`.
+
+**Not bound, deliberately.** `sharedConfig` (internal; `solid-js/internal`), `materializeContainerTrace` (moved to
+`solid-js/internal/container-trace`), `enforceLoadingBoundary`, `getNextChildId` and `resetErrorHalt` (all
+`@internal`). `enableHydration` is public but only matters to custom renderers.
 
 **Gaps.** Nothing load-bearing, but these are genuinely exported and currently unbindable from F#:
 
@@ -109,15 +117,6 @@ use the `NoHydration` component).
 | `storePath` (removed from `solid-js` in rc.9) | [`store/index.ts:83`](../solid/packages/signals/src/store/index.ts#L83) | typed deep-path setters (`PathSetter`, `Part`, `StorePathRange`) | medium | The draft mutaters/new value returns are more idiomatic for F#; no reason to use this deprecated method |
 | `$PROXY` `$TRACK` (`$REFRESH` `$TARGET` no longer re-exported by `solid-js`) | [`index.ts:2-3`](../solid/packages/solid/src/index.ts#L2-L3) | store introspection symbols | low | Unless we can quickly identify whether something is a store, or get other information from some type, then this is not useful |
 
-| Missing                                          | Defined at | Why you'd want it | Priority |
-|--------------------------------------------------| --- | --- | --- |
-| `isWrappable` | [`store/index.ts:14`](../solid/packages/signals/src/store/index.ts#L14) | guard before `createStore`; already flagged `// todo - isWrappable` | medium |
-| `isEqual`                                        | [signals barrel `:20`](../solid/packages/signals/src/index.ts#L20) | default comparator, useful as an explicit `equals` argument | medium |
-| `NotReadyError`                                  | [signals barrel `:5`](../solid/packages/signals/src/index.ts#L5) | catchable async-suspend sentinel — needed to write correct error boundaries | medium |
-| `enforceLoadingBoundary`                         | [signals barrel `:29`](../solid/packages/signals/src/index.ts#L29) | used by upstream `render` itself ([`web/src/client.ts:323`](../solid/packages/web/src/client.ts#L323)) | low |
-| `sharedConfig` / `enableHydration`               | [`:196`](../solid/packages/solid/src/client/hydration.ts#L196) / [`:1327`](../solid/packages/solid/src/client/hydration.ts#L1327) | hydration control for custom renderers | low |
-| `materializeContainerTrace` | [`hydration.ts:911`](../solid/packages/solid/src/client/hydration.ts#L911) (exported at [`index.ts:120`](../solid/packages/solid/src/index.ts#L120)) | advanced hydration | low |
-| `getNextChildId`                                 | [signals barrel `:13`](../solid/packages/signals/src/index.ts#L13) | SSR id generation | low |
 
 **Deliberately not bound** (compiler-facing — the Babel/Partas plugin emits these, users never write them):
 `$DEVCOMP` and the `ssrHandleError` / `ssrScope` / `runInServerComponentScope` /
@@ -332,8 +331,7 @@ Flagging these so nobody burns time searching for them:
 1. ~~**Land the restored `failwith "redo"` cases**~~ — done ([§6](#6-plugin--tests--status)).
 2. ~~**`createOwner`**~~ — done (`Bindings.createOwner`); the owner/`runWithOwner` pair is now symmetric.
 3. **Component type aliases** (`Component` `ParentProps` `FlowProps` `Ref` …) — user-facing typing ergonomics.
-4. **`isWrappable` `isEqual` `NotReadyError`** + store path types (`storePath` itself is gone in rc.9) — small,
-   mechanical, removes the existing `// todo - isWrappable`.
+4. ~~**`isWrappable` `isEqual` `NotReadyError`**~~ — done, with `isHydrating`/`isHydratable` from rc.14.
 5. **Decide where SSR request/response plumbing lives** (web vs start bindings) before binding it.
 6. **Re-run the JSX diff against rc.9** ([§5](#5-jsx--dom-attribute-surface)) using
    [`solid/packages/web/jsx/jsx.d.ts`](../solid/packages/web/jsx/jsx.d.ts) — no extra submodule needed. Start with

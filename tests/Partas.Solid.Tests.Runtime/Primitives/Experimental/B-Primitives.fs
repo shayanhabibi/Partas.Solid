@@ -3,6 +3,9 @@ module Partas.Solid.Tests.Runtime.Primitives.Experimental.OwnerPrimitives
 open Partas.Solid
 open Fable.Core
 
+// createErrorBoundary is [<Obsolete>] (internal since solid-js rc.14); this suite still covers the binding.
+#nowarn "44"
+
 // ------------------------------------------------------------- signals
 
 /// Signal options through the ParamObject overload: a debug name and a case-insensitive comparator.

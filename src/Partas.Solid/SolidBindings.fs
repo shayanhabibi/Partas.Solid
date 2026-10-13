@@ -83,6 +83,15 @@ module Bindings =
     /// <summary>Rejection value of <c>until</c> when the predicate does not turn truthy within its <c>timeout</c>.</summary>
     [<Import("TimeoutError", "solid-js")>]
     type TimeoutError(?message: string) = inherit exn()
+    /// <summary>
+    /// Thrown by a read of a source that is still pending. <c>Loading</c> catches it and shows its fallback;
+    /// match on it (<c>:? NotReadyError</c>) in an error handler to tell "not loaded yet" from a real failure.
+    /// </summary>
+    [<Import("NotReadyError", "solid-js")>]
+    type NotReadyError(source: obj) =
+        inherit exn()
+        /// The pending source whose read threw.
+        member _.source: obj = jsNative
 
 
     module ErrorBoundary =
@@ -184,6 +193,11 @@ module Bindings =
         interface HtmlContainer
         [<Erase; DefaultValue>]
         val mutable fallback: HtmlElement
+        /// <summary>
+        /// A dependency, not a value: when it changes, the boundary shows its fallback again until the content
+        /// settles. Pass the tracked value itself (<c>on = route ()</c>), not an accessor. What it holds does not
+        /// matter, only that it changed.
+        /// </summary>
         [<Erase; DefaultValue>]
         val mutable on: objnull
 
@@ -741,6 +755,28 @@ type Bindings =
     static member flush<'T>(fn: unit -> 'T): 'T = jsNative
     [<ImportMember "solid-js">]
     static member isPending(fn: unit -> objnull): bool = jsNative
+    /// <summary>
+    /// The comparison signals and memos use when no <c>equals</c> is given: strict equality (<c>===</c>).
+    /// Pass it where an option takes an equality function and you want the default spelled out.
+    /// </summary>
+    [<ImportMember "solid-js">]
+    static member isEqual<'T>(a: 'T, b: 'T): bool = jsNative
+    /// <summary>
+    /// Whether the code is running while the page hydrates server-rendered HTML. Not reactive: read it where a
+    /// component or primitive is created, render what the server rendered while it is <c>true</c>, and switch to the
+    /// client-only value in <c>onSettled</c>.
+    /// </summary>
+    /// <remarks>Requires solid-js 2.0.0-rc.14 or later.</remarks>
+    [<ImportMember "solid-js">]
+    static member isHydrating(): bool = jsNative
+    /// <summary>
+    /// Whether the calling owner sits where hydration applies: not under <c>NoHydration</c>, or back under a nested
+    /// <c>Hydration</c>. <c>false</c> with no owner, so read it where the owner is known. For libraries that write
+    /// their own hydration values.
+    /// </summary>
+    /// <remarks>Requires solid-js 2.0.0-rc.14 or later.</remarks>
+    [<ImportMember "solid-js">]
+    static member isHydratable(): bool = jsNative
     [<ImportMember "solid-js">]
     static member latest<'T>(fn: unit -> 'T): 'T = jsNative
     [<ImportMember "solid-js">]
@@ -975,20 +1011,30 @@ type Bindings =
 
     [<ImportMember "solid-js">]
     static member deep<'T>(store: Store<'T>): 'T = jsNative
-    // todo - isWrappable
+    /// <summary>
+    /// Whether a store would wrap the value in a reactive proxy. Plain objects and arrays wrap; primitives, class
+    /// instances, DOM nodes and frozen objects are stored as they are.
+    /// </summary>
+    [<ImportMember "solid-js">]
+    static member isWrappable(value: objnull): bool = jsNative
 
     [<ImportMember "solid-js">]
     static member snapshot<'T>(item: Store<'T>): 'T = jsNative
     [<ImportMember "solid-js">]
     static member snapshot<'T>(item: Store<'T>, ?map: System.Collections.IDictionary, ?lookup: System.Collections.IDictionary): 'T = jsNative
 
+    // solid-js 2.0.0-rc.14 marks the boundary primitives @internal: application code uses the components.
     [<ImportMember "solid-js">]
+    [<Obsolete("Internal to solid-js since 2.0.0-rc.14. Use the Errored component.")>]
     static member createErrorBoundary<'T, 'U>(fn: unit -> 'T, fallback: Func<Accessor<objnull>, ResetFunc, 'U>): Accessor<U2<'T, 'U>> = jsNative
     [<ImportMember "solid-js"; ParamObject(2)>]
+    [<Obsolete("Internal to solid-js since 2.0.0-rc.14. Use the Loading component.")>]
     static member createLoadingBoundary<'T, 'U>(fn: unit -> 'T, fallback: unit -> 'U, ?on: unit -> objnull): Accessor<U2<'T, 'U>> = jsNative
     [<ImportMember "solid-js">]
+    [<Obsolete("Internal to solid-js since 2.0.0-rc.14. Use the Reveal component.")>]
     static member createRevealOrder<'T>(fn: unit -> 'T): 'T = jsNative
     [<ImportMember "solid-js"; ParamObject(1)>]
+    [<Obsolete("Internal to solid-js since 2.0.0-rc.14. Use the Reveal component.")>]
     static member createRevealOrder<'T>(fn: unit -> 'T, ?order: Accessor<Reveal.Order>, ?collapsed: Accessor<bool>): 'T = jsNative
     [<Import("mapArray","solid-js"); ParamObject(2)>]
     static member mapArray'<'Item, 'MappedItem>(list: Accessor<'Item array>, map: U3<Func<'Item, Accessor<int>, 'MappedItem>, Func<Accessor<'Item>, int, 'MappedItem>, Func<Accessor<'Item>, Accessor<int>, 'MappedItem>>, ?keyed: U2<bool, 'Item -> objnull>, ?fallback: Accessor<objnull>, ?name: string): Accessor<'MappedItem[]> = jsNative

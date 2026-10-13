@@ -276,6 +276,14 @@ The web runtime (`@solidjs/web`, formerly `solid-js/web`) now has its own file (
 `Bindings.render` / `renderToString` / `isServer` are no longer on the core `Bindings` type (`DEV` stays there) — update your
 `open`s accordingly.
 
+### New core bindings, and obsolete boundary primitives
+
+- `isWrappable`, `isEqual` and `NotReadyError` (match a pending read with `:? NotReadyError`). `isHydrating` and
+  `isHydratable` need solid-js 2.0.0-rc.14.
+- `createErrorBoundary`, `createLoadingBoundary` and `createRevealOrder` are internal to solid-js from rc.14 and now
+  `[<Obsolete>]`: use `Errored`, `Loading` and `Reveal`.
+- `Loading`'s `on` is a dependency: any change to it shows the fallback again. Pass the value, not an accessor.
+
 ### `Partas.Solid.Start` removed
 
 The SolidStart bindings (`SolidStartBindings.fs`, namespace `Partas.Solid.Start`) are gone. No SolidStart release
