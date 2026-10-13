@@ -141,8 +141,8 @@ wait for them.
 ## How it works
 
 `Workbench.fs` runs Fable's pipeline (type-check, `FSharp2Fable`, `FableTransforms`, `Fable2Babel`, print)
-with the same options the tests pass `dotnet fable`: `-c Release --optimize -e .fs.jsx --exclude
-Partas.Solid.FablePlugin`. Fable loads plugins through a `getPlugin` callback, which the workbench redirects to its
+with the same options the tests pass `dotnet fable`: `-c Release --optimize --typedArrays false -e .fs.jsx
+--exclude Partas.Solid.FablePlugin`. Fable loads plugins through a `getPlugin` callback, which the workbench redirects to its
 current copy of `Partas.Solid.FablePlugin`. `reloadPlugin` builds the plugin in Release and loads the result into a
 new collectible `AssemblyLoadContext`. That context resolves nothing itself, so the plugin shares Fable.AST and
 FSharp.Core with the session. Fable looks for `fable-library` next to its host process, which is SageFs here, so

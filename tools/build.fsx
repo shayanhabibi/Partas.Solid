@@ -189,11 +189,11 @@ rootCommandOfScript {
                 return stage "run scratch" {
                     if watch then
                         stage "watch" {
-                            run $"dotnet fable watch -o output --optimize -c Release -e {extension} --cwd {Repo.Project.ScratchTests.Directory} --exclude Partas.Solid.FablePlugin"
+                            run $"dotnet fable watch -o output --optimize --typedArrays false -c Release -e {extension} --cwd {Repo.Project.ScratchTests.Directory} --exclude Partas.Solid.FablePlugin"
                         }
                     else
                         stage "run" {
-                            run $"dotnet fable -o output --optimize -c Release -e {extension} --cwd {Repo.Project.ScratchTests.Directory} --exclude Partas.Solid.FablePlugin"
+                            run $"dotnet fable -o output --optimize --typedArrays false -c Release -e {extension} --cwd {Repo.Project.ScratchTests.Directory} --exclude Partas.Solid.FablePlugin"
                         }
                 }
             }

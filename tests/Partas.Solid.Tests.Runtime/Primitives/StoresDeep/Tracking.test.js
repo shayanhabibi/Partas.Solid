@@ -225,13 +225,14 @@ describe("array updates on the draft via ResizeArray / Array APIs", () => {
 });
 
 describe("F# array (int[]) fields", () => {
-    it("int[] compiles to an Int32Array, which Solid does not wrap: per-index writes are inert", () => {
-        // Fable emits numeric F# arrays as typed arrays; Solid 2's isWrappable rejects platform
-        // objects, so the array is stored raw. The write lands, but nothing is notified.
-        expect(h.state.scores).toBeInstanceOf(Int32Array);
-        expect(rerunsAfter(() => h.setScore(1, 21))).toEqual([]);
+    it("int[] is a plain array under --typedArrays false, so per-index writes notify", () => {
+        // With Fable's default, int[] would be an Int32Array, which Solid's isWrappable rejects: the
+        // write would land but notify nothing. The suites compile with --typedArrays false, as the docs
+        // recommend, so the store wraps the array and tracks each index.
+        expect(Array.isArray(h.state.scores)).toBe(true);
+        expect(rerunsAfter(() => h.setScore(1, 21))).toEqual(["score1"]);
         expect([...h.state.scores]).toEqual([10, 21, 30]);
-        expect(h.memos.score1()).toBe(20);
+        expect(h.memos.score1()).toBe(21);
     });
 
     it("Array.map produces a new array that replaces the field", () => {

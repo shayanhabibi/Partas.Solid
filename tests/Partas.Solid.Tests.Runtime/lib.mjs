@@ -33,6 +33,9 @@ export const FABLE_ARGS = [
     // Same as the plugin snapshot tests (tests/Partas.Solid.Tests.Plugin/Common.fs), so runtime tests
     // exercise the same JSX the snapshots pin.
     "--optimize",
+    // Plain JS arrays for numeric F# arrays, as the docs recommend: Solid's stores and most libraries expect them.
+    "--typedArrays",
+    "false",
     // Output next to the sources. Referenced projects (Partas.Solid) then land in <Suite>/Partas.Solid/
     // with a suite-local fable_modules, instead of being written next to the shared library sources
     // where every suite (and the snapshot tests) would overwrite each other's import paths.

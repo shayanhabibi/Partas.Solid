@@ -156,14 +156,14 @@ their npm dependencies for you. Bindings that target Solid 1.x will not work wit
 Pass these flags to Fable:
 
 ```bash
-dotnet fable -e .fs.jsx -c Release [--typedArrays false]
+dotnet fable -e .fs.jsx -c Release --typedArrays false
 ```
 
 | Flag | Why |
 | --- | --- |
 | `-e .fs.jsx` | The plugin emits JSX, so Fable must write files with a `.jsx` extension. The Solid compiler then reads them. |
 | `-c Release` | F# and Fable produce a different AST in Debug and Release. The plugin was built against the Release AST. Pass `-c Release` every time, including under `dotnet fable watch`, which otherwise compiles in Debug. |
-| `--typedArrays false` | Fable compiles numeric arrays to typed arrays, so an `int[]` becomes an `Int32Array`. Some libraries expect a plain array and break on typed arrays. Turn them off with this flag, or `box` the values (`[\| box 5 \|]`) where it matters. |
+| `--typedArrays false` | Without it, Fable compiles numeric arrays to typed arrays, so an `int[]` becomes an `Int32Array`. Solid's stores do not wrap typed arrays (`createStore [\| 1; 2 \|]` is not reactive per item), and libraries that expect a plain array can break on them. Partas.Solid is tested with this flag, so pass it. |
 
 :::note
 The Partas.SolidStart `dotnet new` templates (`bare-devtools`, `tailwind-devtools`, `solidbase-devtools`,

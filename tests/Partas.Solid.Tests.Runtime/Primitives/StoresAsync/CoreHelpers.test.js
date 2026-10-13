@@ -3,8 +3,8 @@ import {flush} from "../../helpers/index.js";
 import {wrappable, equality, makeNotReady} from "./E-CoreHelpers.fs.jsx";
 
 describe("isWrappable", () => {
-    it("wraps plain objects and arrays, and leaves typed arrays, primitives, null, class instances and frozen objects", () => {
-        expect(wrappable()).toEqual([true, true, false, false, false, false, false, false]);
+    it("wraps plain objects and arrays (numeric ones too, under --typedArrays false), and leaves primitives, null, class instances and frozen objects", () => {
+        expect(wrappable()).toEqual([true, true, true, false, false, false, false, false]);
     });
 });
 

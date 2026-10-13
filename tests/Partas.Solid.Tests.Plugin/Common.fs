@@ -17,7 +17,7 @@ let buildCases () =
     cli {
         Shell platformShell
         WorkingDirectory dir
-        Command "dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize"
+        Command "dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize --typedArrays false"
     }
     |> Command.execute
     |> fun output ->

@@ -110,7 +110,7 @@ Never weaken the assertion. When the bug is fixed, vitest reports the `it.fails`
 `tests/ScratchTests/` is a playground for checking the JSX of code that is not a test case yet. From inside it:
 
 ```bash
-dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize --watch
+dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize --typedArrays false --watch
 ```
 
 ### Workbench

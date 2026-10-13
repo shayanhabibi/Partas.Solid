@@ -231,7 +231,7 @@ let private copyFableLibrary (projDir: string) =
         Directory.CreateDirectory(Path.GetDirectoryName dest) |> ignore
         File.Copy(file, dest, true)
 
-/// What `dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize` passes: as
+/// What `dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize --typedArrays false` passes: as
 /// the snapshot tests run it, or with `-o .` as the runtime suites do (tests/Partas.Solid.Tests.Runtime/lib.mjs).
 /// Cracking with these options resets the project's fable_modules, as the CLI does.
 let private cliArgsFor (projFile: string) =
@@ -262,7 +262,8 @@ let private cliArgsFor (projFile: string) =
             define = [ "FABLE_COMPILER"; "FABLE_COMPILER_5"; "FABLE_COMPILER_JAVASCRIPT" ],
             debugMode = false,
             fileExtension = ".fs.jsx",
-            optimizeFSharpAst = true
+            optimizeFSharpAst = true,
+            typedArrays = false
         )
       Verbosity = Verbosity.Silent }
 

@@ -39,9 +39,10 @@ If your IDE cannot infer the types of `item` and `index`, the `yield` is probabl
 
 ## Typed arrays
 
-Fable compiles numeric arrays to typed arrays, so `[| 1; 2; 3 |]` becomes an `Int32Array`. JavaScript libraries that
-expect a plain array can fail on it. Compile with `--typedArrays false`, or `box` the values. See
-[Installation](installation.md).
+Without `--typedArrays false`, Fable compiles numeric arrays to typed arrays, so `[| 1; 2; 3 |]` becomes an
+`Int32Array`. Solid's stores leave typed arrays unwrapped, so their items are not reactive, and JavaScript libraries
+that expect a plain array can fail on them. Compile with `--typedArrays false`, as [Installation](installation.md)
+shows; Partas.Solid's own tests do.
 
 ## Compiling in Debug
 

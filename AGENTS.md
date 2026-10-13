@@ -99,7 +99,7 @@ After Expecto, `test` runs `node tests/Partas.Solid.Tests.Runtime/run.mjs all`, 
 `node_modules` is missing. It needs Node >= 22.12 on `PATH`.
 
 Format with `dotnet fantomas <files>` directly, and compile ScratchTests with `dotnet fable --exclude
-Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize [--watch]` inside `tests/ScratchTests/` (or `build.fsx test scratch`).
+Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize --typedArrays false [--watch]` inside `tests/ScratchTests/` (or `build.fsx test scratch`).
 
 ### Generated JSX attributes (`tools/JsxGen`)
 
@@ -158,7 +158,7 @@ dotnet run --project tests/Partas.Solid.Tests.Plugin/Partas.Solid.Tests.Plugin.f
 ```
 
 The test assembly first runs `buildCases()`, which shells out to
-`dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize` inside
+`dotnet fable --exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize --typedArrays false` inside
 `tests/Partas.Solid.Tests.Plugin/Compiled/`. That step must succeed or every test fails.
 
 Runtime tests (vitest) are run through `run.mjs` from `tests/Partas.Solid.Tests.Runtime/`:

@@ -9,7 +9,8 @@ open Fable.Core.JsInterop
 // ---------------------------------------------------------------------------------------------
 
 /// isWrappable over a plain object, an array, a numeric array, primitives, null, a class instance and a frozen
-/// object. Fable compiles `int[]` to an `Int32Array` (typed arrays are on by default), which a store does not wrap.
+/// object. The suites compile with `--typedArrays false`, so `int[]` is a plain array a store wraps; with Fable's
+/// default it would be an `Int32Array`, which a store leaves unwrapped.
 let wrappable () =
     [| isWrappable (createObj [ "a" ==> 1 ])
        isWrappable [| "a"; "b" |]

@@ -4,7 +4,7 @@ Runtime tests for Partas.Solid. The snapshot tests in `Partas.Solid.Tests.Plugin
 emits. These tests run that JSX and check what it does:
 
 1. **Fable + the Partas plugin** compile F# fixtures to `*.fs.jsx`. The flags match the snapshot tests
-   (`--exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize`), plus `-o .`.
+   (`--exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize --typedArrays false`), plus `-o .`.
 2. **The real Solid 2 JSX compiler** (`@solidjs/vite-plugin` → `@solidjs/compiler`, pinned to
    `2.0.0-rc.9`) turns that JSX into DOM code inside vitest.
 3. **vitest + jsdom** run specs that mount components and assert on the actual DOM and reactive behaviour.
