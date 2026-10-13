@@ -3047,20 +3047,20 @@ module HtmlAttributes =
             with set (_: string) = ()
             and [<Erase>] get (): string = unbox ()
 
-        [<Erase; LanguageInjection("jsx", Prefix = "<input max='", Suffix = "' >")>]
+        [<Erase>]
         member _.max
-            with set (_: string) = ()
-            and [<Erase>] get (): string = unbox ()
+            with set (_: U2<float, string>) = ()
+            and [<Erase>] get (): U2<float, string> = unbox ()
 
         [<Erase>]
         member _.maxlength
             with set (_: int) = ()
             and [<Erase>] get (): int = unbox ()
 
-        [<Erase; LanguageInjection("jsx", Prefix = "<input min='", Suffix = "' >")>]
+        [<Erase>]
         member _.min
-            with set (_: string) = ()
-            and [<Erase>] get (): string = unbox ()
+            with set (_: U2<float, string>) = ()
+            and [<Erase>] get (): U2<float, string> = unbox ()
 
         [<Erase>]
         member _.minlength
@@ -3122,10 +3122,10 @@ module HtmlAttributes =
             with set (_: string) = ()
             and [<Erase>] get (): string = unbox ()
 
-        [<Erase; LanguageInjection("jsx", Prefix = "<input step='", Suffix = "' >")>]
+        [<Erase>]
         member _.step
-            with set (_: string) = ()
-            and [<Erase>] get (): string = unbox ()
+            with set (_: U2<float, string>) = ()
+            and [<Erase>] get (): U2<float, string> = unbox ()
 
         [<Erase; LanguageInjection("jsx", Prefix = "<input type='", Suffix = "' >")>]
         member _.type'

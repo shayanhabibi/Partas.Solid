@@ -9,7 +9,7 @@ open Fable.Core.JsInterop
 let InputTypes () =
     div (class' = "types") {
         input (id = "t-text", type' = "text", value = "hello", placeholder = "p", maxlength = 8, minlength = 2, pattern = "[a-z]+", autocomplete = "off")
-        input (id = "t-num", type' = "number", value = "5", min = "0", max = "10", step = "0.5")
+        input (id = "t-num", type' = "number", value = "5", min = 0.0, max = 10.0, step = 0.5)
         input (id = "t-range", type' = "range", value = "30", min = "0", max = "200", step = "10")
         input(id = "t-date", type' = "date", value = "2024-03-15").attr("min", "2024-01-01").attr ("max", "2024-12-31")
         input (id = "t-email", type' = "email", value = "a@b.co", multiple = true)

@@ -344,7 +344,7 @@ supports Solid 2: every version, including the rc and beta tags, requires `solid
   `blocking`, `xmlns` on `a`/`script`/`style`/`title`, and the rest of rc.14's HTML attributes.
 - Removed, as rc.14 does not declare them: `color`, `media` on `<a>`, `hreflang` on `<area>`, `form` on `<label>`,
   `content` on `<template>`, `crossorigin` on `<input>`, and the `<meta>` attributes that were misfiled on
-  `MenuHTMLAttributes`. `<input>` `min`/`max` are now strings (they also take dates); `<meter>`/`<progress>` values
+  `MenuHTMLAttributes`. `<input>` `min`/`max`/`step` are `U2<float, string>` (`min = 0.5`, or a date such as `"2024-01-01"`); `<meter>`/`<progress>` values
   are `float`.
 
 ## 10. Toolchain

@@ -6,9 +6,9 @@
   "types": {
     "ElementAttributes.textContent": "string",
     "HTMLAttributes.innerText": "string",
-    "InputHTMLAttributes.min": "string",
-    "InputHTMLAttributes.max": "string",
-    "InputHTMLAttributes.step": "string",
+    "InputHTMLAttributes.min": "U2<float, string>",
+    "InputHTMLAttributes.max": "U2<float, string>",
+    "InputHTMLAttributes.step": "U2<float, string>",
     "InputHTMLAttributes.value": "string",
     "MeterHTMLAttributes.value": "float",
     "MeterHTMLAttributes.min": "float",
