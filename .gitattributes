@@ -1,0 +1,2 @@
+# ShipIt cannot read the front matter of a CRLF changelog: it drops it and restarts the version at 1.0.0.
+src/CHANGELOG.md text eol=lf
