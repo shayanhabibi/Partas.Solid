@@ -63,11 +63,13 @@ describe("key overloads (per-item key function)", () => {
 });
 
 describe("plain-value createOptimisticStore", () => {
-    it("an ambient optimistic write shows for one flush and then reverts", () =>
+    it("an ambient optimistic write (no action) is never shown", () =>
         using(makePlainOptimistic(), h => {
             h.edit("typing");
             flush();
-            expect(h.log).toEqual(["saved", "typing", "saved"]);
+            // solid-js rc.14, "lane contract 2": an optimistic write in a frame that does not park is as if it
+            // never happened. rc.9 showed it for one flush, then reverted.
+            expect(h.log).toEqual(["saved"]);
             expect(h.draft.text).toBe("saved");
         }));
 });

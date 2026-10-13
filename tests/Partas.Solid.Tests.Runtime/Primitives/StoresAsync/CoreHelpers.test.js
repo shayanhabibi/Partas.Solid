@@ -1,6 +1,6 @@
 import {describe, it, expect} from "vitest";
 import {flush} from "../../helpers/index.js";
-import {wrappable, equality, makeNotReady} from "./E-CoreHelpers.fs.jsx";
+import {wrappable, equality, makeNotReady, hydratableWithoutOwner, hydrationInRoot} from "./E-CoreHelpers.fs.jsx";
 
 describe("isWrappable", () => {
     it("wraps plain objects and arrays (numeric ones too, under --typedArrays false), and leaves primitives, null, class instances and frozen objects", () => {
@@ -43,5 +43,15 @@ describe("NotReadyError", () => {
         } finally {
             h.dispose();
         }
+    });
+});
+
+describe("isHydrating / isHydratable", () => {
+    it("isHydratable is false with no owner", () => {
+        expect(hydratableWithoutOwner()).toBe(false);
+    });
+
+    it("in a root during a client render: not hydrating, but hydratable", () => {
+        expect(hydrationInRoot()).toEqual([false, true]);
     });
 });

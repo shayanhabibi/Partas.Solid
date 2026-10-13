@@ -277,12 +277,13 @@ describe("mount { } (onSettled)", () => {
 });
 
 describe("cleanup { } (onCleanup)", () => {
-    it("runs nothing until dispose; children first, then own cleanups in registration order", () => {
+    it("runs nothing until dispose; children first, then own cleanups last-registered first", () => {
         const c = makeCleanup();
         flush();
         expect(c.log).toEqual([]);
         c.dispose();
-        expect(c.log).toEqual(["child", "first", "second", "third"]);
+        // solid-js rc.14: within one owner, later cleanups run first (LIFO, as in 1.x; MIGRATION.md, ownership).
+        expect(c.log).toEqual(["child", "third", "second", "first"]);
     });
 
     it("runs each cleanup exactly once", () => {

@@ -126,10 +126,11 @@ describe("owners", () => {
         expect(a.log.at(-1)).toBe("late-cleanup");
     });
 
-    it("dispose order: child roots (newest first), then own cleanups in registration order", () => {
+    it("dispose order: child roots (newest first), then own cleanups last-registered first", () => {
         const o = makeOrdering();
         o.dispose();
-        expect(o.log).toEqual(["child-b", "child-a", "parent-1", "parent-2"]);
+        // solid-js rc.14: within one owner, later cleanups run first (LIFO, as in 1.x; MIGRATION.md, ownership).
+        expect(o.log).toEqual(["child-b", "child-a", "parent-2", "parent-1"]);
     });
 
     it("a child root disposed early is not disposed again with its parent", () => {
@@ -137,7 +138,7 @@ describe("owners", () => {
         o.disposeFirstChild();
         expect(o.log).toEqual(["child-a"]);
         o.dispose();
-        expect(o.log).toEqual(["child-a", "child-b", "parent-1", "parent-2"]);
+        expect(o.log).toEqual(["child-a", "child-b", "parent-2", "parent-1"]);
     });
 
     it("disposing a child root stops only its effects; disposing the parent stops the rest", () => {

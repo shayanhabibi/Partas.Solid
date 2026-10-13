@@ -24,7 +24,7 @@ set up by `tools/workbench.fsx`) in `tools/`. `Partas.Solid.slnx`, `docs/` and t
 ## `solid/` — vendored upstream, NOT part of this project
 
 `solid/` is a **git submodule** of [`solidjs/solid`](https://github.com/solidjs/solid) (branch `next`), pinned at tag
-`solid-js@2.0.0-rc.9` (`9a29b1a0`). It is upstream TypeScript/JavaScript/Rust reference material, checked out purely so
+`solid-js@2.0.0-rc.14` (`8d23a5a1`). It is upstream TypeScript/JavaScript/Rust reference material, checked out purely so
 the Solid 2 API can be consulted while porting the bindings. **It is not built, tested, packaged, formatted, or shipped
 by anything in this repository, and no F# source depends on it.**
 
@@ -200,9 +200,9 @@ knowing:
 
 The snapshot tests pin *what* the plugin emits. The runtime tests check *what that output does*. F# fixtures are
 compiled by Fable and the plugin (same flags as the snapshots, plus `-o .`), then compiled again by the real Solid
-2 JSX compiler (`@solidjs/vite-plugin` / `@solidjs/compiler`, pinned to rc.9 with the other Solid packages in
+2 JSX compiler (`@solidjs/vite-plugin` / `@solidjs/compiler`, pinned to rc.14 with the other Solid packages in
 `package.json`). vitest runs the result in jsdom against the browser development build of `solid-js` and `@solidjs/web`.
-`README.md` there is the full guide. It covers the helpers and rc.9 scheduling: setters only queue a microtask, so
+`README.md` there is the full guide. It covers the helpers and Solid 2 scheduling: setters only queue a microtask, so
 call `flush()` or use `click`/`input`/`act` before you assert.
 
 Three suites, each its own Fable project (`<Suite>/Partas.Solid.Tests.Runtime.<Suite>.fsproj`, globbing `**\*.fs`):
@@ -223,7 +223,8 @@ Three suites, each its own Fable project (`<Suite>/Partas.Solid.Tests.Runtime.<S
 - **Known bugs are `it.fails`.** When runtime behaviour is wrong because of Partas.Solid, keep the correct assertion,
   mark the test `it.fails(...)`, and put `// BUG: <one line>` next to it. Never weaken the assertion. When the bug is
   fixed, vitest reports the `it.fails` as failing; change it to `it` then. `grep -rn "BUG:"` over the suites is
-  the current list of known defects.
+  the current list of known defects. A defect in Solid itself takes `// UPSTREAM: <one line>` instead, once the same
+  failure is reproduced with hand-written JSX; recheck those on every Solid bump.
 - `run.mjs` serialises Fable compiles across processes with `.compile-lock/`. It does not coordinate with a
   concurrent snapshot-test build, and both of them build `Partas.Solid` and the plugin.
 

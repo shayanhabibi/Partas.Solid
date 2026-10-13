@@ -11,7 +11,7 @@ Fable writes `.jsx` files, and a bundler such as Vite runs the Solid JSX compile
 a Node toolchain.
 
 :::warning
-These docs cover **Partas.Solid 3.0**, which targets **Solid 2.0.0-rc.9**.
+These docs cover **Partas.Solid 3.0**, which targets **Solid 2.0.0-rc.14**.
 
 **New releases are on a temporary NuGet feed.** The nuget.org account is inaccessible while NuGet support transfers
 package ownership, so new releases are published to **Cloudsmith**, under the same package IDs:
@@ -77,8 +77,8 @@ If you use Paket, add `nuget Partas.Solid 3.0.0` to `paket.dependencies` along w
 Solid 2 is a release candidate, so pin the exact versions Partas.Solid 3.0 is tested against:
 
 ```bash
-npm install solid-js@2.0.0-rc.9 @solidjs/web@2.0.0-rc.9
-npm install --save-dev vite@8.3.1 @solidjs/vite-plugin@3.0.0-next.44 @solidjs/compiler@2.0.0-rc.9 @solidjs/babel-plugin@2.0.0-rc.9
+npm install solid-js@2.0.0-rc.14 @solidjs/web@2.0.0-rc.14
+npm install --save-dev vite@8.3.1 @solidjs/vite-plugin@3.0.0-next.49 @solidjs/compiler@2.0.0-rc.14 @solidjs/babel-plugin@2.0.0-rc.14
 ```
 
 Or in `package.json`:
@@ -87,20 +87,20 @@ Or in `package.json`:
 {
   "type": "module",
   "dependencies": {
-    "@solidjs/web": "2.0.0-rc.9",
-    "solid-js": "2.0.0-rc.9"
+    "@solidjs/web": "2.0.0-rc.14",
+    "solid-js": "2.0.0-rc.14"
   },
   "devDependencies": {
-    "@solidjs/babel-plugin": "2.0.0-rc.9",
-    "@solidjs/compiler": "2.0.0-rc.9",
-    "@solidjs/vite-plugin": "3.0.0-next.44",
+    "@solidjs/babel-plugin": "2.0.0-rc.14",
+    "@solidjs/compiler": "2.0.0-rc.14",
+    "@solidjs/vite-plugin": "3.0.0-next.49",
     "vite": "8.3.1"
   },
   "overrides": {
-    "@solidjs/compiler": "2.0.0-rc.9",
-    "@solidjs/babel-plugin": "2.0.0-rc.9",
-    "solid-js": "2.0.0-rc.9",
-    "@solidjs/web": "2.0.0-rc.9"
+    "@solidjs/compiler": "2.0.0-rc.14",
+    "@solidjs/babel-plugin": "2.0.0-rc.14",
+    "solid-js": "2.0.0-rc.14",
+    "@solidjs/web": "2.0.0-rc.14"
   }
 }
 ```

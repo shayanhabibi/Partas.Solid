@@ -6,9 +6,9 @@ emits. These tests run that JSX and check what it does:
 1. **Fable + the Partas plugin** compile F# fixtures to `*.fs.jsx`. The flags match the snapshot tests
    (`--exclude Partas.Solid.FablePlugin --noCache -e .fs.jsx -c Release --optimize --typedArrays false`), plus `-o .`.
 2. **The real Solid 2 JSX compiler** (`@solidjs/vite-plugin` → `@solidjs/compiler`, pinned to
-   `2.0.0-rc.9`) turns that JSX into DOM code inside vitest.
+   `2.0.0-rc.14`) turns that JSX into DOM code inside vitest.
 3. **vitest + jsdom** run specs that mount components and assert on the actual DOM and reactive behaviour.
-   `solid-js` / `@solidjs/web` `2.0.0-rc.9` resolve to their **browser development** builds.
+   `solid-js` / `@solidjs/web` `2.0.0-rc.14` resolve to their **browser development** builds.
    `helpers/setup.js` fails every run that picks up the server or production build.
 
 ## What is covered
@@ -30,7 +30,7 @@ starts passing, which vitest reports as a failure. Change it to a plain `it` the
 
 ```
 tests/Partas.Solid.Tests.Runtime/
-  package.json, package-lock.json   exact pins: solid-js, @solidjs/web, @solidjs/compiler, @solidjs/babel-plugin 2.0.0-rc.9
+  package.json, package-lock.json   exact pins: solid-js, @solidjs/web, @solidjs/compiler, @solidjs/babel-plugin 2.0.0-rc.14
   vitest.config.mjs                 one config for all suites (jsdom, solid plugin over **/*.jsx, browser+development)
   run.mjs                           compile (with a cross-process lock) and then run vitest
   helpers/index.js                  mount, withRoot, flush, act, click, input, settle, waitFor, deferred, text
@@ -172,7 +172,7 @@ because the `-o .` output keeps each suite's generated library code inside the s
 | `deferred()` | `{ promise, resolve, reject }`, to drive async resolution deterministically. |
 | `text(el)` | `textContent` with whitespace collapsed. |
 
-### How Solid 2 (rc.9) schedules updates
+### How Solid 2 (rc.14) schedules updates
 
 This is why the helpers look the way they do. See `solid/packages/signals/src/core/scheduler.ts`:
 `schedule()`, `flush()`.
@@ -192,8 +192,8 @@ This is why the helpers look the way they do. See `solid/packages/signals/src/co
 
 - The fsproj files are also in `Partas.Solid.slnx` under `/Tests/`, so the IDE type-checks fixtures.
   `dotnet build` of them is only a type-check. Fable produces the JS.
-- The vite plugin is `@solidjs/vite-plugin@3.0.0-next.44`. Its default backend is the native
-  `@solidjs/compiler`. `package.json` `overrides` pin the compiler and babel plugin to `2.0.0-rc.9`. To
+- The vite plugin is `@solidjs/vite-plugin@3.0.0-next.49`. Its default backend is the native
+  `@solidjs/compiler`. `package.json` `overrides` pin the compiler and babel plugin to `2.0.0-rc.14`. To
   compare against the Babel backend, set `compiler: "babel"` in the plugin options in `vitest.config.mjs`.
 - Solid's dev template validator rejects any JSX child of `<template>`: it re-serialises the markup with an
   html5ever DOM that drops template contents. Fill a template in a fixture through `innerHTML` instead.

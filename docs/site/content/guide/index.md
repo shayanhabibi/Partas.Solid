@@ -24,7 +24,7 @@ let Counter () =
 The example above is live, compiled from this F# when the site was built.
 
 :::warning
-These docs are for **Partas.Solid 3.0 on Solid 2.0.0-rc.9**. 3.0 is published to a
+These docs are for **Partas.Solid 3.0 on Solid 2.0.0-rc.14**. 3.0 is published to a
 [temporary Cloudsmith feed](installation.md), not nuget.org. If you use Partas.Solid 2.x on Solid 1.9, read [Migrating to Solid 2](migrating-to-solid-2.md) for what changed.
 :::
 

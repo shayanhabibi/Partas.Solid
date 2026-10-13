@@ -10,7 +10,7 @@ The rest of these docs assume you know both a little.
 ## Introduction
 
 Partas.Solid is a plugin for Fable, the F# to JavaScript compiler. It turns F# into JSX for
-[Solid](https://www.solidjs.com/). Partas.Solid 3.0 targets Solid 2.0 (currently `2.0.0-rc.9`).
+[Solid](https://www.solidjs.com/). Partas.Solid 3.0 targets Solid 2.0 (currently `2.0.0-rc.14`).
 
 It has one overarching goal that sets it apart from other F# front-end libraries:
 

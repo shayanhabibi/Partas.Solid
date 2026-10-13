@@ -2,7 +2,7 @@
 title: Solid-JS
 ---
 
-This page covers the `solid-js` bindings in Partas.Solid 3.0, which target Solid 2.0 (`2.0.0-rc.9`).
+This page covers the `solid-js` bindings in Partas.Solid 3.0, which target Solid 2.0 (`2.0.0-rc.14`).
 The examples run live on the page.
 
 Solid 2.0 removed or renamed a large part of the 1.x API. If you are upgrading, read

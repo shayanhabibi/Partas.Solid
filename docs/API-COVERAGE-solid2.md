@@ -4,7 +4,7 @@ Working map for the `solid2rc` port: what the upstream surface **is**, where eac
 **bound**, and what is **left**. Companion to [`CHANGES-solid2.md`](CHANGES-solid2.md) (which records usage-level
 breaking changes); this file is the coverage ledger.
 
-All `solid/...` paths are the pinned submodule (`solidjs/solid` @ tag `solid-js@2.0.0-rc.9`, HEAD `9a29b1a0`).
+All `solid/...` paths are the pinned submodule (`solidjs/solid` @ tag `solid-js@2.0.0-rc.14`, HEAD `8d23a5a1`). Line anchors were taken at rc.9 and may have drifted.
 File references are relative links — they resolve in Rider's and VS Code's Markdown preview, and `Ctrl/Cmd+Click`
 jumps to the line. They will **not** resolve on GitHub for paths under `solid/`, since that is a submodule.
 

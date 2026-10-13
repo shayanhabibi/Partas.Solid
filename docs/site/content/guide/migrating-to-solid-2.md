@@ -2,7 +2,7 @@
 title: Migrating to Solid 2
 ---
 
-Partas.Solid 3.0 targets Solid 2.0 (`2.0.0-rc.9`); 2.x targeted Solid 1.9. Solid 2 renamed, removed or
+Partas.Solid 3.0 targets Solid 2.0 (`2.0.0-rc.14`); 2.x targeted Solid 1.9. Solid 2 renamed, removed or
 reworked much of its runtime API, so expect to touch every component that does more than render markup.
 Each section below shows the 2.x code and what replaces it. For the full 3.0 API, see
 [Solid-JS](../guide/solid-js.md).

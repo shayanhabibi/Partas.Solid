@@ -168,7 +168,7 @@ describe("createProjection", () => {
 });
 
 describe("createOptimistic / createOptimisticStore (ambient writes, no action)", () => {
-    it("an optimistic signal write outside an action is shown by the flush then reverted", () => {
+    it("an optimistic signal write outside an action is never shown", () => {
         const h = makeOptimisticSignal();
         try {
             flush();
@@ -176,21 +176,25 @@ describe("createOptimistic / createOptimisticStore (ambient writes, no action)",
             h.setValue(5);
             expect(h.value()).toBe(1);
             flush();
-            expect(h.log).toEqual([1, 5, 1]);
+            // solid-js rc.14, "lane contract 2": an optimistic write in a frame that does not park (no action in
+            // flight) is as if it never happened, so no reader sees it. rc.9 showed it for one flush, then reverted.
+            expect(h.log).toEqual([1]);
             expect(h.value()).toBe(1);
         } finally {
             h.dispose();
         }
     });
 
-    it("an optimistic store write outside an action is shown by the flush then reverted", () => {
+    it("an optimistic store write outside an action is never shown", () => {
         const h = makeOptimisticStore();
         try {
             flush();
             h.rename("Jake");
             expect(h.profile.name).toBe("John");
             flush();
-            expect(h.log).toEqual(["John", "Jake", "John"]);
+            // solid-js rc.14, "lane contract 2": an optimistic write in a frame that does not park (no action in
+            // flight) is as if it never happened, so no reader sees it. rc.9 showed it for one flush, then reverted.
+            expect(h.log).toEqual(["John"]);
             expect(h.profile.name).toBe("John");
         } finally {
             h.dispose();

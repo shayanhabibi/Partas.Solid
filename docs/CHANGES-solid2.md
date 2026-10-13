@@ -6,7 +6,7 @@ This branch retargets Partas.Solid from **solid-js 1.x to solid-js 2.0**. Solid 
 restructured a large part of its own runtime API, so most of what follows is that change surfacing through the
 bindings — it is not gratuitous churn. Expect to touch every non-trivial component.
 
-> **Status:** the branch is a release candidate built from `wip:` commits, tracking `solid-js` 2.0.0-rc.9. The
+> **Status:** the branch is a release candidate built from `wip:` commits, tracking `solid-js` 2.0.0-rc.14. The
 > plugin test inputs that were stubbed with `failwith "redo"` / `"REDO"` (`IndexedPropSpreading`,
 > `OperatorsInProps`, `SignalSetterInvoke`, `ThisArgTransforms`, `ExperimentalBuilders`) have been restored against
 > the Solid 2 API and their snapshots regenerated; all plugin cases pass.
@@ -275,6 +275,18 @@ The web runtime (`@solidjs/web`, formerly `solid-js/web`) now has its own file (
 
 `Bindings.render` / `renderToString` / `isServer` are no longer on the core `Bindings` type (`DEV` stays there) — update your
 `open`s accordingly.
+
+### Solid 2.0.0-rc.14
+
+Partas.Solid now tracks rc.14 (runtime tests, the `solid/` reference checkout, and the generated JSX surface).
+Behaviour that changed upstream between rc.9 and rc.14:
+
+- Cleanups within one owner run last-registered first (LIFO, as in Solid 1.x). Children are still disposed
+  before their parent's own cleanups.
+- An optimistic write outside an `action` is never shown. rc.9 showed it for one flush, then reverted it.
+- Known upstream regression: a `Portal` whose `mount` is a conditional expression throws
+  `PRIMITIVE_IN_EFFECT_CALLBACK` when the condition changes. It fails the same way in hand-written JSX.
+- Use `@solidjs/vite-plugin@3.0.0-next.49` or later: next.44 passes an option the rc.14 compiler rejects.
 
 ### New core bindings, and obsolete boundary primitives
 

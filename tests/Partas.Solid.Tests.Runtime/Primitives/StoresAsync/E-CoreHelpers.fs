@@ -61,3 +61,17 @@ let makeNotReady () : NotReadyHarness =
                 with :? NotReadyError as e ->
                     not (isNull e.source)
           dispose = dispose })
+
+// ---------------------------------------------------------------------------------------------
+// isHydrating, isHydratable (solid-js rc.14)
+// ---------------------------------------------------------------------------------------------
+
+/// isHydratable with no owner: there is no position for a hydration value to key to.
+let hydratableWithoutOwner () = isHydratable ()
+
+/// isHydrating and isHydratable read inside a root during a plain client render.
+let hydrationInRoot () =
+    createRoot (fun (dispose: unit -> unit) ->
+        let result = [| isHydrating (); isHydratable () |]
+        dispose ()
+        result)
