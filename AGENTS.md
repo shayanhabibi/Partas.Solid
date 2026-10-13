@@ -139,8 +139,8 @@ Partas.Solid does not reference `Fable.Browser.Dom`. DOM types come from `Xantha
 `Fable.Core` namespace. Its `globalThis` shadows the one Xantham's unreleased `TSExtensions` adds: when that ships, the
 binding can be deleted or left, as both are the same global. Its lookups return options (`getElementById`), and its
 `addEventListener` overloads are typed: call the string form through `EventTarget` with an
-`EventListenerOrEventListenerObject`. Opening `Fable.Core.TS.Dom` shadows Partas's `Attr` module (DOM has an `Attr`
-type), so qualify `Partas.Solid.Attr` there.
+`EventListenerOrEventListenerObject`. Write DOM types as `Dom.X` after `open Fable.Core.TS`, rather than opening `Fable.Core.TS.Dom`: DOM has an `Attr` type that would
+shadow Partas's `Attr` module, which keeps its name (as usual in F#, the qualified access is the fix).
 
 ### Releases (ShipIt)
 

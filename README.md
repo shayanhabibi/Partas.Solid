@@ -45,14 +45,16 @@
 > Public restores require **no account or API key**. Once ownership is restored, publishing will
 > return to nuget.org and this notice will be updated.
 
-Add the temporary source alongside nuget.org so dependencies can still be restored:
+Add the temporary source alongside nuget.org so dependencies can still be restored. Partas.Solid's DOM
+types come from `Xantham.Fable.Core.TS`, which is published on its own Cloudsmith feed, so add that too:
 
 ```shell
 dotnet nuget add source https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json --name partas-solid-temporary
+dotnet nuget add source https://nuget.cloudsmith.io/shayanhabibi/xantham/v3/index.json --name xantham
 ```
 
-For shared projects and CI, add that URL to the repository's `NuGet.Config` as well. If your
-configuration uses package source mapping, map `Partas.Solid*` to this source.
+For shared projects and CI, add those URLs to the repository's `NuGet.Config` as well. If your
+configuration uses package source mapping, map `Partas.Solid*` to the first and `Xantham.*` to the second.
 
 Package hosting is provided by [Cloudsmith](https://cloudsmith.com).
 

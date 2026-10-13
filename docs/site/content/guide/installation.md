@@ -40,13 +40,15 @@ dotnet tool install fable --version 5.13.0
 
 ### 2. Add the Cloudsmith feed
 
-Add a `nuget.config` next to your solution, keeping nuget.org for the dependencies:
+Partas.Solid's DOM types come from `Xantham.Fable.Core.TS`, which is published on its own Cloudsmith feed, so add both
+feeds. Add a `nuget.config` next to your solution, keeping nuget.org for the other dependencies:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
     <add key="partas-solid-temporary" value="https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json" />
+    <add key="xantham" value="https://nuget.cloudsmith.io/shayanhabibi/xantham/v3/index.json" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
 </configuration>
@@ -56,9 +58,11 @@ Or add it to your user configuration:
 
 ```bash
 dotnet nuget add source https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json --name partas-solid-temporary
+dotnet nuget add source https://nuget.cloudsmith.io/shayanhabibi/xantham/v3/index.json --name xantham
 ```
 
-If your configuration uses package source mapping, map `Partas.Solid*` to this source.
+If your configuration uses package source mapping, map `Partas.Solid*` to the first source and `Xantham.*` to the
+second.
 
 ### 3. Reference Partas.Solid
 
@@ -67,7 +71,8 @@ dotnet add package Partas.Solid --version 3.0.0
 ```
 
 If you use Paket, add `nuget Partas.Solid 3.0.0` to `paket.dependencies` along with
-`source https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json`, then run `paket install`.
+`source https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json` and `source https://nuget.cloudsmith.io/shayanhabibi/xantham/v3/index.json`, then run
+`paket install`.
 
 `Partas.Solid` brings in `Partas.Solid.FablePlugin`, `Fable.Core` 5.2.0, `Xantham.Fable.Core.TS` and `FSharp.Core` 10.
 
