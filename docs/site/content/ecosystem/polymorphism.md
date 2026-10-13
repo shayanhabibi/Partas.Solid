@@ -45,18 +45,14 @@ type Box() =
 let BoxAsButton () =
     let count, setCount = createSignal 0
     Box(class' = "boxed")
-        .as'(button (type' = "button", onClick = fun _ -> setCount (count () + 1))) {
+        .as'(button (type' = Attr.ButtonType.Button, onClick = fun _ -> setCount (count () + 1))) {
         $"Pressed {count ()} times"
     }
 ```
 
-The element passed to `.as'` becomes a function that spreads the parent's props onto the morph target:
-
-```jsx
-as={(PARTAS_POLYPROPS) => <button {...PARTAS_POLYPROPS} n$={false} type="button" onClick={...} />}
-```
-
-So the rendered `<button>` gets `Box`'s `class` and children, and keeps the `type` and `onClick` set on it.
+The JSX tab shows the element passed to `.as'` turned into a function, `(PARTAS_POLYPROPS) => <button
+{...PARTAS_POLYPROPS} ... />`, that spreads the parent's props onto the morph target. So the rendered `<button>` gets
+`Box`'s `class` and children, and keeps the `type` and `onClick` set on it.
 
 The morph target can be another component. Its own props arrive alongside the parent's:
 

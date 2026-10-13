@@ -14,8 +14,8 @@ let Icon = TagValue(Pill)
 let Icon = !@Pill
 ```
 
-`!@` is rewritten by the plugin, so it only works inside a `[<SolidComponent>]` or `[<SolidTypeComponent>]`. See
-[SolidComponent](solid-component-attribute.md) for what that means for code outside a component.
+`!@` is rewritten by the plugin, so it only works inside a `[<SolidComponent>]` or `[<SolidTypeComponent>]` (see
+[SolidComponent](solid-component-attribute.md#tag-values-need-a-plugin-scope)).
 
 A prop that holds a tag value has the type `TagValue`.
 
@@ -76,16 +76,16 @@ type Labelled() =
         }
 ```
 
-```fsharp solid
+```fsharp solid jsx
 div () {
     Labelled(label = "default wrapper")
     Labelled(label = "custom wrapper", wrapper = !@Shouty)
 }
 ```
 
-A tag value in a local binding works the same way, and renders as `<Pill title=...>`:
+A tag value in a local binding works the same way:
 
-```fsharp
+```fsharp solid render=LocalTag jsx
 [<SolidComponent>]
 let LocalTag () =
     let Wrapper = !@Pill
@@ -105,7 +105,7 @@ exist at runtime.
 To let the caller choose between HTML tags, or to pick a tag from a signal, use `Dynamic` from `Partas.Solid.Web`.
 It takes the tag name as a string:
 
-```fsharp solid render=HeadingLevels
+```fsharp solid render=HeadingLevels jsx
 open Partas.Solid.Web
 
 [<SolidComponent>]

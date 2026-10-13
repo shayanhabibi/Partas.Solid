@@ -2,434 +2,206 @@
 title: Solid Router
 ---
 
-Bindings for [`@solidjs/router`](https://docs.solidjs.com/solid-router/). They live in the `Partas.Solid.Router`
-namespace, which ships inside the `Partas.Solid` package.
+Bindings for [`@solidjs/router`](https://github.com/solidjs/solid-router) 2, in the `Partas.Solid.Router` namespace of
+the `Partas.Solid` package. Install the npm package yourself:
+
+```bash
+npm install @solidjs/router@2.0.0-next.38
+```
+
+The Solid 2 router is configured, not composed. There are no `Router`, `Route` or `A` components: you declare the
+route tree as data, create the router once, and render the router it returns. Links are plain `a` elements.
+
+## Routes and the router
+
+`route` declares a route. Its component is a component that takes `RouteSectionProps`, or `unit`, such as a
+`[<SolidComponent>]` let binding. `createRouter` takes the tree and returns the router.
 
 ```fsharp
 open Partas.Solid
 open Partas.Solid.Router
-```
 
-Partas.Solid does not install the npm package:
-
-```bash
-npm install @solidjs/router
-```
-
-:::warning
-These bindings were written for `@solidjs/router` on Solid 1.x and carried over to Partas.Solid 3.0 unchanged. Only
-the plugin's output for `Router` and `Route` is tested; nothing checks the bindings against a Solid 2 build of the
-router. Treat every signature on this page as unverified on Solid 2, and check the router's own docs for the release
-you install.
-:::
-
-## An example
-
-```fsharp
 [<SolidComponent>]
 let Home () = h1 () { "Home" }
 
 [<SolidComponent>]
-let About () = h1 () { "About" }
-
-[<Erase>]
-type Layout() =
-    inherit div()
-
-    [<SolidTypeComponent>]
-    member props.View =
-        div () {
-            nav () {
-                A(href = "/") { "Home" }
-                A(href = "/about", activeClass = "active") { "About" }
-            }
-            props.children
-        }
+let User (props: RouteSectionProps) =
+    h1 () { "User " + (props.``params``["id"] |> Option.defaultValue "") }
 
 [<SolidComponent>]
+let Users (props: RouteSectionProps) =
+    section () {
+        h2 () { "Users" }
+        props.children
+    }
+
+let Router =
+    createRouter (
+        RouterConfig(
+            [| route ("/", Home)
+               route ("/users", Users, children = [| route ("/:id", User, matchFilters = {| id = intFilter |}) |])
+               route ("*404", Home) |]
+        )
+    )
+```
+
+Create the router at module level, and give it a capitalised name, in a capitalised module: the router is the component
+you render, and the Solid compiler treats a lowercase tag as an HTML element. The plugin reports a lowercase one as an
+error.
+
+A parent with a component wraps its children, which render where it places `props.children`. `routePaths` matches
+several paths with one route, and `routeGroup` groups children under a path without a component of its own.
+
+| `route` argument | |
+| --- | --- |
+| `path` | The path. `:id` is a parameter, `:id?` an optional one, `*rest` the remainder of the path |
+| `component` | The component to render |
+| `children` | Nested routes |
+| `preload` | Runs on navigation and link preloading. Its result reaches the component as `props.data` |
+| `matchFilters` | An object of filters per parameter. `intFilter` accepts integers, an array lists the allowed values |
+| `info` | Metadata, read back through `useRouteMatches` |
+
+`RouterConfig` takes the routes, then `history` (`browserHistory ()` by default, `hashHistory ()`, or
+`memoryHistory "/start"` for tests), `base`, `preload`, `links`, `preloadLinks` and the router's other options.
+
+## Rendering the router
+
+`Router.render ()` renders the matched route. To keep a layout mounted around it, render the router with a
+`RouterRoot`, whose child lambda receives the matched content as `props.children`:
+
+```fsharp
+[<SolidComponent>]
 let App () =
-    Router(root = !@Layout) {
-        Route(path = "/", component' = !@Home)
-        Route(path = "/about", component' = !@About)
+    Router % RouterRoot() {
+        yield fun props ->
+            div () {
+                nav () {
+                    a (href = "/") { "Home" }
+                    a (href = "/users/1") { "User 1" }
+                }
+                main () { props.children }
+            }
     }
 ```
 
-A `Route` can hold nested `Route`s. `component'` and `root` take a `TagValue`: use `!@Component` to pass a component
-rather than call it. The router passes the matched route to `root` as `children`, which is why `Layout` is a type
-component that inherits `div`. Like every `[<SolidTypeComponent>]`, `Layout` must be declared in a namespace or module
-whose name starts with `Partas.Solid` (see [SolidTypeComponent](solid-type-attribute.md)).
-
-What the plugin emits for `Router () { Route () }`:
-
 ```jsx
-import { Route, Router } from "@solidjs/router";
-
-<Router>
-    <Route />
-</Router>
+export function App() {
+    return <Router>
+        {(props) => <div>
+            <nav>
+                <a href="/">
+                    Home
+                </a>
+                <a href="/users/1">
+                    User 1
+                </a>
+            </nav>
+            <main>
+                {props.children}
+            </main>
+        </div>}
+    </Router>;
+}
 ```
 
-## Components
+The hooks below read the router's context, so call them in a component rendered under the router: a route, or a
+component inside the root layout. `App` itself is outside it.
 
-### Router
+## Links
 
-```fsharp
-type Router() = interface HtmlElement
-```
+The router handles clicks on any same-origin `a`. Anchor attributes change how it navigates:
 
-| Property | Type |
+| Attribute | |
 | --- | --- |
-| `root` | `TagValue` |
-| `base'` | `string` |
-| `actionBase` | `string` |
-| `preload` | `bool` |
-| `explicitLinks` | `bool` |
-| `url` | `string` |
+| `replace = true` | Replace the history entry instead of pushing one |
+| `noscroll = true` | Do not scroll to the top |
+| `state = "..."` | A JSON string, pushed as `location.state` |
+| `preload = "false"` | Never preload this link. `"viewport"` or `"eager"` opts it into that strategy |
+| `link = true` | Marks a router link when `explicitLinks = true` |
 
-The body accepts `Route` children, or a `RootConfig[]` for config-based routing.
+The router marks links for CSS: `aria-current="page"` on an exact match, `data-active` on the link's path and the paths
+under it, and `data-pending` on the target of an in-flight navigation when the router is created with
+`links = pendingLinks`. `useLinkState` gives the same state to code.
 
-### HashRouter
+Link preloading is off by default. Turn it on with `preloadLinks = [| intentPreload () |]` (hover, focus and touch),
+`tapPreload ()`, `viewportPreload ()` or `eagerPreload ()`.
 
-```fsharp
-type HashRouter() = inherit Router()
-```
+`Router.paths` builds URLs from the route tree: `Router.paths["users"].Invoke(2).href` is `"/users/2"`.
 
-Same properties as `Router`.
+## Hooks
 
-### MemoryRouter
-
-```fsharp
-type MemoryRouter() = inherit Router()
-```
-
-Adds `history: MemoryHistory`. Create one with `createMemoryHistory ()`.
-
-### MemoryHistory
-
-```fsharp
-member get(): string
-member set(value: string, ?scroll: bool, ?replace: bool): unit   // emitted as one options object
-member back()
-member forward()
-member go(n: int): unit
-member listen(listener: string -> unit): unit -> unit
-```
-
-`listen` returns the function that removes the listener.
-
-### Route
-
-```fsharp
-type Route() = interface HtmlElement
-```
-
-| Property | Type | Notes |
-| --- | --- | --- |
-| `path` | `string` | |
-| `paths` | `string array` | Sets `path` to an array of paths. |
-| `component'` | `TagValue` | |
-| `matchFilters` | `obj` | |
-| `preload` | `RoutePreloadFunc` | |
-
-### RootConfig
-
-```fsharp
-[<Pojo>]
-type RootConfig(path: string, ``component``: HtmlElement)
-```
-
-`component'` is an alias for ``` ``component`` ```.
-
-### A
-
-```fsharp
-type A() = interface RegularNode
-```
-
-| Property | Type |
+| Hook | Returns |
 | --- | --- |
-| `href` | `string` |
-| `noScroll` | `bool` |
-| `replace` | `bool` |
-| `state` | `obj` |
-| `activeClass` | `string` |
-| `inactiveClass` | `string` |
-| `end'` | `bool` |
-
-### Navigate
-
-```fsharp
-type Navigate() = interface RegularNode
-```
-
-Properties: `href: string`, `state: obj`.
-
-## Navigation
-
-### useNavigate
-
-```fsharp
-useNavigate(): Navigator
-```
-
-`Navigator` has three ways to call it:
-
-```fsharp
-abstract Invoke: ``to``: string * ?options: NavigateOptions -> unit
-abstract InvokeOptions: ``to``: string * ?resolve: bool * ?replace: bool * ?scroll: bool * ?state: obj -> unit
-abstract Invoke: delta: float -> unit
-```
-
-`InvokeOptions` builds the options object for you, so you do not need a `NavigateOptions`:
-
-```fsharp
-let navigate = useNavigate ()
-navigate.InvokeOptions ("/login", replace = true)
-navigate.Invoke(-1.)
-```
-
-`NavigateOptions` is a `[<Pojo>]` with the optional arguments `resolve`, `replace`, `scroll` and `state`.
-
-### useLocation
-
-```fsharp
-useLocation(): Location
-```
-
-```fsharp
-type Path =
-    abstract pathname: string
-    abstract search: string
-    abstract hash: string
-
-type Location =
-    inherit Path
-    abstract query: obj
-    abstract state: obj option
-    abstract key: string
-```
-
-### useParams
-
-```fsharp
-useParams(): obj
-```
-
-### useSearchParams
-
-```fsharp
-useSearchParams(): Signal<obj>
-```
-
-See [Solid-js](solid-js.md) for `Signal<'T>`.
-
-### useIsRouting
-
-```fsharp
-useIsRouting(): unit -> bool
-```
-
-### useMatch
-
-```fsharp
-useMatch(fn: unit -> string, ?matchFilters: obj): unit -> bool
-```
-
-### useBeforeLeave
-
-```fsharp
-useBeforeLeave(listener: BeforeLeaveEventArgs -> unit): unit
-```
-
-```fsharp
-type BeforeLeaveEventArgs =
-    abstract from: Location
-    abstract ``to``: U2<string, float>
-    abstract options: NavigateOptions option
-    abstract defaultPrevented: bool
-    abstract preventDefault: unit -> unit
-    abstract retry: ?force: bool -> unit
-```
-
-### useCurrentMatches
-
-```fsharp
-useCurrentMatches(): unit -> RouteMatch[]
-```
-
-```fsharp
-type PathMatch =
-    abstract ``params``: obj
-    abstract path: string
-
-type RouteMatch =
-    inherit PathMatch
-    abstract route: RouteDescription
-
-type RouteDescription =
-    abstract key: obj
-    abstract originalPath: string
-    abstract pattern: string
-    abstract preload: RoutePreloadFunc option
-    abstract matcher: (string -> PathMatch option)
-    abstract matchFilters: obj option
-    abstract info: obj option
-```
-
-### usePreloadRoute
-
-```fsharp
-usePreloadRoute(): (string -> PreloadData) -> unit
-```
-
-`PreloadData` is a `[<Pojo>]` with one field, `preloadData: bool`.
-
-:::warning
-This return type does not match the router, whose `usePreloadRoute` returns a function taking a URL and an options
-object. As bound, you cannot call the result with a path. Use `Fable.Core.JsInterop` until the binding is fixed.
-:::
-
-## Preloading
-
-```fsharp
-type RoutePreloadFunc = RoutePreloadFuncArgs -> unit
-
-type RoutePreloadFuncArgs =
-    abstract ``params``: obj
-    abstract location: Location
-    abstract intent: Intent
-```
-
-`Intent` is a `[<StringEnum>]` with `[<RequireQualifiedAccess>]`: `Intent.Initial`, `Intent.Native`,
-`Intent.Navigate`, `Intent.Preload`.
+| `useParams ()` | The route's parameters: `ps["id"]` is a `string option` |
+| `useNavigate ()` | `navigate.Invoke "/path"`, `navigate.Invoke("/path", NavigateOptions(replace = true))`, `navigate.Invoke -1` |
+| `useLocation ()` | The reactive location: `pathname`, `search`, `hash`, `query`, `state` |
+| `useSearchParams ()` | The query string, and a setter that merges keys: `setSearch.Invoke {| page = 2 |}` |
+| `useIsRouting ()` | `true` while a navigation settles |
+| `useMatch (fun () -> "/users/:id")` | The match of a pattern against the location, or `None` |
+| `useRouteMatches ()` | The routes matching the location, outermost first |
+| `useLinkState (fun () -> "/users")` | `active`, `current` and `pending` for a link |
+| `useBeforeLeave listener` | Runs before leaving the route; `e.preventDefault ()` blocks the navigation |
+| `usePreloadRoute ()` | Preloads a route by hand |
 
 ## Data
 
-### query
+`query` caches a fetching function under a key. Read it with Solid's own primitives: the router has no async wrapper of
+its own in Solid 2.
 
 ```fsharp
-query<'Input, 'Output>(fn: 'Input -> 'Output, ?name: string): 'Input -> 'Output
-query'<'Input, 'Output>(fn: 'Input -> 'Output, ?name: string): Query<'Input, 'Output>
+let getUser = query ((fun (id: string) -> fetchUser id), "user")
+
+[<SolidComponent>]
+let UserName (props: RouteSectionProps) =
+    let user = createMemo (fun (_: User option) -> getUser.Invoke(props.``params``["id"].Value))
+    Loading (fallback = p () { "Loading" }) { h1 () { user().name } }
 ```
 
-`query` hands back a plain F# function. `query'` hands back a `Query`, which exposes the cache key:
+`getUser.key` and `getUser.keyFor id` name its cache entries for `revalidate`. Pass several values as a tuple or a
+record.
+
+`liveQuery` is a query over a stream: its function returns an async iterable that yields the current value, then each
+change. Every caller with the same argument shares one connection, and a memo holds the latest value. F# has no async
+generators, so a producer usually wraps a JavaScript stream, such as an `EventSource`:
 
 ```fsharp
-type Query<'Input, 'Output> =
-    abstract Invoke: 'Input -> 'Output
-    abstract key: string
-    abstract keyFor: 'Input -> string
+let roomMessages: LiveQuery<string, string> = liveQuery (subscribeToRoom, "messages")
+
+[<SolidComponent>]
+let Room (props: RouteSectionProps) =
+    let latest = createMemo (fun (_: string option) -> roomMessages.Invoke(props.``params``["room"].Value))
+    Loading (fallback = p () { "Connecting" }) { p () { latest () } }
 ```
 
-If you used `query`, the extension members `.key` and `.keyFor value` on the returned function do the same thing.
+`roomMessages.status room` reads the connection state (`LiveQueryStatus`) reactively, and `revalidate` with its key
+reconnects it.
 
-### revalidate
+`action` is a mutation with a URL. A form posts its `FormData` to it, and `useAction` calls it directly. Settled
+submissions are listed by `useSubmissions`. In-flight and optimistic state belongs to Solid's optimistic primitives,
+fed by the action's `onSubmit` hook.
 
 ```fsharp
-revalidate(key: string, ?force: bool): unit
+let saveTitle =
+    action ((fun (id: int) (data: obj) -> save id (unbox<string> (data?get "title"))), "save-title")
+
+[<SolidComponent>]
+let Editor () =
+    form (action = (saveTitle.with' 3).url, method = Attr.Method.Post) {
+        input (name = "title")
+        button (type' = Attr.ButtonType.Submit) { "Save" }
+    }
 ```
 
-### createAsync
-
-```fsharp
-createAsync<'T>(
-    fn: 'T option -> Promise<'T>,
-    ?name: string,
-    ?initialValue: 'T,
-    ?deferStream: bool,
-    ?onHydrated: unit -> unit,
-    ?ssrLoadFrom: string,
-    ?storage: unit -> Signal<'T>
-    ): Accessor<'T>
-```
-
-`createAsyncWithLatest` takes the same arguments and returns an `AsyncAccessor<'T>`, which adds `latest: 'T`. On a
-plain accessor the `.latest` extension member reads the same field.
-
-### createAsyncStore
-
-```fsharp
-createAsyncStore<'T>(
-    fn: 'T option -> Promise<'T>,
-    ?name: string,
-    ?initialValue: 'T,
-    ?deferStream: bool,
-    ?reconcile: obj,
-    ?onHydrated: unit -> unit,
-    ?ssrLoadFrom: string
-    ): Accessor<'T>
-```
-
-`createAsyncStoreWithLatest` is the `AsyncAccessor<'T>` form.
-
-:::warning
-The router takes these options as one object: `createAsync(fn, { name, initialValue, ... })`. The bindings do not
-mark the optional arguments as an options object, so Fable passes them positionally. Pass only `fn` until this is
-fixed.
-:::
-
-:::note
-Solid 2 removed `createResource`. In core Solid, async data now comes from `createMemo` or `createStore` given an async
-function, with `Loading` and `isPending` to show progress. See [Migrating to Solid 2](migrating-to-solid-2.md#createresource).
-:::
-
-## Actions
-
-:::note
-`solid-js` 2.0 has its own `action`, bound on `Partas.Solid.Bindings`. With both `Partas.Solid` and
-`Partas.Solid.Router` open, both are in scope under the same name. Qualify the one you mean:
-`Partas.Solid.Router.Bindings.action`.
-:::
-
-### action
-
-Actions only work with `POST` requests.
-
-```fsharp
-action<'Input, 'Output>(
-    handler: 'Input -> Promise<'Output>,
-    ?name: string,
-    ?onComplete: Submission<'Input, 'Output> -> unit
-    ): SolidAction<'Input, 'Output>
-```
-
-`name` and `onComplete` are passed as one options object.
-
-```fsharp
-type SolidAction<'Input, 'Result> =
-    abstract url: string
-    abstract with': 'Input -> string
-```
-
-### useAction
-
-```fsharp
-useAction<'Input, 'Result>(action: SolidAction<'Input, 'Result>): 'Input -> 'Result
-```
-
-This avoids `FormData`, but needs client-side JavaScript, so it is not progressively enhanced the way a form is.
-
-### useSubmission, useSubmissions
-
-```fsharp
-useSubmission<'Input>(action: SolidAction<'Input, unit>, ?filter: 'Input -> bool): Submission<'Input, unit>
-useSubmissions<'Input>(action: SolidAction<'Input, unit>, ?filter: 'Input -> bool): Submission<'Input, unit>[]
-```
-
-```fsharp
-type Submission<'Input, 'Result> =
-    abstract input: 'Input
-    abstract result: 'Result option
-    abstract error: obj
-    abstract pending: bool
-    abstract url: string
-    abstract clear: (unit -> unit)
-    abstract retry: (unit -> unit)
-```
-
-Do not use the `.pending` extension member on an array of submissions: it has no implementation and always returns
-`undefined`. Use `Array.exists _.pending`.
+`with'` binds an action's first argument, in place of a hidden form field. An action that is not a server function
+needs a stable name, the second argument of `action`.
 
 ## Not bound
 
-`preload`, `json`, `redirect` and `reload` are not bound. Import them with `Fable.Core.JsInterop.import`.
+- **Deferred until Partas.Solid has a server-functions story:** server rendering helpers (`@solidjs/router/server`)
+  and server component routes. They consume `"use server"` functions, which nothing in Partas.Solid produces yet.
+- **Deferred until there is a design for F# route files:** file-system routes (`@solidjs/router/fs`).
+- **Not bound yet:** the `query` cache helpers (`get`, `set`, `clear`), lazy route subtrees and
+  `RouterContext`. Until then, bind one yourself with `[<Import>]`.
+- **Not needed:** `defineRoute` and `defineRoutes` only add TypeScript types.
+
+The 2.x router bindings, for Solid 1.9, are documented on the [2.x site](https://partas-solid.vercel.app/partas-solid).

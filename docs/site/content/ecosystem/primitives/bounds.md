@@ -8,21 +8,17 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 
 Bindings for `@solid-primitives/bounds`.
 
-## ElementBounds
+```fsharp
+let createElementBounds(
+    target: #HTMLElement | Accessor<#HTMLElement>,
+    ?trackScroll: bool,
+    ?trackMutation: bool,
+    ?trackResize: bool
+    ): ElementBounds
+```
 
-Type: `interface`
-
-- width: `int`
-- height: `int`
-- top: `int`
-- left: `int`
-- right: `int`
-- bottom: `int`
-
-## Bindings
-
-`createElementBounds` returns a reactive, store-like object with the element's position on the screen and its size.
-All three kinds of tracking are on by default; set the ones you don't need to `false`.
+Returns a reactive, store-like object with the element's position on the screen and its size. All three kinds of
+tracking are on by default; set the ones you don't need to `false`.
 
 | Parameter | Listens to |
 | --- | --- |
@@ -30,47 +26,6 @@ All three kinds of tracking are on by default; set the ones you don't need to `f
 | `trackMutation` | Changes to the DOM structure and styles |
 | `trackResize` | The element's resize events |
 
-:::details Bindings
-```fsharp
-[<Erase; AutoOpen>]
-type Bounds =
-    /// <summary>
-    /// Creates a reactive store-like object of current element bounds — position on the screen, and size dimensions. Bounds will be automatically updated on scroll, resize events and updates to the DOM.
-    /// </summary>
-    /// <param name="target">Ref or reactive ref element</param>
-    /// <param name="trackScroll">Listen to window scroll events</param>
-    /// <param name="trackMutation">Listen to changes to the dom structure/styles</param>
-    /// <param name="trackResize">Listen to changes to the element's resize events</param>
-    /// <remarks>All options are 'truthy' by default</remarks>
-    [<ImportMember(path); ParamObject(1)>]
-    static member createElementBounds(target: #HTMLElement,
-                                      ?trackScroll: bool,
-                                      ?trackMutation: bool,
-                                      ?trackResize: bool): ElementBounds = jsNative
-    /// <summary>
-    /// Creates a reactive store-like object of current element bounds — position on the screen, and size dimensions. Bounds will be automatically updated on scroll, resize events and updates to the DOM.
-    /// </summary>
-    /// <param name="target">Ref or reactive ref element</param>
-    [<ImportMember(path)>]
-    static member createElementBounds(target: #HTMLElement): ElementBounds = jsNative
-    /// <summary>
-    /// Creates a reactive store-like object of current element bounds — position on the screen, and size dimensions. Bounds will be automatically updated on scroll, resize events and updates to the DOM.
-    /// </summary>
-    /// <param name="target">Ref or reactive ref element</param>
-    /// <param name="trackScroll">Listen to window scroll events</param>
-    /// <param name="trackMutation">Listen to changes to the dom structure/styles</param>
-    /// <param name="trackResize">Listen to changes to the element's resize events</param>
-    /// <remarks>All options are 'truthy' by default</remarks>
-    [<ImportMember(path); ParamObject(1)>]
-    static member createElementBounds(target: Accessor<#HTMLElement>,
-                                      ?trackScroll: bool,
-                                      ?trackMutation: bool,
-                                      ?trackResize: bool): ElementBounds = jsNative
-    /// <summary>
-    /// Creates a reactive store-like object of current element bounds — position on the screen, and size dimensions. Bounds will be automatically updated on scroll, resize events and updates to the DOM.
-    /// </summary>
-    /// <param name="target">Ref or reactive ref element</param>
-    [<ImportMember(path)>]
-    static member createElementBounds(target: Accessor<#HTMLElement>): ElementBounds = jsNative
-```
-:::
+## ElementBounds
+
+An interface with `width`, `height`, `top`, `left`, `right` and `bottom`, each an `int`.

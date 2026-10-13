@@ -19,7 +19,7 @@ plugin where to import it from.
   of the `solid-js` flow components.
 - `[<PartasImport("Name", "path")>]` comes from `Partas.Solid`. Fable sees an ordinary local type, and the plugin adds
   the import when it turns a constructor call into a JSX tag. Use it when Fable's import would get in the way, for
-  example on a type that carries its own builder members. `Router`, `Route`, `Switch` and `Dynamic` are bound this way.
+  example on a type that carries its own builder members. `Switch` and `Dynamic` are bound this way.
 
 The interfaces decide what the tag accepts:
 

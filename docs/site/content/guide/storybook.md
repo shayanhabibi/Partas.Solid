@@ -2,8 +2,9 @@
 title: Storybook Support
 ---
 
-The plugin ships a second attribute, `PartasStorybook`, that turns a `storybook<'T> { ... }` expression into a
-Storybook CSF module: a default-exported `meta` object and one named export per story.
+The plugin's second attribute, `PartasStorybook`, turns a `storybook<'T> { ... }` expression into a Storybook CSF
+module: a default-exported `meta` object and one named export per story. Setting up a Storybook project that picks up
+Fable's output is on the [Storybook ecosystem page](../ecosystem/storybook.md).
 
 ```fsharp
 open Partas.Solid
@@ -14,186 +15,81 @@ let private meta = storybook<Button> { () }
 ```
 
 :::warning
-Declare the binding `private` or `internal`. Otherwise Fable emits its own export for it next to the one the plugin
-generates. The plugin exports the meta object and every story for you.
+Declare the binding `private` or `internal`, or Fable emits its own export next to the plugin's.
+
+No test covers `PartasStorybook`, and Storybook's Solid renderer targets Solid 1.x: it is not verified with Solid 2
+components.
 :::
 
-For setting up a Storybook project that picks up Fable's output, see the [Storybook ecosystem
-page](../ecosystem/storybook.md).
+## Operations
 
-:::warning
-The `PartasStorybook` attribute and the `storybook` builder are unchanged in Partas.Solid 3.0, and no test covers them.
-The Solid renderer for Storybook targets Solid 1.x and is not verified with Solid 2 components.
-:::
+| Operation | Sets |
+| --- | --- |
+| `args (fun c -> c.prop <- value)` | Args for every story, read from the assignments |
+| `render (fun props -> Comp().spread props)` | The render function. Spread the props, or the controls do nothing |
+| `decorator (fun story -> div () { story () })` | A decorator. One per story for now |
+| `cases (fun c -> match c.prop with ...)` | The options of a `[<StringEnum>]` property ([Cases](#cases)) |
+| `tags [\| "autodocs" \|]` | The meta object's tags |
+
+Put a story name first (`args "Default" (fun c -> ...)`) and `args`, `render` and `decorator` apply to that story
+alone. Each story name becomes a named export.
 
 ## ArgTypes
 
-The plugin infers `argTypes` from the component type. It reads each property's type and picks a control:
+The plugin infers `argTypes` from the component type, picking a control from each property's type:
 
 | Property type | Control | Table summary |
 | --- | --- | --- |
 | `bool` | `boolean` | `bool` |
-| `string` | `text` | `string` |
+| `string`, `char`, `Regex` | `text` | the type name |
 | `[<StringEnum>]` with `cases` | `radio` under 6 options, else `select` | `[<StringEnum>]` |
-| `char` | `text` | `char` |
-| `Regex` | `text` | `Regex` |
-| integer and float types | `number`, with `min`/`max`/`step` set from the type's range (for example `int` and `byte`) | the type name |
+| integer and float types | `number`, with `min`/`max`/`step` from the type's range | the type name |
 | tuples, lists, arrays, records, unions, anonymous records | `object` | the type shape |
 | functions, generic parameters | hidden | `function`, or `GenericParam` and the parameter's name |
 | option, nullable | the wrapped type's control | |
 
-To cut noise, properties inherited from the native tag bindings are ignored. They get no argType, and a value you give
-one in `args` is dropped too: the plugin only emits args for properties it collected. In the example below,
-`btn.about <- "test"` does not appear in the generated `args`.
-
-`[<StringEnum>]` unions need extra help: see [Cases](#cases). XML docs can steer generation: see [XML docs](#xml-docs).
+Properties inherited from the native tag bindings get no argType, and args set on them are dropped: `btn.about <-
+"test"` in the example below does not reach `args`.
 
 ### Cases
 
-A `[<StringEnum>]` union reaches the plugin as a plain string. There is no type information left to list its cases, so
-you declare them with the `cases` operation.
-
-Take this component:
-
-```fsharp
-[<StringEnum>]
-type Variant =
-    | Black
-    | Red
-    | Blue
-
-[<Erase>]
-type Button() =
-    interface RegularNode
-
-    [<DefaultValue>]
-    val mutable variant: Variant
-```
-
-By default `variant` gets a `text` control. To get the options, match on the property inside `cases`. Rider and most
-F# IDEs can generate the full match for you, and the values on the right-hand side do not matter:
+A `[<StringEnum>]` union reaches the plugin as a plain string, so without help it gets a `text` control. List its
+cases by matching on the property inside `cases`. The right-hand sides do not matter, and Rider can generate the
+match:
 
 ```fsharp
-[<PartasStorybook>]
-let private meta =
-    storybook<Button> {
-        cases (fun btn ->
-            match btn.variant with
-            | Black -> failwith "todo"
-            | Red -> failwith "todo"
-            | Blue when btn.variant = Black -> failwith "todo"
-            | _ -> ())
-    }
+cases (fun btn ->
+    match btn.variant with
+    | Black -> failwith "todo"
+    | Red -> failwith "todo"
+    | Blue when btn.variant = Black -> failwith "todo"
+    | _ -> ())
 ```
 
 :::warning
-Put a guard on the last case that refers back to the first case, as `Blue` does above. Without it, the compiler can
-fold the last case into the `else` branch, and the plugin loses it.
+Guard the last case with a reference back to the first, as `Blue` does. Without it the compiler can fold the last case
+into the `else` branch, and the plugin loses it.
 :::
-
-The plugin now has every case, but not the union's name, since that was erased. The generated argType:
-
-```jsx
-variant: {
-    control: {
-        type: "radio",
-    },
-    options: ["blue", "red", "black"],
-    table: {
-        type: {
-            summary: "[<StringEnum>]",
-        },
-    },
-},
-```
 
 ### XML docs
 
-:::warning
-Fable does not give plugins the XML docs of `val mutable` fields. To steer generation with XML docs, declare the
-property with `member val`.
-:::
+XML docs on a `member val` steer generation. Fable does not pass plugins the XML docs of `val mutable` fields.
 
-- `<summary>` becomes the property's description.
-- `<defaultValue>` becomes the default value shown in the docs table.
-- `<storybook />` is a closed tag whose attributes set options:
+- `<summary>` is the property's description.
+- `<defaultValue>` is the default value in the docs table.
+- `<storybook />` takes attributes:
 
 | Attribute | Effect |
 | --- | --- |
-| `spy="true"` | On a function-typed property, sets the arg to `fn()` from `storybook/test`, so calls show in the Actions panel. Function properties whose names start with `on` get this without the attribute. |
-| `controlType="..."` | Overrides the control type, for example `radio`, `select`, `color`, `date`, `range`. Ignored on number properties. Experimental. |
-| `controlType="false"` | Hides the control. So does any value starting with `hide`. |
-
-```fsharp
-/// <summary>Fired when the button is chosen.</summary>
-/// <storybook spy="true"/>
-[<Erase>]
-member val choosey: Browser.Types.Event -> unit = unbox null with get, set
-```
-
-## Args
-
-`args` sets args for every story. The plugin reads them from the assignments in the lambda:
-
-```fsharp
-args (fun btn ->
-    btn.variant <- Variant.Black)
-```
-
-Put a story name first to set args for that story alone. Each story name becomes a named export:
-
-```fsharp
-args "Default" (fun btn ->
-    btn.variant <- Variant.Red)
-```
-
-## Render
-
-`render` sets the render function. Spread the props you are given into the component, or the controls do nothing:
-
-```fsharp
-render (fun props -> Button().spread props)
-```
-
-With a story name first, it sets the render function for that story:
-
-```fsharp
-render "Default" (fun props -> Button().spread props)
-```
-
-## Decorators
-
-`decorator` sets a decorator. Only one per story is supported for now. Call the story you are given:
-
-```fsharp
-decorator (fun story ->
-    div () {
-        "decorated:"
-        story ()
-    })
-```
-
-With a story name first, it applies to that story:
-
-```fsharp
-decorator "Default" (fun story ->
-    div () {
-        "default story decoration:"
-        story ()
-    })
-```
-
-## Tags
-
-`tags` sets the meta object's Storybook tags:
-
-```fsharp
-tags [| "autodocs" |]
-```
+| `spy="true"` | On a function property, sets the arg to `fn()` from `storybook/test`, so calls show in the Actions panel. Function properties named `on...` get this anyway |
+| `controlType="..."` | Overrides the control type (`radio`, `select`, `color`, `date`, `range`). Ignored on numbers. Experimental |
+| `controlType="false"` | Hides the control, as does any value starting with `hide` |
 
 ## Example
 
 ```fsharp
+open Fable.Core.TS
+
 [<StringEnum>]
 type Variant =
     | Brown2
@@ -210,18 +106,14 @@ type Button() =
     [<DefaultValue>]
     val mutable variant: Variant
 
-    /// <summary>
-    /// Test
-    /// </summary>
+    /// <summary>A flavour.</summary>
     [<Erase>]
     member val chocolate: string = unbox null with get, set
 
-    /// <summary>
-    /// sd
-    /// </summary>
+    /// <summary>Fired when the button is chosen.</summary>
     /// <storybook spy="true"/>
     [<Erase>]
-    member val choosey: Browser.Types.Event -> unit = unbox null with get, set
+    member val choosey: Dom.Event -> unit = unbox null with get, set
 
     [<SolidTypeComponent>]
     member props.__ =
@@ -234,9 +126,7 @@ type Button() =
                 | Black -> "black"
                 | Brown2 -> "cho"
         )
-```
 
-```fsharp
 [<PartasStorybook>]
 let private meta =
     storybook<Button> {
@@ -248,7 +138,6 @@ let private meta =
 
         args (fun btn ->
             btn.variant <- Variant.Black
-            btn.chocolate <- "Some value"
             btn.about <- "test")
 
         decorator (fun story -> div () { story () })
@@ -261,91 +150,51 @@ let private meta =
     }
 ```
 
-This output was captured with Partas.Solid 2.x, with the spread marker updated to 3.0's `n$={false}`:
+The plugin emits (the component itself omitted):
 
 ```jsx
+import { fn } from "storybook/test";
+
 const meta = {
     args: {
-        chocolate: "Some value",
-        choosey: fn(),
         variant: "black",
+        choosey: fn(),
     },
     argTypes: {
         color: {
-            control: {
-                type: "text",
-            },
-            table: {
-                type: {
-                    summary: "string",
-                },
-            },
-        },
-        chocolate: {
-            control: {
-                type: "text",
-            },
-            description: "Test",
-            table: {
-                type: {
-                    summary: "string",
-                },
-            },
-        },
-        choosey: {
-            control: {
-                type: false,
-            },
-            description: "sd",
-            table: {
-                type: {
-                    summary: "function",
-                },
-            },
+            control: { type: "text" },
+            table: { type: { summary: "string" } },
         },
         variant: {
-            control: {
-                type: "radio",
-            },
+            control: { type: "radio" },
             options: ["brown", "black"],
-            table: {
-                type: {
-                    summary: "[<StringEnum>]",
-                },
-            },
+            table: { type: { summary: "[<StringEnum>]" } },
+        },
+        chocolate: {
+            control: { type: "text" },
+            description: "A flavour.",
+            table: { type: { summary: "string" } },
+        },
+        choosey: {
+            control: { type: false },
+            description: "Fired when the button is chosen.",
+            table: { type: { summary: "function" } },
         },
     },
-    decorators: [(story) => <div>
-        {story()}
-    </div>],
-    render: (btn_3) => <Button about="test"
-        {...btn_3} n$={false}>
-        Test
-    </Button>,
-    component: Button_1
- };
+    decorators: [(story) => <div>{story()}</div>],
+    render: (btn_3) => <Button about="test" {...btn_3} n$={false}>Test</Button>,
+    component: Button
+};
 
 export default meta;
 
 export const brown = {
-        args: {
-            variant: "brown",
-        },
-        render: (PARTAS_RENDER_BUILDER) => <Button about="brown"
-            {...PARTAS_RENDER_BUILDER} n$={false}>
-            brown test
-        </Button>,
-        decorators: [(PARTAS_DECORATOR_BUILDER) => <div>
-            <div>
-                {PARTAS_DECORATOR_BUILDER()}
-            </div>
-        </div>],
-    }
+    args: { variant: "brown" },
+    render: (PARTAS_RENDER_BUILDER) => <Button about="brown" {...PARTAS_RENDER_BUILDER} n$={false}>brown test</Button>,
+    decorators: [(PARTAS_DECORATOR_BUILDER) => <div><div>{PARTAS_DECORATOR_BUILDER()}</div></div>],
+}
 export const choc = {
-        args: {},
-        render: (PARTAS_RENDER_BUILDER_2) => <Button />,
-    }
-
-const $PARTAS_DISCARD = { $discard: true,
-};
+    args: {},
+    render: (PARTAS_RENDER_BUILDER_2) => <Button />,
+}
 ```

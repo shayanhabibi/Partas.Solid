@@ -6,15 +6,13 @@ title: Modular Forms
 These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to Solid 2 yet.
 :::
 
-`Partas.Solid.ModularForms` binds [Modular Forms](https://modularforms.dev/solid/api/createForm). Apart from some
-typing helpers and a couple of caveats with Fable.Remoting, the library is used as its docs describe.
+`Partas.Solid.ModularForms` binds [Modular Forms](https://modularforms.dev/solid/api/createForm), and is used as its
+docs describe, apart from the differences below.
 
-## Differences
+## Mapping fields
 
-Besides mapping a field with `name`, as the docs do, the binding adds a `map` extension method. It takes a lambda that
-selects the field from the form, and turns it into a string path with `Fable.Core.Experimental.namesofLambda`.
-
-Take this form type:
+Besides naming a field with `name`, the binding adds a `map` extension method. It takes a lambda that selects the field,
+and turns it into a string path with `Fable.Core.Experimental.namesofLambda`. Take this form type:
 
 ```fsharp
 type FormData = {
@@ -36,8 +34,6 @@ let valueField = Field(of' = form).map(_.Value) {
 ```
 
 ## Fable.Remoting
-
-### Invalid submissions
 
 If your form data is a record, initialise every field of the record by passing an `initialValue`. Modular Forms does not
 send null data, and Fable.Remoting will not match an object to a record unless every field is present with the right

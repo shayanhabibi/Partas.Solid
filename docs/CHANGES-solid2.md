@@ -6,7 +6,7 @@ This branch retargets Partas.Solid from **solid-js 1.x to solid-js 2.0**. Solid 
 restructured a large part of its own runtime API, so most of what follows is that change surfacing through the
 bindings — it is not gratuitous churn. Expect to touch every non-trivial component.
 
-> **Status:** the branch is a release candidate built from `wip:` commits, tracking `solid-js` 2.0.0-rc.9. The
+> **Status:** the branch is a release candidate built from `wip:` commits, tracking `solid-js` 2.0.0-rc.14. The
 > plugin test inputs that were stubbed with `failwith "redo"` / `"REDO"` (`IndexedPropSpreading`,
 > `OperatorsInProps`, `SignalSetterInvoke`, `ThisArgTransforms`, `ExperimentalBuilders`) have been restored against
 > the Solid 2 API and their snapshots regenerated; all plugin cases pass.
@@ -204,7 +204,9 @@ Two specifics worth calling out:
 - **`[<SolidComponent>]` calls in JSX are untracked.** `Label "x"` inside another component now emits
   `{untrack(() => Label("x"))}` instead of `{Label("x")}`, matching the `createComponent` behind `<Comp/>`. The body runs
   once: a signal read in the body is a snapshot, a read in the returned JSX stays live. Before, Solid tracked the body
-  and rebuilt the component's DOM on every change.
+  and rebuilt the component's DOM on every change. The arguments are bound outside the `untrack`, as
+  `{untrack(Label.bind(undefined, "x", count()))}`, so a signal read in an argument still re-runs the call; the first
+  form, `untrack(() => Label("x", count()))`, left such a call frozen at its first value.
 - **Function props with two or more arguments are called uncurried.** `props.renderItem item index` emits
   `props.renderItem(item, index)`, the shape Fable uses when an F# parent sets the prop. It used to emit
   `props.renderItem(item)(index)`, which broke every F# caller. JS callers must now pass `(item, index) => ...`, not a
@@ -276,6 +278,90 @@ The web runtime (`@solidjs/web`, formerly `solid-js/web`) now has its own file (
 `Bindings.render` / `renderToString` / `isServer` are no longer on the core `Bindings` type (`DEV` stays there) — update your
 `open`s accordingly.
 
+### DOM types from Xantham; `Fable.Browser.Dom` is gone
+
+Partas.Solid no longer references `Fable.Browser.Dom`. DOM types come from `Xantham.Fable.Core.TS` 0.2.1:
+`open Fable.Core.TS` and write `Dom.HTMLElement`, `Dom.MouseEvent`. Partas.Solid binds the globals `globalThis`,
+`document` and `window`, which `open Fable.Core` brings in. Its lookups return options: `getElementById` is
+`HTMLElement option`. Tags whose element type was a generic `HTMLElement` now name it (`slot` is `HTMLSlotElement`,
+`details` `HTMLDetailsElement`), so a ref typed `HTMLElement` on those tags needs `:?> _`.
+
+### ARIA, SVG and events are generated too
+
+- ARIA: closed sets are enums (`role = Attr.AriaRole.Dialog`); "true"/"false" states are `bool`
+  (`ariaExpanded = isOpen ()`); states with more values take `U2<bool, Attr.AriaX>` (`ariaChecked`, `ariaInvalid`).
+  New: `ariaColIndexText`, `ariaRowIndexText`. Removed: `ariaDescendant`, which wrote the non-existent
+  `aria-descendant`.
+- SVG: every attribute rc.14 declares, with enums for closed sets (`Attr.Svg*`).
+- Events: every handler is typed by its event (`onAuxClick: Dom.PointerEvent -> unit`), including window events on
+  `body` and media/SVG-animation events. `onEncrypted` is on media elements only, as upstream.
+
+### `Partas.Solid.Meta` follows `@solidjs/meta` 1.0
+
+- `MetaProvider` is gone (meta 1.0 has none). New: `Head` (groups tags into one replacement set), `Script` and
+  `Stylesheet`. Every tag but `Base` takes a `key`. Install `@solidjs/meta@1.0.0-next.2`.
+
+### `Partas.Solid.Router` follows `@solidjs/router` 2
+
+Rebound against `@solidjs/router@2.0.0-next.38`, which has no JSX components:
+
+- `Router`, `HashRouter`, `MemoryRouter` and `Route` are gone. Declare routes with `route` (`routePaths` for several
+  paths, `routeGroup` for a component-less parent), create the router with `createRouter (RouterConfig(routes, ...))`
+  at module level, and render it: `Router.render ()`, or `Router % RouterRoot() { yield fun props -> ... }` for a root
+  layout. `hashHistory ()` and `memoryHistory "/"` replace the router variants.
+- `A` and `Navigate` are gone. Links are plain `a` elements; `replace`, `noscroll`, `state`, `preload` and `link` are
+  anchor attributes. `<a>`'s `preload` is now a `string`, so `preload = "false"` writes the opt-out the router reads.
+- `createAsync`, `createAsyncStore` and `useSubmission` are gone. Read a `query` with `createMemo`; submissions are
+  settled history (`useSubmissions`), and in-flight state belongs to the action's `onSubmit` hook.
+- `useCurrentMatches` is `useRouteMatches`. New: `useLinkState`, `pendingLinks`, the link preload strategies,
+  `intFilter`, `Router.paths` and `Router.matchUrl`.
+
+### Solid 2.0.0-rc.14
+
+Partas.Solid now tracks rc.14 (runtime tests, the `solid/` reference checkout, and the generated JSX surface).
+Behaviour that changed upstream between rc.9 and rc.14:
+
+- Cleanups within one owner run last-registered first (LIFO, as in Solid 1.x). Children are still disposed
+  before their parent's own cleanups.
+- An optimistic write outside an `action` is never shown. rc.9 showed it for one flush, then reverted it.
+- Known upstream regression: a `Portal` whose `mount` is a conditional expression throws
+  `PRIMITIVE_IN_EFFECT_CALLBACK` when the condition changes. It fails the same way in hand-written JSX.
+- Use `@solidjs/vite-plugin@3.0.0-next.49` or later: next.44 passes an option the rc.14 compiler rejects.
+
+### New core bindings, and obsolete boundary primitives
+
+- `isWrappable`, `isEqual` and `NotReadyError` (match a pending read with `:? NotReadyError`). `isHydrating` and
+  `isHydratable` need solid-js 2.0.0-rc.14.
+- `createErrorBoundary`, `createLoadingBoundary` and `createRevealOrder` are internal to solid-js from rc.14 and now
+  `[<Obsolete>]`: use `Errored`, `Loading` and `Reveal`.
+- `Loading`'s `on` is a dependency: any change to it shows the fallback again. Pass the value, not an accessor.
+
+### `Partas.Solid.Start` removed
+
+The SolidStart bindings (`SolidStartBindings.fs`, namespace `Partas.Solid.Start`) are gone. No SolidStart release
+supports Solid 2: every version, including the rc and beta tags, requires `solid-js` 1.9 and `@solidjs/router` below
+2.0. Stay on Partas.Solid 2.x for SolidStart projects. `clientOnly`, `httpStatus` and `httpHeader` are in
+`Partas.Solid.Web`.
+
+### HTML attributes are generated from Solid's JSX types
+
+`HtmlAttributes.fs` is now generated from `@solidjs/web@2.0.0-rc.14`'s JSX declarations:
+
+- Attributes with a closed set of values take a `[<StringEnum>]` from `Partas.Solid.Attr` instead of a string:
+  `dir = Attr.Dir.Rtl`, `type' = Attr.ButtonType.Submit`, `loading = Attr.Loading.Lazy`. Boolean attributes take
+  `bool` (`reversed = true`, not `reversed = ""`). Use `.attr(name, value)` for a value outside the set.
+- Names follow upstream's lowercase spelling (`tabindex`, `readonly`, `colspan`). The camelCase spellings still
+  compile, marked `[<Obsolete>]`.
+- New tags: `slot`, `template`, `selectedcontent`, and MathML under `MathML.` (`MathML.math () { MathML.mi () { "x" } }`).
+  `big`, `keygen`, `menuitem` and `param` exist but are `[<Obsolete>]`. `base'` now takes `href`/`target`, `<meta>`
+  its `name`/`content`/`http-equiv`, and `track` and `wbr` are void elements.
+- New: `command`/`commandfor` on buttons, `shadowroot*` on `<template>`, `popovertarget` on inputs, `closedby`,
+  `blocking`, `xmlns` on `a`/`script`/`style`/`title`, and the rest of rc.14's HTML attributes.
+- Removed, as rc.14 does not declare them: `color`, `media` on `<a>`, `hreflang` on `<area>`, `form` on `<label>`,
+  `content` on `<template>`, `crossorigin` on `<input>`, and the `<meta>` attributes that were misfiled on
+  `MenuHTMLAttributes`. `<input>` `min`/`max`/`step` are `U2<float, string>` (`min = 0.5`, or a date such as `"2024-01-01"`); `<meter>`/`<progress>` values
+  are `float`.
+
 ## 10. Toolchain
 
 Relevant if you build from source or pin transitively:
@@ -284,8 +370,9 @@ Relevant if you build from source or pin transitively:
   The `Ident` AST node gained `IsInlineIfLambda`, which is why the plugin's `AstUtils.Ident`/`IdentExpr` helpers
   took a new optional parameter.
 - Solution file replaced: `Partas.Solid.sln` → **`Partas.Solid.slnx`**.
-- New build CLI (`partas-solid.fsproj`) supersedes `build.fsx`:
-  `dotnet run --project partas-solid.fsproj -- test|build|publish|bump`. It has no format/lint command.
+- `tools/build.fsx` moved to Partas.Build 0.8 and is the only build entry point (`test|build|publish|docs|bump|release`).
+  Releases moved from git-cliff to EasyBuild.ShipIt: `src/CHANGELOG.md` versions both packages, and new releases go
+  to a temporary Cloudsmith feed while nuget.org ownership is transferred.
 - Test discovery is now directory-driven — cases are found by walking `Compiled/*Cases/**` for `.expected` files
   rather than being listed in `Tests.fs`. Adding a case means adding a folder.
 

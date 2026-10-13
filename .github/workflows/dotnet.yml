@@ -1,42 +1,58 @@
 name: CI
 
+# Builds the packages and runs the Expecto snapshot suites and the vitest runtime suites.
+# master is tested by release.yml, which calls this workflow before ShipIt runs.
 on:
-  push:
   pull_request:
+  push:
+    branches-ignore:
+      - master
   workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
 
 env:
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-  DOTNET_CLI_TELEMETRY_OPTOUT: true
-  DOTNET_VERSION: 9.0.101
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_NOLOGO: 'true'
 
-# Kill other jobs when we trigger this workflow by sending new commits
-# to the PR.
-# https://stackoverflow.com/a/72408109
+# Cancel superseded runs of the same PR or branch, but never a master run gating a release.
+# A fixed prefix: under workflow_call, github.workflow is the caller's name, and sharing the
+# caller's group would make this job wait on its own caller.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
-  build:
-    runs-on: ubuntu-22.04
+  test:
+    name: Build and test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      # No submodules: solid/ is upstream reference material nothing builds from.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
-
-      - name: Set up git-cliff
-        uses: kenji-miyake/setup-git-cliff@v1
-
-      # workaround for https://github.com/actions/runner/issues/2033
-      - name: ownership workaround
-        run: git config --global --add safe.directory '*'
+          persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          global-json-file: global.json
 
-      - name: Run test script
-        run: dotnet fsi ./build.fsx -- test
+      # The runtime suites run the Solid compiler and vitest, which need Node 22.12 or later.
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('global.json', '**/*.fsproj', 'tools/build.fsx', '.config/dotnet-tools.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Build and test
+        run: dotnet fsi tools/build.fsx -- test

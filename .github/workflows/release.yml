@@ -1,0 +1,118 @@
+name: Release
+
+# Every push to master is tested, then ShipIt opens or updates the release pull request
+# (`chore: release Partas.Solid@x.y.z`) from the conventional commits since the last release.
+# Merging that pull request pushes the release commit, which publishes the packages.
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_NOLOGO: 'true'
+
+# Let an active publication finish; queue the next push behind it.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Build and test
+    uses: ./.github/workflows/dotnet.yml
+
+  shipit-pr:
+    name: ShipIt - Pull Request
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # ShipIt reads the commit history since the last release.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('global.json', '**/*.fsproj', 'tools/build.fsx', '.config/dotnet-tools.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Configure git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: ShipIt (pull request)
+        run: dotnet fsi tools/build.fsx -- release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish to Cloudsmith
+    needs: test
+    # Only the commit a merged ShipIt release pull request produces.
+    if: "${{ startsWith(github.event.head_commit.message, 'chore: release ') }}"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('global.json', '**/*.fsproj', 'tools/build.fsx', '.config/dotnet-tools.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # nuget.org publishing is paused while package ownership is transferred; releases go to the
+      # temporary Cloudsmith feed under the same package IDs. The test job has already run the suites.
+      - name: Publish
+        env:
+          NUGET_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        run: |
+          if [ -z "$NUGET_API_KEY" ]; then
+            echo '::error::Cloudsmith publishing requires CLOUDSMITH_API_KEY.'
+            exit 1
+          fi
+          dotnet fsi tools/build.fsx -- publish --skip-tests --nuget-source "https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json"
+
+      # Tags follow the existing scheme (2.1.3, no `v`); the notes are the release's changelog section.
+      - name: Tag and create the GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Partas.Solid/Partas.Solid.fsproj | head -n 1)
+          # ShipIt writes `## <version> - <yyyy-MM-dd>`.
+          awk -v v="$version" '
+            index($0, "## " v " ") == 1 || $0 == "## " v { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' src/CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          prerelease=""
+          case "$version" in *-*) prerelease="--prerelease" ;; esac
+          gh release create "$version" --target "$GITHUB_SHA" --title "$version" --notes-file "$RUNNER_TEMP/notes.md" $prerelease

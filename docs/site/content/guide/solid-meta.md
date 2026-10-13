@@ -2,71 +2,60 @@
 title: Solid Meta
 ---
 
-Bindings for [`@solidjs/meta`](https://docs.solidjs.com/solid-meta/). They live in the `Partas.Solid.Meta` namespace,
-which ships inside the `Partas.Solid` package.
-
-```fsharp
-open Partas.Solid
-open Partas.Solid.Meta
-```
-
-Partas.Solid does not install the npm package:
+Bindings for [`@solidjs/meta`](https://docs.solidjs.com/solid-meta/) 1.0, in the `Partas.Solid.Meta` namespace of the
+`Partas.Solid` package. Install the npm package yourself:
 
 ```bash
-npm install @solidjs/meta
+npm install @solidjs/meta@1.0.0-next.2
 ```
 
-:::warning
-These bindings were written for `@solidjs/meta` on Solid 1.x and have not changed for Partas.Solid 3.0. No test covers
-them, and they are not verified against Solid 2. For a tested alternative, use `useHead` from `@solidjs/web`, below.
-:::
+No provider is needed (1.0 removed `MetaProvider`). Render the tag components anywhere: they reach `document.head` in
+a microtask after the update that renders them, and leave it when their component is disposed.
 
 ## Components
 
-Each component inherits the matching HTML tag, so it takes the same attributes.
+Each component inherits the matching HTML tag, so it takes the same attributes. Every tag but `Base` also takes a
+`key`: a later tag with the same key replaces the earlier one, which comes back when the later one is disposed.
 
-| Component | Inherits | Upstream docs |
+| Component | Inherits | Notes |
 | --- | --- | --- |
-| `MetaProvider` | `FragmentNode` | [MetaProvider](https://docs.solidjs.com/solid-meta/reference/meta/metaprovider) |
-| `Title` | `title` | [Title](https://docs.solidjs.com/solid-meta/reference/meta/title) |
-| `Style` | `style` | [Style](https://docs.solidjs.com/solid-meta/reference/meta/style) |
-| `Link` | `link` | [Link](https://docs.solidjs.com/solid-meta/reference/meta/link) |
-| `Meta` | `meta` | [Meta](https://docs.solidjs.com/solid-meta/reference/meta/meta) |
-| `Base` | `base'` | [Base](https://docs.solidjs.com/solid-meta/reference/meta/base) |
+| `Head` | `FragmentNode` | Groups its child tags into one replacement set |
+| `Title` | `title` | |
+| `Meta` | `meta` | |
+| `Link` | `link` | |
+| `Stylesheet` | `link` | `rel="stylesheet"` preset. Solid preloads it and holds the update until it loads |
+| `Style` | `style` | |
+| `Script` | `script` | |
+| `Base` | `base'` | Shell-only: applied in server rendering, ignored on the client |
 
 ```fsharp
+open Partas.Solid.Meta
+
 [<SolidComponent>]
-let App () =
-    MetaProvider() {
-        Title() { "My page" }
-        Meta().attr("name", "description").attr("content", "A page about things")
-        div () { "Hello" }
+let PageHead () =
+    Head () {
+        Title (key = "title") { "My page" }
+        Meta (key = "description", name = "description", content = "A page about things")
+        Stylesheet (href = "/site.css")
     }
 ```
 
-:::warning
-The `meta` tag binding has no `name`, `content` or `charset` properties: in `HtmlAttributes.fs` they (and an `http`
-property meant as `http-equiv`) are declared on the `menu` tag's attributes instead. `Meta(name = ...)` does not
-compile. Set them with `.attr`, as above, until the binding is fixed.
-:::
+A `Head` inside another `Head` forms its own group. To add tags to the surrounding group, render bare tags instead.
 
-## useHead from @solidjs/web
+## useHead
 
-Bound in `Partas.Solid.Web`. It needs no extra package and no provider. The runtime tests cover it: tags reach
-`document.head`, a reactive title updates, and the tags are removed when the component is disposed.
+`useHead`, from `@solidjs/web`, is bound in `Partas.Solid.Web` and needs no extra package:
 
 ```fsharp
-open Partas.Solid.Web
-
 useHead(tag: HeadTag): unit
 useHead(tag: HeadTag[]): unit
 useHead(tag: unit -> HeadTag): unit
 useHead(tag: unit -> HeadTag[]): unit
 ```
 
-`HeadTag` is a `[<Pojo>]`: `HeadTag(tag: HeadTag.Tag, props: obj, ?key: U2<string, unit -> string>)`. `HeadTag.Tag`
-is `Title`, `Meta`, `Link`, `Style`, `Script` or `Base`. Put the element's children, such as a title's text, in
-`props` under `"children"`.
+`HeadTag(tag: HeadTag.Tag, props: obj, ?key: U2<string, unit -> string>)` is a `[<Pojo>]`. `HeadTag.Tag` is `Title`,
+`Meta`, `Link`, `Style`, `Script` or `Base`. A title's text goes in `props` under `"children"`. Pass a function when
+the tag depends on reactive state:
 
 ```fsharp solid show=code jsx
 open Partas.Solid.Web
@@ -78,5 +67,3 @@ let ReactiveTitle () =
     useHead (HeadTag(HeadTag.Tag.Meta, createObj [ "name", box "description"; "content", box "A counter" ]))
     button (onClick = fun _ -> setCount (count () + 1)) { count () }
 ```
-
-Pass a function when a tag depends on reactive state, as the title does here.

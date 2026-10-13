@@ -10,68 +10,29 @@ Bindings for `@solid-primitives/input-mask`.
 
 ## InputMask
 
-Type: erased DU
+An erased union of the four ways to describe a mask:
 
 ```fsharp
-type InputMask
-```
+type InputMask =
+    | Fn of InputMaskFn          // delegate of value: string * selection: Selection -> string
+    | Array of InputMaskArray    // InputMaskArray of U2<string, Regex>[]
+    | Regex of InputMaskRegex    // InputMaskRegex of regex: Regex * replacer: (obj -> string)
+    | String of string
 
-### `Fn of InputMaskFn`
-
-```fsharp
-type InputMaskFn = delegate of value: string * selection: Selection -> value: string
-```
-
-```fsharp
 type Selection = Selection of start: float * finish: float
 ```
 
-### `Array of InputMaskArray`
-
-```fsharp
-type InputMaskArray = InputMaskArray of U2<string, Regex>[]
-```
-
-### `Regex of InputMaskRegex`
-
-```fsharp
-type InputMaskRegex = InputMaskRegex of regex: Regex * replacer: (obj -> string)
-```
-
-### `String of string`
-
 ## Bindings
 
-The `createKeyboard*`, `createInput*` and `createClipboard*` members are inline helpers that fix the event type of
-`createInputMask` and `createMaskPattern`.
-
-:::details Bindings
 ```fsharp
-[<AutoOpen; Erase>]
-type InputMask =
-    [<ImportMember(Spec.path)>]
-    static member stringMaskToArray(mask: string, ?regexps: Map<string, Regex>): InputMask.InputMaskArray = jsNative
-    [<ImportMember(Spec.path)>]
-    static member regexMaskToFn(regex: Regex, replacer: obj): InputMask.InputMaskFn = jsNative
-    [<ImportMember(Spec.path)>]
-    static member maskArrayToFn(maskArray: InputMask.InputMaskArray): InputMask.InputMaskFn = jsNative
-    [<ImportMember(Spec.path)>]
-    static member anyMaskToFn(mask: InputMask.InputMask, ?regexps: Map<string, Regex>): InputMask.InputMaskFn = jsNative
-    [<ImportMember(Spec.path)>]
-    static member createInputMask<'MaskEvent>(mask: InputMask.InputMask, ?regexps: Map<string, Regex>): 'MaskEvent -> string = jsNative
-    static member inline createKeyboardInputMask(mask: InputMask.InputMask, ?regexps: Map<string, Regex>) =
-        InputMask.createInputMask<KeyboardEvent>(mask, ?regexps = regexps)
-    static member inline createInputInputMask(mask: InputMask.InputMask, ?regexps: Map<string, Regex>) =
-        InputMask.createInputMask<InputEvent>(mask, ?regexps = regexps)
-    static member inline createClipboardInputMask(mask: InputMask.InputMask, ?regexps: Map<string, Regex>) =
-        InputMask.createInputMask<ClipboardEvent>(mask, ?regexps = regexps)
-    [<ImportMember(Spec.path)>]
-    static member createMaskPattern<'MaskEvent>(inputMask: 'MaskEvent -> string, pattern: string -> string): 'MaskEvent -> string = jsNative
-    static member inline createKeyboardMaskPattern(inputMask: KeyboardEvent -> string, pattern: string -> string) =
-        InputMask.createMaskPattern<KeyboardEvent>(inputMask,pattern)
-    static member inline createInputMaskPattern(inputMask: InputEvent -> string, pattern: string -> string) =
-        InputMask.createMaskPattern<InputEvent>(inputMask,pattern)
-    static member inline createClipboardMaskPattern(inputMask: ClipboardEvent -> string, pattern: string -> string) =
-        InputMask.createMaskPattern<ClipboardEvent>(inputMask,pattern)
+let stringMaskToArray(mask: string, ?regexps: Map<string, Regex>): InputMaskArray
+let regexMaskToFn(regex: Regex, replacer: obj): InputMaskFn
+let maskArrayToFn(maskArray: InputMaskArray): InputMaskFn
+let anyMaskToFn(mask: InputMask, ?regexps: Map<string, Regex>): InputMaskFn
+let createInputMask<'MaskEvent>(mask: InputMask, ?regexps: Map<string, Regex>): 'MaskEvent -> string
+let createMaskPattern<'MaskEvent>(inputMask: 'MaskEvent -> string, pattern: string -> string): 'MaskEvent -> string
 ```
-:::
+
+`createKeyboardInputMask`, `createInputInputMask` and `createClipboardInputMask` are inline helpers that fix
+`'MaskEvent` of `createInputMask` to `KeyboardEvent`, `InputEvent` or `ClipboardEvent`. `createKeyboardMaskPattern`,
+`createInputMaskPattern` and `createClipboardMaskPattern` do the same for `createMaskPattern`.

@@ -32,6 +32,32 @@
 
 ---
 
+## ⚠️ IMPORTANT: NEW RELEASES ARE ON A TEMPORARY NUGET FEED ⚠️
+
+> [!WARNING]
+> **Use the Cloudsmith feed below for new releases of Partas.Solid and Partas.Solid.FablePlugin.**
+> I currently cannot access the old nuget.org account and am waiting for NuGet support to transfer
+> package ownership to my new account. While that transfer is pending, new releases are published
+> to **Cloudsmith temporarily**, under the existing package IDs. Older releases remain on nuget.org.
+>
+> **Feed:** <https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json>
+>
+> Public restores require **no account or API key**. Once ownership is restored, publishing will
+> return to nuget.org and this notice will be updated.
+
+Add the temporary source alongside nuget.org so dependencies can still be restored. Partas.Solid's DOM
+types come from `Xantham.Fable.Core.TS`, which is published on its own Cloudsmith feed, so add that too:
+
+```shell
+dotnet nuget add source https://nuget.cloudsmith.io/shayanhabibi/partas-solid/v3/index.json --name partas-solid-temporary
+dotnet nuget add source https://nuget.cloudsmith.io/shayanhabibi/xantham/v3/index.json --name xantham
+```
+
+For shared projects and CI, add those URLs to the repository's `NuGet.Config` as well. If your
+configuration uses package source mapping, map `Partas.Solid*` to the first and `Xantham.*` to the second.
+
+Package hosting is provided by [Cloudsmith](https://cloudsmith.com).
+
 ## Getting Started
 
 [See the docs to get started!](https://partas-solid.vercel.app/partas-solid)
@@ -295,17 +321,17 @@ To develop the plugin, ensure you exclude the plugin on compilation:
 
 `fable --exclude Partas.Solid.FablePlugin --noCache -o output -e .fs.jsx --run dotnet restore`
 
-## FAKE Scripts
+## Build script
 
 There are a suite of tests to run to help inform if any changes have broken something else.
 
-You can run them from your IDE or using the FAKE script:
+You can run them from your IDE or using the build script (`--help` lists every command):
 
-`dotnet fsi build.fsx`
+`dotnet fsi tools/build.fsx -- test`
 
-Format with fantomas:
+Format the files you touch with fantomas (much of the repository does not pass `fantomas --check`):
 
-`dotnet fsi build.fsx target format`
+`dotnet fantomas <files>`
 
 > [!NOTE]
 > The FablePlugin `Plugin.fs` is excluded from formatting as the heavily nested

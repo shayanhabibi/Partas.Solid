@@ -82,7 +82,6 @@ let theme =
                     Menu.page "guide/experimental.md"
                     Menu.page "guide/solid-router.md"
                     Menu.page "guide/solid-meta.md"
-                    Menu.page "guide/solid-start.md"
                     Menu.page "guide/storybook.md"
                 ]
         ]
@@ -328,15 +327,21 @@ let private solidExamples (options: SolidExamplesOptions) =
         | "" -> None
         | value -> Some value
 
+    // The examples compile against this repository's src/Partas.Solid, so the docs always show the
+    // current sources. PARTAS_SOLID_VERSION (and PARTAS_SOLID_FEED) try them against a package instead.
+    let options =
+        match fromEnvironment "PARTAS_SOLID_VERSION", fromEnvironment "PARTAS_SOLID_FEED" with
+        | Some version, Some feed -> options |> SolidExamples.partasVersion version |> SolidExamples.feed feed
+        | Some version, None -> options |> SolidExamples.partasVersion version
+        | None, _ ->
+            options
+            |> SolidExamples.partasProject (
+                Path.Combine(__SOURCE_DIRECTORY__, "..", "..", "src", "Partas.Solid", "Partas.Solid.fsproj")
+            )
+
     options
-    |> SolidExamples.partasVersion (
-        fromEnvironment "PARTAS_SOLID_VERSION"
-        |> Option.defaultValue "3.0.0-local.e08ad85"
-    )
-    |> SolidExamples.feed (
-        fromEnvironment "PARTAS_SOLID_FEED"
-        |> Option.defaultValue (Path.Combine(__SOURCE_DIRECTORY__, "feed"))
-    )
+    // The Solid release Partas.Solid is tested against.
+    |> SolidExamples.solidVersion "2.0.0-rc.14"
     // Libraries the live examples import. Each change re-runs npm install in .nacara/partas-solid.
     |> SolidExamples.npm "animejs" "4.5.0"
     |> SolidExamples.npm "apexcharts" "7.6.0"

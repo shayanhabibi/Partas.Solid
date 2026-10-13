@@ -106,34 +106,14 @@ from the spread props, so you have to pass it to the root by name as well.
 
 :::details Using the CheckboxRenderProp instead
 The checkbox passes its state to its child function. Read `indeterminate` from there, and you no longer need to pass
-the property by name:
+the property by name. Only these lines change:
 
 ```fsharp
-[<SolidTypeComponent>]
-member props.checkbox =
     Kobalte.Checkbox(
         class' = Lib.cn [| "items-top group relative flex space-x-2"; props.class' |]
         ).spread(props) { yield fun rprops -> Fragment() {
-
-        Checkbox.Input(class'="peer")
-        Checkbox.Control(
-            class' = "size-4 shrink-0 rounded-sm border border-primary
-            ring-offset-background disabled:cursor-not-allowed disabled:opacity-50
-            peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring
-            peer-focus-visible:ring-offset-2 data-[checked]:border-none
-            data-[indeterminate]:border-none data-[checked]:bg-primary
-            data-[indeterminate]:bg-primary data-[checked]:text-primary-foreground
-            data-[indeterminate]:text-primary-foreground"
-            ) {
-            Checkbox.Indicator() {
+    // ...
                 if rprops.indeterminate then
-                    Minus(class' = "size-4", strokeWidth = 2)
-                else
-                    Check(class' = "size-4", strokeWidth = 2)
-            }
-        }
-    }
-    }
 ```
 :::
 
@@ -183,23 +163,7 @@ The header is not a plain string, so the column needs a unique `id` to identify 
 
 ## Adding selection to the table
 
-Change the table options to hold the selection state. First, make a signal for it:
-
-```fsharp
-[<SolidComponent>]
-let TestSelectableTable () =
-    let selection,setSelection =
-        createSignal <| RowSelectionState.init()
-    let table = createTable(
-            TableOptions<User>(
-                getCoreRowModel = getCoreRowModel()
-            )   .data(fun _ -> userData)
-                .columns(fun _ -> columnDefs)
-        )
-    DataTable(table = table)
-```
-
-Then plug it into the `TableOptions` passed to `createTable`:
+Hold the selection state in a signal, and plug it into the `TableOptions` passed to `createTable`:
 
 ```fsharp
 [<SolidComponent>]
@@ -227,10 +191,4 @@ hands you an object that makes that easy to do from Fable.
 
 Render `TestSelectableTable` and try selecting rows.
 
-## Conclusion
-
-That is the end of this exercise. The idea was to try some of the binding libraries and get familiar with
-Partas.Solid.
-
-For data tables, `@tanstack/table` is one of the best known libraries around. Its API, and this large binding, are
-worth exploring.
+That is the end of the walkthrough. TanStack Table's API, and this large binding, have much more to explore.

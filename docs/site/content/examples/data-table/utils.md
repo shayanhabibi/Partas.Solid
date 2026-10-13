@@ -26,8 +26,7 @@ type [<Erase>] Lib =
 class passed to a component overrides the component's own.
 
 :::note
-Nothing here depends on Solid. `clsx` and `tailwind-merge` are plain npm packages, so this file works unchanged on
-Partas.Solid 3.0. The `AccordionItem` in [Benefits of JSX output](../../about/jsx-output.md) uses the same helper.
+Nothing here depends on Solid, so this file works unchanged on Partas.Solid 3.0.
 :::
 
 Next: [Table components](table-component.md).

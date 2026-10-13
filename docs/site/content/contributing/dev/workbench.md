@@ -8,22 +8,18 @@ test run:
 
 | Change | What to run | Time (all snapshot cases) |
 | --- | --- | --- |
-| a binding in `Partas.Solid/`, or a test input | `Workbench.checkAll ()` | under 1 s |
-| the plugin (`Partas.Solid.FablePlugin/`) | `Workbench.reloadPlugin ()`, then `Workbench.checkAll ()` | about 2.5 s |
+| a binding in `src/Partas.Solid/`, or a test input | `Workbench.checkAll ()` | under 1 s |
+| the plugin (`src/Partas.Solid.FablePlugin/`) | `Workbench.reloadPlugin ()`, then `Workbench.checkAll ()` | about 2.5 s |
 
-The first compile in a session takes about 10 s, because it cracks the project. The build CLI's `test` command stays
-the final gate.
-
-:::note
-`Workbench/README.md` is the full reference. This page covers what you need to start.
-:::
+The first compile in a session takes about 10 s, because it cracks the project. `dotnet fsi tools/build.fsx -- test`
+stays the final gate, and `tools/Workbench/README.md` is the full reference.
 
 ## Setup
 
 From the repository root:
 
 ```bash
-dotnet fsi workbench.fsx
+dotnet fsi tools/workbench.fsx
 ```
 
 This clones [Fable.SageFs](https://github.com/shayanhabibi/Fable.SageFs) into the gitignored `.workbench/`, points it
@@ -31,7 +27,7 @@ at the Fable version in `.config/dotnet-tools.json`, and builds the workbench. R
 version. Fable ships its own fork of the F# compiler service, which clashes with the one SageFs is built on, and
 Fable.SageFs renames the fork so both can load.
 
-Then create a SageFs session on `Workbench/Partas.Solid.Workbench.fsproj`, with `Workbench/` as the working
+Then create a SageFs session on `tools/Workbench/Partas.Solid.Workbench.fsproj`, with `tools/Workbench/` as the working
 directory. The workbench is not in `Partas.Solid.slnx`, because it only builds after setup.
 
 ## Snapshot cases
@@ -72,7 +68,7 @@ reads as the pattern that reaches it. This is usually faster than compiling with
 Workbench.emit Workbench.Suite.Dom;;   // write the suite's .fs.jsx files; returns the error logs
 ```
 
-Then run `node run.mjs dom --no-compile` from `Partas.Solid.Tests.Runtime/`. `emit` writes the same files as
+Then run `node run.mjs dom --no-compile` from `tests/Partas.Solid.Tests.Runtime/`. `emit` writes the same files as
 `dotnet fable -o .`, including the `Partas.Solid` sources, so binding edits reach the runtime tests too.
 
 ## Watching
@@ -87,7 +83,7 @@ Workbench.unwatch ();;
 The watcher reacts to saved `.fs` files in the plugin, the bindings and the test inputs, and reloads the plugin first
 when it changed. `watchFiles` is the tightest loop: keep a `.fs.jsx` open in your editor, and it follows a plugin edit
 about 3 s after you save. To rerun specs on every save as well, run `watchSuite` alongside `npx vitest --dir Dom` in
-`Partas.Solid.Tests.Runtime/`.
+`tests/Partas.Solid.Tests.Runtime/`.
 
 :::caution
 `reloadPlugin`, a project's first compile, and `emit` take the same `.compile-lock` as `run.mjs`. They wait for a

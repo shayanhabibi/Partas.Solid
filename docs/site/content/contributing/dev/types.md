@@ -2,10 +2,6 @@
 title: Plugin types
 ---
 
-:::note
-The plugin's source is documented heavily. Only short notes are kept here.
-:::
-
 `Types.fs` holds the unions, records and functions the transformation passes around.
 
 ## Unions that name what a pattern found

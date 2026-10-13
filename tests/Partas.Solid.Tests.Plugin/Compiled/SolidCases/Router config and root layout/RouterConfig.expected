@@ -1,0 +1,99 @@
+
+import { defaultArg } from "../../fable_modules/fable-library-js.5.13.0/Option.js";
+import { revalidate, useBeforeLeave, useIsRouting, useNavigate, intentPreload, pendingLinks, hashHistory, int, createRouter } from "@solidjs/router";
+
+export function Home() {
+    return <h1>
+        Home
+    </h1>;
+}
+
+export function User(props) {
+    return <h1>
+        {defaultArg(props.params["id"], "")}
+    </h1>;
+}
+
+export function Layout(props) {
+    return <section>
+        {props.children}
+    </section>;
+}
+
+export const Router = createRouter({
+    routes: [{
+        path: "/",
+        component: Home,
+    }, {
+        path: "/users",
+        component: Layout,
+        children: [{
+            path: "/:id",
+            component: User,
+            matchFilters: {
+                id: int,
+            },
+        }],
+    }, {
+        path: ["/login", "/register"],
+        component: Home,
+    }, {
+        path: "/admin",
+        children: [{
+            path: "/",
+            component: Home,
+        }],
+    }],
+    base: "/app",
+    history: hashHistory(),
+    links: pendingLinks,
+    preloadLinks: [intentPreload({
+        delay: 50,
+    })],
+});
+
+export function App() {
+    return <Router>
+        {(props) => <div>
+            <nav>
+                <a href="/">
+                    Home
+                </a>
+                <a href="/users/1"
+                    replace={true}
+                    noscroll={true}
+                    preload="false">
+                    User 1
+                </a>
+            </nav>
+            <main>
+                {props.children}
+            </main>
+        </div>}
+    </Router>;
+}
+
+export function Bare() {
+    return <Router />;
+}
+
+export function Hooks() {
+    const navigate = useNavigate();
+    const isRouting = useIsRouting();
+    useBeforeLeave((e) => {
+        if (!e.defaultPrevented) {
+            e.preventDefault();
+        }
+    });
+    return <button disabled={isRouting()}
+        onClick={(_arg) => {
+            revalidate("users");
+            navigate("/users", {
+                replace: true,
+                scroll: false,
+            });
+        }}>
+        Users
+    </button>;
+}
+

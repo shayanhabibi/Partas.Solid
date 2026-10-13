@@ -2,55 +2,109 @@
 title: Migrating to Solid 2
 ---
 
-Partas.Solid 3.0 targets Solid 2.0 (`2.0.0-rc.9`); 2.x targeted Solid 1.9. Solid 2 renamed, removed or
-reworked much of its runtime API, so expect to touch every component that does more than render markup.
-Each section below shows the 2.x code and what replaces it. For the full 3.0 API, see
-[Solid-JS](../guide/solid-js.md).
+Partas.Solid 3.0 targets Solid `2.0.0-rc.14`; 2.x targeted Solid 1.9. Expect to touch every component that does more
+than render markup. Each section shows the 2.x code and what replaces it. The full 3.0 API is in
+[Solid-JS](solid-js.md).
 
 ## Checklist
 
-1. Update the packages: Partas.Solid and Partas.Solid.FablePlugin 3.0, `solid-js` and `@solidjs/web`
-   2.0. The plugin needs Fable 5.
-2. Rename `.classList` to `.class'`. Replace `.on (...)`, `.prop (...)` and `.use' (...)` calls.
-3. Rename the control-flow components: `ErrorBoundary` to `Errored`, `Suspense` to `Loading`,
-   `SuspenseList` to `Reveal`, `For` to `For.Keyed` or `For.NonKeyed`. Drop `Index`.
-4. Replace `splitProps` and `mergeProps` with `omit` and `merge`.
-5. Split each `createEffect` into a compute function and an effect function. Return cleanups from the
-   effect instead of calling `onCleanup` in it.
-6. Rework code built on `createResource`, `batch`, `onMount`, `createSelector`, `createComputed`,
-   `startTransition`, `useTransition`, `produce` or `unwrap`.
-7. Pass store setters an updater: `setStore (fun s -> ...)`. Change `solid-js/store` imports to
-   `solid-js`.
-8. Write two-argument callbacks (`mapArray`, `createErrorBoundary`) as curried lambdas.
-9. Add `open Partas.Solid.Web` where you use `render`, `hydrate`, `renderToString`, `isServer`,
-   `Portal` or `Dynamic`.
-10. Rewrite `batch { }` and `selector { }` blocks. Give each `effect { }` block a `let!`.
-11. Regenerate any committed JSX snapshots.
+1. Update the packages: Partas.Solid 3.0, Fable 5, `solid-js` and `@solidjs/web` 2.0 (see
+   [Installation](installation.md)). Compile with `--typedArrays false`.
+2. Replace `Fable.Browser.Dom` with `open Fable.Core.TS` and `Dom.X` ([DOM types](#dom-types)).
+3. Replace string values of closed attributes with `Attr.*` cases ([Attributes](#attributes-and-events)).
+4. Rename `.classList` to `.class'`; replace `.on`, `.prop` and `.use'` ([Extension methods](#extension-methods)).
+5. Rename the control flow: `Errored`, `Loading`, `Reveal`, `For.Keyed` / `For.NonKeyed` ([Control flow](#control-flow)).
+6. Replace `splitProps` / `mergeProps` with `omit` / `merge` ([Props](#props-omit-and-merge)).
+7. Split each `createEffect` into compute and effect functions ([Effects](#effects-have-two-phases)).
+8. Rework `createResource`, `batch`, `onMount`, `createSelector`, store setters and the removed primitives
+   ([table](#removed-and-replaced-primitives)).
+9. Add `open Partas.Solid.Web` for `render`, `Portal`, `Dynamic` and the rest of the [web runtime](#the-web-runtime).
+10. Regenerate any committed JSX snapshots.
+
+## Packages and bindings that moved
+
+| 2.x | 3.0 |
+| --- | --- |
+| `Fable.Browser.Dom` | `Xantham.Fable.Core.TS`, from its own Cloudsmith feed ([Installation](installation.md)) |
+| `solid-js/web` | `@solidjs/web`, bound in `Partas.Solid.Web` |
+| `solid-js/store` | `solid-js` |
+| `@solidjs/meta` with `MetaProvider` | `@solidjs/meta` 1.0, no provider ([Solid Meta](solid-meta.md)) |
+| `Router`, `Route`, `A`, `Navigate` | `@solidjs/router` 2: `createRouter` with `route` definitions, plain `a` links ([Solid Router](solid-router.md)) |
+| SolidStart bindings | Removed |
+
+## DOM types
+
+DOM types come from `Fable.Core.TS.Dom`. Write them as `Dom.X` after `open Fable.Core.TS`; opening
+`Fable.Core.TS.Dom` would shadow Partas's `Attr` module with DOM's `Attr` type. `document`, `window` and
+`globalThis` are bound by Partas.Solid and come in with `open Fable.Core`. Lookups return options:
+
+```fsharp
+// 2.x
+open Browser.Types
+let el: HTMLElement = Browser.Dom.document.getElementById "root"
+
+// 3.0
+open Fable.Core.TS
+let el: Dom.HTMLElement = (document.getElementById "root").Value
+```
+
+## Attributes and events
+
+The HTML, ARIA and SVG attributes are generated from Solid's JSX declarations:
+
+- A closed set of values is a `[<StringEnum>]` union in `Attr`: `type' = Attr.ButtonType.Button`,
+  `role = Attr.AriaRole.Dialog`.
+- An attribute that is only `"true"`/`"false"` is a `bool`.
+- Names follow Solid's lowercase spelling. The old camelCase spellings still compile, as `[<Obsolete>]` aliases.
+- Event handlers take their event type: `onClick: Dom.MouseEvent -> unit`.
+- `<input>`'s `min`, `max` and `step` take a number or a string.
+
+```fsharp solid jsx render=TypedAttributes
+[<SolidComponent>]
+let TypedAttributes () =
+    let position, setPosition = createSignal "not clicked"
+
+    div () {
+        button (type' = Attr.ButtonType.Button, onClick = fun e -> setPosition $"{e.clientX}, {e.clientY}") {
+            "Click me"
+        }
+        p () { $"Last click: {position ()}" }
+    }
+```
+
+See [Oxpecker DSL](oxpecker-dsl.md), [ARIA attributes](aria-attributes.md) and [SVG elements](svg-elements.md).
 
 ## Props: omit and merge
 
-Solid 2 replaced `splitProps` and `mergeProps` with `omit` and `merge`. `omit` returns only the rest
-of the props, so there is no "local" half any more.
+Solid 2 replaced `splitProps` and `mergeProps` with `omit` and `merge`. `omit` returns only the rest of the props,
+so there is no `PARTAS_LOCAL` any more: read props straight from the self identifier.
 
-For `[<SolidTypeComponent>]` members your F# does not change; only the generated JSX does:
+A `[<SolidTypeComponent>]` needs no change. The JSX tab shows the new preamble: `merge` for the default set in the
+body, `omit` for the props it reads.
 
-| 2.x output | 3.0 output |
-| --- | --- |
-| `const [PARTAS_LOCAL, PARTAS_OTHERS] = splitProps(props, ["class"])` | `const PARTAS_OTHERS = omit(props, "class")` |
-| `PARTAS_LOCAL.class` | `props.class` |
-| `props = mergeProps({ class: "x" }, props)` | `props = merge({ class: "x" }, props)` |
-| `import { splitProps, mergeProps } from "solid-js"` | `import { omit, merge } from "solid-js"` |
+```fsharp solid jsx render=ChipRow
+[<Erase>]
+type Chip() =
+    inherit span()
 
-When a component reads no props, the plugin drops the `omit` call and its import:
+    [<Erase>]
+    member val tone: string = unbox null with get, set
 
-```jsx
-export function MyTag(props) {
-    const PARTAS_OTHERS = props;
-    return <div />;
-}
+    [<SolidTypeComponent>]
+    member props.View =
+        props.tone <- "info"
+        span(class' = "chip chip-" + props.tone).spread props { props.children }
+
+[<SolidComponent>]
+let ChipRow () =
+    div () {
+        Chip () { "Default tone" }
+        Chip (tone = "warning") { "Warning tone" }
+    }
 ```
 
-If you called `splitProps` or `mergeProps` yourself, call `omit` and `merge` instead:
+A component that reads no props gets `const PARTAS_OTHERS = props` and no import. If you called the functions
+yourself:
 
 ```fsharp
 // 2.x
@@ -62,101 +116,36 @@ let others = omit (props, "class", "size")
 let withDefaults = merge ({| size = "md" |}, props)
 ```
 
-Read the omitted props straight from `props`.
+The self identifier no longer has to be `props`: `member this.View` compiles to `function Chip(this$)`. Two new
+flags control the preamble: `ComponentFlag.SkipOmit` drops the `omit`, and `ComponentFlag.SpreadProps` makes
+`.spread` spread the self identifier. See [Attribute flags](attribute-flags.md).
 
-## The self identifier can have any name
-
-In 2.x the self identifier of a `[<SolidTypeComponent>]` member had to be `props`. In 3.0 any name
-works, and it appears in the JSX as written:
-
-```fsharp
-[<Erase>]
-type Button() =
-    interface RegularNode
-    [<Erase>] member val size: string = unbox null with get, set
-    [<Erase>] member val variant: string = unbox null with get, set
-
-    [<SolidTypeComponent>]
-    member this.constructor =
-        button (class' = $"btn {this.size} {this.variant}").spread this
-```
-
-```jsx
-export function Button(this$) {
-    const PARTAS_OTHERS = omit(this$, "size", "variant");
-    return <button class={`btn ${this$.size} ${this$.variant}`} {...PARTAS_OTHERS} n$={false} />;
-}
-```
-
-The member must still be an instance member with a single unit parameter, on a type in the
-`Partas.Solid` namespace. See [SolidTypeComponent](../guide/solid-type-attribute.md).
-
-## New component flags
-
-Two new `ComponentFlag`s control the props preamble:
-
-- `ComponentFlag.SkipOmit` leaves out the `omit` call.
-- `ComponentFlag.SpreadProps` makes `.spread` spread the self identifier instead of `PARTAS_OTHERS`.
-
-With either flag, `.spread props` compiles to `{...props}`, so a wrapper can pass its props on
-without paying for `omit`. `For.Keyed` is defined this way:
-
-```fsharp
-[<SolidTypeComponent(ComponentFlag.SkipOmit ||| ComponentFlag.SpreadProps)>]
-member props.comp = For(keyed = !^true).spread props
-```
-
-See [Attribute flags](../guide/attribute-flags.md). The existing flags are unchanged.
-
-## The spread marker
-
-A spread used to emit a `bool:`-prefixed marker prop. The prefix is gone:
-
-```diff
-- <div {...PARTAS_OTHERS} bool:n$={false}>
-+ <div {...PARTAS_OTHERS} n$={false}>
-```
-
-This only matters if you post-process the generated JSX.
+The marker after a spread lost its prefix: `bool:n$={false}` is now `n$={false}`.
 
 ## Extension methods
 
 | 2.x | 3.0 |
 | --- | --- |
-| `.classList (obj)` | `.class' (obj)` |
-| `.on (name, handler)` | Removed |
+| `.classList (obj)` | `.classObj (obj)` |
+| `.on (name, handler)` | Removed. Use the event attribute, or an `OnHandler` for `once`, `passive` and `capture` |
 | `.prop (name, value)` | Removed |
-| `.use' (name, value)` | Removed. Solid 2 has no `use:` directives. |
+| `.use' (name, value)` | Removed. Solid 2 has no `use:` directives. Pass `createDirectiveFactory` to `.ref` |
 | `.bool (name, value)`, emitting `bool:name` | `.bool (name, value)`, emitting `name` |
 | `.spread` on `#HtmlTag` | `.spread` on `#HtmlElement` |
-
-`.attr`, `.data`, `.ref`, `.style'`, `.class'`, `.bool` and `.spread` remain. Of those, only `.data`
-still adds a prefix (`data-name`).
-
-```fsharp
-// 2.x
-div().classList {| active = isActive () |}
-
-// 3.0
-div().class' {| active = isActive () |}
-```
-
-`.on` and `.use'` have no direct replacement. Use the typed event attributes (`onClick = ...`), or an
-`OnHandler` for `once`, `passive` and `capture`. For a directive, pass `createDirectiveFactory` to `.ref`:
 
 ```fsharp
 // 2.x
 input().use' ("autofocus", true)
 
 // 3.0
-let autofocus = createDirectiveFactory (fun (el: Browser.Types.HTMLInputElement) ->
+let autofocus = createDirectiveFactory (fun (el: Dom.HTMLInputElement) ->
     el.focus ()
     ignore)
 
 input().ref autofocus
 ```
 
-See [Extension methods](../guide/extension-methods.md).
+See [Extension methods](extension-methods.md).
 
 ## Control flow
 
@@ -165,73 +154,51 @@ See [Extension methods](../guide/extension-methods.md).
 | `ErrorBoundary` | `Errored` |
 | `Suspense` | `Loading` |
 | `SuspenseList` | `Reveal` |
-| `For<'T>` | `For.Keyed<'T>`, `For.NonKeyed<'T>` or `For.KeyedFn<'T>` (`For.Component<'T>` is `For.Keyed`) |
+| `For<'T>` | `For.Keyed<'T>`, `For.NonKeyed<'T>` or `For.KeyedFn<'T>` |
 | `Index<'T>` | `For.NonKeyed<'T>` |
 | `Show`, `Switch`, `Match` | Unchanged, plus `Show.Keyed`, `Show.NonKeyed`, `Match.Keyed` and `Match.NonKeyed` |
-| none | `Repeat`, which renders by count instead of by array |
+| none | `Repeat`, which renders by count |
 | `Portal`, `Dynamic` in `Partas.Solid` | The same names in `Partas.Solid.Web` |
 
-### For and Index
+`For.Keyed` gives the row the item and an index accessor. `For.NonKeyed` gives it an item accessor and a plain index:
 
-```fsharp
-// 2.x
-For(each = items ()) {
-    yield fun item index -> li () { item.name }
-}
+```fsharp solid jsx render=Lists
+[<SolidComponent>]
+let Lists () =
+    let names = [| "Ada"; "Grace"; "Edsger" |]
 
-Index(each = names ()) {
-    yield fun name index -> li () { name () }
-}
-
-// 3.0
-For.Keyed(each = items ()) {
-    yield fun item index -> li () { item.name }
-}
-
-For.NonKeyed(each = names ()) {
-    yield fun name index -> li () { name () }
-}
+    div () {
+        ul () {
+            For.Keyed(each = names) {
+                yield fun name index -> li () { $"{index ()}: {name}" }
+            }
+        }
+        ul () {
+            For.NonKeyed(each = names) {
+                yield fun name index -> li () { $"{index}: {name ()}" }
+            }
+        }
+    }
 ```
 
-`For.Keyed` gives the row the item and an index accessor. `For.NonKeyed` gives it an item accessor
-and a plain index.
-
-### ErrorBoundary to Errored
-
-The fallback function now gets the error as an accessor, and `fallback` is a union of an element and
-a function, so the function needs `!^`. `plainFallback` is gone.
+`Errored`'s fallback gets the error as an accessor, and `fallback` is a union, so a function needs `!^` (or set
+`fallbackFn` instead). `plainFallback` is gone.
 
 ```fsharp
 // 2.x
 ErrorBoundary(fallback = ErrorBoundary.Fallback(fun err reset -> div () { string err })) {
     Risky ()
 }
-
-// 3.0
-Errored(
-    fallback =
-        !^(ErrorBoundary.Fallback(fun err reset ->
-            div () { (err () :?> exn).Message }))
-) {
-    Risky ()
-}
-```
-
-`Errored` also has `fallbackFn` and `fallbackEle` setters, which set `fallback` without the `!^`.
-
-### Suspense and SuspenseList
-
-```fsharp
-// 2.x
 SuspenseList(revealOrder = SuspenseList.RevealOrder.Forwards) {
     Suspense(fallback = Spinner ()) { Profile () }
-    Suspense(fallback = Spinner ()) { Posts () }
 }
 
 // 3.0
+Errored(fallback = !^(ErrorBoundary.Fallback(fun err reset -> div () { (err () :?> exn).Message }))) {
+    Risky ()
+}
 Reveal(order = Reveal.Order.Sequential) {
     Loading(fallback = Spinner ()) { Profile () }
-    Loading(fallback = Spinner ()) { Posts () }
 }
 ```
 
@@ -239,15 +206,15 @@ Reveal(order = Reveal.Order.Sequential) {
 
 | 2.x | 3.0 |
 | --- | --- |
-| `createResource` and its types | An async `createMemo`, under `Loading`. `refresh` re-runs it. |
+| `createResource` | An async `createMemo`, under `Loading`. `refresh` re-runs it |
 | `createComputed` | A memo, or a writable derived signal (`createSignal (fun () -> ...)`) |
 | `createDeferred` | None |
 | `createSelector` | `createProjection` |
-| `batch` | `flush`. Writes are always batched. |
+| `batch` | `flush`. Writes are always batched |
 | `startTransition`, `useTransition` | `action`, with `isPending` |
 | `onMount` | `onSettled` |
 | `on` | The compute half of `createEffect` |
-| `catchError` | `createErrorBoundary` |
+| `catchError` | `Errored` |
 | `indexArray` | `mapArrayUnkeyed` |
 | `produce` | The store setter: mutate the draft and return it |
 | `unwrap` | `snapshot` |
@@ -260,60 +227,20 @@ Reveal(order = Reveal.Order.Sequential) {
 ```fsharp
 // 2.x
 let user, manager = createResource (userId, fetchUser)
-
-Suspense(fallback = p () { "Loading..." }) {
-    p () { user.current.name }
-}
+Suspense(fallback = p () { "Loading..." }) { p () { user.current.name } }
 
 // 3.0
 let user = createMemo (fun (_: User option) -> fetchUser (userId ()))
-
-Loading(fallback = p () { "Loading..." }) {
-    p () { user().name }
-}
+Loading(fallback = p () { "Loading..." }) { p () { user().name } }
 ```
 
-An async memo suspends its readers until the promise settles, so you read the value directly.
-`refresh user` replaces `manager.refetch ()`. `isPending (fun () -> box (user ()))` tells you a refetch is in flight.
-
-### onMount and batch
-
-```fsharp
-// 2.x
-onMount (fun () -> inputRef.focus ())
-
-batch (fun () ->
-    setFirst "Ada"
-    setLast "Lovelace")
-
-// 3.0
-onSettled (fun () -> inputRef.focus ())
-
-// Writes are batched anyway. Use flush to apply them now.
-flush (fun () ->
-    setFirst "Ada"
-    setLast "Lovelace")
-```
+An async memo suspends its readers until the promise settles. `refresh user` replaces `manager.refetch ()`.
+[Async memos](solid-js.md#async-memos) has a live example.
 
 ## Effects have two phases
 
-Solid 2 has no single-function `createEffect`. An effect is a tracked compute function, which
-returns a value, and an untracked effect function, which gets it.
-
-```fsharp
-// 2.x
-createEffect (fun () ->
-    console.log $"count is {count ()}")
-
-// 3.0
-createEffect (
-    (fun (_: int option) -> count ()),
-    fun (n: int) -> console.log $"count is {n}"
-)
-```
-
-Return a cleanup from the effect function instead of calling `onCleanup` inside it. `createEffect`
-has overloads for an effect function that returns a cleanup:
+An effect is a tracked compute function, which returns a value, and an untracked effect function, which gets it.
+Return a cleanup from the effect function instead of calling `onCleanup` in it:
 
 ```fsharp
 // 2.x
@@ -330,119 +257,50 @@ createEffect (
 )
 ```
 
-`on (deps, fn)` is gone as well: the compute function already names what the effect depends on.
-When you cannot separate the two phases, `createTrackedEffect (fun () -> ...)` runs one function
-that both tracks and acts.
+[Effects](solid-js.md#effects) has live examples. When the phases cannot be separated, `createTrackedEffect (fun () -> ...)` runs one function that tracks and acts.
+In `Partas.Solid.Experimental`, `effect { }` needs exactly one `let!` naming the tracked source, and `batch { }` and
+`selector { }` are gone ([Experimental](experimental.md)).
 
 ## Stores
 
-Stores moved into `solid-js`; there is no `solid-js/store` module. The setter takes a single updater,
-`'T -> 'T`. Path setters and `produce` are gone, because mutating the draft is now the default. Mutate
-the draft and return it, or return a new value:
+The setter takes one updater, `'T -> 'T`. Path setters and `produce` are gone: mutate the draft and return it, or
+return a new value. `createStore` returns a `Store<'T>`; read it through `.Value`.
 
 ```fsharp
 // 2.x
-setState.Path.Map(_.todos).Update (fun todos -> Array.append todos [| todo |])
 setState.Update (produce (fun s -> s.count <- s.count + 1))
 
 // 3.0
-setState (fun s -> {| s with todos = Array.append s.todos [| todo |] |})
-
 setState (fun s ->
     s.count <- s.count + 1
     s)
 ```
 
-`createStore` now returns a `Store<'T>` rather than a bare `'T`. Read it through `.Value`:
-`state.Value.todos`. `unwrap state` is now `snapshot state`. `reconcile next` returns an updater, so
-`setState (reconcile next)` still works.
+`setState (reconcile next)` still works. [Stores](solid-js.md#stores) has a live example.
 
 ## Curried callbacks
 
-The two-argument callbacks of `mapArray` and `createErrorBoundary` are now typed as `Func<_, _, _>`.
-Write them as curried lambdas, `fun item index -> ...`, which F# converts to a two-argument JS
-function. The 2.x signatures compiled to a one-argument JS function, so Solid never passed the index
-or the reset function.
+`mapArray`'s two-argument callback is a `Func<_, _, _>`: write it as a curried lambda. In 2.x it compiled to a
+one-argument JS function, so Solid never passed the index.
 
 ```fsharp
-// map an array, with the index
 let labels = mapArray (items, fun item index -> $"{index ()}: {item.name}")
-
-// an error boundary, with its reset function
-let view = createErrorBoundary ((fun () -> Risky ()), fun err reset -> Fallback (err ()) reset)
-```
-
-## lazy'
-
-`lazy'` follows Solid 2's `lazy (fn, options?, moduleUrl?)`. `importComponent` is gone. Use Fable's
-`importDynamic`:
-
-```fsharp
-// 2.x
-let Settings = lazy' (fun () -> importComponent "./Settings.fs.jsx")
-
-// 3.0
-let Settings = lazy' (fun () -> importDynamic "./Settings.fs.jsx")
-
-// a named export instead of the default one
-let Panel = lazy' ((fun () -> importDynamic "./Panels.fs.jsx"), LazyOptions (``export`` = "Panel"))
 ```
 
 ## The web runtime
 
-`solid-js/web` is now `@solidjs/web`. Its bindings are in the `Partas.Solid.Web` namespace:
-`render`, `hydrate`, `renderToString`, `renderToStream`, `isServer`, `isDev`, `clientOnly`,
-`httpHeader`, `httpStatus`, `Portal`, `Dynamic` and `HeadTag`.
+`Partas.Solid.Web` binds `@solidjs/web`: `render`, `hydrate`, `renderToString`, `renderToStream`, `isServer`, `isDev`,
+`clientOnly`, `httpHeader`, `httpStatus`, `useHead`, `Portal` and `Dynamic`.
 
 ```fsharp
-// 2.x
-open Partas.Solid
-
-render ((fun () -> App ()), document.getElementById "root")
-
-// 3.0
 open Partas.Solid
 open Partas.Solid.Web
 
-render ((fun () -> App ()), document.getElementById "root")
+render ((fun () -> App ()), (document.getElementById "root").Value)
 ```
 
-Install `@solidjs/web` next to `solid-js`.
+## Snapshots
 
-## Experimental builders
-
-The builders in `Partas.Solid.Experimental` follow the new primitives:
-
-- `effect { }` needs exactly one `let!`, which names the tracked source. The rest of the block is the
-  effect.
-- `mount { }` wraps `onSettled`.
-- `lazyload { }` takes `importDynamic`.
-- `batch { }` and `selector { }` are gone. Call `flush` and `createProjection` directly.
-
-```fsharp
-// 2.x
-effect {
-    console.log $"count is {count ()}"
-}
-
-// 3.0
-effect {
-    let! n = count
-    console.log $"count is {n}"
-}
-```
-
-See [Experimental features](../guide/experimental.md).
-
-## Snapshots and generated JSX
-
-If you commit the generated JSX, or compare against it in tests, regenerate it. Expect:
-
-- `PARTAS_LOCAL` is gone. Props are read from the self identifier.
-- `splitProps` and `mergeProps` become `omit` and `merge`, and the imports change to match.
-- `bool:n$` becomes `n$`.
-- Control-flow imports change: `Errored`, `Loading`, `Reveal` from `solid-js`, and `KeyedFor` /
-  `NonKeyedFor` from Partas.Solid's compiled bindings (`SolidBindings.fs.jsx`).
-- Anything from the web runtime is imported from `@solidjs/web`.
-
-See [JSX output](../about/jsx-output.md) for how the plugin output is laid out.
+Regenerated JSX shows `omit`/`merge` instead of `splitProps`/`mergeProps`, no `PARTAS_LOCAL`, `n$` instead of
+`bool:n$`, `Errored`/`Loading`/`Reveal` from `solid-js`, `KeyedFor`/`NonKeyedFor` from Partas.Solid's compiled
+bindings, and web imports from `@solidjs/web`. See [JSX output](../about/jsx-output.md).

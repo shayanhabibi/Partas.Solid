@@ -6,9 +6,7 @@ title: Idle
 These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to Solid 2 yet.
 :::
 
-Bindings for `@solid-primitives/idle`.
-
-## createIdleTimer
+Bindings for `@solid-primitives/idle`, which tracks whether the user is idle.
 
 ```fsharp
 let createIdleTimer(
@@ -23,15 +21,7 @@ let createIdleTimer(
     ): IdleTimer
 ```
 
-Tracks whether the user is idle.
-
-## IdleTimer
-
-```fsharp
-type IdleTimer = interface
-```
-
-| Member | Type | Desc |
+| `IdleTimer` member | Type | Desc |
 | --- | --- | --- |
 | `isIdle` | `Accessor<bool>` | Whether the user is idle. |
 | `isPrompted` | `Accessor<bool>` | Whether the user is in the prompt period. |

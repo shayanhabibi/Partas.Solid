@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <IsPackable>false</IsPackable>
+        <GenerateProgramFile>false</GenerateProgramFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="SolidTests.fs"/>
+        <Compile Include="Main.fs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../../tools/Partas.Nacara.Plugins.Solid/Partas.Nacara.Plugins.Solid.fsproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Expecto" Version="11.0.0-alpha8"/>
+        <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.15.5"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0"/>
+    </ItemGroup>
+
+</Project>

@@ -8,44 +8,17 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 
 Bindings for `@solid-primitives/scroll`.
 
-## ScrollPosition
-
 ```fsharp
-type ScrollPosition = interface
-```
+type ScrollPosition =
+    member x: int     // will likely become float
+    member y: int
 
-```fsharp
-member x: int
-member y: int
-```
-
-:::note
-These will likely become `float` in a later version of the binding.
-:::
-
-## createScrollPosition
-
-```fsharp
-let createScrollPosition(
-    ?element: #HtmlElement | Accessor<#HtmlElement>
-    ): Accessor<ScrollPosition>
-```
-
-The target defaults to `window`.
-
-## useWindowScrollPosition
-
-```fsharp
+let createScrollPosition(?element: #HtmlElement | Accessor<#HtmlElement>): Accessor<ScrollPosition>
 let useWindowScrollPosition(): ScrollPosition
-```
-
-A reactive window scroll position. Its signals and listeners are shared by every caller, so it is cheap to use in many
-places.
-
-## getScrollPosition
-
-```fsharp
 let getScrollPosition(): ScrollPosition
 ```
 
-Reads the current position once, without tracking.
+- `createScrollPosition` tracks an element's scroll position. The target defaults to `window`.
+- `useWindowScrollPosition` tracks the window's. Its signals and listeners are shared by every caller, so it is cheap
+  to use in many places.
+- `getScrollPosition` reads the current position once, without tracking.

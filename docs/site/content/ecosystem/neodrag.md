@@ -9,7 +9,7 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 `Partas.Solid.NeoDrag` binds [@neodrag/solid](https://www.neodrag.dev/docs/solid), for drag and drop. See its docs for
 usage. The binding has not been tested much.
 
-## Vanilla NeoDrag on Solid 2
+## On Solid 2 today
 
 [@neodrag/vanilla](https://www.neodrag.dev/docs/vanilla) has no framework dependency, so it works on Solid 2 today.
 Its whole API is one class, `Draggable`. `[<Import>]` on a class type imports the named export, and calling the
@@ -17,10 +17,10 @@ constructor emits `new Draggable(...)`. The options are an anonymous record, and
 passes to its drag callbacks.
 
 ```fsharp solid
-open Browser.Types
+open Fable.Core.TS
 
 [<Import("Draggable", "@neodrag/vanilla")>]
-type Draggable(node: HTMLElement, options: obj) =
+type Draggable(node: Dom.HTMLElement, options: obj) =
     member _.updateOptions(options: obj) : unit = jsNative
     member _.destroy() : unit = jsNative
 
@@ -49,7 +49,7 @@ makes the position controlled, so Reset can move the card back with `updateOptio
 let DragDemo () =
     let x, setX = createSignal 0
     let y, setY = createSignal 0
-    let mutable card: HTMLDivElement = JS.undefined
+    let mutable card: Dom.HTMLDivElement = JS.undefined
     let mutable drag: Draggable = JS.undefined
 
     onSettled (fun () ->

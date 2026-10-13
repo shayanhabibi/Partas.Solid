@@ -14,9 +14,7 @@ It will not get much more work: stories are moving to the plugin's own `[<Partas
 
 ## Installation
 
-This package has no Femto helpers. Set up Storybook before you add it.
-
-### Create a solid-storybook project
+This package has no Femto helpers. Create a solid-storybook project first:
 
 ```bash
 npx create-solid-storybook [path/project]
@@ -28,7 +26,7 @@ npm install
 npm run storybook
 ```
 
-If that works, set up your Fable project in the same directory.
+Then set up your Fable project in the same directory.
 
 ## Running Fable and Storybook
 
@@ -36,27 +34,14 @@ Compile into the `stories/` directory, so styling and imports resolve as Storybo
 files ending `.stories.jsx`, so the other compiled files do not get in the way.
 
 ```bash
-fable watch -c Release -o stories -e .jsx --run storybook dev -p 6006
+dotnet fable watch -c Release --typedArrays false -o stories -e .jsx --run storybook dev -p 6006
 ```
 
 ## Making a story
 
-See Storybook's [Component Story Format](https://storybook.js.org/docs/api/csf).
-
-Create a source file in the `stories/` directory with a `.stories` suffix:
-
-```
-Button.stories.fs
-```
-
-Define the component meta, and make it the default export.
-
-:::note
-Make the meta binding private, or Storybook will treat it as a story too. Storybook's docs explain how it picks up
-stories.
-:::
-
-`[<SolidComponent>]` is required for `!@` to render correctly:
+Stories follow Storybook's [Component Story Format](https://storybook.js.org/docs/api/csf). Create a file such as
+`stories/Button.stories.fs`, and make the component meta its default export. Make the meta binding private, or
+Storybook treats it as a story too. `[<SolidComponent>]` is required for `!@` to render correctly:
 
 ```fsharp
 [<SolidComponent>]

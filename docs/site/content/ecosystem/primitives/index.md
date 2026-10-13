@@ -3,14 +3,16 @@ title: Solid Primitives
 ---
 
 :::warning
-These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to Solid 2 yet.
+These bindings target Partas.Solid 2.x on Solid 1.9. `@solid-primitives` depends on Solid 1.x, so none of these
+packages work with Partas.Solid 3.0 until they are ported upstream and here.
 :::
 
 Bindings for the community packages published under `@solid-primitives`. Each page lists the bound signatures; for
-usage, read the upstream documentation for the package, which the bindings follow closely.
+usage, read the upstream documentation, which the bindings follow closely. The signatures are the 2.x packages', so
+their DOM types (`HtmlElement`, `Event`) come from Fable.Browser.Dom; a Solid 2 port will use Xantham's `Dom.X` types.
 
-`@solid-primitives` depends on Solid 1.x, so none of these packages work with Partas.Solid 3.0 on Solid 2 until they
-are ported upstream and here. That is why these pages have no live examples.
+Some pages show the primitive's behaviour live, written in plain Partas.Solid 3.0. That code works today, so you can
+use it until the package is ported.
 
 ## Packages
 
@@ -42,37 +44,28 @@ are ported upstream and here. That is why these pages have no live examples.
 | [Tween](tween.md) | `@solid-primitives/tween` |
 | [WebSocket](websocket.md) | `@solid-primitives/websocket` (not bound) |
 
-## Package organisation
+## Packages and namespaces
 
-Each primitive is its own NuGet package, such as `Partas.Solid.Primitives.Mouse`, and all of them share the namespace
-`Partas.Solid.Primitives` and a dependency on `Partas.Solid.Primitives.Common`. (Before `0.2.0`, each primitive had its
-own namespace.)
+Each primitive is its own NuGet package, such as `Partas.Solid.Primitives.Mouse`. All of them share the namespace
+`Partas.Solid.Primitives` and depend on `Partas.Solid.Primitives.Common`. Femto installs a package together with its
+npm dependency:
+
+```bash
+femto install Partas.Solid.Primitives.Mouse
+```
 
 :::note
 The package `Partas.Solid.Primitives` installs the latest version of every primitive. Do not depend on it when you
 publish a library.
 :::
 
-## Femto
-
-Each primitive package can be installed with Femto, which also adds its npm dependency:
-
-```bash
-femto install Partas.Solid.Primitives.Mouse
-```
-
 ## Use, make and create
 
 The bindings keep the `@solid-primitives` naming scheme:
 
 - `make` primitives are not reactive, but they clean up their resources when their owner is disposed.
-- `use` primitives are usually *rootless*: there is one instance of the primitive, shared by every consumer.
+- `use` primitives are usually *rootless*: one instance, shared by every consumer.
 - `create` primitives are reactive, and clean up their resources when their owner is disposed.
 
-## Disposal callbacks
-
-Some primitives return a `DisposeCallback`, a `unit -> unit` function that cleans up the resource. Call it when you
-need to release the resource before its owner is disposed.
-
-`DisposeCallback` comes from `Partas.Solid.Primitives.Common`. Core Partas.Solid 3.0 has its own `DisposalFunc` type,
-which is what `createRoot` passes to its callback.
+Some primitives return a `DisposeCallback`, a `unit -> unit` from `Partas.Solid.Primitives.Common`. Call it to release
+the resource before its owner is disposed. (Core Partas.Solid 3.0 calls the same shape `DisposalFunc`.)

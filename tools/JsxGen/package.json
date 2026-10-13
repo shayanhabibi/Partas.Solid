@@ -1,0 +1,10 @@
+{
+  "name": "partas-solid-jsxgen",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "@solidjs/web": "2.0.0-rc.14",
+    "solid-js": "2.0.0-rc.14",
+    "typescript": "7.1.0-dev.20260902.1"
+  }
+}

@@ -8,31 +8,19 @@ These bindings target Partas.Solid 2.x on Solid 1.9 and have not been ported to 
 
 Bindings for `@solid-primitives/autofocus`.
 
-## createAutofocus
-
 ```fsharp
-/// <summary>
-/// Reactively autofocuses an element passed in as a signal
-/// </summary>
-[<ImportMember(path)>]
-static member createAutofocus (ref: unit -> #HtmlElement): unit = jsNative
+let createAutofocus(ref: unit -> #HtmlElement): unit
 ```
 
 Pass an accessor that returns the element to focus: one that reads a captured `ref`, or a signal that the element's
 `ref` sets. Upstream usage:
 
 ```jsx
-import { createAutofocus } from "@solid-primitives/autofocus";
-
-// Using ref
 let ref;
 createAutofocus(() => ref);
-
 <button ref={ref}>Autofocused</button>;
 
-// Using ref signal
 const [ref, setRef] = createSignal();
 createAutofocus(ref);
-
 <button ref={setRef}>Autofocused</button>;
 ```

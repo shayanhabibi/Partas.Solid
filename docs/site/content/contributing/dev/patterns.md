@@ -2,11 +2,6 @@
 title: Plugin patterns
 ---
 
-:::note
-The plugin's source is documented heavily. Every pattern has a comment on what it matches and why. This page is a
-map.
-:::
-
 `Plugin.fs` is one recursive module, `AST`. Its active patterns recognise the pieces of a tag: its constructor, its
 attributes and its children. Order matters in several places, and the comments say where.
 
