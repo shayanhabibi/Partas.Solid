@@ -82,7 +82,6 @@ let theme =
                     Menu.page "guide/experimental.md"
                     Menu.page "guide/solid-router.md"
                     Menu.page "guide/solid-meta.md"
-                    Menu.page "guide/solid-start.md"
                     Menu.page "guide/storybook.md"
                 ]
         ]

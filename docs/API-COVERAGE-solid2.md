@@ -19,7 +19,7 @@ jumps to the line. They will **not** resolve on GitHub for paths under `solid/`,
 | `@solidjs/web` | [`web/src/index.ts`](../solid/packages/web/src/index.ts) | [`SolidWebBindings.fs`](../src/Partas.Solid/SolidWebBindings.fs) | **renamed** from `solid-js/web`; already correct |
 | `@solidjs/router` | *not in submodule* | [`SolidRouterBindings.fs`](../src/Partas.Solid/SolidRouterBindings.fs) (446 ln, 27 imports) | separate repo — see [§7](#7-blind-spots--things-these-submodules-cannot-answer) |
 | `@solidjs/meta` | *not in submodule* | [`SolidMetaBindings.fs`](../src/Partas.Solid/SolidMetaBindings.fs) (35 ln) | separate repo |
-| `@solidjs/start` | *not in submodule* | [`SolidStartBindings.fs`](../src/Partas.Solid/SolidStartBindings.fs) (182 ln) | separate repo |
+| `@solidjs/start` | *not in submodule* | *removed in 3.0* | no SolidStart release supports Solid 2 yet |
 
 **`solid-js/store` no longer exists.** [`solid/packages/solid/package.json`](../solid/packages/solid/package.json#L30)
 declares only `.`, `./refresh`, `./attribution`, `./internal`, `./package.json`. The store API lives in
@@ -140,7 +140,7 @@ Gaps:
 
 | Missing | Defined at | Verdict |
 | --- | --- | --- |
-| Request/response plumbing — `createRequestEvent` `createResponseStub` `createSSRResponse` `commitEventResponse` `composeMiddleware` `getExpectedRedirectStatus` | [`server-mock.ts:254-342`](../solid/packages/web/src/server-mock.ts#L254-L342) | **belongs in [`SolidStartBindings.fs`](../src/Partas.Solid/SolidStartBindings.fs)**, not web — decide placement |
+| Request/response plumbing — `createRequestEvent` `createResponseStub` `createSSRResponse` `commitEventResponse` `composeMiddleware` `getExpectedRedirectStatus` | [`server-mock.ts:254-342`](../solid/packages/web/src/server-mock.ts#L254-L342) | server plumbing; SolidStart bindings were removed in 3.0, so bind here only if needed |
 | Asset types — `AssetManifest` `AssetResolver` `AssetResolverFn` `ResolvedAssets` `InlineStyleAsset` | [`server-mock.ts:56-142`](../solid/packages/web/src/server-mock.ts#L56-L142) | only if we bind SSR asset handling |
 | Response helpers — `redirect` `reload` `respond` `markSafeError` `isSafeError` `ResponseEnvelope` `HREF` `REVALIDATE_HEADER` … (`export * from "./response.js"`) | [`response.ts:33-288`](../solid/packages/web/src/response.ts#L33-L288) | now in-tree (was an unverifiable `@dom-expressions/runtime` re-export); server-function plumbing — same placement question as the request/response row |
 | `export * from "./client.js"` | [`client.ts`](../solid/packages/web/src/client.ts) (in-tree since rc.9) | compiler-facing DOM runtime (`insert`, `spread`, `template`, `delegateEvents`) — do not bind; only `render` / `hydrate` are user-facing |

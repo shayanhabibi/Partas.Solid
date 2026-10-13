@@ -9,7 +9,7 @@ Partas.Solid is an F#/Fable front-end framework for [solid-js](https://www.solid
 Oxpecker.Solid. It ships two NuGet packages that are always versioned in lockstep:
 
 - **Partas.Solid** — the DSL/bindings library (tags, HTML/ARIA/SVG attributes, CSS-in-F# style spec, solid-js /
-  solid-router / solid-meta / solid-start bindings). Almost all of it is `[<Erase>]`/import surface: the types exist to
+  solid-router / solid-meta bindings). Almost all of it is `[<Erase>]`/import surface: the types exist to
   give F# a typed authoring experience and are erased by the plugin.
 - **Partas.Solid.FablePlugin** — a Fable compiler plugin (`MemberDeclarationPluginAttribute`) that rewrites the F# AST
   into JSX. This is where the real behaviour lives; the library alone produces nothing useful.
@@ -67,7 +67,7 @@ Anchors when you do need to look (package dirs are `web` and `signals`, not `sol
 Coverage of the JSX/DOM surface is tracked in [`docs/API-COVERAGE-solid2.md`](docs/API-COVERAGE-solid2.md) §5 — read
 that before re-deriving a diff by hand.
 
-Not in this checkout, so don't search for them: **`@solidjs/router` / `@solidjs/meta` / `@solidjs/start`** (separate
+Not in this checkout, so don't search for them: **`@solidjs/router` / `@solidjs/meta`** (separate
 repos).
 
 Never edit files under `solid/`. Changes there are upstream's, and committing inside the submodule would move the

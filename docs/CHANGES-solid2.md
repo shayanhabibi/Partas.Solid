@@ -276,6 +276,13 @@ The web runtime (`@solidjs/web`, formerly `solid-js/web`) now has its own file (
 `Bindings.render` / `renderToString` / `isServer` are no longer on the core `Bindings` type (`DEV` stays there) — update your
 `open`s accordingly.
 
+### `Partas.Solid.Start` removed
+
+The SolidStart bindings (`SolidStartBindings.fs`, namespace `Partas.Solid.Start`) are gone. No SolidStart release
+supports Solid 2: every version, including the rc and beta tags, requires `solid-js` 1.9 and `@solidjs/router` below
+2.0. Stay on Partas.Solid 2.x for SolidStart projects. `clientOnly`, `httpStatus` and `httpHeader` are in
+`Partas.Solid.Web`.
+
 ## 10. Toolchain
 
 Relevant if you build from source or pin transitively:

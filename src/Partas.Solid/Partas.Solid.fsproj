@@ -33,7 +33,6 @@
       <Compile Include="SolidWebBindings.fs" />
       <Compile Include="SolidRouterBindings.fs" />
       <Compile Include="SolidMetaBindings.fs" />
-      <Compile Include="SolidStartBindings.fs" />
       <Compile Include="Experimental.fs" />
       <Compile Include="PolymorphicSupport.fs" />
       <Compile Include="Storybook.fs" />

@@ -214,30 +214,7 @@ let PlanetTable () =
 
 ## Getting started
 
-Set up either a SolidStart project or a plain Vite project.
-
-## Partas.SolidStart
-
-See [Installation](../../guide/installation.md) and start from the tailwind template. Then install the npm
-dependencies:
-
-```bash
-npm install @kobalte/core @tanstack/solid-table clsx tailwind-merge lucide-solid
-```
-
-and the bindings:
-
-```bash
-dotnet add package Partas.Solid.TanStack.Table
-dotnet add package Partas.Solid.Lucide
-dotnet add package Partas.Solid.Kobalte
-```
-
-Start the dev server and check that everything works:
-
-```bash
-dotnet run dev
-```
+Set up a plain Vite project. SolidStart does not support Solid 2 yet.
 
 ## Vite
 
