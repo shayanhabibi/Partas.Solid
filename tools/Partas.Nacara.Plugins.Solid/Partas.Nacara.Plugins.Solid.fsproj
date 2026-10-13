@@ -1,40 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <OutputType>Library</OutputType>
-        <TargetFramework>net10.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <RootNamespace>Partas.Nacara.Plugins.Solid</RootNamespace>
-        <AssemblyName>Partas.Nacara.Plugins.Solid</AssemblyName>
-        <PackageId>Partas.Nacara.Plugins.Solid</PackageId>
-        <Title>Partas.Nacara.Plugins.Solid</Title>
-        <Description>Live Partas.Solid examples in Nacara pages, compiled at build time.</Description>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <RepositoryUrl>https://github.com/shayanhabibi/Partas.Solid</RepositoryUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Authors>shayanhabibi</Authors>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <!-- Written by ShipIt, in lockstep with Partas.Solid (src/CHANGELOG.md). -->
-        <Version>3.0.0</Version>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-        <WarningsAsErrors>$(WarningsAsErrors);FS0025</WarningsAsErrors>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <Compile Include="Types.fs" />
-        <Compile Include="Scan.fs" />
-        <Compile Include="Generate.fs" />
-        <Compile Include="Workspace.fs" />
-        <Compile Include="Watch.fs" />
-        <Compile Include="Compile.fs" />
-        <Compile Include="Solid.fs" />
-        <EmbeddedResource Include="assets/loader.js" LogicalName="Partas.Nacara.Plugins.Solid.assets.loader.js" />
-        <EmbeddedResource Include="assets/bundle.mjs" LogicalName="Partas.Nacara.Plugins.Solid.assets.bundle.mjs" />
-        <None Include="README.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Nacara.Core" Version="2.0.0-beta.6" />
-    </ItemGroup>
-
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Partas.Nacara.Plugins.Solid</RootNamespace>
+    <AssemblyName>Partas.Nacara.Plugins.Solid</AssemblyName>
+    <PackageId>Partas.Nacara.Plugins.Solid</PackageId>
+    <Title>Partas.Nacara.Plugins.Solid</Title>
+    <Description>Live Partas.Solid examples in Nacara pages, compiled at build time.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/shayanhabibi/Partas.Solid</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Authors>shayanhabibi</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Written by ShipIt, in lockstep with Partas.Solid (src/CHANGELOG.md). -->
+    <Version>3.0.0-rc.1</Version>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+    <WarningsAsErrors>$(WarningsAsErrors);FS0025</WarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="Scan.fs" />
+    <Compile Include="Generate.fs" />
+    <Compile Include="Workspace.fs" />
+    <Compile Include="Watch.fs" />
+    <Compile Include="Compile.fs" />
+    <Compile Include="Solid.fs" />
+    <EmbeddedResource Include="assets/loader.js" LogicalName="Partas.Nacara.Plugins.Solid.assets.loader.js" />
+    <EmbeddedResource Include="assets/bundle.mjs" LogicalName="Partas.Nacara.Plugins.Solid.assets.bundle.mjs" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Nacara.Core" Version="2.0.0-beta.6" />
+  </ItemGroup>
 </Project>
