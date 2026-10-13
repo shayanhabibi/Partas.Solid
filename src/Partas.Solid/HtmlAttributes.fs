@@ -8,6 +8,11 @@ open Partas.Solid.Experimental.U
 /// Closed value sets of JSX attributes, as string enums: `dir = Attr.Dir.Rtl`.
 module Attr =
     [<StringEnum; RequireQualifiedAccess>]
+    type Actiontype =
+        | [<CompiledName "statusline">] Statusline
+        | [<CompiledName "toggle">] Toggle
+
+    [<StringEnum; RequireQualifiedAccess>]
     type AnchorPreload =
         | [<CompiledName "false">] False
 
@@ -46,11 +51,6 @@ module Attr =
         | [<CompiledName "on">] On
 
     [<StringEnum; RequireQualifiedAccess>]
-    type BdoDir =
-        | [<CompiledName "ltr">] Ltr
-        | [<CompiledName "rtl">] Rtl
-
-    [<StringEnum; RequireQualifiedAccess>]
     type Blocking =
         | [<CompiledName "render">] Render
 
@@ -87,6 +87,18 @@ module Attr =
         | [<CompiledName "right">] Right
 
     [<StringEnum; RequireQualifiedAccess>]
+    type Columnalign =
+        | [<CompiledName "center">] Center
+        | [<CompiledName "left">] Left
+        | [<CompiledName "right">] Right
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type Columnlines =
+        | [<CompiledName "dashed">] Dashed
+        | [<CompiledName "none">] None
+        | [<CompiledName "solid">] Solid
+
+    [<StringEnum; RequireQualifiedAccess>]
     type Contenteditable =
         | [<CompiledName "false">] False
         | [<CompiledName "inherit">] Inherit
@@ -105,10 +117,21 @@ module Attr =
         | [<CompiledName "sync">] Sync
 
     [<StringEnum; RequireQualifiedAccess>]
+    type Denomalign =
+        | [<CompiledName "center">] Center
+        | [<CompiledName "left">] Left
+        | [<CompiledName "right">] Right
+
+    [<StringEnum; RequireQualifiedAccess>]
     type Dir =
         | [<CompiledName "auto">] Auto
         | [<CompiledName "ltr">] Ltr
         | [<CompiledName "rtl">] Rtl
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type Display =
+        | [<CompiledName "block">] Block
+        | [<CompiledName "inline">] Inline
 
     [<StringEnum; RequireQualifiedAccess>]
     type Draggable =
@@ -151,6 +174,12 @@ module Attr =
         | [<CompiledName "low">] Low
 
     [<StringEnum; RequireQualifiedAccess>]
+    type Form =
+        | [<CompiledName "infix">] Infix
+        | [<CompiledName "postfix">] Postfix
+        | [<CompiledName "prefix">] Prefix
+
+    [<StringEnum; RequireQualifiedAccess>]
     type Formenctype =
         | [<CompiledName "application/x-www-form-urlencoded">] ApplicationXWwwFormUrlencoded
         | [<CompiledName "multipart/form-data">] MultipartFormData
@@ -161,6 +190,12 @@ module Attr =
         | [<CompiledName "dialog">] Dialog
         | [<CompiledName "get">] Get
         | [<CompiledName "post">] Post
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type Frame =
+        | [<CompiledName "dashed">] Dashed
+        | [<CompiledName "none">] None
+        | [<CompiledName "solid">] Solid
 
     [<StringEnum; RequireQualifiedAccess>]
     type Hidden =
@@ -221,6 +256,18 @@ module Attr =
         | [<CompiledName "lazy">] Lazy
 
     [<StringEnum; RequireQualifiedAccess>]
+    type MathMLMtableAlign =
+        | [<CompiledName "axis">] Axis
+        | [<CompiledName "baseline">] Baseline
+        | [<CompiledName "bottom">] Bottom
+        | [<CompiledName "center">] Center
+        | [<CompiledName "top">] Top
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type Mathvariant =
+        | [<CompiledName "normal">] Normal
+
+    [<StringEnum; RequireQualifiedAccess>]
     type MediaPreload =
         | [<CompiledName "auto">] Auto
         | [<CompiledName "metadata">] Metadata
@@ -236,6 +283,12 @@ module Attr =
         | [<CompiledName "dialog">] Dialog
         | [<CompiledName "get">] Get
         | [<CompiledName "post">] Post
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type Numalign =
+        | [<CompiledName "center">] Center
+        | [<CompiledName "left">] Left
+        | [<CompiledName "right">] Right
 
     [<StringEnum; RequireQualifiedAccess>]
     type Popover =
@@ -259,6 +312,20 @@ module Attr =
         | [<CompiledName "strict-origin">] StrictOrigin
         | [<CompiledName "strict-origin-when-cross-origin">] StrictOriginWhenCrossOrigin
         | [<CompiledName "unsafe-url">] UnsafeUrl
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type Rowalign =
+        | [<CompiledName "axis">] Axis
+        | [<CompiledName "baseline">] Baseline
+        | [<CompiledName "bottom">] Bottom
+        | [<CompiledName "center">] Center
+        | [<CompiledName "top">] Top
+
+    [<StringEnum; RequireQualifiedAccess>]
+    type Rowlines =
+        | [<CompiledName "dashed">] Dashed
+        | [<CompiledName "none">] None
+        | [<CompiledName "solid">] Solid
 
     [<StringEnum; RequireQualifiedAccess>]
     type Scope =
@@ -321,6 +388,149 @@ module Attr =
 
 [<AutoOpen>]
 module HtmlAttributes =
+    // Marker interfaces Builder.fs does not declare: MathML, and HTML elements added since.
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type EventHandlersWindow = interface end
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type BodyHTMLAttributes =
+        inherit EventHandlersWindow
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLAttributes = interface end
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLAnnotationElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLAnnotationXmlElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMactionElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMathElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMencloseElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMerrorElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMfencedElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMfracElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMiElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMmultiscriptsElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMnElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMoElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMoverElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMpaddedElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMphantomElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMprescriptsElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMrootElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMrowElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMsElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMspaceElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMsqrtElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMstyleElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMsubElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMsubsupElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMsupElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMtableElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMtdElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMtextElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMtrElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMunderElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLMunderoverElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type MathMLSemanticsElementAttributes =
+        inherit MathMLAttributes
+
+    [<EB(EBState.Never); AllowNullLiteral; Interface>]
+    type TitleHTMLAttributes =
+        inherit AmbiguousNamespaceAttributes
+
     type HTMLAttributes with
         [<Erase; LanguageInjection(InjectedLanguage.HTML)>]
         member _.innerHTML
@@ -734,12 +944,6 @@ module HtmlAttributes =
             with set (_: string) = ()
             and [<Erase>] get (): string = unbox ()
 
-    type BdoHTMLAttributes with
-        [<Erase>]
-        member _.dir
-            with set (_: Attr.BdoDir) = ()
-            and [<Erase>] get (): Attr.BdoDir = unbox ()
-
     type BlockquoteHTMLAttributes with
         [<Erase; LanguageInjection("jsx", Prefix = "<blockquote cite='", Suffix = "' >")>]
         member _.cite
@@ -933,16 +1137,6 @@ module HtmlAttributes =
         member _.open'
             with set (_: bool) = ()
             and [<Erase>] get (): bool = unbox ()
-
-        /// <summary>
-        /// Do not add the `tabindex` property to the `&lt;dialog&gt;` element as it is not interactive and
-        /// does not receive focus. The dialog's contents, including the close button contained in the
-        /// dialog, can receive focus and be interactive.
-        /// </summary>
-        [<Erase; LanguageInjection("jsx", Prefix = "<dialog tabindex='", Suffix = "' >")>]
-        member _.tabindex
-            with set (_: string) = ()
-            and [<Erase>] get (): string = unbox ()
 
         [<Erase; LanguageInjection("jsx", Prefix = "<dialog prop:tabIndex='", Suffix = "' >")>]
         member _.``prop:tabIndex``
@@ -1690,6 +1884,415 @@ module HtmlAttributes =
         member _.name
             with set (_: string) = ()
             and [<Erase>] get (): string = unbox ()
+
+    type MathMLAnnotationElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div encoding='", Suffix = "' >")>]
+        member _.encoding
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div src='", Suffix = "' >")>]
+        member _.src
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLAnnotationXmlElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div encoding='", Suffix = "' >")>]
+        member _.encoding
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div src='", Suffix = "' >")>]
+        member _.src
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLAttributes with
+        [<Erase>]
+        member _.displaystyle
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div scriptlevel='", Suffix = "' >")>]
+        member _.scriptlevel
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div xmlns='", Suffix = "' >")>]
+        member _.xmlns
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div href='", Suffix = "' >")>]
+        member _.href
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div mathbackground='", Suffix = "' >")>]
+        member _.mathbackground
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div mathcolor='", Suffix = "' >")>]
+        member _.mathcolor
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div mathsize='", Suffix = "' >")>]
+        member _.mathsize
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMactionElementAttributes with
+        [<Erase>]
+        member _.actiontype
+            with set (_: Attr.Actiontype) = ()
+            and [<Erase>] get (): Attr.Actiontype = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div selection='", Suffix = "' >")>]
+        member _.selection
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMathElementAttributes with
+        [<Erase>]
+        member _.display
+            with set (_: Attr.Display) = ()
+            and [<Erase>] get (): Attr.Display = unbox ()
+
+    type MathMLMencloseElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div notation='", Suffix = "' >")>]
+        member _.notation
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMfencedElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div close='", Suffix = "' >")>]
+        member _.close
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div open='", Suffix = "' >")>]
+        member _.open'
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div separators='", Suffix = "' >")>]
+        member _.separators
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMfracElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div linethickness='", Suffix = "' >")>]
+        member _.linethickness
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase>]
+        member _.denomalign
+            with set (_: Attr.Denomalign) = ()
+            and [<Erase>] get (): Attr.Denomalign = unbox ()
+
+        [<Erase>]
+        member _.numalign
+            with set (_: Attr.Numalign) = ()
+            and [<Erase>] get (): Attr.Numalign = unbox ()
+
+    type MathMLMiElementAttributes with
+        [<Erase>]
+        member _.mathvariant
+            with set (_: Attr.Mathvariant) = ()
+            and [<Erase>] get (): Attr.Mathvariant = unbox ()
+
+    type MathMLMmultiscriptsElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div subscriptshift='", Suffix = "' >")>]
+        member _.subscriptshift
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div superscriptshift='", Suffix = "' >")>]
+        member _.superscriptshift
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMoElementAttributes with
+        [<Erase>]
+        member _.fence
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+        [<Erase>]
+        member _.form
+            with set (_: Attr.Form) = ()
+            and [<Erase>] get (): Attr.Form = unbox ()
+
+        [<Erase>]
+        member _.largeop
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div lspace='", Suffix = "' >")>]
+        member _.lspace
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div maxsize='", Suffix = "' >")>]
+        member _.maxsize
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div minsize='", Suffix = "' >")>]
+        member _.minsize
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase>]
+        member _.movablelimits
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div rspace='", Suffix = "' >")>]
+        member _.rspace
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase>]
+        member _.separator
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+        [<Erase>]
+        member _.stretchy
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+        [<Erase>]
+        member _.symmetric
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+        [<Erase>]
+        member _.accent
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+    type MathMLMoverElementAttributes with
+        [<Erase>]
+        member _.accent
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+    type MathMLMpaddedElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div depth='", Suffix = "' >")>]
+        member _.depth
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div height='", Suffix = "' >")>]
+        member _.height
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div lspace='", Suffix = "' >")>]
+        member _.lspace
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div voffset='", Suffix = "' >")>]
+        member _.voffset
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div width='", Suffix = "' >")>]
+        member _.width
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMsElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div lquote='", Suffix = "' >")>]
+        member _.lquote
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div rquote='", Suffix = "' >")>]
+        member _.rquote
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMspaceElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div depth='", Suffix = "' >")>]
+        member _.depth
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div height='", Suffix = "' >")>]
+        member _.height
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div width='", Suffix = "' >")>]
+        member _.width
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMstyleElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div background='", Suffix = "' >")>]
+        member _.background
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div color='", Suffix = "' >")>]
+        member _.color
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div fontsize='", Suffix = "' >")>]
+        member _.fontsize
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div fontstyle='", Suffix = "' >")>]
+        member _.fontstyle
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div fontweight='", Suffix = "' >")>]
+        member _.fontweight
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div scriptminsize='", Suffix = "' >")>]
+        member _.scriptminsize
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div scriptsizemultiplier='", Suffix = "' >")>]
+        member _.scriptsizemultiplier
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMsubElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div subscriptshift='", Suffix = "' >")>]
+        member _.subscriptshift
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMsubsupElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div subscriptshift='", Suffix = "' >")>]
+        member _.subscriptshift
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div superscriptshift='", Suffix = "' >")>]
+        member _.superscriptshift
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMsupElementAttributes with
+        [<Erase; LanguageInjection("jsx", Prefix = "<div superscriptshift='", Suffix = "' >")>]
+        member _.superscriptshift
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMtableElementAttributes with
+        [<Erase>]
+        member _.align
+            with set (_: Attr.MathMLMtableAlign) = ()
+            and [<Erase>] get (): Attr.MathMLMtableAlign = unbox ()
+
+        [<Erase>]
+        member _.columnalign
+            with set (_: Attr.Columnalign) = ()
+            and [<Erase>] get (): Attr.Columnalign = unbox ()
+
+        [<Erase>]
+        member _.columnlines
+            with set (_: Attr.Columnlines) = ()
+            and [<Erase>] get (): Attr.Columnlines = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div columnspacing='", Suffix = "' >")>]
+        member _.columnspacing
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase>]
+        member _.frame
+            with set (_: Attr.Frame) = ()
+            and [<Erase>] get (): Attr.Frame = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div framespacing='", Suffix = "' >")>]
+        member _.framespacing
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase>]
+        member _.rowalign
+            with set (_: Attr.Rowalign) = ()
+            and [<Erase>] get (): Attr.Rowalign = unbox ()
+
+        [<Erase>]
+        member _.rowlines
+            with set (_: Attr.Rowlines) = ()
+            and [<Erase>] get (): Attr.Rowlines = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div rowspacing='", Suffix = "' >")>]
+        member _.rowspacing
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+        [<Erase; LanguageInjection("jsx", Prefix = "<div width='", Suffix = "' >")>]
+        member _.width
+            with set (_: string) = ()
+            and [<Erase>] get (): string = unbox ()
+
+    type MathMLMtdElementAttributes with
+        [<Erase>]
+        member _.columnspan
+            with set (_: int) = ()
+            and [<Erase>] get (): int = unbox ()
+
+        [<Erase>]
+        member _.rowspan
+            with set (_: int) = ()
+            and [<Erase>] get (): int = unbox ()
+
+        [<Erase>]
+        member _.columnalign
+            with set (_: Attr.Columnalign) = ()
+            and [<Erase>] get (): Attr.Columnalign = unbox ()
+
+        [<Erase>]
+        member _.rowalign
+            with set (_: Attr.Rowalign) = ()
+            and [<Erase>] get (): Attr.Rowalign = unbox ()
+
+    type MathMLMtrElementAttributes with
+        [<Erase>]
+        member _.columnalign
+            with set (_: Attr.Columnalign) = ()
+            and [<Erase>] get (): Attr.Columnalign = unbox ()
+
+        [<Erase>]
+        member _.rowalign
+            with set (_: Attr.Rowalign) = ()
+            and [<Erase>] get (): Attr.Rowalign = unbox ()
+
+    type MathMLMunderElementAttributes with
+        [<Erase>]
+        member _.accentunder
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+    type MathMLMunderoverElementAttributes with
+        [<Erase>]
+        member _.accent
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
+
+        [<Erase>]
+        member _.accentunder
+            with set (_: bool) = ()
+            and [<Erase>] get (): bool = unbox ()
 
     type MediaHTMLAttributes with
         [<Erase>]

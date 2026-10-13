@@ -1,0 +1,93 @@
+
+
+/**
+ * Elements added by generating Tags.fs from Solid's tag maps.
+ */
+export function NewElements() {
+    return <div>
+        <slot name="header" />
+        <template shadowrootmode="open"
+            shadowrootdelegatesfocus={true} />
+        <select>
+            <button>
+                <selectedcontent />
+            </button>
+            <option value="a">
+                A
+            </option>
+        </select>
+    </div>;
+}
+
+/**
+ * Elements whose generated declarations fixed their attributes or void-ness.
+ */
+export function FixedElements() {
+    return <div>
+        <base href="/app/"
+            target="_self" />
+        <meta name="description"
+            content="generated"
+            http-equiv="content-security-policy" />
+        <video>
+            <track kind="subtitles"
+                src="en.vtt"
+                srclang="en"
+                default={true} />
+        </video>
+        <p>
+            long
+            <wbr />
+            word
+        </p>
+        <bdo dir="rtl">
+            abc
+        </bdo>
+        <table>
+            <caption>
+                Scores
+            </caption>
+        </table>
+    </div>;
+}
+
+/**
+ * MathML elements, behind the MathML module.
+ */
+export function Formula() {
+    return <math display="block">
+        <mrow>
+            <mi>
+                x
+            </mi>
+            <mo>
+                =
+            </mo>
+            <mfrac linethickness="2px">
+                <mn>
+                    1
+                </mn>
+                <mn>
+                    2
+                </mn>
+            </mfrac>
+        </mrow>
+    </math>;
+}
+
+/**
+ * A hyphenated MathML element name.
+ */
+export function Annotated() {
+    return <semantics>
+        <mi>
+            y
+        </mi>
+        <annotation-xml encoding="MathML-Content">
+            <mi>
+                y
+            </mi>
+        </annotation-xml>
+    </semantics>;
+}
+

@@ -103,8 +103,8 @@ Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize [--watch]` inside `test
 
 ### Generated JSX attributes (`tools/JsxGen`)
 
-`src/Partas.Solid/HtmlAttributes.fs` is **generated**: edit `tools/JsxGen/overrides.json` or the generator, never the
-file. `tools/JsxGen` (ported from Ranvier's DOM generator) reads `@solidjs/web`'s `namespace JSX` through the pinned
+`src/Partas.Solid/HtmlAttributes.fs` and everything after the `// <generated>` line of `Tags.fs` are **generated**:
+edit `tools/JsxGen/overrides.json` or the generator, never those. `tools/JsxGen` (ported from Ranvier's DOM generator) reads `@solidjs/web`'s `namespace JSX` through the pinned
 TypeScript 7 compiler (Xantham.TypeScript.Wire), so interfaces, `extends` chains and member types come from the
 compiler. Regenerate with `npm ci` in `tools/JsxGen`, then `dotnet run -c Release --project tools/JsxGen`.
 `tools/JsxGen/out/diff.md` reports drift against the file being replaced.
@@ -114,8 +114,14 @@ compiler. Regenerate with `npm ci` in `tools/JsxGen`, then `dotnet run -c Releas
   that owns the attribute.
 - `overrides.json` holds what the declarations cannot say: interface renames, per-member types, skipped members,
   and `aliases`, the legacy camelCase spellings kept as `[<Obsolete>]` members.
-- Events, `children`, `style` and `inlist` stay hand-written in `HtmlEvents.fs`. New marker interfaces still go in
-  `Builder.fs` by hand.
+- Events, `children`, `style` and `inlist` stay hand-written in `HtmlEvents.fs`. Marker interfaces `Builder.fs` lacks
+  (MathML, newer HTML elements) are generated at the top of `HtmlAttributes.fs`.
+- Tags come from the tag maps. Existing tags keep their identifier (`option'`, `select`) and DOM type; new ones fall
+  back to `HTMLElement` when Fable.Browser.Dom lacks the element type. Void elements are a list in `TagsEmit.fs`,
+  because the declarations do not say. MathML tags sit behind `MathML.`, as SVG's (still hand-written) sit behind
+  `Svg.`. A per-element member that redeclares a global one (`dir` on `<bdo>`) is dropped: it would be ambiguous.
+- Solid's compiler rejects a `<template>` with static children (the browser moves them into `.content`), and
+  jsdom drops a `<button>` inside `<select>`, so the runtime tests render both without those children.
 - Upstream bumps are a `package.json` change in `tools/JsxGen`; regenerate and read `diff.md`.
 
 ### Releases (ShipIt)

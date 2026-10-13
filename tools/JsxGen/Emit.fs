@@ -15,6 +15,8 @@ type Overrides =
         Types: Map<string, string>
         SkipMembers: Set<string>
         SkipInterfaces: Set<string>
+        /// Tags left out of `Tags.fs`, e.g. Electron's `webview`.
+        SkipTags: Set<string>
         /// `<PartasInterface>.<legacyName>` -> upstream name, kept as `[<Obsolete>]` members.
         Aliases: Map<string, string>
     }
@@ -36,6 +38,7 @@ let loadOverrides (path: string) =
         Types = map "types"
         SkipMembers = set "skipMembers"
         SkipInterfaces = set "skipInterfaces"
+        SkipTags = set "skipTags"
         Aliases = map "aliases"
     }
 
@@ -100,7 +103,10 @@ let private xml (text: string) =
 /// `ElementAttributes` and `CustomAttributes` into `HTMLAttributes`, which every tag inherits through `HtmlTag`.
 let htmlTargets (overrides: Overrides) (surface: Surface) =
     let isHtml (name: string) =
-        (name.EndsWith "HTMLAttributes" || name.EndsWith "HtmlAttributes" || (name.StartsWith "HTML" && name.EndsWith "ElementAttributes"))
+        (name.EndsWith "HTMLAttributes"
+         || name.EndsWith "HtmlAttributes"
+         || (name.StartsWith "HTML" && name.EndsWith "ElementAttributes")
+         || (name.StartsWith "MathML" && name.EndsWith "Attributes"))
         && name <> "HTMLAttributes"
         && not (overrides.SkipInterfaces.Contains name)
 
@@ -154,6 +160,15 @@ let plan (overrides: Overrides) (surface: Surface) : Emission =
 
         fun (upstream: string) -> owners.TryFind upstream |> Option.defaultValue "div"
 
+    // Every tag reaches HTMLAttributes through HtmlTag. A same-named member on another interface (`dir` on
+    // `<bdo>`, `href` on MathML) would make the property ambiguous, so the global one stands.
+    let globalNames =
+        targets
+        |> List.filter (fun (target, _) -> target = "HTMLAttributes")
+        |> List.collect (fun (_, sources) -> sources |> List.collect (fun s -> s.Members |> Array.toList))
+        |> List.map _.Name
+        |> Set.ofList
+
     let candidates =
         [
             for target, sources in targets do
@@ -161,7 +176,9 @@ let plan (overrides: Overrides) (surface: Surface) : Emission =
                     for m in source.Members do
                         let key = $"{source.Name}.{m.Name}"
 
-                        if overrides.SkipMembers.Contains key then
+                        if target <> "HTMLAttributes" && globalNames.Contains m.Name then
+                            omitted.Add(key, "redeclares a global HTMLAttributes member")
+                        elif overrides.SkipMembers.Contains key then
                             omitted.Add(key, "skipped by overrides.json")
                         elif m.Method || m.Name.StartsWith "on" then
                             omitted.Add(key, "event or method: hand-written")
@@ -255,7 +272,7 @@ let plan (overrides: Overrides) (surface: Surface) : Emission =
         Omitted = List.ofSeq omitted
     }
 
-let render (overrides: Overrides) (emission: Emission) =
+let render (overrides: Overrides) (markers: string) (emission: Emission) =
     let out = StringBuilder()
     let line (text: string) = out.Append(text).Append('\n') |> ignore
 
@@ -280,6 +297,10 @@ let render (overrides: Overrides) (emission: Emission) =
 
     line "[<AutoOpen>]"
     line "module HtmlAttributes ="
+
+    if markers <> "" then
+        line "    // Marker interfaces Builder.fs does not declare: MathML, and HTML elements added since."
+        out.Append(markers) |> ignore
 
     for target, members in emission.Members |> List.groupBy _.Target do
         line $"    type {target} with"

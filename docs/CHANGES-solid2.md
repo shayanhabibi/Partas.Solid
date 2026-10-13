@@ -292,6 +292,9 @@ supports Solid 2: every version, including the rc and beta tags, requires `solid
   `bool` (`reversed = true`, not `reversed = ""`). Use `.attr(name, value)` for a value outside the set.
 - Names follow upstream's lowercase spelling (`tabindex`, `readonly`, `colspan`). The camelCase spellings still
   compile, marked `[<Obsolete>]`.
+- New tags: `slot`, `template`, `selectedcontent`, and MathML under `MathML.` (`MathML.math () { MathML.mi () { "x" } }`).
+  `big`, `keygen`, `menuitem` and `param` exist but are `[<Obsolete>]`. `base'` now takes `href`/`target`, `<meta>`
+  its `name`/`content`/`http-equiv`, and `track` and `wbr` are void elements.
 - New: `command`/`commandfor` on buttons, `shadowroot*` on `<template>`, `popovertarget` on inputs, `closedby`,
   `blocking`, `xmlns` on `a`/`script`/`style`/`title`, and the rest of rc.14's HTML attributes.
 - Removed, as rc.14 does not declare them: `color`, `media` on `<a>`, `hreflang` on `<area>`, `form` on `<label>`,

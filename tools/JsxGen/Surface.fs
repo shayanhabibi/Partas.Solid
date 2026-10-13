@@ -57,6 +57,8 @@ type Tag =
         Interfaces: string array
         /// `html`, `svg`, `mathml` or `deprecated`: the tag map it came from.
         Group: string
+        /// The DOM element type the attribute interface is instantiated with, e.g. `HTMLAnchorElement`.
+        DomType: string
     }
 
 type Surface =
@@ -292,13 +294,33 @@ let read (root: string) : Surface =
                 else
                     [ t ]
 
+            let attributes =
+                parts
+                |> List.filter (fun t ->
+                    symbolName t |> ValueOption.exists (fun n -> n.EndsWith "Attributes"))
+
+            let domType =
+                attributes
+                |> List.tryPick (fun t ->
+                    Api.getTypeArguments
+                        channel
+                        {
+                            Snapshot = snapshot
+                            Project = project
+                            Type = t.Id
+                        }
+                    |> ValueOption.bind (Array.tryHead >> ValueOption.ofOption)
+                    |> ValueOption.bind symbolName
+                    |> ValueOption.toOption)
+                |> Option.defaultValue "HTMLElement"
+
             {
                 Name = tag.Name
                 Group = group
+                DomType = domType
                 Interfaces =
-                    parts
+                    attributes
                     |> List.choose (symbolName >> ValueOption.toOption)
-                    |> List.filter (fun n -> n.EndsWith "Attributes")
                     |> List.toArray
             })
 

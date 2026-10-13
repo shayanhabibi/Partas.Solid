@@ -120,10 +120,13 @@ module Tags =
         [<Extension; Erase>]
         static member spread(this: #HtmlElement, value: obj) = this
 
+    // <generated> Everything below is written by tools/JsxGen from @solidjs/web's tag maps. Edit the generator.
+
     [<Erase>]
     type a() =
         interface IntrinsicParentNode
         interface AnchorHTMLAttributes
+        interface AmbiguousNamespaceAttributes
         member inline this.asDomElement: HTMLAnchorElement = unbox this
 
     [<Erase>]
@@ -156,6 +159,7 @@ module Tags =
     type audio() =
         interface IntrinsicParentNode
         interface AudioHTMLAttributes
+        interface MediaHTMLAttributes
         member inline this.asDomElement: HTMLAudioElement = unbox this
 
     [<Erase>]
@@ -166,6 +170,7 @@ module Tags =
     [<Erase>]
     type base'() =
         interface IntrinsicVoidNode
+        interface BaseHTMLAttributes
         member inline this.asDomElement: HTMLBaseElement = unbox this
 
     [<Erase>]
@@ -176,6 +181,7 @@ module Tags =
     [<Erase>]
     type bdo() =
         interface IntrinsicParentNode
+        interface BdoHTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
@@ -187,6 +193,8 @@ module Tags =
     [<Erase>]
     type body() =
         interface IntrinsicParentNode
+        interface BodyHTMLAttributes
+        interface EventHandlersWindow
         member inline this.asDomElement: HTMLBodyElement = unbox this
 
     [<Erase>]
@@ -209,6 +217,7 @@ module Tags =
     [<Erase>]
     type caption() =
         interface IntrinsicParentNode
+        interface CaptionHTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
@@ -252,6 +261,7 @@ module Tags =
     [<Erase>]
     type del() =
         interface IntrinsicParentNode
+        interface InsHTMLAttributes
         member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
@@ -566,6 +576,7 @@ module Tags =
     type script() =
         interface IntrinsicParentNode
         interface ScriptHTMLAttributes
+        interface AmbiguousNamespaceAttributes
         member inline this.asDomElement: HTMLScriptElement = unbox this
 
     [<Erase>]
@@ -583,6 +594,17 @@ module Tags =
         interface IntrinsicParentNode
         interface SelectHTMLAttributes
         member inline this.asDomElement: HTMLSelectElement = unbox this
+
+    [<Erase>]
+    type selectedcontent() =
+        interface IntrinsicParentNode
+        member inline this.asDomElement: HTMLElement = unbox this
+
+    [<Erase>]
+    type slot() =
+        interface IntrinsicParentNode
+        interface HTMLSlotElementAttributes
+        member inline this.asDomElement: HTMLElement = unbox this
 
     [<Erase>]
     type small() =
@@ -609,6 +631,7 @@ module Tags =
     type style() =
         interface IntrinsicParentNode
         interface StyleHTMLAttributes
+        interface AmbiguousNamespaceAttributes
         member inline this.asDomElement: HTMLStyleElement = unbox this
 
     [<Erase>]
@@ -643,6 +666,12 @@ module Tags =
         member inline this.asDomElement: HTMLTableCellElement = unbox this
 
     [<Erase>]
+    type template() =
+        interface IntrinsicParentNode
+        interface TemplateHTMLAttributes
+        member inline this.asDomElement: HTMLTemplateElement = unbox this
+
+    [<Erase>]
     type textarea() =
         interface IntrinsicParentNode
         interface TextareaHTMLAttributes
@@ -673,6 +702,8 @@ module Tags =
     [<Erase>]
     type title() =
         interface IntrinsicParentNode
+        interface TitleHTMLAttributes
+        interface AmbiguousNamespaceAttributes
         member inline this.asDomElement: HTMLTitleElement = unbox this
 
     [<Erase>]
@@ -682,7 +713,7 @@ module Tags =
 
     [<Erase>]
     type track() =
-        interface IntrinsicParentNode
+        interface IntrinsicVoidNode
         interface TrackHTMLAttributes
         member inline this.asDomElement: HTMLTrackElement = unbox this
 
@@ -705,10 +736,227 @@ module Tags =
     type video() =
         interface IntrinsicParentNode
         interface VideoHTMLAttributes
+        interface MediaHTMLAttributes
         member inline this.asDomElement: HTMLVideoElement = unbox this
 
     [<Erase>]
     type wbr() =
+        interface IntrinsicVoidNode
+        member inline this.asDomElement: HTMLElement = unbox this
+
+    [<Erase; System.Obsolete("<big> is deprecated in HTML.")>]
+    type big() =
         interface IntrinsicParentNode
         member inline this.asDomElement: HTMLElement = unbox this
 
+    [<Erase; System.Obsolete("<keygen> is deprecated in HTML.")>]
+    type keygen() =
+        interface IntrinsicVoidNode
+        interface KeygenHTMLAttributes
+        member inline this.asDomElement: HTMLUnknownElement = unbox this
+
+    [<Erase; System.Obsolete("<menuitem> is deprecated in HTML.")>]
+    type menuitem() =
+        interface IntrinsicParentNode
+        member inline this.asDomElement: HTMLUnknownElement = unbox this
+
+    [<Erase; System.Obsolete("<param> is deprecated in HTML.")>]
+    type param() =
+        interface IntrinsicVoidNode
+        interface ParamHTMLAttributes
+        member inline this.asDomElement: HTMLParamElement = unbox this
+
+    /// <summary>MathML elements: <c>MathML.math () { MathML.mi () { "x" } }</c>.</summary>
+    module MathML =
+
+        [<Erase>]
+        type annotation() =
+            interface RegularNode
+            interface MathMLAnnotationElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type ``annotation-xml``() =
+            interface RegularNode
+            interface MathMLAnnotationXmlElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type math() =
+            interface RegularNode
+            interface MathMLMathElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type merror() =
+            interface RegularNode
+            interface MathMLMerrorElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mfrac() =
+            interface RegularNode
+            interface MathMLMfracElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mi() =
+            interface RegularNode
+            interface MathMLMiElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mmultiscripts() =
+            interface RegularNode
+            interface MathMLMmultiscriptsElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mn() =
+            interface RegularNode
+            interface MathMLMnElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mo() =
+            interface RegularNode
+            interface MathMLMoElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mover() =
+            interface RegularNode
+            interface MathMLMoverElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mpadded() =
+            interface RegularNode
+            interface MathMLMpaddedElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mphantom() =
+            interface RegularNode
+            interface MathMLMphantomElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mprescripts() =
+            interface RegularNode
+            interface MathMLMprescriptsElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mroot() =
+            interface RegularNode
+            interface MathMLMrootElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mrow() =
+            interface RegularNode
+            interface MathMLMrowElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type ms() =
+            interface RegularNode
+            interface MathMLMsElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mspace() =
+            interface RegularNode
+            interface MathMLMspaceElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type msqrt() =
+            interface RegularNode
+            interface MathMLMsqrtElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mstyle() =
+            interface RegularNode
+            interface MathMLMstyleElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type msub() =
+            interface RegularNode
+            interface MathMLMsubElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type msubsup() =
+            interface RegularNode
+            interface MathMLMsubsupElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type msup() =
+            interface RegularNode
+            interface MathMLMsupElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mtable() =
+            interface RegularNode
+            interface MathMLMtableElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mtd() =
+            interface RegularNode
+            interface MathMLMtdElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mtext() =
+            interface RegularNode
+            interface MathMLMtextElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mtr() =
+            interface RegularNode
+            interface MathMLMtrElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type munder() =
+            interface RegularNode
+            interface MathMLMunderElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type munderover() =
+            interface RegularNode
+            interface MathMLMunderoverElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type semantics() =
+            interface RegularNode
+            interface MathMLSemanticsElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type menclose() =
+            interface RegularNode
+            interface MathMLMencloseElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type maction() =
+            interface RegularNode
+            interface MathMLMactionElementAttributes
+            interface MathMLAttributes
+
+        [<Erase>]
+        type mfenced() =
+            interface RegularNode
+            interface MathMLMfencedElementAttributes
+            interface MathMLAttributes

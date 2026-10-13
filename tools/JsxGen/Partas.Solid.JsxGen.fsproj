@@ -14,6 +14,7 @@
     <PackageReference Include="Xantham.TypeScript.Wire" Version="[0.3.0]" />
     <Compile Include="Surface.fs" />
     <Compile Include="Emit.fs" />
+    <Compile Include="TagsEmit.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>

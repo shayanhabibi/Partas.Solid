@@ -86,5 +86,8 @@
     "ThHTMLAttributes.colSpan": "colspan",
     "ThHTMLAttributes.rowSpan": "rowspan",
     "TimeHTMLAttributes.dateTime": "datetime"
-  }
+  },
+  "skipTags": [
+    "webview"
+  ]
 }

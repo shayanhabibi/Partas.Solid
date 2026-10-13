@@ -6,6 +6,7 @@ open System
 open System.IO
 open System.Text
 open System.Text.Json
+open System.Text.RegularExpressions
 
 let private write (path: string) (text: string) =
     Directory.CreateDirectory(Path.GetDirectoryName path) |> ignore
@@ -28,17 +29,39 @@ let main args =
         let overrides = Emit.loadOverrides (Path.Combine(root, "overrides.json"))
         let emission = Emit.plan overrides surface
 
-        let target =
-            Path.GetFullPath(Path.Combine(root, "..", "..", "src", "Partas.Solid", "HtmlAttributes.fs"))
+        let src = Path.GetFullPath(Path.Combine(root, "..", "..", "src", "Partas.Solid"))
+        let target = Path.Combine(src, "HtmlAttributes.fs")
+
+        let markers =
+            TagsEmit.missingMarkers overrides surface (File.ReadAllText(Path.Combine(src, "Builder.fs")))
+
+        // Fable.Browser.Dom at the version Partas.Solid references: the element types tags can name.
+        let browser =
+            let fsproj = File.ReadAllText(Path.Combine(src, "Partas.Solid.fsproj"))
+            let version = Regex.Match(fsproj, "\"Fable.Browser.Dom\" Version=\"([^\"]+)\"").Groups[1].Value
+
+            let packages =
+                Environment.GetEnvironmentVariable "NUGET_PACKAGES"
+                |> Option.ofObj
+                |> Option.defaultValue (Path.Combine(Environment.GetFolderPath Environment.SpecialFolder.UserProfile, ".nuget", "packages"))
+
+            Directory.GetFiles(Path.Combine(packages, "fable.browser.dom", version), "Browser.Dom.dll", SearchOption.AllDirectories)
+            |> Array.head
+            |> TagsEmit.browserTypes
 
         // Report drift against the file being replaced before replacing it.
         write (Path.Combine(output, "diff.md")) (Emit.report emission target)
-        write target (Emit.render overrides emission)
+        write target (Emit.render overrides (TagsEmit.renderMarkers markers) emission)
+
+        let tagsFile = Path.Combine(src, "Tags.fs")
+        write tagsFile (TagsEmit.renderTags overrides surface browser tagsFile)
 
         printfn
-            "JSX: %d interfaces, %d tags; generated %d attribute members, %d enums, %d omitted -> %s"
+            "JSX: %d interfaces, %d tags (%d generated, %d new markers); generated %d attribute members, %d enums, %d omitted -> %s"
             surface.Interfaces.Length
             surface.Tags.Length
+            (TagsEmit.generatedTags overrides surface).Length
+            markers.Length
             emission.Members.Length
             emission.Enums.Length
             emission.Omitted.Length
