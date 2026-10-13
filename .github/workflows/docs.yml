@@ -8,6 +8,9 @@ on:
       - master
     paths:
       - 'docs/site/**'
+      # The live examples compile against src/ with the in-repo plugin, so either changes the site.
+      - 'src/**'
+      - 'tools/Partas.Nacara.Plugins.Solid/**'
       - '.github/workflows/docs.yml'
 
 permissions:
@@ -35,8 +38,8 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
-      # Partas.Solid 3.0 and the Partas.Nacara packages come from the committed feed in
-      # docs/site/feed until they are on NuGet; docs/site/nuget.config maps them there.
+      # The examples build src/Partas.Solid and tools/Partas.Nacara.Plugins.Solid from source. The
+      # Nacara theme comes from the committed feed in docs/site/feed; docs/site/nuget.config maps it there.
       - name: Build the site
         run: dotnet fsi tools/build.fsx -- docs
       - name: Upload the site

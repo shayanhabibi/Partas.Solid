@@ -1,6 +1,6 @@
 name: CI
 
-# Builds both packages and runs the Expecto snapshot suites and the vitest runtime suites.
+# Builds the packages and runs the Expecto snapshot suites and the vitest runtime suites.
 # master is tested by release.yml, which calls this workflow before ShipIt runs.
 on:
   pull_request:

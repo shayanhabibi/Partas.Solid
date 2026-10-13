@@ -27,6 +27,11 @@ module Project =
     let src = [ Repo.Project.``Partas.Solid``.Path; Repo.Project.``Partas.Solid.FablePlugin``.Path ]
     /// The Expecto suites. The vitest runtime suites are driven by their own run.mjs.
     let tests = [ Repo.Project.``Partas.Solid.Tests.Core``.Path; Repo.Project.``Partas.Solid.Tests.Plugin``.Path ]
+    /// The docs' live-examples plugin, released in lockstep with src (docs/site references the project), and its tests.
+    let docsPlugin = Repo.Project.``Partas.Nacara.Plugins.Solid``.Path
+    let docsPluginTests = Repo.Project.``Partas.Nacara.Plugins.Solid.Tests``.Path
+    /// Everything `pack` and `publish` ship.
+    let packages = src @ [ docsPlugin ]
 
 module Options =
     let extension =
@@ -73,7 +78,7 @@ let fantomas = Stages.fantomas fantomasPaths
 let fantomasCheck = Stages.fantomasWith (InputSpec.ofInput Common.quick) true fantomasPaths
 
 // Sequential: Partas.Solid references the plugin, so parallel builds race on its deps.json.
-let build = Stages.build Project.src |> InputSpec.map (StageContext.toggleParallel false)
+let build = Stages.build Project.packages |> InputSpec.map (StageContext.toggleParallel false)
 
 let tests = input {
     let! config = Dotnet.configOrRelease
@@ -84,7 +89,7 @@ let tests = input {
         when' (not skipTests)
         continueStepsOnFailure
         stage "run-tests" {
-            for test in Project.tests do
+            for test in Project.tests @ [ Project.docsPluginTests ] do
                 stage "run-target" {
                     if ci then
                         stage "run" {
@@ -107,7 +112,7 @@ let tests = input {
 }
 
 let private packages = Repo.VirtualFileSystem.bin.ToString()
-let pack = Stages.pack packages Project.src
+let pack = Stages.pack packages Project.packages
 
 let docs = input {
     let! watch = Common.watch
@@ -204,7 +209,7 @@ rootCommandOfScript {
         tests
     }
     command "publish" {
-        description "Builds, tests, packs and pushes both packages (--nuget-source, --nuget-key)."
+        description "Builds, tests, packs and pushes the three packages (--nuget-source, --nuget-key)."
         restore
         fableClean
         build
@@ -217,7 +222,7 @@ rootCommandOfScript {
         docs
     }
     command "bump" {
-        description "Calculates the next version from conventional commits and writes it to src/CHANGELOG.md and both .fsproj files (--dry-run to preview)."
+        description "Calculates the next version from conventional commits and writes it to src/CHANGELOG.md and the three .fsproj files (--dry-run to preview)."
         restore
         ShipIt.bump
     }

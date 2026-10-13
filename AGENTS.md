@@ -6,20 +6,22 @@ Claude Code reads it through `CLAUDE.md`, which imports it; edit this file, not 
 ## What this is
 
 Partas.Solid is an F#/Fable front-end framework for [solid-js](https://www.solidjs.com/), an opinionated fork of
-Oxpecker.Solid. It ships two NuGet packages that are always versioned in lockstep:
+Oxpecker.Solid. It ships three NuGet packages that are always versioned in lockstep:
 
 - **Partas.Solid** — the DSL/bindings library (tags, HTML/ARIA/SVG attributes, CSS-in-F# style spec, solid-js /
   solid-router / solid-meta bindings). Almost all of it is `[<Erase>]`/import surface: the types exist to
   give F# a typed authoring experience and are erased by the plugin.
 - **Partas.Solid.FablePlugin** — a Fable compiler plugin (`MemberDeclarationPluginAttribute`) that rewrites the F# AST
   into JSX. This is where the real behaviour lives; the library alone produces nothing useful.
+- **Partas.Nacara.Plugins.Solid** — the Nacara plugin behind the docs' live examples (`tools/`, see below).
 
 Because the plugin rewrites the AST rather than emitting from a runtime, **the compiled `.jsx` output is the
 specification**. Behaviour changes are observed by diffing generated JSX, not by running the framework.
 
 Layout: the two shipped projects live in `src/`; the snapshot, runtime and unit test projects and `ScratchTests` in
-`tests/`; the build script (`tools/build.fsx`) and the SageFs workbench (`tools/Workbench/`,
-set up by `tools/workbench.fsx`) in `tools/`. `Partas.Solid.slnx`, `docs/` and the `solid/` submodule stay at the root.
+`tests/`; the build script (`tools/build.fsx`), the SageFs workbench (`tools/Workbench/`,
+set up by `tools/workbench.fsx`), the JSX generator (`tools/JsxGen`) and the docs' live-examples plugin
+(`tools/Partas.Nacara.Plugins.Solid`) in `tools/`. `Partas.Solid.slnx`, `docs/` and the `solid/` submodule stay at the root.
 
 ## `solid/` — vendored upstream, NOT part of this project
 
@@ -101,6 +103,16 @@ After Expecto, `test` runs `node tests/Partas.Solid.Tests.Runtime/run.mjs all`, 
 Format with `dotnet fantomas <files>` directly, and compile ScratchTests with `dotnet fable --exclude
 Partas.Solid.FablePlugin --noCache -e .fs.jsx --optimize --typedArrays false [--watch]` inside `tests/ScratchTests/` (or `build.fsx test scratch`).
 
+### Docs live examples (`tools/Partas.Nacara.Plugins.Solid`)
+
+The docs site compiles every `fsharp solid` fence with Fable and this repository's plugin. The Nacara plugin that does it
+lives in `tools/Partas.Nacara.Plugins.Solid` (moved from Partas.Nacara.Plugins, and released with the other two), and `docs/site`
+references it as a project. `Site.fs` points it at `src/Partas.Solid` with `SolidExamples.partasProject`, so the
+examples always compile against the current sources: an edit under `src/` reruns them on the next `docs` build. Set
+`PARTAS_SOLID_VERSION` (and `PARTAS_SOLID_FEED`) to try the docs against a package instead. The plugin's README is its
+guide; its tests are `tests/Partas.Nacara.Plugins.Solid.Tests`, run by `test`. The Nacara theme still comes from
+Partas.Nacara.Plugins, as packages in `docs/site/feed`.
+
 ### Generated JSX surface (`tools/JsxGen`)
 
 **Generated, never hand-edited:** `HtmlAttributes.fs`, `AriaAttributes.fs`, `Svg.fs`, and everything after the
@@ -145,12 +157,13 @@ shadow Partas's `Attr` module, which keeps its name (as usual in F#, the qualifi
 ### Releases (ShipIt)
 
 [EasyBuild.ShipIt](https://github.com/easybuild-org/EasyBuild.ShipIt) owns the version. `src/CHANGELOG.md` is the one
-changelog for both packages: its front matter registers both `.fsproj` `<Version>` elements as updaters, so they stay in
-lockstep. ShipIt calculates the next version from the **conventional commits** touching `src/` since
+changelog for all three packages: its front matter registers each `.fsproj` `<Version>` element as an updater, so they
+stay in lockstep. ShipIt calculates the next version from the **conventional commits** touching `src/` or
+`tools/Partas.Nacara.Plugins.Solid/` since
 `last_commit_released`, so commit messages must be conventional (`feat:`, `fix:`, `feat!:` ...). Edit only that front
 matter; ShipIt rewrites the body. Releases up to 2.1.3 are in `docs/RELEASE_NOTES.md`, frozen.
 
-- `build.fsx -- bump --dry-run` previews the next version; without `--dry-run` it writes the changelog and both
+- `build.fsx -- bump --dry-run` previews the next version; without `--dry-run` it writes the changelog and the
   versions locally. Add `--allow-branch <branch>` off `master`.
 - `build.fsx -- release` opens the release pull request on GitHub; CI runs it.
 - The ShipIt stages run from `src/`: from the root, ShipIt would treat every `solid/**/CHANGELOG.md` as a project.
@@ -314,6 +327,6 @@ compile that component with `PrintDisposals`.
   match in the plugin is a build failure, not a warning.
 - Target frameworks intentionally differ: `Partas.Solid` `net8.0`, `Partas.Solid.FablePlugin` `net6.0`, plugin test host
   `net8.0`, the fable test project and `Partas.Solid.Tests.Core` `net9.0`, ScratchTests `net10.0`.
-- Versions are duplicated in both `.fsproj`s and written by ShipIt (see *Releases*); never bump them by hand.
+- Versions are duplicated in the three `.fsproj`s and written by ShipIt (see *Releases*); never bump them by hand.
 - `.fs.js` / `.fs.jsx` files sitting next to sources in `src/Partas.Solid/` and the plugin are fable build artifacts, not
   inputs.

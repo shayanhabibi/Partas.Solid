@@ -15,6 +15,9 @@
     <File Path=".github/workflows/docs.yml" />
     <File Path=".github/workflows/release.yml" />
   </Folder>
+  <Folder Name="/docs/">
+    <Project Path="docs/site/docs.fsproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Partas.Solid.FablePlugin/Partas.Solid.FablePlugin.fsproj" />
     <Project Path="src/Partas.Solid/Partas.Solid.fsproj" />
@@ -27,10 +30,12 @@
     <Project Path="tests/Partas.Solid.Tests.Runtime/Integration/Partas.Solid.Tests.Runtime.Integration.fsproj" />
     <Project Path="tests/Partas.Solid.Tests.Runtime/Primitives/Partas.Solid.Tests.Runtime.Primitives.fsproj" />
     <Project Path="tests/ScratchTests/ScratchTests.fsproj" />
+    <Project Path="tests/Partas.Nacara.Plugins.Solid.Tests/Partas.Nacara.Plugins.Solid.Tests.fsproj" />
   </Folder>
   <Folder Name="/tools/">
     <File Path="tools/build.fsx" />
     <Project Path="tools/JsxGen/Partas.Solid.JsxGen.fsproj" />
+    <Project Path="tools/Partas.Nacara.Plugins.Solid/Partas.Nacara.Plugins.Solid.fsproj" />
     <File Path="tools/workbench.fsx" />
   </Folder>
 </Solution>

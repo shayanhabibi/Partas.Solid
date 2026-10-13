@@ -1,5 +1,6 @@
 ---
-# Partas.Solid and Partas.Solid.FablePlugin release together: this one changelog versions both.
+# Partas.Solid, Partas.Solid.FablePlugin and the docs plugin Partas.Nacara.Plugins.Solid release together:
+# this one changelog versions all three.
 name: Partas.Solid
 # 3.0 targets Solid 2.0 release candidates. Remove this line to release stable versions.
 pre_release: rc
@@ -9,12 +10,17 @@ last_commit_released: 0e25620966b4b8e2b824a3496c14a7759ac89211
 include:
   - ../Partas.Solid/
   - ../Partas.Solid.FablePlugin/
+  # The live-examples plugin lives in tools/, outside this directory.
+  - ../tools/Partas.Nacara.Plugins.Solid/
 updaters:
   - xml:
       file: 'Partas.Solid/Partas.Solid.fsproj'
       selector: /Project/PropertyGroup/Version
   - xml:
       file: 'Partas.Solid.FablePlugin/Partas.Solid.FablePlugin.fsproj'
+      selector: /Project/PropertyGroup/Version
+  - xml:
+      file: '../tools/Partas.Nacara.Plugins.Solid/Partas.Nacara.Plugins.Solid.fsproj'
       selector: /Project/PropertyGroup/Version
 ---
 

@@ -2,7 +2,7 @@ name: Release
 
 # Every push to master is tested, then ShipIt opens or updates the release pull request
 # (`chore: release Partas.Solid@x.y.z`) from the conventional commits since the last release.
-# Merging that pull request pushes the release commit, which publishes both packages.
+# Merging that pull request pushes the release commit, which publishes the packages.
 on:
   push:
     branches:
