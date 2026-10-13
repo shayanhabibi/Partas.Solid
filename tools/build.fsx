@@ -72,7 +72,8 @@ let fantomasPaths = [
 let fantomas = Stages.fantomas fantomasPaths
 let fantomasCheck = Stages.fantomasWith (InputSpec.ofInput Common.quick) true fantomasPaths
 
-let build = Stages.build Project.src
+// Sequential: Partas.Solid references the plugin, so parallel builds race on its deps.json.
+let build = Stages.build Project.src |> InputSpec.map (StageContext.toggleParallel false)
 
 let tests = input {
     let! config = Dotnet.configOrRelease
@@ -233,3 +234,5 @@ rootCommandOfScript {
     }
     addCommand ShipIt.commands
 }
+// Without this the script exits 0 whatever happened, and CI can never go red.
+|> exit
