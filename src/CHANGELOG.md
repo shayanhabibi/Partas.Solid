@@ -1,5 +1,5 @@
 ---
-last_commit_released: b1ed26be939192b85abec2b23254657321e0e2ae
+last_commit_released: 6ab02ad31a93d30428a8c4d425d0431af3037325
 pre_release: rc
 name: Partas.Solid
 include:
@@ -27,6 +27,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 This changelog is generated using [EasyBuild.ShipIt](https://github.com/easybuild-org/EasyBuild.ShipIt).
 
 ⚠ Only edit the front matter metadata at the top of this file. All other changes will be overwritten when a new release is created.
+
+## 3.0.0-rc.2 - 2026-10-15
+
+### 🚀 Features
+
+* Add reactive match! and preserve JSX child semantics ([6ab02ad](https://github.com/shayanhabibi/Partas.Solid/commit/6ab02ad31a93d30428a8c4d425d0431af3037325))
+
+<strong><small>[View changes on Github](https://github.com/shayanhabibi/Partas.Solid/compare/b1ed26be939192b85abec2b23254657321e0e2ae..6ab02ad31a93d30428a8c4d425d0431af3037325)</small></strong>
 
 ## 3.0.0-rc.1 - 2026-10-13
 

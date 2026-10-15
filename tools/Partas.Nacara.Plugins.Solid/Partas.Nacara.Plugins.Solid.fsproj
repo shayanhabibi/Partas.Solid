@@ -14,7 +14,7 @@
     <Authors>shayanhabibi</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- Written by ShipIt, in lockstep with Partas.Solid (src/CHANGELOG.md). -->
-    <Version>3.0.0-rc.1</Version>
+    <Version>3.0.0-rc.2</Version>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <WarningsAsErrors>$(WarningsAsErrors);FS0025</WarningsAsErrors>
   </PropertyGroup>
