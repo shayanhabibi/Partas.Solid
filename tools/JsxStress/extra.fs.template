@@ -1,0 +1,157 @@
+module Stress
+
+open __LIB__.Solid
+
+type Kind = Alpha | Beta of string | Other
+
+[<SolidComponent>]
+let UnionPayloadNested (kind: Kind) =
+    div() {
+        match kind with
+        | Beta text -> span() { b() { text } }
+        | _ -> "empty"
+    }
+
+[<SolidComponent>]
+let UnionPayloadLength (kind: Kind) =
+    div() {
+        match kind with
+        | Beta text -> span() { text.Length }
+        | _ -> "empty"
+    }
+
+[<SolidComponent>]
+let UnionPayloadAttribute (kind: Kind) =
+    div() {
+        match kind with
+        | Beta text -> span(title = text) { text }
+        | _ -> "empty"
+    }
+
+[<SolidComponent>]
+let UnionPayloadSiblings (kind: Kind) =
+    div() {
+        match kind with
+        | Beta text ->
+            span() { text }
+            b() { "tail" }
+        | _ -> "empty"
+    }
+
+[<SolidComponent>]
+let UnionPayloadLocal (kind: Kind) =
+    div() {
+        match kind with
+        | Beta text ->
+            let upper = text.ToUpper()
+            span() { upper }
+            b() { text }
+        | _ -> "empty"
+    }
+
+[<SolidComponent>]
+let UnionPayloadGuarded (kind: Kind) =
+    div() {
+        match kind with
+        | Beta text when text.Length > 2 ->
+            span() { text }
+            b() { "long" }
+        | Beta text -> i() { text }
+        | _ -> "empty"
+    }
+
+[<SolidComponent>]
+let IfTwoElements (flag: bool) =
+    div() {
+        if flag then
+            span() { "one" }
+            b() { "two" }
+        else
+            i() { "three" }
+            strong() { "four" }
+    }
+
+[<SolidComponent>]
+let IfElementText (flag: bool) =
+    div() {
+        if flag then
+            span() { "one" }
+            "two"
+        else "empty"
+    }
+
+[<SolidComponent>]
+let IfTextElement (flag: bool) =
+    div() {
+        if flag then
+            "one"
+            span() { "two" }
+        else "empty"
+    }
+
+[<SolidComponent>]
+let IfLocalTwoElements (flag: bool) (text: string) =
+    div() {
+        if flag then
+            let upper = text.ToUpper()
+            span() { upper }
+            b() { text }
+        else "empty"
+    }
+
+[<SolidComponent>]
+let MatchTwoElements (kind: Kind) =
+    div() {
+        match kind with
+        | Alpha ->
+            span() { "one" }
+            b() { "two" }
+        | _ ->
+            i() { "three" }
+            strong() { "four" }
+    }
+
+[<SolidComponent>]
+let LetThreeChildren (text: string) =
+    div() {
+        let upper = text.ToUpper()
+        span() { upper }
+        "middle"
+        b() { text }
+    }
+
+[<SolidComponent>]
+let NestedLocalTwoChildren (text: string) =
+    div() {
+        span() {
+            let upper = text.ToUpper()
+            b() { upper }
+            i() { text }
+        }
+        "tail"
+    }
+
+[<SolidComponent>]
+let AttributeUnionMatch (kind: Kind) =
+    div(title = (match kind with Beta text -> text | Alpha -> "alpha" | Other -> "other")) { "body" }
+
+[<SolidComponent>]
+let AttributeArrayBranch (flag: bool) =
+    div(title = (String.concat ":" [| "head"; (if flag then "yes" else "no"); "tail" |])) { "body" }
+
+[<SolidComponent>]
+let AttributeArrayUnion (kind: Kind) =
+    div(title = (String.concat ":" [| "head"; (match kind with Beta text -> text | _ -> "empty"); "tail" |])) { "body" }
+
+[<SolidComponent>]
+let AttributeArrayComprehension (flag: bool) =
+    div(title = (String.concat ":" [|
+        yield "head"
+        if flag then yield "yes"
+        yield "tail"
+    |])) { "body" }
+
+[<SolidComponent>]
+let AttributeUserThunk (flag: bool) =
+    let choose (f: unit -> string) = f()
+    div(title = choose (fun () -> if flag then "yes" else "no")) { "body" }

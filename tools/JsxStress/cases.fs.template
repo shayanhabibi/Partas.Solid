@@ -1,0 +1,188 @@
+module Stress
+
+open __LIB__.Solid
+
+type Kind = Alpha | Beta of string | Other
+
+[<SolidComponent>]
+let Baseline () = div() { span() { "one" }; "two" }
+
+[<SolidComponent>]
+let IfOnly (flag: bool) = div() { if flag then span() { "yes" } }
+
+[<SolidComponent>]
+let IfElse (flag: bool) = div() { if flag then span() { "yes" } else b() { "no" } }
+
+[<SolidComponent>]
+let IfText (flag: bool) = div() { if flag then "yes" else "no" }
+
+[<SolidComponent>]
+let IfMixed (flag: bool) = div() { if flag then span() { "yes" } else "no" }
+
+[<SolidComponent>]
+let IfBeforeSibling (flag: bool) =
+    div() {
+        if flag then span() { "yes" }
+        b() { "tail" }
+    }
+
+[<SolidComponent>]
+let IfAfterSibling (flag: bool) = div() { b() { "head" }; if flag then span() { "yes" } }
+
+[<SolidComponent>]
+let IfBetweenSiblings (flag: bool) =
+    div() {
+        b() { "head" }
+        if flag then span() { "yes" } else i() { "no" }
+        b() { "tail" }
+    }
+
+[<SolidComponent>]
+let NestedIf (a: bool) (second: bool) =
+    div() {
+        if a then
+            if second then span() { "ab" } else i() { "a" }
+        else "none"
+    }
+
+[<SolidComponent>]
+let MatchOnly (kind: Kind) = div() { match kind with Alpha -> span() { "a" } | Beta s -> b() { s } | Other -> i() { "o" } }
+
+[<SolidComponent>]
+let MatchGuard (kind: Kind) =
+    div() {
+        match kind with
+        | Beta s when s.Length > 2 -> span() { s }
+        | Alpha | Other -> b() { "other" }
+        | Beta s -> i() { s }
+    }
+
+[<SolidComponent>]
+let LetText (text: string) = div() { let upper = text.ToUpper() in span() { upper } }
+
+[<SolidComponent>]
+let LetSibling (text: string) =
+    div() {
+        "head"
+        let upper = text.ToUpper()
+        span() { upper }
+        "tail"
+    }
+
+[<SolidComponent>]
+let LetInBranch (flag: bool) (text: string) =
+    div() {
+        if flag then
+            let upper = text.ToUpper()
+            span() { upper }
+        else "no"
+    }
+
+[<SolidComponent>]
+let StatementInBranch (flag: bool) (log: string -> unit) =
+    div() {
+        if flag then
+            log "effect"
+            span() { "yes" }
+        else "no"
+    }
+
+[<SolidComponent>]
+let StatementInMatch (kind: Kind) (log: string -> unit) =
+    div() {
+        match kind with
+        | Alpha ->
+            log "effect"
+            span() { "yes" }
+        | _ -> "no"
+    }
+
+[<SolidComponent>]
+let StatementBefore (log: string -> unit) = div() { log "before"; span() { "yes" } }
+
+[<SolidComponent>]
+let StatementBetween (log: string -> unit) = div() { span() { "head" }; log "middle"; b() { "tail" } }
+
+[<SolidComponent>]
+let StatementAfter (log: string -> unit) = div() { span() { "yes" }; log "after" }
+
+[<SolidComponent>]
+let ExplicitYield (flag: bool) =
+    div() {
+        yield "head"
+        if flag then yield span() { "yes" }
+        yield "tail"
+    }
+
+[<SolidComponent>]
+let ArrayMap (items: string[]) = items |> Array.map (fun s -> span() { s })
+
+[<SolidComponent>]
+let ListMap (items: string list) = items |> List.map (fun s -> span() { s })
+
+[<SolidComponent>]
+let ArrayLiteral () : HtmlElement[] = [| span() { "one" }; b() { "two" } |]
+
+[<SolidComponent>]
+let ListLiteral () : HtmlElement list = [ span() { "one" }; b() { "two" } ]
+
+[<SolidComponent>]
+let SeqExpression (items: string[]) = seq { for s in items do yield span() { s } }
+
+[<SolidComponent>]
+let LambdaReturn () = fun () -> span() { "lazy" }
+
+[<SolidComponent>]
+let LetElement () =
+    let child = span() { "bound" }
+    div() { child }
+
+[<SolidComponent>]
+let LetElementInCe () = div() { let child = span() { "bound" } in child }
+
+[<SolidComponent>]
+let FunctionLocal (text: string) =
+    let make (s: string) = span() { s }
+    div() { make text }
+
+[<SolidComponent>]
+let AttributeBranch (flag: bool) = div(title = (if flag then "yes" else "no")) { "body" }
+
+[<SolidComponent>]
+let AttributeQuotes () = div(title = "a\"b\n<&") { "body" }
+
+[<SolidComponent>]
+let AttributeLambda (log: string -> unit) = button(onClick = (fun _ -> log "click")) { "button" }
+
+[<SolidComponent>]
+let OutsideConditional (flag: bool) = if flag then div() { "yes" } else div() { "no" }
+
+[<SolidComponent>]
+let OutsideMatch (kind: Kind) = match kind with Alpha -> div() { "yes" } | _ -> div() { "no" }
+
+[<SolidComponent>]
+let TryExpression (flag: bool) =
+    try
+        if flag then failwith "bad"
+        div() { "ok" }
+    with _ -> div() { "caught" }
+
+[<SolidComponent>]
+let TryFinally (log: string -> unit) =
+    try div() { "ok" }
+    finally log "finally"
+
+[<SolidComponent>]
+let NestedArrayBranch (flag: bool) : HtmlElement[] = [| if flag then span() { "yes" } else b() { "no" } |]
+
+[<SolidComponent>]
+let ArrayComprehension (items: string[]) = [| for s in items do if s.Length > 0 then yield span() { s } |]
+
+[<SolidComponent>]
+let MatchTuple (a: bool) (second: bool) =
+    div() {
+        match a,second with
+        | true,true -> span() { "both" }
+        | true,false | false,true -> b() { "one" }
+        | _ -> i() { "none" }
+    }

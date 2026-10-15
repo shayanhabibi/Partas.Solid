@@ -1,0 +1,134 @@
+module AstTriage
+open Partas.Solid
+type Kind = Alpha | Beta of string | Other
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let BranchChildren (flag: bool) =
+    div() {
+        if flag then
+            span() { "one" }
+            b() { "two" }
+        else "empty"
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let BranchExplicitChildren (flag: bool) =
+    div() {
+        if flag then
+            yield span() { "one" }
+            yield b() { "two" }
+        else yield "empty"
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let BranchDiscardElement (flag: bool) =
+    div() {
+        if flag then
+            do span() { "one" } |> ignore
+            b() { "two" }
+        else "empty"
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let BranchEffect (flag: bool) (log: string -> unit) =
+    div() {
+        if flag then
+            log "one"
+            b() { "two" }
+        else "empty"
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let BranchTexts (flag: bool) =
+    div() {
+        if flag then
+            "one"
+            "two"
+        else "empty"
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let BranchDiscardText (flag: bool) =
+    div() {
+        if flag then
+            do "one" |> ignore
+            "two"
+        else "empty"
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let BranchBoundChildren (flag: bool) (text: string) =
+    div() {
+        if flag then
+            let upper = text.ToUpper()
+            span() { upper }
+            b() { text }
+        else "empty"
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let UnionPayload (kind: Kind) =
+    div() { match kind with Beta text -> span() { text } | _ -> "empty" }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let UnionLength (kind: Kind) =
+    div() { match kind with Beta text -> span() { text.Length } | _ -> "empty" }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let OmittedArrayItem (flag: bool) =
+    div(title = String.concat ":" [|
+        yield "head"
+        if flag then yield "yes"
+        yield "tail"
+    |]) { "body" }
+
+[<SolidComponent(ComponentFlag.DebugMode ||| ComponentFlag.SkipCEOptimisation)>]
+let OmittedArrayItemSkip (flag: bool) =
+    div(title = String.concat ":" [|
+        yield "head"
+        if flag then yield "yes"
+        yield "tail"
+    |]) { "body" }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let IdentityCallback () =
+    button(onClick = ignore) { "body" }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let DiscardedCall (produce: unit -> HtmlElement) =
+    div() {
+        do produce() |> ignore
+        "tail"
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let YieldedCall (produce: unit -> HtmlElement) =
+    div() {
+        yield produce()
+        "tail"
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let FragmentBranch (flag: bool) =
+    div() {
+        if flag then
+            Fragment() {
+                span() { "one" }
+                b() { "two" }
+            }
+        else "empty"
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let LocalOutsideCe (text: string) =
+    let upper = text.ToUpper()
+    div() {
+        span() { upper }
+        b() { text }
+    }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let CallsOpaqueHelper () = div() { AstTriageHelpers.OpaqueHelper() }
+
+[<SolidComponent(ComponentFlag.DebugMode)>]
+let CallsAnnotatedHelper () = div() { AstTriageHelpers.AnnotatedHelper() }
