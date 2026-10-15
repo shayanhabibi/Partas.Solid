@@ -1,0 +1,3 @@
+interface:
+  display_name: "Partas.Solid"
+  short_description: "Build F# apps with the Partas.Solid DSL"
