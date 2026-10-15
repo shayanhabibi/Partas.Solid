@@ -18,7 +18,7 @@ member props.View = div () { "..." }
 | `ComponentFlag.DebugMode` | `0b0001` | Prints the component's AST before the plugin transforms it. |
 | `ComponentFlag.SkipPojoOptimisation` | `0b0010` | Turns off the `[<Pojo>]` constructor optimisation. |
 | `ComponentFlag.PrintDisposals` | `0b0100` | Logs every expression the plugin discards. Noisy. |
-| `ComponentFlag.SkipCEOptimisation` | `0b1000` | Turns off the optimisation of computation expressions and lists. |
+| `ComponentFlag.SkipCEOptimisation` | `0b1000` | Keeps attribute array computations instead of unrolling them into array literals. |
 | `ComponentFlag.SkipOmit` | `0b0001_0000` | Leaves out the `PARTAS_OTHERS = omit(...)` binding. Type components only. |
 | `ComponentFlag.SpreadProps` | `0b0010_0000` | Makes `.spread` on the self identifier spread the whole props object. Type components only. |
 
@@ -48,11 +48,12 @@ This flag turns that off. Use it if the optimisation breaks a component.
 :::
 
 :::details SkipCEOptimisation
-The plugin removes computation expression plumbing around lists and children, so the output is a plain array or
-plain JSX children rather than a chain of builder calls.
+Recognized attribute array computations compile to array literals. A branch yielding one item on each side becomes
+a ternary item; optional or multiple items become spreads such as `...(flag ? ["one", "two"] : [])`.
+Bindings and side effects keep their scope and evaluation order. Unrecognized sequence shapes retain their original
+Fable helper calls, and F# lists remain lists.
 
-This flag turns that off. Fable 5 handles most of these shapes itself. Use the flag if the optimisation produces
-wrong code, and report it.
+This flag disables attribute array unrolling. Element builders always compile to JSX children.
 :::
 
 ## SkipOmit and SpreadProps

@@ -88,13 +88,17 @@ function jsxPlugin() {
     if(index !== all.length - 1) s = s.trimEnd();
     return s;
   }).filter(Boolean).join(' ');
+  const childrenOf = el => el.children.flatMap(c => c.type === 'JSXText' ? (text(c.value) ? [t.stringLiteral(text(c.value))] : []) : c.type === 'JSXExpressionContainer' ? (c.expression.type === 'JSXEmptyExpression' ? [] : [c.expression]) : [c]);
   return {visitor: {
     ExportNamedDeclaration(p) { p.replaceWith(p.node.declaration); },
     JSXElement: {exit(p) {
       const el = p.node;
       const props = el.openingElement.attributes.map(a => t.objectProperty(t.stringLiteral(a.name.name), a.value === null ? t.booleanLiteral(true) : a.value.type === 'JSXExpressionContainer' ? a.value.expression : a.value));
-      const children = el.children.flatMap(c => c.type === 'JSXText' ? (text(c.value) ? [t.stringLiteral(text(c.value))] : []) : c.type === 'JSXExpressionContainer' ? (c.expression.type === 'JSXEmptyExpression' ? [] : [c.expression]) : [c]);
+      const children = childrenOf(el);
       p.replaceWith(t.callExpression(t.identifier('__jsx'), [name(el.openingElement.name),t.objectExpression(props),t.arrayExpression(children)]));
+    }},
+    JSXFragment: {exit(p) {
+      p.replaceWith(t.arrayExpression(childrenOf(p.node)));
     }}
   }};
 }

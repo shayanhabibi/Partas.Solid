@@ -51,6 +51,7 @@ let CardDemo () =
 
 - [Installation](../guide/installation.md): set up a project.
 - [Benefits of JSX output](jsx-output.md): what the compiled output looks like and why it matters.
+- [Comparing JSX with Oxpecker](oxpecker-comparison.md): tested F# inputs and generated output from both libraries.
 - [The Oxpecker fork](oxpecker-fork.md): why this is a fork of Lanayx's [Oxpecker.Solid](https://github.com/lanayx/oxpecker),
   and how the two differ.
 - [Migrating to Solid 2](../guide/migrating-to-solid-2.md): if you are coming from Partas.Solid 2.x.

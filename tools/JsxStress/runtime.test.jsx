@@ -21,16 +21,13 @@ describe('differential output under the Solid 2 DOM compiler',()=>{
   it('hand-written JSX preserves both branch children',()=>{
     expect(mount(()=><div><span>one</span><b>two</b></div>)).toBe('<div><span>one</span><b>two</b></div>');
   });
-  // BUG: Partas lowers multiple branch children to a comma expression.
-  it.fails('Partas preserves both conditional branch children',()=>{
+  it('Partas preserves both conditional branch children',()=>{
     expect(mount(()=>IfTwoElements(true))).toBe('<div><span>one</span><b>two</b></div>');
   });
-  // BUG: Partas drops the bound child before a following sibling.
-  it.fails('Partas retains a bound child and following sibling',()=>{
+  it('Partas retains a bound child and following sibling',()=>{
     expect(mount(()=>LetSibling('hello'))).toBe('<div>head<span>HELLO</span>tail</div>');
   });
-  // BUG: Partas inserts an empty array entry in place of omission.
-  it.fails('Partas omits a false array-comprehension branch',()=>{
+  it('Partas omits a false array-comprehension branch',()=>{
     expect(mount(()=>PartasArray(false))).toBe('<div title="head:tail">body</div>');
   });
   it('Oxpecker omits a false array-comprehension branch',()=>{
@@ -39,8 +36,7 @@ describe('differential output under the Solid 2 DOM compiler',()=>{
   it('Oxpecker preserves a matched union payload',()=>{
     expect(mount(()=>OxpeckerMatch(new OxpeckerKind(1,['hello'])))).toBe('<div><b>hello</b></div>');
   });
-  // BUG: Partas substitutes the union object for its string field.
-  it.fails('Partas preserves a matched union payload',()=>{
+  it('Partas preserves a matched union payload',()=>{
     expect(mount(()=>PartasMatch(new PartasKind(1,['hello'])))).toBe('<div><b>hello</b></div>');
   });
   it('Partas preserves a statement and following child',()=>{

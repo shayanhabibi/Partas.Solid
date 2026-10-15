@@ -1,6 +1,6 @@
 # Differential JSX stress corpus
 
-Read the [findings](../../docs/research/solid-jsx-stress-test.md). This investigation
+Read the [comparison and examples](../../docs/site/content/about/oxpecker-comparison.md). This investigation
 harness changes no framework sources or tool pins.
 
 From the repository root, install prerequisites once:
@@ -28,11 +28,13 @@ the survey ran, not whether every library probe passed. Inspect `results.json` a
 the printed failures. Oxpecker's aggregate compilation exits 1 because it explicitly
 rejects five isolated files; other emitted files remain usable for the survey.
 Case output is cleared first to prevent stale successes. Generated work is under
-`.research/jsx-stress`; the snapshot command writes durable evidence to `docs/research`.
+`.research/jsx-stress`; the snapshot command writes local evidence there too.
 
 The DOM checks use the real Solid 2 rc.14 compiler/runtime for shared intrinsic JSX.
 They do not claim Oxpecker binds Solid 2 APIs. Known defects retain correct assertions
-with `it.fails`; five expected failures and five control checks are the recorded result.
+with `it.fails`; the current result is nine passing assertions and one expected Oxpecker failure.
+`snapshot.mjs` accepts an optional output path; omitting it writes `.research/jsx-stress/evidence.json`.
+AST triage evidence also stays local under `.research/ast-triage/`.
 
 `check.mjs` reruns the semantic oracle without compilation. Its JSX lowering uses
 inert trees and actual Fable collection helpers, independently of Solid versions.

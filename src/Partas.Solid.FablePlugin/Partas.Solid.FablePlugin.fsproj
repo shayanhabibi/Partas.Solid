@@ -20,6 +20,7 @@
     <Compile Include="Utils.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="Spec.fs" />
+    <Compile Include="ReactiveMatch.fs" />
     <Compile Include="Plugin.fs" />
     <Compile Include="Storybook.fs" />
   </ItemGroup>

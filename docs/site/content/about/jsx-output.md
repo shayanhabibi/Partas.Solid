@@ -128,6 +128,9 @@ whether it says what you meant. If it does not, [submit an issue](../contributin
 
 ## Comparing Fable/Feliz output with Partas.Solid
 
+For the same F# input compiled through two Solid DSLs, see [Comparing JSX with Oxpecker](oxpecker-comparison.md).
+It shows captured output for branches, local bindings, collection callbacks, statements, and attribute escaping.
+
 Here is a sidebar, compiled with Feliz:
 
 ```js

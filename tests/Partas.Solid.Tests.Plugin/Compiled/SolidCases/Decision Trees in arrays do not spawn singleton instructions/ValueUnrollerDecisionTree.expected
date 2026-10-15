@@ -8,12 +8,14 @@ export function Lib_cn_Z35CD86D0(classes) {
 }
 
 export function ValueUnrollTest(props) {
+    let matchValue;
     const PARTAS_OTHERS = omit(props, "variant");
-    return <div class={Lib_cn_Z35CD86D0(["bg-primary", (props.variant === "black") ? "black" : ((props.variant === "green") ? "green" : "brown")])} />;
+    return <div class={Lib_cn_Z35CD86D0(["bg-primary", (matchValue = props.variant, (matchValue === "black") ? "black" : ((matchValue === "green") ? "green" : "brown"))])} />;
 }
 
 export function ValueUnrollNestedTest(props) {
+    let matchValue, matchValue_1;
     const PARTAS_OTHERS = omit(props, "variant", "altVariant");
-    return <div class={Lib_cn_Z35CD86D0(["bg-primary", (props.variant === "black") ? ((props.altVariant === "blue") ? "black & blue" : "black") : ((props.variant === "green") ? ((props.altVariant === "orange") ? "orange & blue" : ((props.altVariant === "yellow") ? "yellow & blue" : "green & blue")) : "brown")])} />;
+    return <div class={Lib_cn_Z35CD86D0(["bg-primary", (matchValue = props.variant, (matchValue === "black") ? ((props.altVariant === "blue") ? "black & blue" : "black") : ((matchValue === "green") ? ((matchValue_1 = props.altVariant, (matchValue_1 === "orange") ? "orange & blue" : ((matchValue_1 === "yellow") ? "yellow & blue" : "green & blue"))) : "brown"))])} />;
 }
 

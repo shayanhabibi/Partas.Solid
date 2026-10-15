@@ -30,6 +30,6 @@ const excerpts = Object.fromEntries(names.map((name,index)=>{
 const evidence = {renderingContract:'Partas retains F#-discarded expressions in JSX children. DiscardedCall and YieldedCall emitting the same child expression is expected, not a bug.',fable:'5.21.0',exitCode:result.status,inputs:fs.readFileSync(path.join(dir,'Probes.fs'),'utf8'),excerpts,
   output:fs.readFileSync(path.join(dir,'Probes.fs.jsx'),'utf8'),helpers:fs.readFileSync(path.join(dir,'Helpers.fs.jsx'),'utf8'),
   note:'Pre-transform DebugMode excerpts, including nearby metadata; full AST dumps are regenerated under .research/ast-triage. Excerpts are not a complete-AST equivalence test.'};
-fs.writeFileSync(path.join(root,'docs/research/solid-jsx-ast-evidence.json'),JSON.stringify(evidence,null,2).replaceAll(root.replaceAll('\\','/'),'<repo>')+'\n');
+fs.writeFileSync(path.join(dir,'evidence.json'),JSON.stringify(evidence,null,2).replaceAll(root.replaceAll('\\','/'),'<repo>')+'\n');
 console.log({exitCode:result.status,dumps:dumps.length,names,log:'.research/ast-triage/compile.log'});
 process.exitCode = result.status ?? 1;

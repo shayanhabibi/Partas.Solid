@@ -6,29 +6,34 @@
         <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="Site.fs"/>
-        <Content Include="content\**" CopyToOutputDirectory="Never"/>
+        <Compile Include="Site.fs" />
+        <Content Include="content\**" CopyToOutputDirectory="Never" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Nacara.Core" Version="2.0.0-*"/>
-        <PackageReference Include="Nacara.Plugin.Markdown" Version="1.0.0-*"/>
-        <PackageReference Include="Nacara.Plugin.Highlight.TreeSitter" Version="1.0.0-*"/>
-        <PackageReference Include="Nacara.Plugin.Sitemap" Version="1.0.0-*"/>
-        <PackageReference Include="Nacara.Plugin.LinkValidator" Version="1.0.0-*"/>
-        <PackageReference Include="Nacara.Plugin.Versions" Version="1.0.0-*"/>
-        <PackageReference Include="Nacara.Plugin.Assets.Esbuild" Version="1.0.0-*"/>
-        <PackageReference Include="Nacara.Plugin.Assets.Nuglify" Version="1.0.0-*"/>
-        <PackageReference Include="Nacara.Plugin.Deploy.GitHubPages" Version="1.0.0-*"/>
+        <PackageReference Include="Nacara.Core" Version="2.0.0-*" />
+        <PackageReference Include="Nacara.Plugin.Markdown" Version="1.0.0-*" />
+        <PackageReference Include="Nacara.Plugin.Highlight.TreeSitter" Version="1.0.0-*" />
+        <PackageReference Include="Nacara.Plugin.Literate" Version="1.0.0-*" />
+        <PackageReference Include="Nacara.Plugin.Sitemap" Version="1.0.0-*" />
+        <PackageReference Include="Nacara.Plugin.LinkValidator" Version="1.0.0-*" />
+        <PackageReference Include="Nacara.Plugin.Versions" Version="1.0.0-*" />
+        <PackageReference Include="Nacara.Plugin.Assets.Esbuild" Version="1.0.0-*" />
+        <PackageReference Include="Nacara.Plugin.Assets.Nuglify" Version="1.0.0-*" />
+        <PackageReference Include="Nacara.Plugin.Deploy.GitHubPages" Version="1.0.0-*" />
     </ItemGroup>
     <!-- The theme is built from Partas.Nacara.Plugins and committed under feed/, until it is published. -->
     <ItemGroup>
         <!-- The feed's Partas.Nacara packages were built with the .NET 11 SDK and need FSharp.Core 11;
              without this, an older SDK's implicit FSharp.Core wins and the site fails to start. -->
-        <PackageReference Include="FSharp.Core" Version="11.0.101-rc1.26425.128"/>
-        <PackageReference Include="Partas.Nacara.Theme" Version="0.2.0-local.44d0693"/>
+        <PackageReference Include="FSharp.Core" Version="11.0.101-rc1.26425.128" />
+        <PackageReference Include="Partas.Nacara.Theme" Version="0.2.0-local.44d0693" />
     </ItemGroup>
     <!-- The live examples plugin lives in this repository, so the docs build it from source. -->
     <ItemGroup>
-        <ProjectReference Include="..\..\tools\Partas.Nacara.Plugins.Solid\Partas.Nacara.Plugins.Solid.fsproj"/>
+        <ProjectReference Include="..\..\tools\Partas.Nacara.Plugins.Solid\Partas.Nacara.Plugins.Solid.fsproj" />
+        <!-- Not referenced: built so literate.fsx can #r its Release output when type-checking the .fsx pages. -->
+        <ProjectReference Include="..\..\src\Partas.Solid\Partas.Solid.fsproj"
+                          ReferenceOutputAssembly="false"
+                          SetConfiguration="Configuration=Release" />
     </ItemGroup>
 </Project>

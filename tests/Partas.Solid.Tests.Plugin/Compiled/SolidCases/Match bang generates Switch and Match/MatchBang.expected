@@ -1,0 +1,123 @@
+
+import { Union } from "../../fable_modules/fable-library-js.5.13.0/Types.js";
+import { union_type, int32_type, string_type } from "../../fable_modules/fable-library-js.5.13.0/Reflection.js";
+import { Match, Switch, createMemo } from "solid-js";
+
+export class State extends Union {
+    constructor(tag, fields) {
+        super();
+        this.tag = tag;
+        this.fields = fields;
+    }
+    cases() {
+        return ["Waiting", "Ready", "Failed"];
+    }
+    static Waiting = new State(0, []);
+}
+
+export function State_$reflection() {
+    return union_type("Partas.Solid.Tests.MatchBang.State", [], State, () => [[], [["Item", string_type]], [["Item1", int32_type], ["Item2", string_type]]]);
+}
+
+export function View(state, expanded) {
+    const PARTAS_MATCH_SELECTION_1 = createMemo(() => {
+        const _arg = state();
+        return (_arg.tag === 1) ? ((_arg.fields[0].length > 2) ? {
+            arm: 1,
+            values: [_arg, _arg.fields[0]],
+        } : {
+            arm: 2,
+            values: [_arg, _arg.fields[0]],
+        }) : ((_arg.tag === 2) ? {
+            arm: 3,
+            values: [_arg, _arg.fields[0], _arg.fields[1]],
+        } : {
+            arm: 0,
+            values: [_arg],
+        });
+    }, {
+        lazy: true,
+    });
+    return <div>
+        <h1>
+            Status
+        </h1>
+        <Switch>
+            <Match keyed={false}
+                when={PARTAS_MATCH_SELECTION_1().arm === 0 ? PARTAS_MATCH_SELECTION_1().values : undefined}>
+                {(PARTAS_MATCH_VALUES_1) => <span>
+                    Waiting
+                </span>}
+            </Match>
+            <Match keyed={false}
+                when={PARTAS_MATCH_SELECTION_1().arm === 1 ? PARTAS_MATCH_SELECTION_1().values : undefined}>
+                {(PARTAS_MATCH_VALUES_1) => {
+                    const PARTAS_MATCH_SELECTION_2 = createMemo(() => {
+                        const _arg_1 = expanded();
+                        return _arg_1 ? {
+                            arm: 0,
+                            values: [_arg_1],
+                        } : {
+                            arm: 1,
+                            values: [_arg_1],
+                        };
+                    }, {
+                        lazy: true,
+                    });
+                    return <section>
+                        <Switch>
+                            <Match keyed={false}
+                                when={PARTAS_MATCH_SELECTION_2().arm === 0 ? PARTAS_MATCH_SELECTION_2().values : undefined}>
+                                {(PARTAS_MATCH_VALUES_2) => <strong>
+                                    {PARTAS_MATCH_VALUES_1()[1]}
+                                </strong>}
+                            </Match>
+                            <Match keyed={false}
+                                when={PARTAS_MATCH_SELECTION_2().arm === 1 ? PARTAS_MATCH_SELECTION_2().values : undefined}>
+                                {(PARTAS_MATCH_VALUES_2) => <i>
+                                    {PARTAS_MATCH_VALUES_1()[1]}
+                                </i>}
+                            </Match>
+                        </Switch>
+                    </section>;
+                }}
+            </Match>
+            <Match keyed={false}
+                when={PARTAS_MATCH_SELECTION_1().arm === 2 ? PARTAS_MATCH_SELECTION_1().values : undefined}>
+                {(PARTAS_MATCH_VALUES_1) => <b>
+                    {PARTAS_MATCH_VALUES_1()[1]}
+                </b>}
+            </Match>
+            <Match keyed={false}
+                when={PARTAS_MATCH_SELECTION_1().arm === 3 ? PARTAS_MATCH_SELECTION_1().values : undefined}>
+                {(PARTAS_MATCH_VALUES_1) => <>
+                    <span>
+                        {PARTAS_MATCH_VALUES_1()[1]}
+                    </span>
+                    <span>
+                        {PARTAS_MATCH_VALUES_1()[2]}
+                    </span>
+                </>}
+            </Match>
+        </Switch>
+    </div>;
+}
+
+export function OrdinaryMatch(state) {
+    let matchValue;
+    return <div>
+        {(matchValue = state(), (matchValue.tag === 1) ? <b>
+            {matchValue.fields[0]}
+        </b> : ((matchValue.tag === 2) ? <>
+            <span>
+                {matchValue.fields[0]}
+            </span>
+            <span>
+                {matchValue.fields[1]}
+            </span>
+        </> : <span>
+            Waiting
+        </span>))}
+    </div>;
+}
+

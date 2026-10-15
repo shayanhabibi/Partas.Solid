@@ -160,6 +160,7 @@ let theme =
         [
             Menu.page "about/index.md"
             Menu.page "about/jsx-output.md"
+            Menu.page "about/oxpecker-comparison.md"
             Menu.page "about/oxpecker-fork.md"
         ]
     |> Theme.menu
@@ -344,6 +345,8 @@ let private solidExamples (options: SolidExamplesOptions) =
     |> SolidExamples.solidVersion "2.0.0-rc.14"
     // Libraries the live examples import. Each change re-runs npm install in .nacara/partas-solid.
     |> SolidExamples.npm "animejs" "4.5.0"
+    // The landing page's demo. Served by the partas-animejs source in nuget.config.
+    |> SolidExamples.nuget "Partas.AnimeJs" "0.1.1"
     |> SolidExamples.npm "apexcharts" "7.6.0"
     |> SolidExamples.npm "motion-dom" "13.4.4"
     |> SolidExamples.npm "@neodrag/vanilla" "2.3.1"
@@ -361,6 +364,9 @@ let site =
     |> Site.staticFiles "static"
     |> Markdown.register
     |> TreeSitter.register
+    // content/**/*.fsx pages: type-checked against src/Partas.Solid through literate.fsx, and their
+    // (*** solid … ***) blocks become `fsharp solid …` fences for SolidExamples.
+    |> Literate.registerWith (Literate.extensions [ ".fsx" ])
     |> Sitemap.register
     |> LinkValidator.register
     |> SolidExamples.registerWith solidExamples

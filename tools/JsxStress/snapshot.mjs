@@ -26,5 +26,7 @@ const evidence = {
 };
 let serialized = JSON.stringify(evidence,null,2)+'\n';
 for(const spelling of [root,root.replaceAll('\\','/')]) serialized = serialized.replaceAll(JSON.stringify(spelling).slice(1,-1),'<repo>');
-fs.writeFileSync(path.join(root,'docs/research/solid-jsx-stress-evidence.json'),serialized);
+const output = path.resolve(root, process.argv[2] ?? '.research/jsx-stress/evidence.json');
+fs.writeFileSync(output,serialized);
+console.log(`Evidence: ${path.relative(root,output)}`);
 console.log(Object.fromEntries(Object.entries(groups).map(([key,value])=>[key,value.length])));
