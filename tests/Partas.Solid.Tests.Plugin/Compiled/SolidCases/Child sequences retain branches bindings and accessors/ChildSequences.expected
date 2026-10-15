@@ -1,0 +1,98 @@
+
+import { Union } from "../../fable_modules/fable-library-js.5.13.0/Types.js";
+import { union_type, int32_type, string_type } from "../../fable_modules/fable-library-js.5.13.0/Reflection.js";
+import { join } from "../../fable_modules/fable-library-js.5.13.0/String.js";
+
+export class Kind extends Union {
+    constructor(tag, fields) {
+        super();
+        this.tag = tag;
+        this.fields = fields;
+    }
+    cases() {
+        return ["Empty", "Text", "Pair"];
+    }
+    static Empty = new Kind(0, []);
+}
+
+export function Kind_$reflection() {
+    return union_type("Partas.Solid.Tests.ChildSequences.Kind", [], Kind, () => [[], [["Item", string_type]], [["Item1", int32_type], ["Item2", string_type]]]);
+}
+
+export function Payload(kind) {
+    return <div>
+        {(kind.tag === 2) ? (<span>
+            {kind.fields[0]}
+            {kind.fields[1]}
+        </span>) : ((kind.tag === 0) ? ("empty") : (<b>
+            {kind.fields[0].length}
+        </b>))}
+    </div>;
+}
+
+export function Branches(flag, log) {
+    return <div>
+        {flag ? (<>
+            {log("before")}
+            <span>
+                one
+            </span>
+            {log("between")}
+            <b>
+                two
+            </b>
+            {log("after")}
+        </>) : (<>
+            {"one"}
+            {"two"}
+        </>)}
+    </div>;
+}
+
+export function Binding(text) {
+    let upper;
+    return <div>
+        head
+        {(upper = text.toLocaleUpperCase(), <>
+            <span>
+                {upper}
+            </span>
+            {"middle"}
+            <b>
+                {text}
+            </b>
+            {"tail"}
+        </>)}
+    </div>;
+}
+
+export function Matched(kind) {
+    let upper;
+    return <div>
+        {(kind.tag === 1) ? ((kind.fields[0].length > 2) ? ((upper = kind.fields[0].toLocaleUpperCase(), <>
+            <b>
+                {upper}
+            </b>
+            <i>
+                {kind.fields[0]}
+            </i>
+        </>)) : (<>
+            {"no"}
+            <span>
+                payload
+            </span>
+        </>)) : (<>
+            {"no"}
+            <span>
+                payload
+            </span>
+        </>)}
+    </div>;
+}
+
+export function AttributeArray(flag) {
+    return <div title={join(":", ["head", ...(flag ? ["one", "two"] : []), "tail"])}>
+        body
+    </div>;
+}
+

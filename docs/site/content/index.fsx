@@ -1,8 +1,22 @@
+(**
 ---
 title: Partas
 layout: splash
 ---
+*)
+(*** hide ***)
+#load "../literate.fsx"
 
+open Partas.Solid
+open Fable.Core
+open Fable.Core.JsInterop
+
+(*** solid setup ***)
+open Fable.Core.TS
+open Partas.AnimeJs
+open Partas.Solid.Aria
+
+(**
 <section class="p-hero">
 <img class="p-hero__logo" src="/Partas.Solid/logo.png" alt="" width="88" height="88">
 <a class="p-hero__eyebrow" href="/Partas.Solid/guide/migrating-to-solid-2/"><span class="p-hero__eyebrow-tag">3.0</span> Partas.Solid now targets Solid 2 <span aria-hidden="true">→</span></a>
@@ -19,37 +33,37 @@ layout: splash
 
 ## Try it
 
-Every example on this site is compiled from its F# when the site is built. Fable and the Partas plugin produce JSX, Solid's compiler turns it into DOM code, and it runs in your browser. This one also uses anime.js from npm.
+Every example on this site is compiled from its F# when the site is built. Fable and the Partas plugin produce JSX, Solid's compiler turns it into DOM code, and it runs in your browser. This one also animates with anime.js, through [Partas.AnimeJs](https://github.com/shayanhabibi/partas.animejs).
+*)
 
-```fsharp solid setup
-open Fable.Core.TS
 
-[<Import("animate", "animejs")>]
-let animate (targets: obj, parameters: obj): obj = jsNative
-
-[<Import("stagger", "animejs")>]
-let stagger (step: int, parameters: obj): obj = jsNative
-```
-
+(**
 <div class="p-demo">
+*)
 
-```fsharp solid render=HeroCounter jsx
+(*** solid render=HeroCounter jsx ***)
 [<SolidComponent>]
 let HeroCounter () =
     let count, setCount = createSignal 0
     let mutable number: Dom.HTMLSpanElement = JS.undefined
     let mutable bars: Dom.HTMLDivElement = JS.undefined
 
-    let pop = {| scale = {| from = 1.4; ``to`` = 1 |}; ease = "outElastic(1, .5)" |}
-    let wave =
-        {| scaleY = {| from = 1; ``to`` = 2.6 |}; duration = 240
-           alternate = true; loop = 1
-           delay = stagger (30, {| from = "center" |}) |}
+    let pop = animation {
+        Transform.scale (Tween.fromTo 1.4 1.)
+        Animation.ease (Ease.named "outElastic(1, .5)")
+    }
+    let wave = animation {
+        Transform.scaleY (Tween.fromTo 1. 2.6)
+        Animation.duration 240.
+        Animation.alternate true
+        Animation.loop 1.
+        Animation.delay (Anime.stagger 30. (stagger { Stagger.from "center" }) |> unbox<Raw.DurationKeyframes.Item.Duration>)
+    }
 
     let bump () =
         setCount (count () + 1)
-        animate (number, pop) |> ignore
-        animate (bars.children, wave) |> ignore
+        Anime.animate (Target.element number) pop |> ignore
+        Anime.animate (U6.Case5 (bars.querySelectorAll "span" :> Dom.NodeList)) wave |> ignore
 
     div (class' = "p-demo__stage") {
         span(class' = "p-demo__count").ref (number) { $"{count ()}" }
@@ -60,8 +74,8 @@ let HeroCounter () =
             "Increment"
         }
     }
-```
 
+(**
 </div>
 
 ## Why Partas.Solid
@@ -69,11 +83,12 @@ let HeroCounter () =
 Write the whole front end in F#, and ship ordinary Solid code.
 
 <div class="p-cards">
+<a class="p-card" href="/Partas.Solid/guide/solid-component-attribute/#reactive-pattern-matching"><span class="p-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v12a3 3 0 0 0 3 3h9"/><path d="M6 6h12"/><path d="m15 3 3 3-3 3"/><path d="m15 15 3 3-3 3"/></svg></span><strong class="p-card__title">Reactive pattern matching</strong><p>Use <code>match!</code> with F# patterns and guards. The plugin generates Switch and Match, retaining the selected arm's DOM as its payload changes.</p></a>
 <a class="p-card" href="/Partas.Solid/guide/oxpecker-dsl/"><span class="p-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg></span><strong class="p-card__title">Typed DSL</strong><p>Tags, attributes, ARIA and SVG are typed F#. A misspelled attribute is a compile error.</p></a>
 <a class="p-card" href="/Partas.Solid/about/jsx-output/"><span class="p-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span><strong class="p-card__title">Compiles to JSX</strong><p>The plugin rewrites the F# AST into JSX, and Solid's compiler does the rest.</p></a>
 <a class="p-card" href="/Partas.Solid/guide/solid-js/"><span class="p-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></span><strong class="p-card__title">Solid 2 APIs</strong><p>Signals, memos, split effects, stores, Loading, Errored and actions are all bound.</p></a>
 <a class="p-card" href="/Partas.Solid/guide/solid-type-attribute/"><span class="p-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span><strong class="p-card__title">Components as types</strong><p>With [&lt;SolidTypeComponent&gt;], props get defaults, and the plugin writes the merge and omit for you.</p></a>
-<a class="p-card" href="/Partas.Solid/ecosystem/bindings/"><span class="p-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span><strong class="p-card__title">Any npm library</strong><p>Bind a package with [&lt;Import&gt;] and drive it through a ref, as the demo above does.</p></a>
+<a class="p-card" href="/Partas.Solid/ecosystem/bindings/"><span class="p-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span><strong class="p-card__title">Any npm library</strong><p>Bind a package with [&lt;Import&gt;], or use F# bindings like Partas.AnimeJs, and drive it through a ref, as the demo above does.</p></a>
 <a class="p-card" href="/Partas.Solid/about/oxpecker-fork/"><span class="p-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9v2c0 .6-.4 1-1 1H7c-.6 0-1-.4-1-1V9"/><path d="M12 12v3"/></svg></span><strong class="p-card__title">Oxpecker heritage</strong><p>An opinionated fork of Oxpecker.Solid. Components you write use the same DSL as native tags.</p></a>
 </div>
 
@@ -95,3 +110,4 @@ Open source F# front-end projects, built on Fable and Solid.
 <a class="p-btn p-btn--secondary" href="/Partas.Solid/guide/overview/">Overview</a>
 </div>
 </section>
+*)

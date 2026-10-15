@@ -156,6 +156,10 @@ module Builder =
     /// Alias used in the provided builder
     [<EB(EBState.Never)>]
     type HtmlContainerFun = HtmlContainer -> unit
+
+    /// <summary>Compiler marker for reactive element-builder bindings.</summary>
+    [<Emit("__PARTAS_MATCH__($0, $1)"); EB(EBState.Never)>]
+    let __PARTAS_MATCH__ (_value: 'T) (_continuation: 'T -> HtmlContainerFun): HtmlContainerFun = jsNative
     /// Alias used in the provided builder
     [<EB(EBState.Never)>]
     type FlowContainerFun<'A> = FlowContainer<'A> -> unit
@@ -186,6 +190,12 @@ module Builder =
 
 
     type HtmlContainer with
+        /// <summary>Renders <c>match!</c> arms as a Solid Switch with non-keyed Match children.</summary>
+        /// <remarks>The selected arm retains its DOM while its pattern-bound values update.</remarks>
+        [<Erase; EB(EBState.Never)>]
+        member inline _.Bind(PARTAS_MATCH_SOURCE: 'T, PARTAS_MATCH_CONT: 'T -> HtmlContainerFun): HtmlContainerFun =
+            __PARTAS_MATCH__ PARTAS_MATCH_SOURCE PARTAS_MATCH_CONT
+
         [<EB(EBState.Never)>]
         member inline _.Combine
             ([<InlineIfLambda>] (* do not change *) PARTAS_FIRST: HtmlContainerFun,

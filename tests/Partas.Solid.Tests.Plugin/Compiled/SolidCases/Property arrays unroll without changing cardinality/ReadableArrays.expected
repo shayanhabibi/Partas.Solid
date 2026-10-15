@@ -1,0 +1,15 @@
+
+import { join } from "../../fable_modules/fable-library-js.5.13.0/String.js";
+
+export function Simple(flag) {
+    return <div title={join(":", ["head", flag ? "yes" : "no", "tail"])}>
+        body
+    </div>;
+}
+
+export function Optional(flag) {
+    return <div title={join(":", ["head", ...(flag ? ["one", "two"] : []), "tail"])}>
+        body
+    </div>;
+}
+

@@ -69,8 +69,7 @@ type ComponentFlag =
     | SkipPojoOptimisation = 0b0010
     /// Noisy. Prints any expressions that are disposed of in transformation.
     | PrintDisposals = 0b0100
-    /// SolidComponents optimise out computation expressions, particularly of
-    /// lists etc. In Fable 5, this should be handled by the compiler.
+    /// <summary>Preserves attribute array computations instead of unrolling recognized sequences into array literals.</summary>
     | SkipCEOptimisation = 0b1000
     | SkipOmit = 0b0001_0000
     | SpreadProps = 0b0010_0000
@@ -99,6 +98,8 @@ type internal PluginContext =
       SetterCollector: (string * Expr) -> unit
       GetterCollector: string -> unit
       Flags: ComponentFlag
+      /// <summary>Per-component counter for generated reactive-match identifiers.</summary>
+      mutable MatchCounter: int
       mutable SelfIdentifier: string }
 
     member this.HasFlag flag =
@@ -130,6 +131,7 @@ module internal PluginContext =
               SetterCollector = fun _ -> ()
               GetterCollector = fun _ -> ()
               Flags = flags
+              MatchCounter = 0
               SelfIdentifier = null }
 
         { ctx with

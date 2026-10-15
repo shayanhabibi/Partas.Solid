@@ -25,10 +25,12 @@ export function LetBeforeChildren(items, log) {
         <KeyedFor each={items}>
             {(item, index) => {
                 const title = item.toLocaleUpperCase();
-                log(index);
-                return <li>
-                    {title}
-                </li>;
+                return <>
+                    {log(index)}
+                    <li>
+                        {title}
+                    </li>
+                </>;
             }}
         </KeyedFor>
     </ul>;
@@ -38,9 +40,12 @@ export function MatchBranchStatements(kind, log) {
     return <div>
         {(kind.tag === 1) ? (<i>
             ?
-        </i>) : ((log("alpha"), <b>
-            A
-        </b>))}
+        </i>) : (<>
+            {log("alpha")}
+            <b>
+                A
+            </b>
+        </>)}
     </div>;
 }
 

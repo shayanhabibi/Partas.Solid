@@ -88,6 +88,28 @@ Bindings for different libraries [Partas.Solid.Bindings](https://github.com/shay
 
 [//]: # (~~[Legacy Docs]&#40;http://shayanhabibi.github.io/partas-solid-docs/&#41;~~)
 
+### Reactive pattern matching with `match!` (3.0)
+
+Use F# patterns and guards to select reactive UI. Inside an element builder, `match!` generates Solid's `Switch`
+and non-keyed `Match` arms. Payload changes within the selected arm update its content while retaining its DOM.
+
+```fsharp
+open Partas.Solid
+
+[<SolidComponent>]
+let Status () =
+    let message, _ = createSignal (Some "Ready")
+    div () {
+        match! message () with
+        | Some text -> span () { text }
+        | None -> b () { "Waiting" }
+    }
+```
+
+Supply a reactive expression such as `message ()`; ordinary values stay static.
+See [reactive pattern matching](docs/site/content/guide/solid-component-attribute.md#reactive-pattern-matching)
+for the selection and binding semantics.
+
 
 <details>
     <summary>Aggressive transformation of AST</summary>
