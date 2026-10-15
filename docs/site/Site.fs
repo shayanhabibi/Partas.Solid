@@ -56,6 +56,7 @@ let theme =
                 [
                     Menu.page "guide/oxpecker-dsl.md"
                     Menu.page "guide/building-the-dom.md"
+                    Menu.page "guide/match-expression.md"
                     Menu.page "guide/api-differences.md"
                     Menu.page "guide/common-issues.md"
                 ]

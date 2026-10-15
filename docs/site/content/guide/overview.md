@@ -16,7 +16,7 @@ function in F#:
 
 Both tell the Fable plugin to rewrite the body into JSX. Without one, the DSL compiles to nothing useful.
 
-Inside element builders, [`match!`](solid-component-attribute.md#reactive-pattern-matching) turns F# patterns and
+Inside element builders, [`match!`](match-expression.md) turns F# patterns and
 guards into Solid `Switch` and `Match` arms. Supply a reactive expression to select the arm; changes to its
 pattern-bound payload update the content while preserving that arm's DOM.
 

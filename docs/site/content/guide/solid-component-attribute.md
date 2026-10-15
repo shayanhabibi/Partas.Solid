@@ -84,28 +84,9 @@ Fable 5.13.0; the differential JSX corpus also verifies Fable 5.21.0.
 
 ## Reactive pattern matching
 
-Inside an element builder, `match!` generates a Solid `Switch` with a non-keyed `Match` for each arm:
-
-```fsharp solid jsx
-[<SolidComponent>]
-let Status () =
-    let message, setMessage = createSignal (Some "Ready")
-    div () {
-        match! message () with
-        | Some text -> span () { text }
-        | None -> b () { "Waiting" }
-    }
-```
-
-Supply a reactive expression such as `message ()`; a static value stays static. Changing the value within the same
-arm updates its pattern-bound values while retaining that arm's DOM. Selecting another arm replaces its content.
-Pattern-bound reads in JSX and event callbacks use the selected Match's accessor.
-
-The plugin shares the source evaluation, guards, and pattern captures through a generated selection memo declared
-before the JSX in the surrounding component or render-callback scope. This avoids repeating a pattern decision
-for every Match. The memo tracks dependencies read by your expression; it does not turn ordinary values into signals.
-An ordinary `match` keeps its existing expression-based output. `match!` here is synchronous control flow, not an
-asynchronous computation.
+Use [`match!`](match-expression.md) inside an element builder to generate Solid `Switch` and non-keyed `Match`
+arms. The [match! expression guide](match-expression.md) covers patterns, guards, reactive payloads, and arm
+lifetime, with a live example and generated JSX.
 
 ## Tag values need a plugin scope
 

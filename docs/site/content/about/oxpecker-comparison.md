@@ -260,6 +260,6 @@ The repository retains the [harness and commands](https://github.com/shayanhabib
 to regenerate the comparison. Inputs live in the harness templates; generated JSX, compiler logs, per-scenario
 results, and optional evidence snapshots stay in the gitignored `.research/` directory.
 
-Partas also supports reactive [`match!`](../guide/solid-component-attribute.md#reactive-pattern-matching), with
+Partas also supports reactive [`match!`](../guide/match-expression.md), with
 separate snapshot and runtime coverage. It is outside this shared comparison corpus and is not included in the
 counts above.
