@@ -15,7 +15,7 @@
     <Authors>Shayan Habibi, Vladimir Schur and Contributors</Authors>
     <Copyright>Copyright (c) Shayan Habibi 2025, based on work by Vladimir Schur 2024</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>3.0.0-rc.1</Version>
+    <Version>3.0.0-rc.2</Version>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
